@@ -1,5 +1,7 @@
+from flask import redirect
 from flask import render_template
 from flask import request
+from flask import url_for
 
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
@@ -12,8 +14,13 @@ def get_locale():
 
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def root():
+    return redirect(url_for('home'))
+
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 
 @app.route('/about')
