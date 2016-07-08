@@ -1,2 +1,4 @@
 Flask==0.11.1
 Flask-Babel==0.11.1
+Flask-SQLAlchemy==2.1
+Flask-Migrate==1.8.0
