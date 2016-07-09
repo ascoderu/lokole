@@ -1,3 +1,11 @@
+{% macro nav_link_security(endpoint, name) %}
+  <li><a href="{{ url_for_security(endpoint) }}">{{ _(name) }}</a></li>
+{% endmacro %}
+
+{% macro nav_link(endpoint, name) %}
+  <li><a href="{{ url_for(endpoint) }}">{{ _(name) }}</a></li>
+{% endmacro %}
+
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -9,16 +17,16 @@
     </div>
     <div class="collapse navbar-collapse" id="navbar">
       <ul class="nav navbar-nav">
-        <li><a href="{{ url_for('home') }}">{{ _('Home') }}</a></li>
-        <li><a href="{{ url_for('about') }}">{{ _('About') }}</a></li>
-        <li><a href="{{ url_for('email') }}">{{ _('Email') }}</a></li>
+        {{ nav_link('home', 'Home') }}
+        {{ nav_link('about', 'About') }}
+        {{ nav_link('email', 'Email') }}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.is_authenticated %}
-        <li><a href="/logout">{{ _('Logout') }}</a></li>
+          {{ nav_link_security('logout', 'Logout') }}
         {% else %}
-        <li><a href="/login">{{ _('Login') }}</a></li>
-        <li><a href="/register">{{ _('Register') }}</a></li>
+          {{ nav_link_security('login', 'Login') }}
+          {{ nav_link_security('register', 'Register') }}
         {% endif %}
       </ul>
     </div>
