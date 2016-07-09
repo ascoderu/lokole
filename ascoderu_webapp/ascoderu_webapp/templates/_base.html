@@ -14,37 +14,9 @@
 </head>
 <body>
   <div class="container">
+    {% include '_nav.html' ignore missing with context %}
 
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">{{ _('Toggle navigation') }}</span>
-            <span class="glyphicon glyphicon-menu-hamburger"></span>
-          </button>
-          <a class="navbar-brand" href="#">{{ _('Ascoderu') }}</a>
-        </div>
-        <div class="collapse navbar-collapse" id="navbar">
-          <ul class="nav navbar-nav">
-            <li><a href="{{ url_for('home') }}">{{ _('Home') }}</a></li>
-            <li><a href="{{ url_for('about') }}">{{ _('About') }}</a></li>
-            <li><a href="{{ url_for('email') }}">{{ _('Email') }}</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            {% if current_user.is_authenticated %}
-            <li><a href="/logout">{{ _('Logout') }}</a></li>
-            {% else %}
-            <li><a href="/login">{{ _('Login') }}</a></li>
-            <li><a href="/register">{{ _('Register') }}</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    {% block content %}
-    {% endblock %}
-
+    {% block content %}{% endblock %}
   </div>
 </body>
 </html>
