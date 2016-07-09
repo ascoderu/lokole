@@ -2,6 +2,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask_security import login_required
 
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
@@ -26,3 +27,9 @@ def home():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/email')
+@login_required
+def email():
+    return render_template('email.html')
