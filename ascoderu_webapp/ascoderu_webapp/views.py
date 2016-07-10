@@ -40,7 +40,7 @@ def about():
 @login_required
 def welcome():
     user = current_user.name or current_user.email
-    flash(gettext('Welcome, %(user)s', user=user), category='info')
+    flash(gettext('Welcome, %(user)s', user=user), category='success')
     return redirect('/')
 
 
@@ -62,7 +62,7 @@ def email_new():
             subject=form.subject.data,
             body=form.body.data))
         db.session.commit()
-        flash(gettext('Email sent!'), category='info')
+        flash(gettext('Email sent!'), category='success')
         return redirect(url_for('email_outbox'))
 
     return render_template('email_new.html', form=form)
