@@ -36,6 +36,14 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/welcome')
+@login_required
+def welcome():
+    user = current_user.name or current_user.email
+    flash(gettext('Welcome, %(user)s', user=user), category='info')
+    return redirect('/')
+
+
 @app.route('/email')
 @login_required
 def email():
