@@ -5,7 +5,6 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from flask_babel import gettext
 from flask_security import current_user
 from flask_security import login_required
 
@@ -15,6 +14,7 @@ from ascoderu_webapp import db
 from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import User
 from config import LANGUAGES
+from config import ui
 
 from .forms import NewEmailForm
 
@@ -43,7 +43,7 @@ def about():
 @login_required
 def welcome():
     user = current_user.name or current_user.email
-    flash(gettext('Welcome, %(user)s', user=user), category='success')
+    flash(ui('welcome_user', user=user), category='success')
     return redirect('/')
 
 
@@ -60,8 +60,7 @@ def email_new():
     if form.validate_on_submit():
         is_to_local_user = User.exists(form.to.data)
         email_date = datetime.now() if is_to_local_user else None
-        flashed_message = ('Email sent!' if is_to_local_user
-                           else 'Email will be sent soon!')
+        message = ui('email_sent') if is_to_local_user else ui('email_delayed')
         next_endpoint = 'email_sent' if is_to_local_user else 'email_outbox'
 
         db.session.add(Email(
@@ -71,7 +70,7 @@ def email_new():
             subject=form.subject.data,
             body=form.body.data))
         db.session.commit()
-        flash(gettext(flashed_message), category='success')
+        flash(message, category='success')
         return redirect(url_for(next_endpoint))
 
     return render_template('email_new.html', form=form)

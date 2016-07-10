@@ -1,12 +1,33 @@
 # -*- coding: utf-8 -*-
 import os
 
+from flask_babel import gettext
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 LANGUAGES = {
     'en': 'English',
 }
+
+
+def ui(key, **kwargs):
+    message = {
+        'email_field': 'Name or Email',
+        'email_field_required': 'Please enter your name or email.',
+        'name_field': 'Name',
+        'name_field_required': 'Please enter your name.',
+        'email_to_field': 'To',
+        'email_to_field_required': 'Please specify a recipient.',
+        'email_to_field_invalid': 'Must be a user name or email address.',
+        'email_subject_field': 'Subject',
+        'email_body_field': 'Message',
+        'email_submit_field': 'Send',
+        'email_sent': 'Email sent!',
+        'email_delayed': 'Email will be sent soon!',
+        'welcome_user': 'Welcome, %(user)s!',
+    }[key]
+    return gettext(message, **kwargs)
+
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')

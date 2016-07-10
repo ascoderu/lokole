@@ -1,4 +1,3 @@
-from flask_babel import gettext
 from flask_security import LoginForm as BaseLoginForm
 from flask_security import RegisterForm as BaseRegisterForm
 from flask_wtf import Form
@@ -10,21 +9,8 @@ from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
+from config import ui
 from ascoderu_webapp.models import User
-
-
-MESSAGES = {
-    'email_field': gettext('Name or Email'),
-    'email_field_required': gettext('Please enter your name or email.'),
-    'name_field': gettext('Name'),
-    'name_field_required': gettext('Please enter your name.'),
-    'email_to_field': gettext('To'),
-    'email_to_field_required': gettext('Please specify a recipient.'),
-    'email_to_field_invalid': gettext('Must be a user name or email address.'),
-    'email_subject_field': gettext('Subject'),
-    'email_body_field': gettext('Message'),
-    'email_submit_field': gettext('Send'),
-}
 
 
 class EmailOrLocalUser(object):
@@ -41,29 +27,29 @@ class EmailOrLocalUser(object):
 
 class LoginForm(BaseLoginForm):
     email = StringField(
-        label=MESSAGES['email_field'],
-        validators=[DataRequired(MESSAGES['email_field_required'])])
+        label=ui('email_field'),
+        validators=[DataRequired(ui('email_field_required'))])
 
 
 class RegisterForm(BaseRegisterForm):
     email = StringField(
-        label=MESSAGES['name_field'],
-        validators=[DataRequired(MESSAGES['name_field_required'])])
+        label=ui('name_field'),
+        validators=[DataRequired(ui('name_field_required'))])
 
 
 class NewEmailForm(Form):
     to = StringField(
-        label=MESSAGES['email_to_field'],
-        validators=[DataRequired(MESSAGES['email_to_field_required']),
-                    EmailOrLocalUser(MESSAGES['email_to_field_invalid'])])
+        label=ui('email_to_field'),
+        validators=[DataRequired(ui('email_to_field_required')),
+                    EmailOrLocalUser(ui('email_to_field_invalid'))])
 
     subject = StringField(
-        label=MESSAGES['email_subject_field'],
+        label=ui('email_subject_field'),
         validators=[Optional()])
 
     body = TextAreaField(
-        label=MESSAGES['email_body_field'],
+        label=ui('email_body_field'),
         validators=[Optional()])
 
     submit = SubmitField(
-        label=MESSAGES['email_submit_field'])
+        label=ui('email_submit_field'))
