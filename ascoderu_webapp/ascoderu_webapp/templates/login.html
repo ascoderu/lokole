@@ -12,4 +12,7 @@
     {{ render_field_with_label_and_errors(login_user_form.password) }}
     {{ render_button(login_user_form.submit) }}
   </form>
+
+  {{ _("Don't have an account?") }}
+  <a href="{{ url_for_security('register') }}">{{ _('Register now!')}}</a>
 {% endblock %}
