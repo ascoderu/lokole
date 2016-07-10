@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -11,6 +13,7 @@ from ascoderu_webapp import app
 from ascoderu_webapp import babel
 from ascoderu_webapp import db
 from ascoderu_webapp.models import Email
+from ascoderu_webapp.models import User
 from config import LANGUAGES
 
 from .forms import NewEmailForm
@@ -55,15 +58,21 @@ def email():
 def email_new():
     form = NewEmailForm(request.form)
     if form.validate_on_submit():
+        is_to_local_user = User.exists(form.to.data)
+        email_date = datetime.now() if is_to_local_user else None
+        flashed_message = ('Email sent!' if is_to_local_user
+                           else 'Email will be sent soon!')
+        next_endpoint = 'email_sent' if is_to_local_user else 'email_outbox'
+
         db.session.add(Email(
-            date=None,
+            date=email_date,
             to=[form.to.data],
-            sender=current_user.email,
+            sender=current_user.email or current_user.name,
             subject=form.subject.data,
             body=form.body.data))
         db.session.commit()
-        flash(gettext('Email sent!'), category='success')
-        return redirect(url_for('email_outbox'))
+        flash(gettext(flashed_message), category='success')
+        return redirect(url_for(next_endpoint))
 
     return render_template('email_new.html', form=form)
 
@@ -72,7 +81,7 @@ def email_new():
 @login_required
 def email_inbox():
     emails = [mail for mail in Email.query.all()
-              if current_user.email in mail.to]
+              if current_user.email in mail.to or current_user.name in mail.to]
 
     return render_template('email.html', emails=emails, is_outgoing=False)
 
@@ -80,8 +89,9 @@ def email_inbox():
 @app.route('/email/outbox')
 @login_required
 def email_outbox():
-    emails = [mail for mail in Email.query.all()
-              if current_user.email == mail.sender and mail.date is None]
+    emails = Email.query.filter(Email.date.is_(None) &
+                                (Email.sender.is_(current_user.email) |
+                                 Email.sender.is_(current_user.name)))
 
     return render_template('email.html', emails=emails, is_outgoing=True)
 
@@ -89,7 +99,8 @@ def email_outbox():
 @app.route('/email/sent')
 @login_required
 def email_sent():
-    emails = [mail for mail in Email.query.all()
-              if current_user.email == mail.sender and mail.date is not None]
+    emails = Email.query.filter(Email.date.isnot(None) &
+                                (Email.sender.is_(current_user.email) |
+                                 Email.sender.is_(current_user.name)))
 
     return render_template('email.html', emails=emails, is_outgoing=True)
