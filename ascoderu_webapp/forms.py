@@ -13,6 +13,15 @@ from ascoderu_webapp.controllers import user_exists
 from config import ui
 
 
+class UserDoesNotAlreadyExist(object):
+    def __init__(self, message=None):
+        self.message = message
+
+    def __call__(self, form, field):
+        if user_exists(field.data):
+            raise ValidationError(self.message)
+
+
 class EmailOrLocalUser(object):
     def __init__(self, message=None):
         self.message = message
@@ -34,7 +43,8 @@ class LoginForm(BaseLoginForm):
 class RegisterForm(BaseRegisterForm):
     email = StringField(
         label=ui('name_field'),
-        validators=[DataRequired(ui('name_field_required'))])
+        validators=[DataRequired(ui('name_field_required')),
+                    UserDoesNotAlreadyExist(ui('name_field_already_exists'))])
 
 
 class NewEmailForm(Form):

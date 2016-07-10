@@ -16,6 +16,7 @@ def ui(key, **kwargs):
         'email_field_required': 'Please enter your name or email.',
         'name_field': 'Name',
         'name_field_required': 'Please enter your name.',
+        'name_field_already_exists': 'Sorry, this name is already in use.',
         'email_to_field': 'To',
         'email_to_field_required': 'Please specify a recipient.',
         'email_to_field_invalid': 'Must be a user name or email address.',
