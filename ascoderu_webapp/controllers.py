@@ -19,7 +19,7 @@ def sent_emails_for(user):
 
 def inbox_emails_for(user):
     return [mail for mail in Email.query.all()
-            if user.email in mail.to or user.name in mail.to]
+            if any(to == user.email or to == user.name for to in mail.to)]
 
 
 def new_email_for(user, to, subject, body):
