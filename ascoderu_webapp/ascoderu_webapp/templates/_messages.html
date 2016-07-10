@@ -1,0 +1,33 @@
+{% macro render_flashed_error(message) %}
+  <div class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <span class="sr-only">{{ _('Error') }}:</span>
+    {{ message }}
+  </div>
+{% endmacro %}
+
+{% macro render_flashed_info(message) %}
+  <div class="alert alert-info" role="alert">
+    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+    <span class="sr-only">{{ _('Information') }}:</span>
+    {{ message }}
+  </div>
+{% endmacro %}
+
+{% macro render_flashed_message(category, message) %}
+  {% if category == 'error' %}
+    {{ render_flashed_error(message) }}
+  {% elif category == 'info'  %}
+    {{ render_flashed_info(message) }}
+  {% endif %}
+{% endmacro %}
+
+{%- with messages = get_flashed_messages(with_categories=true) -%}
+  {% if messages %}
+    <ul class="flashes list-unstyled">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ render_flashed_message(category, message) }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{%- endwith %}
