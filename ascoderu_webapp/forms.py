@@ -9,8 +9,8 @@ from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
+from ascoderu_webapp.controllers import user_exists
 from config import ui
-from ascoderu_webapp.models import User
 
 
 class EmailOrLocalUser(object):
@@ -21,7 +21,7 @@ class EmailOrLocalUser(object):
         try:
             Email(self.message)(form, field)
         except ValidationError:
-            if not User.exists(field.data):
+            if not user_exists(field.data):
                 raise
 
 

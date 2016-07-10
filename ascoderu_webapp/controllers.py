@@ -5,6 +5,12 @@ from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import User
 
 
+def user_exists(name_or_email):
+    user = User.query.filter(User.name.ilike(name_or_email) |
+                             User.email.ilike(name_or_email)).first()
+    return user is not None
+
+
 def outbox_emails_for(user):
     return Email.query.filter(Email.date.is_(None) &
                               (Email.sender.is_(user.email) |
@@ -23,7 +29,7 @@ def inbox_emails_for(user):
 
 
 def new_email_for(user, to, subject, body):
-    is_to_local_user = User.exists(to)
+    is_to_local_user = user_exists(to)
     email_date = datetime.now() if is_to_local_user else None
 
     db.session.add(Email(

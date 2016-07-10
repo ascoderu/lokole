@@ -21,12 +21,6 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    @classmethod
-    def exists(cls, name_or_email):
-        return User.query.filter(
-            User.name.ilike(name_or_email) | User.email.ilike(name_or_email)
-        ).first() is not None
-
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
