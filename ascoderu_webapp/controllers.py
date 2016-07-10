@@ -14,13 +14,13 @@ def user_exists(name_or_email):
 def outbox_emails_for(user):
     return Email.query.filter(Email.date.is_(None) &
                               (Email.sender.is_(user.email) |
-                               Email.sender.is_(user.name)))
+                               Email.sender.is_(user.name))).all()
 
 
 def sent_emails_for(user):
     return Email.query.filter(Email.date.isnot(None) &
                               (Email.sender.is_(user.email) |
-                               Email.sender.is_(user.name)))
+                               Email.sender.is_(user.name))).all()
 
 
 def inbox_emails_for(user):
