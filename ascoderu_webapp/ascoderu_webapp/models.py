@@ -1,5 +1,6 @@
 from flask_security import RoleMixin
 from flask_security import UserMixin
+from sqlalchemy_utils import ScalarListType
 
 from ascoderu_webapp import db
 
@@ -26,3 +27,12 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
+
+
+class Email(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    date = db.Column(db.DateTime(timezone=True))
+    sender = db.Column(db.String(255), nullable=False)
+    to = db.Column(ScalarListType(), nullable=False)
+    subject = db.Column(db.String())
+    body = db.Column(db.String())

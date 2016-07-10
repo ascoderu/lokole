@@ -1,5 +1,48 @@
 {% extends "_base.html" %}
 
+{% from '_nav.html' import nav_link with context %}
+
 {% block content %}
-  <p>{{ _('Hello Email!') }}</p>
+  <ul class="nav nav-pills">
+    {{ nav_link('email_inbox', 'Inbox', level=1) }}
+    {{ nav_link('email_sent', 'Sent', level=1) }}
+    {{ nav_link('email_outbox', 'Outbox', level=1) }}
+  </ul>
+
+  <div class="panel-group" id="accordion">
+    {% if not emails %}
+      <i>{{ _('No emails.') }}</i>
+    {% endif %}
+
+    {% for email in emails | sort_by('date', reverse=True) %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}">
+              <div class="row">
+                <div class="col-sm-4">
+                  {% if is_outgoing %}
+                    <span class="email-sent-to">{{ email.to | join(', ') }}</span>
+                  {% else %}
+                    <span class="email-sent-by">{{ email.sender }}</span>
+                  {% endif %}
+                </div>
+                <div class="col-sm-6">
+                  <span class="email-subject">{{ email.subject }}</span>
+                </div>
+                <div class="col-sm-2">
+                  <span class="email-sent-at">{{ email.date | render_date }}</span>
+                </div>
+              </div>
+            </a>
+          </h4>
+        </div>
+        <div id="collapse{{ loop.index}}" class="panel-collapse collapse">
+          <div class="panel-body">
+            <span class="email-body">{{ email.body | nl2br }}</span>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}

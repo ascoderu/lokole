@@ -2,10 +2,12 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask_security import current_user
 from flask_security import login_required
 
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
+from ascoderu_webapp import models
 from config import LANGUAGES
 
 
@@ -32,4 +34,31 @@ def about():
 @app.route('/email')
 @login_required
 def email():
-    return render_template('email.html')
+    return redirect(url_for('email_inbox'))
+
+
+@app.route('/email/inbox')
+@login_required
+def email_inbox():
+    emails = [mail for mail in models.Email.query.all()
+              if current_user.email in mail.to]
+
+    return render_template('email.html', emails=emails, is_outgoing=False)
+
+
+@app.route('/email/outbox')
+@login_required
+def email_outbox():
+    emails = [mail for mail in models.Email.query.all()
+              if current_user.email == mail.sender and mail.date is None]
+
+    return render_template('email.html', emails=emails, is_outgoing=True)
+
+
+@app.route('/email/sent')
+@login_required
+def email_sent():
+    emails = [mail for mail in models.Email.query.all()
+              if current_user.email == mail.sender and mail.date is not None]
+
+    return render_template('email.html', emails=emails, is_outgoing=True)
