@@ -5,6 +5,22 @@ from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import User
 
 
+def _query_emails_by(user):
+    def query_user_email():
+        return Email.sender.ilike(user.email)
+
+    def query_user_name():
+        return Email.sender.ilike(user.name)
+
+    if user.email and user.name:
+        return query_user_email() | query_user_name()
+    elif user.email:
+        return query_user_email()
+    elif user.name:
+        return query_user_name()
+    raise ValueError('one of user.email or user.name must be set')
+
+
 def user_exists(name_or_email):
     user = User.query.filter(User.name.ilike(name_or_email) |
                              User.email.ilike(name_or_email)).first()
@@ -12,15 +28,13 @@ def user_exists(name_or_email):
 
 
 def outbox_emails_for(user):
-    return Email.query.filter(Email.date.is_(None) &
-                              (Email.sender.is_(user.email) |
-                               Email.sender.is_(user.name))).all()
+    query = Email.date.is_(None) & _query_emails_by(user)
+    return Email.query.filter(query).all()
 
 
 def sent_emails_for(user):
-    return Email.query.filter(Email.date.isnot(None) &
-                              (Email.sender.is_(user.email) |
-                               Email.sender.is_(user.name))).all()
+    query = Email.date.isnot(None) & _query_emails_by(user)
+    return Email.query.filter(query).all()
 
 
 def inbox_emails_for(user):
