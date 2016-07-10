@@ -1,14 +1,19 @@
+from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask_babel import gettext
 from flask_security import current_user
 from flask_security import login_required
 
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
+from ascoderu_webapp import db
 from ascoderu_webapp import models
 from config import LANGUAGES
+
+from .forms import NewEmailForm
 
 
 @babel.localeselector
@@ -35,6 +40,24 @@ def about():
 @login_required
 def email():
     return redirect(url_for('email_inbox'))
+
+
+@app.route('/email/new', methods=['GET', 'POST'])
+@login_required
+def email_new():
+    form = NewEmailForm(request.form)
+    if form.validate_on_submit():
+        db.session.add(models.Email(
+            date=None,
+            to=[form.to.data],
+            sender=current_user.email,
+            subject=form.subject.data,
+            body=form.body.data))
+        db.session.commit()
+        flash(gettext('Email sent!'), category='info')
+        return redirect(url_for('email_outbox'))
+
+    return render_template('email_new.html', form=form)
 
 
 @app.route('/email/inbox')
