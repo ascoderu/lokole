@@ -1,9 +1,13 @@
 {% macro nav_link_security(endpoint, name) %}
-  <li><a href="{{ url_for_security(endpoint) }}">{{ _(name) }}</a></li>
+  <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
+    <a href="{{ url_for_security(endpoint) }}">{{ _(name) }}</a>
+  </li>
 {% endmacro %}
 
-{% macro nav_link(endpoint, name) %}
-  <li><a href="{{ url_for(endpoint) }}">{{ _(name) }}</a></li>
+{% macro nav_link(endpoint, name, level) %}
+  <li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
+    <a href="{{ url_for(endpoint) }}">{{ _(name) }}</a>
+  </li>
 {% endmacro %}
 
 <nav class="navbar navbar-default">
@@ -17,9 +21,9 @@
     </div>
     <div class="collapse navbar-collapse" id="navbar">
       <ul class="nav navbar-nav">
-        {{ nav_link('home', 'Home') }}
-        {{ nav_link('about', 'About') }}
-        {{ nav_link('email', 'Email') }}
+        {{ nav_link('home', 'Home', level=0) }}
+        {{ nav_link('about', 'About', level=0) }}
+        {{ nav_link('email', 'Email', level=0) }}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.is_authenticated %}
