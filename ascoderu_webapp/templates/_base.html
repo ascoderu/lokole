@@ -7,12 +7,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  {# jquery #}
-  <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery/js/jquery.js') }}"></script>
-
   {# bootstrap #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='libs/bootstrap/css/bootstrap.css') }}">
-  <script type="text/javascript" src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.js') }}"></script>
 
   {# ascoderu_webapp #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/base.css') }}">
@@ -25,5 +21,11 @@
 
     {% block content %}{% endblock %}
   </div>
+
+  {# jquery (required for bootstrap) #}
+  <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery/js/jquery.js') }}"></script>
+
+  {# bootstrap #}
+  <script type="text/javascript" src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.js') }}"></script>
 </body>
 </html>
