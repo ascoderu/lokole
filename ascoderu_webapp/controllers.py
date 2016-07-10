@@ -22,6 +22,9 @@ def _query_emails_by(user):
 
 
 def user_exists(name_or_email):
+    if not name_or_email:
+        return False
+
     user = User.query.filter(User.name.ilike(name_or_email) |
                              User.email.ilike(name_or_email)).first()
     return user is not None
