@@ -10,7 +10,7 @@ from flask_security import login_required
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
 from ascoderu_webapp import db
-from ascoderu_webapp import models
+from ascoderu_webapp.models import Email
 from config import LANGUAGES
 
 from .forms import NewEmailForm
@@ -55,7 +55,7 @@ def email():
 def email_new():
     form = NewEmailForm(request.form)
     if form.validate_on_submit():
-        db.session.add(models.Email(
+        db.session.add(Email(
             date=None,
             to=[form.to.data],
             sender=current_user.email,
@@ -71,7 +71,7 @@ def email_new():
 @app.route('/email/inbox')
 @login_required
 def email_inbox():
-    emails = [mail for mail in models.Email.query.all()
+    emails = [mail for mail in Email.query.all()
               if current_user.email in mail.to]
 
     return render_template('email.html', emails=emails, is_outgoing=False)
@@ -80,7 +80,7 @@ def email_inbox():
 @app.route('/email/outbox')
 @login_required
 def email_outbox():
-    emails = [mail for mail in models.Email.query.all()
+    emails = [mail for mail in Email.query.all()
               if current_user.email == mail.sender and mail.date is None]
 
     return render_template('email.html', emails=emails, is_outgoing=True)
@@ -89,7 +89,7 @@ def email_outbox():
 @app.route('/email/sent')
 @login_required
 def email_sent():
-    emails = [mail for mail in models.Email.query.all()
+    emails = [mail for mail in Email.query.all()
               if current_user.email == mail.sender and mail.date is not None]
 
     return render_template('email.html', emails=emails, is_outgoing=True)
