@@ -1,13 +1,9 @@
 {% extends "_base.html" %}
 
-{% from '_nav.html' import nav_link with context %}
+{% from '_nav.html' import email_subnav with context %}
 
 {% block content %}
-  <ul class="nav nav-pills">
-    {{ nav_link('email_inbox', 'Inbox', level=1) }}
-    {{ nav_link('email_sent', 'Sent', level=1) }}
-    {{ nav_link('email_outbox', 'Outbox', level=1) }}
-  </ul>
+  {{ email_subnav() }}
 
   <div class="panel-group" id="accordion">
     {% if not emails %}

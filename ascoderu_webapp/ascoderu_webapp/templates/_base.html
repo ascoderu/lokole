@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% from '_nav.html' import main_nav with context %}
+
 <html>
 <head>
   {# jquery #}
@@ -13,7 +15,7 @@
 </head>
 <body>
   <div class="container">
-    {% include '_nav.html' ignore missing with context %}
+    {{ main_nav() }}
 
     {% include '_messages.html' %}
 
