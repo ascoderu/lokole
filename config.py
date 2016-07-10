@@ -25,6 +25,8 @@ def ui(key, **kwargs):
         'email_sent': 'Email sent!',
         'email_delayed': 'Email will be sent soon!',
         'welcome_user': 'Welcome, %(user)s!',
+        'welcome_back_user': 'Welcome back, %(user)s!',
+        'loggedout_user': 'Logged out successfully!',
     }[key]
     return gettext(message, **kwargs)
 
@@ -39,7 +41,9 @@ SECURITY_USER_IDENTITY_ATTRIBUTES = ('name', 'email')
 SECURITY_PASSWORD_HASH = 'bcrypt'
 SECURITY_PASSWORD_SALT = 'password-salt'
 SECURITY_REGISTERABLE = True
-SECURITY_POST_REGISTER_VIEW = 'welcome'
+SECURITY_POST_REGISTER_VIEW = 'post_register'
+SECURITY_POST_LOGIN_VIEW = 'post_login'
+SECURITY_POST_LOGOUT_VIEW = 'post_logout'
 SECURITY_SEND_REGISTER_EMAIL = False
 SECURITY_LOGIN_USER_TEMPLATE = 'login.html'
 SECURITY_REGISTER_USER_TEMPLATE = 'register.html'

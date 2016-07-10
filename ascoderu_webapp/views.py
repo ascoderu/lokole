@@ -38,11 +38,25 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/welcome')
+@app.route('/post_register')
 @login_required
-def welcome():
+def post_register():
     user = current_user.name or current_user.email
     flash(ui('welcome_user', user=user), category='success')
+    return redirect('/')
+
+
+@app.route('/post_login')
+@login_required
+def post_login():
+    user = current_user.name or current_user.email
+    flash(ui('welcome_back_user', user=user), category='success')
+    return redirect('/')
+
+
+@app.route('/post_logout')
+def post_logout():
+    flash(ui('loggedout_user'), category='success')
     return redirect('/')
 
 
