@@ -11,12 +11,11 @@ from flask_security import login_required
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
 from ascoderu_webapp import db
+from ascoderu_webapp.forms import NewEmailForm
 from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import User
 from config import LANGUAGES
 from config import ui
-
-from .forms import NewEmailForm
 
 
 @babel.localeselector

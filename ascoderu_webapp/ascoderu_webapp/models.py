@@ -4,7 +4,6 @@ from sqlalchemy_utils import ScalarListType
 
 from ascoderu_webapp import db
 
-
 roles_users = db.Table(
     'roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),

@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_babel import Babel
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_security import Security
 from flask_security import SQLAlchemyUserDatastore
+from flask_security import Security
+from flask_sqlalchemy import SQLAlchemy
 
 from utils import jinja_filters
 
