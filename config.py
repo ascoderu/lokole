@@ -32,6 +32,8 @@ def ui(key, **kwargs):
     return gettext(message, **kwargs)
 
 
+TESTING = False
+
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
