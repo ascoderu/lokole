@@ -3,6 +3,7 @@ from datetime import datetime
 from ascoderu_webapp import db
 from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import User
+from utils.strings import istreq
 
 
 def _query_emails_by(user):
@@ -42,7 +43,8 @@ def sent_emails_for(user):
 
 def inbox_emails_for(user):
     return [mail for mail in Email.query.all()
-            if any(to == user.email or to == user.name for to in mail.to)]
+            if any(istreq(to, user.email) or istreq(to, user.name)
+                   for to in mail.to)]
 
 
 def new_email_for(user, to, subject, body):
