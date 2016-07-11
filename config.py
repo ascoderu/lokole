@@ -32,21 +32,22 @@ def ui(key, **kwargs):
     return gettext(message, **kwargs)
 
 
-TESTING = False
+class Config(object):
+    TESTING = False
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
+    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-SECRET_KEY = 's3cr3t'
+    SECRET_KEY = 's3cr3t'
 
-SECURITY_USER_IDENTITY_ATTRIBUTES = ('name', 'email')
-SECURITY_PASSWORD_HASH = 'bcrypt'
-SECURITY_PASSWORD_SALT = 'password-salt'
-SECURITY_REGISTERABLE = True
-SECURITY_POST_REGISTER_VIEW = 'post_register'
-SECURITY_POST_LOGIN_VIEW = 'post_login'
-SECURITY_POST_LOGOUT_VIEW = 'post_logout'
-SECURITY_SEND_REGISTER_EMAIL = False
-SECURITY_LOGIN_USER_TEMPLATE = 'login.html'
-SECURITY_REGISTER_USER_TEMPLATE = 'register.html'
+    SECURITY_USER_IDENTITY_ATTRIBUTES = ('name', 'email')
+    SECURITY_PASSWORD_HASH = 'bcrypt'
+    SECURITY_PASSWORD_SALT = 'password-salt'
+    SECURITY_REGISTERABLE = True
+    SECURITY_POST_REGISTER_VIEW = 'post_register'
+    SECURITY_POST_LOGIN_VIEW = 'post_login'
+    SECURITY_POST_LOGOUT_VIEW = 'post_logout'
+    SECURITY_SEND_REGISTER_EMAIL = False
+    SECURITY_LOGIN_USER_TEMPLATE = 'login.html'
+    SECURITY_REGISTER_USER_TEMPLATE = 'register.html'

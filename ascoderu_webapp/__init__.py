@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from utils import jinja_filters
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object('config.Config')
 
 babel = Babel(app)
 
