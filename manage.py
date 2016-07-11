@@ -4,7 +4,7 @@ from flask_migrate import MigrateCommand
 from flask_script import Manager
 
 from ascoderu_webapp import app
-from utils.babel import BabelCommand
+from utils.script_commands import BabelCommand
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
