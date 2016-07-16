@@ -22,12 +22,16 @@ def _query_emails_by(user):
     raise ValueError('one of user.email or user.name must be set')
 
 
+def _query_user(name_or_email):
+    return User.query.filter(User.name.ilike(name_or_email) |
+                             User.email.ilike(name_or_email)).first()
+
+
 def user_exists(name_or_email):
     if not name_or_email:
         return False
 
-    user = User.query.filter(User.name.ilike(name_or_email) |
-                             User.email.ilike(name_or_email)).first()
+    user = _query_user(name_or_email)
     return user is not None
 
 
