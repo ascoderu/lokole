@@ -23,14 +23,14 @@ def _find_emails_by(user):
 
 
 def _find_user_by(name_or_email):
+    if not name_or_email:
+        return None
+
     return User.query.filter(User.name.ilike(name_or_email) |
                              User.email.ilike(name_or_email)).first()
 
 
 def user_exists(name_or_email):
-    if not name_or_email:
-        return False
-
     user = _find_user_by(name_or_email)
     return user is not None
 
