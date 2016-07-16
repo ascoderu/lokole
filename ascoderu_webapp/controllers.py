@@ -6,7 +6,7 @@ from ascoderu_webapp.models import User
 from utils.strings import istreq
 
 
-def _query_emails_by(user):
+def _find_emails_by(user):
     def query_user_email():
         return Email.sender.ilike(user.email)
 
@@ -22,7 +22,7 @@ def _query_emails_by(user):
     raise ValueError('one of user.email or user.name must be set')
 
 
-def _query_user(name_or_email):
+def _find_user_by(name_or_email):
     return User.query.filter(User.name.ilike(name_or_email) |
                              User.email.ilike(name_or_email)).first()
 
@@ -31,17 +31,17 @@ def user_exists(name_or_email):
     if not name_or_email:
         return False
 
-    user = _query_user(name_or_email)
+    user = _find_user_by(name_or_email)
     return user is not None
 
 
 def outbox_emails_for(user):
-    query = Email.date.is_(None) & _query_emails_by(user)
+    query = Email.date.is_(None) & _find_emails_by(user)
     return Email.query.filter(query).all()
 
 
 def sent_emails_for(user):
-    query = Email.date.isnot(None) & _query_emails_by(user)
+    query = Email.date.isnot(None) & _find_emails_by(user)
     return Email.query.filter(query).all()
 
 
