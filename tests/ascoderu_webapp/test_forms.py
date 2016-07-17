@@ -10,12 +10,14 @@ from ascoderu_webapp.forms import UserDoesNotAlreadyExist
 from utils.testing import AppTestMixin
 
 
+# noinspection PyPep8Naming
 class BaseFormFieldValidatorTest(AppTestMixin, TestCase, metaclass=ABCMeta):
     @abstractproperty
     def validator_under_test(self):
         raise NotImplementedError
 
-    def _create_field(self, data):
+    @classmethod
+    def _create_field(cls, data):
         return namedtuple('Field', 'data')(data)
 
     def _run_validator(self, data):
