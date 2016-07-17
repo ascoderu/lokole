@@ -1,3 +1,6 @@
+from datetime import timezone
+from tzlocal import get_localzone
+
 import re
 
 from jinja2 import Markup
@@ -8,8 +11,12 @@ from jinja2 import evalcontextfilter
 _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
-def render_date(value, fmt='%x'):
-    return value.strftime(fmt) if value else ''
+def render_date(utcdate, fmt='%x'):
+    if not utcdate:
+        return ''
+
+    local = utcdate.replace(tzinfo=timezone.utc).astimezone(get_localzone())
+    return local.strftime(fmt)
 
 
 def sort_by(iterable, attribute, reverse=False):

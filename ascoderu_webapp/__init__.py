@@ -42,7 +42,7 @@ def create_user():
         from datetime import datetime
         for i in range(1, 6):
             inbound_email = models.Email(
-                date=datetime.now(), sender='sender@sender.net',
+                date=datetime.utcnow(), sender='sender@sender.net',
                 to=['test@test.net', 'foo@bar.com'],
                 subject='cool email %s' % i, body='the message\n' * i)
             outbound_email = models.Email(
@@ -50,7 +50,7 @@ def create_user():
                 to=['sender@sender.net', 'foo@bar.com'],
                 subject='cool reply %s' % i, body='the reply\n' * i)
             sent_email = models.Email(
-                date=datetime.now(), sender='test@test.net',
+                date=datetime.utcnow(), sender='test@test.net',
                 to=['sender@sender.net', 'foo@bar.com'],
                 subject='cool reply %s' % i, body='the reply\n' * i)
             db.session.add(inbound_email)

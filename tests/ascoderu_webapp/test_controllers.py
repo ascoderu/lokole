@@ -59,17 +59,19 @@ class TestReadEmails(AppTestMixin, TestCase):
         self.assertSequenceEqual(actual, expected)
 
     def test_finds_sent_emails_to_name_or_email(self):
+        now = datetime.utcnow()
         user = self.new_user(name='someone', email='someone@test.net')
-        expected = [self.new_email(sender=user.name, date=datetime.now())]
+        expected = [self.new_email(sender=user.name, date=now)]
         not_expected = [self.new_email(sender=user.name)]
         actual = sent_emails_for(user)
 
         self.assertSequenceEqual(actual, expected)
 
     def test_finds_outbox_emails_to_name_or_email(self):
+        now = datetime.utcnow()
         user = self.new_user(name='someone', email='someone@test.net')
         expected = [self.new_email(sender=user.name)]
-        not_expected = [self.new_email(sender=user.name, date=datetime.now())]
+        not_expected = [self.new_email(sender=user.name, date=now)]
         actual = outbox_emails_for(user)
 
         self.assertSequenceEqual(actual, expected)
@@ -85,7 +87,7 @@ class TestWriteEmails(AppTestMixin, TestCase):
         self.assertIsNotNone(email)
         self.assertEqual(sender.email, email.sender)
         self.assertIn(recipient.name, email.to)
-        self.assertEqual((datetime.now() - email.date).days, 0)
+        self.assertEqual((datetime.utcnow() - email.date).days, 0)
 
     def test_creates_new_email_for_remote_user(self):
         sender = self.new_user(email='sender@test.net')

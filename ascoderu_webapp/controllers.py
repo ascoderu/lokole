@@ -53,7 +53,7 @@ def inbox_emails_for(user):
 
 def new_email_for(user, to, subject, body):
     is_to_local_user = user_exists(to)
-    email_date = datetime.now() if is_to_local_user else None
+    email_date = datetime.utcnow() if is_to_local_user else None
 
     db.session.add(Email(
         date=email_date,
