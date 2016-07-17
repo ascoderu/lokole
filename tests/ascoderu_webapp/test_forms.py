@@ -1,8 +1,8 @@
 from abc import ABCMeta
 from abc import abstractproperty
 from collections import namedtuple
-from unittest import TestCase
 
+from flask_testing import TestCase
 from wtforms import ValidationError
 
 from ascoderu_webapp.forms import EmailOrLocalUser

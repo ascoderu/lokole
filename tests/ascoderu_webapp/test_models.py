@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
-from unittest import TestCase
+
+from flask_testing import TestCase
 
 from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import ModelPacker
