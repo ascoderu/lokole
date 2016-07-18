@@ -18,7 +18,7 @@ class CompressedJson(object):
 
     def deserialize(self, compressed):
         if not compressed:
-            return u''
+            return None
 
         serialized_bytes = zlib.decompress(compressed)
         serialized = serialized_bytes.decode(self.ENCODING)

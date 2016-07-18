@@ -7,7 +7,7 @@ class TestCompressedJson(TestCase):
     def test_serializer_is_null_safe(self):
         serializer = CompressedJson()
         self.assertEqual(b'', serializer.serialize(None))
-        self.assertEqual(u'', serializer.deserialize(None))
+        self.assertEqual(None, serializer.deserialize(None))
 
     def test_serializer_roundtrip(self):
         serializer = CompressedJson()
