@@ -20,6 +20,9 @@ class CompressedJson(object):
         if not compressed:
             return None
 
-        serialized_bytes = zlib.decompress(compressed)
-        serialized = serialized_bytes.decode(self.ENCODING)
-        return json.loads(serialized)
+        try:
+            serialized_bytes = zlib.decompress(compressed)
+            serialized = serialized_bytes.decode(self.ENCODING)
+            return json.loads(serialized)
+        except (zlib.error, UnicodeDecodeError, ValueError):
+            return None
