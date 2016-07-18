@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from ascoderu_webapp import app
 from ascoderu_webapp import db
 from ascoderu_webapp.models import Email
@@ -41,3 +43,12 @@ class AppTestMixin(object):
         db.session.add(email)
         db.session.commit()
         return email
+
+    @classmethod
+    def create_complete_email(cls, now=None):
+        return Email(
+            to=['recipient@test.net'],
+            sender='sender@test.net',
+            date=now or datetime.utcnow(),
+            subject='subject',
+            body='body')

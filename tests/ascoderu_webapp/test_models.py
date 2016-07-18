@@ -3,62 +3,52 @@ from datetime import timedelta
 
 from flask_testing import TestCase
 
-from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import ModelPacker
 from utils.testing import AppTestMixin
 
 
-def create_complete_email(now=None):
-    return Email(
-        to=['recipient@test.net'],
-        sender='sender@test.net',
-        date=now or datetime.utcnow(),
-        subject='subject',
-        body='body')
-
-
 class TestEmail(AppTestMixin, TestCase):
     def test_email_with_all_fields_is_complete(self):
-        email = create_complete_email()
+        email = self.create_complete_email()
         self.assertTrue(email.is_complete())
 
     def test_email_must_have_recipient_to_be_complete(self):
-        email = create_complete_email()
+        email = self.create_complete_email()
         email.to = []
         self.assertFalse(email.is_complete())
 
     def test_email_must_have_sender_to_be_complete(self):
-        email = create_complete_email()
+        email = self.create_complete_email()
         email.sender = None
         self.assertFalse(email.is_complete())
 
     def test_email_must_have_date_to_be_complete(self):
-        email = create_complete_email()
+        email = self.create_complete_email()
         email.date = None
         self.assertFalse(email.is_complete())
 
     def test_email_must_have_subject_or_body_to_be_complete(self):
-        email = create_complete_email()
+        email = self.create_complete_email()
         email.subject = None
         self.assertTrue(email.is_complete())
 
-        email = create_complete_email()
+        email = self.create_complete_email()
         email.body = None
         self.assertTrue(email.is_complete())
 
-        email = create_complete_email()
+        email = self.create_complete_email()
         email.body = email.subject = None
         self.assertFalse(email.is_complete())
 
     def test_is_same_as_handles_other_types(self):
-        email = create_complete_email()
+        email = self.create_complete_email()
         self.assertFalse(email.is_same_as(None))
         self.assertFalse(email.is_same_as('something'))
 
     def test_is_same_as(self):
         now = datetime.utcnow()
-        email1 = create_complete_email(now)
-        email2 = create_complete_email(now)
+        email1 = self.create_complete_email(now)
+        email2 = self.create_complete_email(now)
         self.assertTrue(email1.is_same_as(email2))
 
         email2.to = ['other@test.net']
@@ -66,8 +56,8 @@ class TestEmail(AppTestMixin, TestCase):
 
     def test_is_same_as_must_be_within_same_minute(self):
         now = datetime.utcnow()
-        email1 = create_complete_email(now)
-        email2 = create_complete_email(now + timedelta(seconds=10))
+        email1 = self.create_complete_email(now)
+        email2 = self.create_complete_email(now + timedelta(seconds=10))
         self.assertTrue(email1.is_same_as(email2))
 
         email2.date = now - timedelta(seconds=10)
@@ -83,7 +73,7 @@ class TestEmail(AppTestMixin, TestCase):
 class TestModelPacker(AppTestMixin, TestCase):
     def test_email_packing_roundtrip(self):
         packer = ModelPacker()
-        expecteds = [create_complete_email() for _ in range(5)]
+        expecteds = [self.create_complete_email() for _ in range(5)]
         actuals = packer.unpack_emails(packer.pack(expecteds))
         for expected, actual in zip(expecteds, actuals):
             self.assertTrue(expected.is_same_as(actual))
