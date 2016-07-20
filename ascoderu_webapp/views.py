@@ -42,7 +42,7 @@ def about():
 def post_register():
     user = current_user.name or current_user.email
     flash(ui('welcome_user', user=user), category='success')
-    return redirect('/')
+    return redirect(url_for('home'))
 
 
 @app.route('/post_login')
@@ -50,13 +50,13 @@ def post_register():
 def post_login():
     user = current_user.name or current_user.email
     flash(ui('welcome_back_user', user=user), category='success')
-    return redirect('/')
+    return redirect(url_for('home'))
 
 
 @app.route('/post_logout')
 def post_logout():
     flash(ui('loggedout_user'), category='success')
-    return redirect('/')
+    return redirect(url_for('home'))
 
 
 @app.route('/email')
