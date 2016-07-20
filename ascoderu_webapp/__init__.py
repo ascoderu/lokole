@@ -5,10 +5,12 @@ from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
 from flask_sqlalchemy import SQLAlchemy
 
+from config import Config
 from utils import jinja_filters
+from utils.factory import DynamicFactory
 
 app = Flask(__name__)
-app.config.from_object('config.Config')
+app.config.from_object(Config)
 
 babel = Babel(app)
 
@@ -22,6 +24,16 @@ app.jinja_env.filters['sort_by'] = jinja_filters.sort_by
 from ascoderu_webapp import views
 from ascoderu_webapp import models
 from ascoderu_webapp import forms
+
+app.remote_serializer = DynamicFactory(Config.REMOTE_SERIALIZATION_CLASS)()
+app.remote_packer = DynamicFactory(Config.REMOTE_PACKER_CLASS)()
+app.remote_storage = DynamicFactory(Config.REMOTE_STORAGE_CLASS)(
+    account_name=Config.REMOTE_STORAGE_ACCOUNT_NAME,
+    account_key=Config.REMOTE_STORAGE_ACCOUNT_KEY,
+    container=Config.REMOTE_STORAGE_CONTAINER,
+    upload_path=Config.REMOTE_UPLOAD_PATH,
+    download_path=Config.REMOTE_DOWNLOAD_PATH,
+    upload_format=Config.REMOTE_UPLOAD_FORMAT)
 
 user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore,

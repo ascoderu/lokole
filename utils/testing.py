@@ -7,6 +7,19 @@ from ascoderu_webapp.models import User
 from config import Config
 
 
+# noinspection PyUnusedLocal
+class DummyRemoteStorage(object):
+    def __init__(self, *args, **kwargs):
+        self.downloaded = kwargs.pop('download', None)
+        self.uploaded = []
+
+    def upload(self, payload):
+        self.uploaded.append(payload)
+
+    def download(self):
+        return self.downloaded
+
+
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
@@ -20,6 +33,7 @@ class AppTestMixin(object):
 
     def create_app(self):
         app.config.from_object(TestConfig)
+        app.remote_storage = DummyRemoteStorage()
         return app
 
     def setUp(self):

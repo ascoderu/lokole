@@ -8,10 +8,12 @@ from flask_security import login_required
 
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
+from ascoderu_webapp.controllers import download_remote_updates
 from ascoderu_webapp.controllers import inbox_emails_for
 from ascoderu_webapp.controllers import new_email_for
 from ascoderu_webapp.controllers import outbox_emails_for
 from ascoderu_webapp.controllers import sent_emails_for
+from ascoderu_webapp.controllers import upload_local_updates
 from ascoderu_webapp.forms import NewEmailForm
 from config import LANGUAGES
 from config import ui
@@ -100,3 +102,14 @@ def email_outbox():
 def email_sent():
     emails = sent_emails_for(current_user)
     return render_template('email.html', emails=emails, is_outgoing=True)
+
+
+# todo: admin required
+@app.route('/sync')
+def sync():
+    emails_uploaded = upload_local_updates()
+    emails_downloaded = download_remote_updates()
+
+    flash(ui('upload_complete', num=emails_uploaded), category='success')
+    flash(ui('download_complete', num=emails_downloaded), category='success')
+    return redirect(url_for('home'))

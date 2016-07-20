@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from ascoderu_webapp import app
 from ascoderu_webapp import db
 from ascoderu_webapp.models import Email
 from ascoderu_webapp.models import User
@@ -64,3 +65,37 @@ def new_email_for(user, to, subject, body):
     db.session.commit()
 
     return is_to_local_user
+
+
+def upload_local_updates():
+    emails = Email.query.filter(Email.date.is_(None)).all()
+    now = datetime.utcnow()
+    for email in emails:
+        email.date = now
+
+    packed = app.remote_packer.pack(emails)
+    serialized = app.remote_serializer.serialize(packed)
+    app.remote_storage.upload(serialized)
+    db.session.commit()
+
+    return len(emails)
+
+
+def download_remote_updates():
+    serialized = app.remote_storage.download()
+    packed = app.remote_serializer.deserialize(serialized)
+    emails = app.remote_packer.unpack_emails(packed)
+    accounts = app.remote_packer.unpack_accounts(packed)
+
+    for email in emails:
+        if email.is_complete():
+            db.session.add(email)
+    for name, email in accounts:
+        user = _find_user_by(name)
+        if user and name and email:
+            user.name = name
+            user.email = email
+            db.session.add(user)
+    db.session.commit()
+
+    return len(emails)

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_security import RoleMixin
 from flask_security import UserMixin
 from sqlalchemy_utils import ScalarListType
@@ -35,3 +37,78 @@ class Email(db.Model):
     to = db.Column(ScalarListType(), nullable=False)
     subject = db.Column(db.String())
     body = db.Column(db.String())
+
+    def is_complete(self):
+        return (self.sender and
+                self.to and
+                self.date and
+                (self.subject or self.body))
+
+    def is_same_as(self, other):
+        return (isinstance(other, Email) and
+                other.sender == self.sender and
+                other.subject == self.subject and
+                other.body == self.body and
+                ((other.date is None and self.date is None) or
+                 (abs(other.date - self.date).seconds < 60)) and
+                set(other.to) == set(self.to))
+
+
+class ModelPacker(object):
+    _accounts_container = 'accounts'
+    _field_name = 'name'
+    _field_email = 'email'
+
+    _emails_container = 'emails'
+    _field_date = 'date'
+    _field_to = 'to'
+    _field_sender = 'sender'
+    _field_subject = 'subject'
+    _field_body = 'body'
+
+    _date_format = '%Y-%m-%d %H:%M'
+
+    @classmethod
+    def _format_date(cls, utcdatetime):
+        if not utcdatetime:
+            return None
+        return utcdatetime.strftime(cls._date_format)
+
+    @classmethod
+    def _parse_date(cls, datestring):
+        if not datestring:
+            return None
+        return datetime.strptime(datestring, cls._date_format)
+
+    @classmethod
+    def pack(cls, emails):
+        return {
+            cls._emails_container: [{
+                cls._field_date: cls._format_date(email.date),
+                cls._field_to: email.to,
+                cls._field_sender: email.sender,
+                cls._field_subject: email.subject,
+                cls._field_body: email.body,
+            } for email in emails],
+        }
+
+    @classmethod
+    def unpack_emails(cls, packed):
+        if not packed:
+            return []
+
+        return [Email(
+            date=cls._parse_date(email.get(cls._field_date)),
+            to=email.get(cls._field_to),
+            sender=email.get(cls._field_sender),
+            subject=email.get(cls._field_subject),
+            body=email.get(cls._field_body))
+            for email in packed.get(cls._emails_container, [])]
+
+    @classmethod
+    def unpack_accounts(cls, packed):
+        if not packed:
+            return []
+
+        return [(account.get(cls._field_name), account.get(cls._field_email))
+                for account in packed.get(cls._accounts_container, [])]

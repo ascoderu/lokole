@@ -2,12 +2,15 @@ from datetime import datetime
 
 from flask_testing import TestCase
 
+from ascoderu_webapp.controllers import download_remote_updates
 from ascoderu_webapp.controllers import inbox_emails_for
 from ascoderu_webapp.controllers import new_email_for
 from ascoderu_webapp.controllers import outbox_emails_for
 from ascoderu_webapp.controllers import sent_emails_for
+from ascoderu_webapp.controllers import upload_local_updates
 from ascoderu_webapp.controllers import user_exists
 from ascoderu_webapp.models import Email
+from ascoderu_webapp.models import User
 from utils.testing import AppTestMixin
 
 
@@ -100,3 +103,78 @@ class TestWriteEmails(AppTestMixin, TestCase):
         self.assertIn(recipient, email.to)
         self.assertIsNone(email.date)
 
+
+# noinspection PyUnusedLocal
+class TestRemoteUpload(AppTestMixin, TestCase):
+    def _retrieve_uploaded_emails(self, index):
+        uploaded = self.app.remote_storage.uploaded[index]
+        packed = self.app.remote_serializer.deserialize(uploaded)
+        return self.app.remote_packer.unpack_emails(packed)
+
+    def test_transmits_all_new_emails_without_resending_old_emails(self):
+        new_emails = [self.new_email(), self.new_email(), self.new_email()]
+        previously_sent_emails = [self.new_email(date=datetime.utcnow())]
+        upload_local_updates()
+
+        number_of_upload_calls = len(self.app.remote_storage.uploaded)
+        self.assertEqual(number_of_upload_calls, 1)
+
+        uploaded_emails = self._retrieve_uploaded_emails(0)
+        for actual, expected in zip(uploaded_emails, new_emails):
+            self.assertTrue(actual.is_same_as(expected))
+
+        not_transmitted_emails = Email.query.filter(Email.date.is_(None))
+        self.assertEqual(not_transmitted_emails.count(), 0)
+
+
+class TestRemoteDownload(AppTestMixin, TestCase):
+    def _prepare_serialized_data(self, data):
+        serialized = self.app.remote_serializer.serialize(data)
+        self.app.remote_storage.downloaded = serialized
+
+    def _prepare_emails_for_download(self, emails):
+        packed = self.app.remote_packer.pack(emails)
+        self._prepare_serialized_data(packed)
+
+    def _prepare_users_for_download(self, name, email):
+        packed = {'accounts': [{'name': name, 'email': email}]}
+        self._prepare_serialized_data(packed)
+
+    def test_updates_emails(self):
+        remote_emails = [self.create_complete_email() for _ in range(5)]
+        self._prepare_emails_for_download(remote_emails)
+
+        download_remote_updates()
+
+        newly_updated_emails = Email.query.all()
+        self.assertEqual(len(newly_updated_emails), len(remote_emails))
+        for actual, expected in zip(newly_updated_emails, remote_emails):
+            self.assertTrue(actual.is_same_as(expected))
+
+    def test_updates_users_on_name(self):
+        user, email = self.new_user(name='test'), 'test@ascoderu.net'
+        self._prepare_users_for_download(user.name, email)
+
+        download_remote_updates()
+
+        updated_user = User.query.filter(User.name == user.name).first()
+        self.assertIsNotNone(updated_user)
+        self.assertEqual(updated_user.email, email)
+
+    def test_updates_users_on_email(self):
+        user, email = self.new_user(email='test'), 'test@ascoderu.net'
+        self._prepare_users_for_download(user.email, email)
+
+        download_remote_updates()
+
+        updated_user = User.query.filter(User.name == user.name).first()
+        self.assertIsNotNone(updated_user)
+        self.assertEqual(updated_user.email, email)
+
+    def test_ignores_corrupted_remote_data(self):
+        self.app.remote_storage.downloaded = b'\xbe\xef'
+
+        download_remote_updates()
+
+        newly_updated_emails = Email.query.all()
+        self.assertEqual(len(newly_updated_emails), 0)

@@ -28,6 +28,8 @@ def ui(key, **kwargs):
         'welcome_user': 'Welcome, %(user)s!',
         'welcome_back_user': 'Welcome back, %(user)s!',
         'loggedout_user': 'Logged out successfully!',
+        'download_complete': 'Downloaded %(num)d emails.',
+        'upload_complete': 'Uploaded %(num)d emails.',
     }[key]
     return gettext(message, **kwargs)
 
@@ -38,6 +40,18 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    CLIENT_NAME = 'dev-cw'
+
+    REMOTE_STORAGE_CLASS = 'utils.remote_storage.AzureBlob'
+    REMOTE_STORAGE_ACCOUNT_NAME = 'clewolff'
+    REMOTE_STORAGE_ACCOUNT_KEY = os.getenv('ASCODERU_REMOTE_ACCOUNT_KEY')
+    REMOTE_STORAGE_CONTAINER = 'ascoderu'
+    REMOTE_UPLOAD_PATH = '%s/from_opwen/new' % CLIENT_NAME
+    REMOTE_UPLOAD_FORMAT = '%Y-%m-%d_%H-%M.json.gz'
+    REMOTE_DOWNLOAD_PATH = '%s/to_opwen/new.json.gz' % CLIENT_NAME
+    REMOTE_SERIALIZATION_CLASS = 'utils.serialization.CompressedJson'
+    REMOTE_PACKER_CLASS = 'ascoderu_webapp.models.ModelPacker'
 
     SECRET_KEY = 's3cr3t'
 
