@@ -1,11 +1,12 @@
 from gzip import GzipFile
-from tempfile import NamedTemporaryFile
 import json
 import zlib
 
+from io import BytesIO
+
 
 def _compress(data, level):
-    with NamedTemporaryFile() as fobj:
+    with BytesIO() as fobj:
         with GzipFile(fileobj=fobj, mode='wb', compresslevel=level) as gzfobj:
             gzfobj.write(data)
         fobj.seek(0)
