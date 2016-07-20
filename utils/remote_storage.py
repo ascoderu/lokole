@@ -1,6 +1,6 @@
 from datetime import datetime
 
-# noinspection PyPackageRequirements
+from azure.common import AzureMissingResourceHttpError
 from azure.storage.blob import BlockBlobService
 
 
@@ -26,4 +26,8 @@ class AzureBlob(object):
         self.conn().create_blob_from_bytes(self.container, upload_path, payload)
 
     def download(self):
-        return self.conn().get_blob_to_bytes(self.container, self.download_path)
+        try:
+            return self.conn().get_blob_to_bytes(self.container,
+                                                 self.download_path)
+        except AzureMissingResourceHttpError:
+            return b''
