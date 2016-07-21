@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from flask_babel import gettext
+from flask_babel import gettext as _
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -11,27 +11,26 @@ LANGUAGES = {
 
 
 def ui(key, **kwargs):
-    message = {
-        'email_field': 'Name or Email',
-        'email_field_required': 'Please enter your name or email.',
-        'name_field': 'Name',
-        'name_field_required': 'Please enter your name.',
-        'name_field_already_exists': 'Sorry, this name is already in use.',
-        'email_to_field': 'To',
-        'email_to_field_required': 'Please specify a recipient.',
-        'email_to_field_invalid': 'Must be a user name or email address.',
-        'email_subject_field': 'Subject',
-        'email_body_field': 'Message',
-        'email_submit_field': 'Send',
-        'email_sent': 'Email sent!',
-        'email_delayed': 'Email will be sent soon!',
-        'welcome_user': 'Welcome, %(user)s!',
-        'welcome_back_user': 'Welcome back, %(user)s!',
-        'loggedout_user': 'Logged out successfully!',
-        'download_complete': 'Downloaded %(num)d emails.',
-        'upload_complete': 'Uploaded %(num)d emails.',
+    return {
+        'email_field': _('Name or Email'),
+        'email_field_required': _('Please enter your name or email.'),
+        'name_field': _('Name'),
+        'name_field_required': _('Please enter your name.'),
+        'name_field_already_exists': _('Sorry, this name is already in use.'),
+        'email_to_field': _('To'),
+        'email_to_field_required': _('Please specify a recipient.'),
+        'email_to_field_invalid': _('Must be a user name or email address.'),
+        'email_subject_field': _('Subject'),
+        'email_body_field': _('Message'),
+        'email_submit_field': _('Send'),
+        'email_sent': _('Email sent!'),
+        'email_delayed': _('Email will be sent soon!'),
+        'welcome_user': _('Welcome, %(user)s!', **kwargs),
+        'welcome_back_user': _('Welcome back, %(user)s!', **kwargs),
+        'loggedout_user': _('Logged out successfully!'),
+        'download_complete': _('Downloaded %(num)d emails.', **kwargs),
+        'upload_complete': _('Uploaded %(num)d emails.', **kwargs),
     }[key]
-    return gettext(message, **kwargs)
 
 
 class Config(object):

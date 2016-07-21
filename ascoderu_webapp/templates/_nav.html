@@ -1,12 +1,12 @@
 {% macro nav_link_security(endpoint, name) %}
   <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
-    <a href="{{ url_for_security(endpoint) }}">{{ _(name) }}</a>
+    <a href="{{ url_for_security(endpoint) }}">{{ name }}</a>
   </li>
 {% endmacro %}
 
 {% macro nav_link(endpoint, name, level) %}
   <li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
-    <a href="{{ url_for(endpoint) }}">{{ _(name) }}</a>
+    <a href="{{ url_for(endpoint) }}">{{ name }}</a>
   </li>
 {% endmacro %}
 
@@ -22,16 +22,16 @@
       </div>
       <div class="collapse navbar-collapse" id="navbar">
         <ul class="nav navbar-nav">
-          {{ nav_link('home', 'Home', level=0) }}
-          {{ nav_link('about', 'About', level=0) }}
-          {{ nav_link('email', 'Email', level=0) }}
+          {{ nav_link('home', _('Home'), level=0) }}
+          {{ nav_link('about', _('About'), level=0) }}
+          {{ nav_link('email', _('Email'), level=0) }}
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if current_user.is_authenticated %}
-            {{ nav_link_security('logout', 'Logout') }}
+            {{ nav_link_security('logout', _('Logout')) }}
           {% else %}
-            {{ nav_link_security('login', 'Login') }}
-            {{ nav_link_security('register', 'Register') }}
+            {{ nav_link_security('login', _('Login')) }}
+            {{ nav_link_security('register', _('Register')) }}
           {% endif %}
         </ul>
       </div>
@@ -41,9 +41,9 @@
 
 {% macro email_subnav() %}
   <ul class="nav nav-pills">
-    {{ nav_link('email_inbox', 'Inbox', level=1) }}
-    {{ nav_link('email_sent', 'Sent', level=1) }}
-    {{ nav_link('email_outbox', 'Outbox', level=1) }}
-    {{ nav_link('email_new', 'Write new', level=1) }}
+    {{ nav_link('email_inbox', _('Inbox'), level=1) }}
+    {{ nav_link('email_sent', _('Sent'), level=1) }}
+    {{ nav_link('email_outbox', _('Outbox'), level=1) }}
+    {{ nav_link('email_new', _('Write new'), level=1) }}
   </ul>
 {% endmacro %}
