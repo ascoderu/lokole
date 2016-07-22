@@ -25,9 +25,14 @@ def ui(key, **kwargs):
         'email_submit_field': _('Send'),
         'email_sent': _('Email sent!'),
         'email_delayed': _('Email will be sent soon!'),
+        'password_field_too_short': _('Password must be at least 6 characters'),
+        'password_field_invalid': _('Invalid password'),
+        'password_field_required': _('Please provide a password'),
+        'password_field_must_match': _('Password does not match'),
         'welcome_user': _('Welcome, %(user)s!', **kwargs),
         'welcome_back_user': _('Welcome back, %(user)s!', **kwargs),
         'loggedout_user': _('Logged out successfully!'),
+        'login_required': _('Please log in to access this page.'),
         'download_complete': _('Downloaded %(num)d emails.', **kwargs),
         'upload_complete': _('Uploaded %(num)d emails.', **kwargs),
     }[key]
@@ -64,3 +69,9 @@ class Config(object):
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_LOGIN_USER_TEMPLATE = 'login.html'
     SECURITY_REGISTER_USER_TEMPLATE = 'register.html'
+    SECURITY_MSG_LOGIN = ui('login_required'), 'error'
+    SECURITY_MSG_PASSWORD_MISMATCH = ui('password_field_must_match'), 'error'
+    SECURITY_MSG_RETYPE_PASSWORD_MISMATCH = ui('password_field_must_match'), 'error'
+    SECURITY_MSG_PASSWORD_NOT_PROVIDED = ui('password_field_required'), 'error'
+    SECURITY_MSG_INVALID_PASSWORD = ui('password_field_invalid'), 'error'
+    SECURITY_MSG_PASSWORD_INVALID_LENGTH = ui('password_field_too_short'), 'error'
