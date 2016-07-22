@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from flask_babel import gettext as _
+from flask_babel import lazy_gettext as _
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
