@@ -1,11 +1,14 @@
 from flask_security import LoginForm as BaseLoginForm
 from flask_security import RegisterForm as BaseRegisterForm
 from flask_wtf import Form
+from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
+from wtforms.validators import EqualTo
+from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
@@ -39,12 +42,27 @@ class LoginForm(BaseLoginForm):
         label=ui('email_field'),
         validators=[DataRequired(ui('email_field_required'))])
 
+    password = PasswordField(ui('password_field'))
+
+    submit = SubmitField(ui('login'))
+
 
 class RegisterForm(BaseRegisterForm):
     email = StringField(
         label=ui('name_field'),
         validators=[DataRequired(ui('name_field_required')),
                     UserDoesNotAlreadyExist(ui('name_field_already_exists'))])
+
+    password = PasswordField(
+        label=ui('password_field'),
+        validators=[DataRequired(ui('password_field_required')),
+                    Length(6, 128, ui('password_field_too_short'))])
+
+    password_confirm = PasswordField(
+        label=ui('password_confirm_field'),
+        validators=[EqualTo('password', ui('password_field_must_match'))])
+
+    submit = SubmitField(ui('register'))
 
 
 class NewEmailForm(Form):
