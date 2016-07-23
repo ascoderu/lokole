@@ -10,7 +10,7 @@
       <i>{{ 'email_empty' | ui }}</i>
     {% endif %}
 
-    {% for email in emails | sort_by('date', reverse=True) %}
+    {% for email in emails | sort_by_date(reverse=True) %}
       <div class="panel panel-default">
         <div class="panel-heading">
           <h4 class="panel-title">

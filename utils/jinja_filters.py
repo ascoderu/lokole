@@ -1,3 +1,4 @@
+from datetime import datetime
 from datetime import timezone
 from tzlocal import get_localzone
 
@@ -20,10 +21,11 @@ def render_date(utcdate, fmt='%x'):
     return local.strftime(fmt)
 
 
-def sort_by(iterable, attribute, reverse=False):
+def sort_by_date(iterable, reverse=False):
+    now = datetime.utcnow()
     return sorted(iterable,
                   reverse=reverse,
-                  key=lambda item: getattr(item, attribute) or 0)
+                  key=lambda item: item.date if item and item.date else now)
 
 
 def ui(key):
