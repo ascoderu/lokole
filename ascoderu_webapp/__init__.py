@@ -40,33 +40,3 @@ user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore,
                     login_form=forms.LoginForm,
                     register_form=forms.RegisterForm)
-
-
-@app.before_first_request
-def create_user():
-    if not models.User.query.filter_by(name='test').first():
-        user_datastore.create_user(name='test', password='test')
-        db.session.commit()
-    if not models.User.query.filter_by(email='test@test.net').first():
-        user_datastore.create_user(email='test@test.net', password='test')
-        db.session.commit()
-
-    if not models.Email.query.all():
-        from datetime import datetime
-        for i in range(1, 6):
-            inbound_email = models.Email(
-                date=datetime.utcnow(), sender='sender@sender.net',
-                to=['test@test.net', 'foo@bar.com'],
-                subject='cool email %s' % i, body='the message\n' * i)
-            outbound_email = models.Email(
-                sender='test@test.net',
-                to=['sender@sender.net', 'foo@bar.com'],
-                subject='cool reply %s' % i, body='the reply\n' * i)
-            sent_email = models.Email(
-                date=datetime.utcnow(), sender='test@test.net',
-                to=['sender@sender.net', 'foo@bar.com'],
-                subject='cool reply %s' % i, body='the reply\n' * i)
-            db.session.add(inbound_email)
-            db.session.add(outbound_email)
-            db.session.add(sent_email)
-        db.session.commit()
