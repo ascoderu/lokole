@@ -7,7 +7,7 @@
 
   <div class="panel-group" id="accordion">
     {% if not emails %}
-      <i>{{ _('No emails.') }}</i>
+      <i>{{ 'email_empty' | ui }}</i>
     {% endif %}
 
     {% for email in emails | sort_by('date', reverse=True) %}

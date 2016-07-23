@@ -74,7 +74,7 @@ def email_new():
     if form.validate_on_submit():
         is_to_local_user = new_email_for(current_user, form.to.data,
                                          form.subject.data, form.body.data)
-        message = ui('email_sent') if is_to_local_user else ui('email_delayed')
+        message = ui('email_done') if is_to_local_user else ui('email_delayed')
         next_endpoint = 'email_sent' if is_to_local_user else 'email_outbox'
 
         flash(message, category='success')

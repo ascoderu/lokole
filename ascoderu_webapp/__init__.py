@@ -20,6 +20,7 @@ migrate = Migrate(app, db)
 app.jinja_env.filters['nl2br'] = jinja_filters.nl2br
 app.jinja_env.filters['render_date'] = jinja_filters.render_date
 app.jinja_env.filters['sort_by'] = jinja_filters.sort_by
+app.jinja_env.filters['ui'] = jinja_filters.ui
 
 from ascoderu_webapp import views
 from ascoderu_webapp import models

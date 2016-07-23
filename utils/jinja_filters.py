@@ -7,6 +7,7 @@ from jinja2 import Markup
 from jinja2 import escape
 from jinja2 import evalcontextfilter
 
+import config
 
 _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
@@ -23,6 +24,10 @@ def sort_by(iterable, attribute, reverse=False):
     return sorted(iterable,
                   reverse=reverse,
                   key=lambda item: getattr(item, attribute) or 0)
+
+
+def ui(key):
+    return config.ui(key) if key else ''
 
 
 @evalcontextfilter

@@ -1,12 +1,12 @@
-{% macro nav_link_security(endpoint, name) %}
+{% macro nav_link_security(endpoint) %}
   <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
-    <a href="{{ url_for_security(endpoint) }}">{{ name }}</a>
+    <a href="{{ url_for_security(endpoint) }}">{{ endpoint | ui }}</a>
   </li>
 {% endmacro %}
 
-{% macro nav_link(endpoint, name, level) %}
+{% macro nav_link(endpoint, level) %}
   <li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
-    <a href="{{ url_for(endpoint) }}">{{ name }}</a>
+    <a href="{{ url_for(endpoint) }}">{{ endpoint | ui }}</a>
   </li>
 {% endmacro %}
 
@@ -15,23 +15,23 @@
     <div class="container-fluid">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">{{ _('Toggle navigation') }}</span>
+          <span class="sr-only">{{ 'show_menu' | ui }}</span>
           <span class="glyphicon glyphicon-menu-hamburger"></span>
         </button>
-        <a class="navbar-brand" href="#">{{ _('Ascoderu') }}</a>
+        <a class="navbar-brand" href="#">{{ 'ascoderu' | ui }}</a>
       </div>
       <div class="collapse navbar-collapse" id="navbar">
         <ul class="nav navbar-nav">
-          {{ nav_link('home', _('Home'), level=0) }}
-          {{ nav_link('about', _('About'), level=0) }}
-          {{ nav_link('email', _('Email'), level=0) }}
+          {{ nav_link('home', level=0) }}
+          {{ nav_link('about', level=0) }}
+          {{ nav_link('email', level=0) }}
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if current_user.is_authenticated %}
-            {{ nav_link_security('logout', _('Logout')) }}
+            {{ nav_link_security('logout') }}
           {% else %}
-            {{ nav_link_security('login', _('Login')) }}
-            {{ nav_link_security('register', _('Register')) }}
+            {{ nav_link_security('login') }}
+            {{ nav_link_security('register') }}
           {% endif %}
         </ul>
       </div>
@@ -41,9 +41,9 @@
 
 {% macro email_subnav() %}
   <ul class="nav nav-pills">
-    {{ nav_link('email_inbox', _('Inbox'), level=1) }}
-    {{ nav_link('email_sent', _('Sent'), level=1) }}
-    {{ nav_link('email_outbox', _('Outbox'), level=1) }}
-    {{ nav_link('email_new', _('Write new'), level=1) }}
+    {{ nav_link('email_inbox', level=1) }}
+    {{ nav_link('email_sent', level=1) }}
+    {{ nav_link('email_outbox', level=1) }}
+    {{ nav_link('email_new', level=1) }}
   </ul>
 {% endmacro %}
