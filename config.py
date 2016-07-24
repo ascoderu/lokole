@@ -35,6 +35,7 @@ def ui(key, **kwargs):
         'register': _('Register'),
         'ascoderu': _('Ascoderu'),
         'show_menu': _('Toggle navigation'),
+        'sync': _('Sync now!'),
         'home': _('Home'),
         'about': _('About'),
         'email': _('Email'),

@@ -33,6 +33,9 @@
             {{ nav_link_security('login') }}
             {{ nav_link_security('register') }}
           {% endif %}
+          {% if current_user | is_admin %}
+            {{ nav_link('sync', level=0) }}
+          {% endif %}
         </ul>
       </div>
     </div>

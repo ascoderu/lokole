@@ -27,6 +27,15 @@ def render_date(utcdate, fmt='%x'):
     return local.strftime(fmt)
 
 
+def is_admin(user):
+    """
+    :type user: ascoderu_webapp.models.User
+    :rtype: bool
+
+    """
+    return user and user.has_role(config.Config.ADMIN_ROLE)
+
+
 def sort_by_date(iterable, reverse=False):
     """
     :type iterable: collections.Iterable[datetime]
