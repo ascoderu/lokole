@@ -66,6 +66,8 @@ class Config(object):
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    EMAILS_PER_PAGE = 20
+
     CLIENT_NAME = 'dev-cw'
 
     REMOTE_STORAGE_CLASS = 'utils.remote_storage.AzureBlob'

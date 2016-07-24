@@ -15,8 +15,10 @@ from ascoderu_webapp.controllers import outbox_emails_for
 from ascoderu_webapp.controllers import sent_emails_for
 from ascoderu_webapp.controllers import upload_local_updates
 from ascoderu_webapp.forms import NewEmailForm
+from config import Config
 from config import LANGUAGES
 from config import ui
+from utils.pagination import paginate
 
 
 @babel.localeselector
@@ -83,24 +85,30 @@ def email_new():
     return render_template('email_new.html', form=form)
 
 
-@app.route('/email/inbox')
+@app.route('/email/inbox', defaults={'page': 1})
+@app.route('/email/inbox/<int:page>')
 @login_required
-def email_inbox():
+def email_inbox(page):
     emails = inbox_emails_for(current_user)
+    emails = paginate(emails, page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails, is_outgoing=False)
 
 
-@app.route('/email/outbox')
+@app.route('/email/outbox', defaults={'page': 1})
+@app.route('/email/outbox/<int:page>')
 @login_required
-def email_outbox():
+def email_outbox(page):
     emails = outbox_emails_for(current_user)
+    emails = paginate(emails, page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails, is_outgoing=True)
 
 
-@app.route('/email/sent')
+@app.route('/email/sent', defaults={'page': 1})
+@app.route('/email/sent/<int:page>')
 @login_required
-def email_sent():
+def email_sent(page):
     emails = sent_emails_for(current_user)
+    emails = paginate(emails, page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails, is_outgoing=True)
 
 

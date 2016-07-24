@@ -6,11 +6,11 @@
   {{ email_subnav() }}
 
   <div class="panel-group" id="accordion">
-    {% if not emails %}
+    {% if not emails.items %}
       <i>{{ 'email_empty' | ui }}</i>
     {% endif %}
 
-    {% for email in emails | sort_by_date(reverse=True) %}
+    {% for email in emails.items | sort_by_date(reverse=True) %}
       <div class="panel panel-default">
         <div class="panel-heading">
           <h4 class="panel-title">
@@ -41,4 +41,21 @@
       </div>
     {% endfor %}
   </div>
+
+  <ul class=pagination>
+    {% for page in emails.iter_pages() %}
+      {% if page %}
+        <li class="{{ 'active' if page == emails.page else ''}}">
+          <a href="{{ url_for(request.endpoint, page=page) }}">
+            {{ page }}
+          </a>
+        </li>
+      {% else %}
+        <li class="disabled">
+          <a href="#">&hellip;</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
 {% endblock %}
