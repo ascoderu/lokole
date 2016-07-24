@@ -5,6 +5,7 @@ from flask import request
 from flask import url_for
 from flask_security import current_user
 from flask_security import login_required
+from flask_security import roles_required
 
 from ascoderu_webapp import app
 from ascoderu_webapp import babel
@@ -112,8 +113,8 @@ def email_sent(page):
     return render_template('email.html', emails=emails, is_outgoing=True)
 
 
-# todo: admin required
 @app.route('/sync')
+@roles_required(Config.ADMIN_ROLE)
 def sync():
     emails_uploaded = upload_local_updates()
     emails_downloaded = download_remote_updates()

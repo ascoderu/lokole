@@ -29,6 +29,7 @@ def ui(key, **kwargs):
         'flash_error': _('Error'),
         'flash_info': _('Information'),
         'flash_success': _('Success'),
+        'unauthorized': _('You do not have permission to view this page.'),
         'login': _('Login'),
         'logout': _('Logout'),
         'register': _('Register'),
@@ -62,6 +63,8 @@ def ui(key, **kwargs):
 class Config(object):
     TESTING = False
 
+    ADMIN_ROLE = 'admininstrator'
+
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -93,6 +96,7 @@ class Config(object):
     SECURITY_LOGIN_USER_TEMPLATE = 'login.html'
     SECURITY_REGISTER_USER_TEMPLATE = 'register.html'
     SECURITY_MSG_LOGIN = ui('login_required'), 'error'
+    SECURITY_MSG_UNAUTHORIZED = ui('unauthorized'), 'error'
     SECURITY_MSG_PASSWORD_MISMATCH = ui('password_field_must_match'), 'error'
     SECURITY_MSG_RETYPE_PASSWORD_MISMATCH = ui('password_field_must_match'), 'error'
     SECURITY_MSG_PASSWORD_NOT_PROVIDED = ui('password_field_required'), 'error'
