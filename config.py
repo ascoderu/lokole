@@ -64,6 +64,8 @@ class Config(object):
     TESTING = False
 
     ADMIN_ROLE = 'admininstrator'
+    ADMIN_NAME = 'ascoderu-administrator'
+    ADMIN_PASSWORD = 'OPWEN: emails 4 the world!'
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')

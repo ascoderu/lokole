@@ -3,6 +3,7 @@ from flask_babel import Babel
 from flask_migrate import Migrate
 from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
+from flask_security.registerable import register_user
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
@@ -40,3 +41,13 @@ user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore,
                     login_form=forms.LoginForm,
                     register_form=forms.RegisterForm)
+
+
+@app.before_first_request
+def before_first_request():
+    admin = user_datastore.find_user(name=Config.ADMIN_NAME)
+    if not admin:
+        is_admin = user_datastore.find_or_create_role(Config.ADMIN_ROLE)
+        register_user(name=Config.ADMIN_NAME, password=Config.ADMIN_PASSWORD,
+                      roles=[is_admin])
+        db.session.commit()
