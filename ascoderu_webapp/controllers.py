@@ -51,24 +51,27 @@ def user_exists(name_or_email):
 def outbox_emails_for(user):
     """
     :type user: models.User
+    :rtype: collections.Iterable[models.Email]
 
     """
     query = Email.date.is_(None) & _find_emails_by(user)
-    return Email.query.filter(query).all()
+    return Email.query.filter(query)
 
 
 def sent_emails_for(user):
     """
     :type user: models.User
+    :rtype: collections.Iterable[models.Email]
 
     """
     query = Email.date.isnot(None) & _find_emails_by(user)
-    return Email.query.filter(query).all()
+    return Email.query.filter(query)
 
 
 def inbox_emails_for(user):
     """
     :type user: models.User
+    :rtype: collections.Iterable[models.Email]
 
     """
     return [mail for mail in Email.query.all()

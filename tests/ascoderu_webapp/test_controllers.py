@@ -41,8 +41,11 @@ class TestUserExists(AppTestMixin, TestCase):
         self.assertFalse(user_exists(non_existing_name))
 
 
-# noinspection PyUnusedLocal
+# noinspection PyUnusedLocal,PyPep8Naming
 class TestReadEmails(AppTestMixin, TestCase):
+    def assertIterablesEqual(self, actual, expected):
+        self.assertListEqual(list(actual), list(expected))
+
     def test_finds_inbox_emails_to_name_or_email(self):
         user = self.new_user(name='someone', email='someone@test.net')
         other_user = self.new_user(name='otherone', email='otherone@test.net')
@@ -59,7 +62,7 @@ class TestReadEmails(AppTestMixin, TestCase):
                         self.new_email(to=[other_user.name.upper()])]
         actual = inbox_emails_for(user)
 
-        self.assertSequenceEqual(actual, expected)
+        self.assertIterablesEqual(actual, expected)
 
     def test_finds_sent_emails_to_name_or_email(self):
         now = datetime.utcnow()
@@ -68,7 +71,7 @@ class TestReadEmails(AppTestMixin, TestCase):
         not_expected = [self.new_email(sender=user.name)]
         actual = sent_emails_for(user)
 
-        self.assertSequenceEqual(actual, expected)
+        self.assertIterablesEqual(actual, expected)
 
     def test_finds_outbox_emails_to_name_or_email(self):
         now = datetime.utcnow()
@@ -77,7 +80,7 @@ class TestReadEmails(AppTestMixin, TestCase):
         not_expected = [self.new_email(sender=user.name, date=now)]
         actual = outbox_emails_for(user)
 
-        self.assertSequenceEqual(actual, expected)
+        self.assertIterablesEqual(actual, expected)
 
 
 class TestWriteEmails(AppTestMixin, TestCase):
