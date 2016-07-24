@@ -8,6 +8,10 @@ from utils.strings import istreq
 
 
 def _find_emails_by(user):
+    """
+    :type user: models.User
+
+    """
     def query_user_email():
         return Email.sender.ilike(user.email)
 
@@ -24,6 +28,10 @@ def _find_emails_by(user):
 
 
 def _find_user_by(name_or_email):
+    """
+    :type name_or_email: str
+
+    """
     if not name_or_email:
         return None
 
@@ -32,27 +40,50 @@ def _find_user_by(name_or_email):
 
 
 def user_exists(name_or_email):
+    """
+    :type name_or_email: str
+
+    """
     user = _find_user_by(name_or_email)
     return user is not None
 
 
 def outbox_emails_for(user):
+    """
+    :type user: models.User
+
+    """
     query = Email.date.is_(None) & _find_emails_by(user)
     return Email.query.filter(query).all()
 
 
 def sent_emails_for(user):
+    """
+    :type user: models.User
+
+    """
     query = Email.date.isnot(None) & _find_emails_by(user)
     return Email.query.filter(query).all()
 
 
 def inbox_emails_for(user):
+    """
+    :type user: models.User
+
+    """
     return [mail for mail in Email.query.all()
             if any(istreq(to, user.email) or istreq(to, user.name)
                    for to in mail.to)]
 
 
 def new_email_for(user, to, subject, body):
+    """
+    :type user: models.Email
+    :type to: str
+    :type subject: str
+    :type body: str
+
+    """
     is_to_local_user = user_exists(to)
     email_date = datetime.utcnow() if is_to_local_user else None
 

@@ -1,5 +1,9 @@
 class DynamicFactory(object):
     def __init__(self, module_or_class):
+        """
+        :type module_or_class: str | type
+
+        """
         self.module_or_class = module_or_class
 
     def _locate_constructor(self):

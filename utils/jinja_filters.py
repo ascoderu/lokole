@@ -14,6 +14,12 @@ _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
 def render_date(utcdate, fmt='%x'):
+    """
+    :type utcdate: datetime
+    :type fmt: str
+    :rtype: str
+
+    """
     if not utcdate:
         return ''
 
@@ -22,6 +28,12 @@ def render_date(utcdate, fmt='%x'):
 
 
 def sort_by_date(iterable, reverse=False):
+    """
+    :type iterable: collections.Iterable[datetime]
+    :type reverse: bool
+    :rtype: list[datetime]
+
+    """
     now = datetime.utcnow()
     return sorted(iterable,
                   reverse=reverse,
@@ -29,6 +41,11 @@ def sort_by_date(iterable, reverse=False):
 
 
 def ui(key):
+    """
+    :type key: str
+    :rtype: str
+
+    """
     return config.ui(key) if key else ''
 
 

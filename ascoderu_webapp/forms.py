@@ -18,19 +18,35 @@ from config import ui
 
 class UserDoesNotAlreadyExist(object):
     def __init__(self, message=None):
+        """
+        :type message: str
+
+        """
         self.message = message
 
     # noinspection PyUnusedLocal
     def __call__(self, form, field):
+        """
+        :type field: wtforms.Field
+
+        """
         if user_exists(field.data):
             raise ValidationError(self.message)
 
 
 class EmailOrLocalUser(object):
     def __init__(self, message=None):
+        """
+        :type message: str
+
+        """
         self.message = message
 
     def __call__(self, form, field):
+        """
+        :type field: wtforms.Field
+
+        """
         try:
             Email(self.message)(form, field)
         except ValidationError:

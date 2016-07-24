@@ -20,6 +20,10 @@ class BabelCommand(Command):
 
     # noinspection PyMethodOverriding
     def run(self, args):
+        """
+        :type args: list[str]
+
+        """
         args.insert(0, sys.argv[0])
         cli = CommandLineInterface()
         cli.run(args)
@@ -35,6 +39,12 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
 
     @classmethod
     def _read_text(cls, text_file, encoding='utf8'):
+        """
+        :type text_file: file
+        :type encoding: str
+        :rtype: str
+
+        """
         text = text_file.read()
         text_file.close()
 
@@ -45,20 +55,37 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
 
     @classmethod
     def _split_sentences(cls, text):
+        """
+        :type text: str
+        :rtype: list[str]
+
+        """
         return re.split('(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
 
     @classmethod
     @lru_cache(maxsize=None)
     def _all_local_senders(cls):
+        """
+        :rtype: list[str]
+        """
+
         users = User.query.all()
         return [user.email or user.name for user in users]
 
     @classmethod
     def _random_local_sender(cls):
+        """
+        :rtype: str
+
+        """
         return random.choice(cls._all_local_senders())
 
     @classmethod
     def _random_email_addresses(cls):
+        """
+        :rtype: list[str]
+
+        """
         addresses = [
             'random@randomtestemail.net',
             'foo@randomtestemail.net',
@@ -71,6 +98,13 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
 
     @classmethod
     def _create_random_email(cls, sentences, min_sents=3, max_sents=20):
+        """
+        :type sentences: list[str]
+        :type min_sents: int
+        :type max_sents: int
+        :rtype: ascoderu_webapp.models.Email
+
+        """
         num_sentences = random.randint(min_sents, max_sents)
         email_sentences = iter(random.sample(sentences, num_sentences))
         subj = next(email_sentences)
@@ -87,6 +121,11 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
 
     @classmethod
     def _populate_emails(cls, text_file, num_emails):
+        """
+        :type text_file: file
+        :type num_emails: int
+
+        """
         if not text_file or not num_emails:
             return
 
@@ -109,5 +148,10 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
 
     # noinspection PyMethodOverriding
     def run(self, text_file, num_emails):
+        """
+        :type text_file: file
+        :type num_emails: int
+
+        """
         self._populate_users()
         self._populate_emails(text_file, num_emails)

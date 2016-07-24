@@ -45,6 +45,11 @@ class Email(db.Model):
                 (self.subject or self.body))
 
     def is_same_as(self, other):
+        """
+        :type other: Email
+        :rtype: bool
+
+        """
         return (isinstance(other, Email) and
                 other.sender == self.sender and
                 other.subject == self.subject and
@@ -70,18 +75,33 @@ class ModelPacker(object):
 
     @classmethod
     def _format_date(cls, utcdatetime):
+        """
+        :type utcdatetime: datetime
+        :rtype: str
+
+        """
         if not utcdatetime:
             return None
         return utcdatetime.strftime(cls._date_format)
 
     @classmethod
     def _parse_date(cls, datestring):
+        """
+        :type datestring: str
+        :rtype: datetime
+
+        """
         if not datestring:
             return None
         return datetime.strptime(datestring, cls._date_format)
 
     @classmethod
     def pack(cls, emails):
+        """
+        :type emails: collections.Iterable[models.Email]
+        :rtype: dict[str,list[dict[str,str]]]
+
+        """
         return {
             cls._emails_container: [{
                 cls._field_date: cls._format_date(email.date),
@@ -94,6 +114,11 @@ class ModelPacker(object):
 
     @classmethod
     def unpack_emails(cls, packed):
+        """
+        :type packed: dict[str,object]
+        :rtype: list[models.Email]
+
+        """
         if not packed:
             return []
 
@@ -107,6 +132,11 @@ class ModelPacker(object):
 
     @classmethod
     def unpack_accounts(cls, packed):
+        """
+        :type packed: dict[str,object]
+        :rtype: list[models.User]
+
+        """
         if not packed:
             return []
 

@@ -6,6 +6,12 @@ from io import BytesIO
 
 
 def _compress(data, level):
+    """
+    :type data: bytes
+    :type level: int
+    :rtype: bytes
+
+    """
     with BytesIO() as fobj:
         with GzipFile(fileobj=fobj, mode='wb', compresslevel=level) as gzfobj:
             gzfobj.write(data)
@@ -15,6 +21,11 @@ def _compress(data, level):
 
 
 def _decompress(compressed):
+    """
+    :type compressed: bytes
+    :rtype: bytes
+
+    """
     try:
         return zlib.decompress(compressed, 16 + zlib.MAX_WBITS)
     except zlib.error as error:
@@ -25,9 +36,18 @@ class CompressedJson(object):
     ENCODING = 'utf8'
 
     def __init__(self, level=9):
+        """
+        :type level: int
+
+        """
         self.level = level
 
     def serialize(self, obj):
+        """
+        :type obj: object
+        :rtype: bytes
+
+        """
         if not obj:
             return b''
 
@@ -36,6 +56,11 @@ class CompressedJson(object):
         return _compress(serialized_bytes, level=self.level)
 
     def deserialize(self, compressed):
+        """
+        :type compressed: bytes
+        :rtype: object
+
+        """
         if not compressed:
             return None
 
