@@ -18,6 +18,7 @@ from ascoderu_webapp.models import User
 class BabelCommand(Command):
     capture_all_args = True
 
+    # noinspection PyMethodOverriding
     def run(self, args):
         args.insert(0, sys.argv[0])
         cli = CommandLineInterface()
@@ -106,6 +107,7 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
             user_datastore.create_user(email='test@test.net', password='test')
             db.session.commit()
 
+    # noinspection PyMethodOverriding
     def run(self, text_file, num_emails):
         self._populate_users()
         self._populate_emails(text_file, num_emails)

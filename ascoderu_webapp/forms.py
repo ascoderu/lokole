@@ -20,6 +20,7 @@ class UserDoesNotAlreadyExist(object):
     def __init__(self, message=None):
         self.message = message
 
+    # noinspection PyUnusedLocal
     def __call__(self, form, field):
         if user_exists(field.data):
             raise ValidationError(self.message)
