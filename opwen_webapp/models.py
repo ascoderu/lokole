@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from bleach import ALLOWED_TAGS
 from bleach import clean
 from flask_security import RoleMixin
 from flask_security import UserMixin
@@ -14,6 +15,10 @@ roles_users = db.Table(
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
 
+_HEADERS = ['h%d' % i for i in range(1, 7)]
+_KEEP_TAGS = ALLOWED_TAGS + _HEADERS + ['u']
+
+
 def _normalize(data, keep_case=False):
     """
     :type data: str
@@ -21,7 +26,8 @@ def _normalize(data, keep_case=False):
     :rtype: str
 
     """
-    data = clean(data, strip=True)
+    data = clean(data, strip=True, tags=_KEEP_TAGS)
+
     if not keep_case:
         data = normalize_caseless(data)
     return data
