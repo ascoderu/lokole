@@ -74,10 +74,10 @@ class Config(object):
 
     EMAILS_PER_PAGE = 20
 
-    CLIENT_NAME = 'dev-cw'
+    CLIENT_NAME = os.getenv('OPWEN_CLIENT_NAME')
 
     REMOTE_STORAGE_CLASS = 'utils.remote_storage.AzureBlob'
-    REMOTE_STORAGE_ACCOUNT_NAME = 'clewolff'
+    REMOTE_STORAGE_ACCOUNT_NAME = os.getenv('OPWEN_REMOTE_ACCOUNT_NAME')
     REMOTE_STORAGE_ACCOUNT_KEY = os.getenv('OPWEN_REMOTE_ACCOUNT_KEY')
     REMOTE_STORAGE_CONTAINER = 'opwen'
     REMOTE_UPLOAD_PATH = '%s/from_opwen/new' % CLIENT_NAME
