@@ -9,7 +9,7 @@ from utils.strings import normalize_caseless
 
 def _find_emails_by(user):
     """
-    :type user: models.User
+    :type user: User
 
     """
     def query_user_email():
@@ -51,8 +51,8 @@ def user_exists(name_or_email):
 
 def outbox_emails_for(user):
     """
-    :type user: models.User
-    :rtype: collections.Iterable[models.Email]
+    :type user: User
+    :rtype: collections.Iterable[Email]
 
     """
     query = Email.date.is_(None) & _find_emails_by(user)
@@ -61,8 +61,8 @@ def outbox_emails_for(user):
 
 def sent_emails_for(user):
     """
-    :type user: models.User
-    :rtype: collections.Iterable[models.Email]
+    :type user: User
+    :rtype: collections.Iterable[Email]
 
     """
     query = Email.date.isnot(None) & _find_emails_by(user)
@@ -71,8 +71,8 @@ def sent_emails_for(user):
 
 def inbox_emails_for(user):
     """
-    :type user: models.User
-    :rtype: collections.Iterable[models.Email]
+    :type user: User
+    :rtype: collections.Iterable[Email]
 
     """
     return [mail for mail in Email.query.all()
@@ -82,7 +82,7 @@ def inbox_emails_for(user):
 
 def new_email_for(user, to, subject, body):
     """
-    :type user: models.Email
+    :type user: User
     :type to: str
     :type subject: str
     :type body: str
