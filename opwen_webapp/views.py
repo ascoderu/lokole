@@ -2,14 +2,12 @@ from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
-from flask import session
 from flask import url_for
 from flask_security import current_user
 from flask_security import login_required
 from flask_security import roles_required
 
 from opwen_webapp import app
-from opwen_webapp import babel
 from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
@@ -18,27 +16,8 @@ from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.forms import NewEmailForm
 from config import Config
-from config import LANGUAGES
 from config import ui
 from utils.pagination import paginate
-
-
-@babel.localeselector
-def get_locale():
-    return request.accept_languages.best_match(LANGUAGES.keys())
-
-
-@app.after_request
-def store_visited_url(response):
-    session['previous_url'] = request.url
-    return response
-
-
-# noinspection PyUnusedLocal
-@app.errorhandler(404)
-def on_404(code_or_exception):
-    flash(ui('page_not_found', url=request.url), category='error')
-    return redirect(session.get('previous_url') or url_for('home'))
 
 
 @app.route('/')
