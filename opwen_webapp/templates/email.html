@@ -42,20 +42,22 @@
     {% endfor %}
   </div>
 
-  <ul class=pagination>
-    {% for page in emails.iter_pages() %}
-      {% if page %}
-        <li class="{{ 'active' if page == emails.page else ''}}">
-          <a href="{{ url_for(request.endpoint, page=page) }}">
-            {{ page }}
-          </a>
-        </li>
-      {% else %}
-        <li class="disabled">
-          <a href="#">&hellip;</a>
-        </li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+  {% if emails.pages > 1 %}
+    <ul class=pagination>
+      {% for page in emails.iter_pages() %}
+        {% if page %}
+          <li class="{{ 'active' if page == emails.page else ''}}">
+            <a href="{{ url_for(request.endpoint, page=page) }}">
+              {{ page }}
+            </a>
+          </li>
+        {% else %}
+          <li class="disabled">
+            <a href="#">&hellip;</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
 
 {% endblock %}
