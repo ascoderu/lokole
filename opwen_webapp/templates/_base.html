@@ -23,6 +23,8 @@
     <script src="{{ url_for('static', filename='libs/html5shiv/js/html5shiv.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/respond/js/respond.js') }}"></script>
   <![endif]-->
+  <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery/js/jquery.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.js') }}"></script>
 
 
   {# opwen_webapp #}
@@ -37,10 +39,5 @@
     {% block content %}{% endblock %}
   </div>
 
-  {# jquery (required for bootstrap) #}
-  <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery/js/jquery.js') }}"></script>
-
-  {# bootstrap #}
-  <script type="text/javascript" src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.js') }}"></script>
 </body>
 </html>
