@@ -3,7 +3,7 @@
 from flask_migrate import MigrateCommand
 from flask_script import Manager
 
-from ascoderu_webapp import app
+from opwen_webapp import app
 from utils.script_commands import BabelCommand
 from utils.script_commands import PopulateDatabaseWithTestEntriesCommand
 

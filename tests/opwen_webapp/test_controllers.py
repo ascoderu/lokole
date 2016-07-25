@@ -2,15 +2,15 @@ from datetime import datetime
 
 from flask_testing import TestCase
 
-from ascoderu_webapp.controllers import download_remote_updates
-from ascoderu_webapp.controllers import inbox_emails_for
-from ascoderu_webapp.controllers import new_email_for
-from ascoderu_webapp.controllers import outbox_emails_for
-from ascoderu_webapp.controllers import sent_emails_for
-from ascoderu_webapp.controllers import upload_local_updates
-from ascoderu_webapp.controllers import user_exists
-from ascoderu_webapp.models import Email
-from ascoderu_webapp.models import User
+from opwen_webapp.controllers import download_remote_updates
+from opwen_webapp.controllers import inbox_emails_for
+from opwen_webapp.controllers import new_email_for
+from opwen_webapp.controllers import outbox_emails_for
+from opwen_webapp.controllers import sent_emails_for
+from opwen_webapp.controllers import upload_local_updates
+from opwen_webapp.controllers import user_exists
+from opwen_webapp.models import Email
+from opwen_webapp.models import User
 from utils.testing import AppTestMixin
 
 
@@ -155,7 +155,7 @@ class TestRemoteDownload(AppTestMixin, TestCase):
             self.assertTrue(actual.is_same_as(expected))
 
     def test_updates_users_on_name(self):
-        user, email = self.new_user(name='test'), 'test@ascoderu.net'
+        user, email = self.new_user(name='test'), 'test@opwen.net'
         self._prepare_users_for_download(user.name, email)
 
         download_remote_updates()
@@ -165,7 +165,7 @@ class TestRemoteDownload(AppTestMixin, TestCase):
         self.assertEqual(updated_user.email, email)
 
     def test_updates_users_on_email(self):
-        user, email = self.new_user(email='test'), 'test@ascoderu.net'
+        user, email = self.new_user(email='test'), 'test@opwen.net'
         self._prepare_users_for_download(user.email, email)
 
         download_remote_updates()

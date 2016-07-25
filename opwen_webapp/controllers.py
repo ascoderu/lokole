@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from ascoderu_webapp import app
-from ascoderu_webapp import db
-from ascoderu_webapp.models import Email
-from ascoderu_webapp.models import User
+from opwen_webapp import app
+from opwen_webapp import db
+from opwen_webapp.models import Email
+from opwen_webapp.models import User
 from utils.strings import istreq
 
 

@@ -9,10 +9,10 @@ from babel.messages.frontend import CommandLineInterface
 from flask_script import Command
 from flask_script import Option
 
-from ascoderu_webapp import db
-from ascoderu_webapp import user_datastore
-from ascoderu_webapp.models import Email
-from ascoderu_webapp.models import User
+from opwen_webapp import db
+from opwen_webapp import user_datastore
+from opwen_webapp.models import Email
+from opwen_webapp.models import User
 
 
 class BabelCommand(Command):
@@ -102,7 +102,7 @@ class PopulateDatabaseWithTestEntriesCommand(Command):
         :type sentences: list[str]
         :type min_sents: int
         :type max_sents: int
-        :rtype: ascoderu_webapp.models.Email
+        :rtype: opwen_webapp.models.Email
 
         """
         num_sentences = random.randint(min_sents, max_sents)

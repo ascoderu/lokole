@@ -7,15 +7,15 @@ from flask_security import current_user
 from flask_security import login_required
 from flask_security import roles_required
 
-from ascoderu_webapp import app
-from ascoderu_webapp import babel
-from ascoderu_webapp.controllers import download_remote_updates
-from ascoderu_webapp.controllers import inbox_emails_for
-from ascoderu_webapp.controllers import new_email_for
-from ascoderu_webapp.controllers import outbox_emails_for
-from ascoderu_webapp.controllers import sent_emails_for
-from ascoderu_webapp.controllers import upload_local_updates
-from ascoderu_webapp.forms import NewEmailForm
+from opwen_webapp import app
+from opwen_webapp import babel
+from opwen_webapp.controllers import download_remote_updates
+from opwen_webapp.controllers import inbox_emails_for
+from opwen_webapp.controllers import new_email_for
+from opwen_webapp.controllers import outbox_emails_for
+from opwen_webapp.controllers import sent_emails_for
+from opwen_webapp.controllers import upload_local_updates
+from opwen_webapp.forms import NewEmailForm
 from config import Config
 from config import LANGUAGES
 from config import ui

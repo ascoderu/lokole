@@ -113,85 +113,85 @@ msgstr ""
 msgid "Uploaded %(num)d emails."
 msgstr ""
 
-#: ascoderu_webapp/templates/_messages.html:4
+#: opwen_webapp/templates/_messages.html:4
 msgid "Error"
 msgstr ""
 
-#: ascoderu_webapp/templates/_messages.html:12
+#: opwen_webapp/templates/_messages.html:12
 msgid "Information"
 msgstr ""
 
-#: ascoderu_webapp/templates/_messages.html:20
+#: opwen_webapp/templates/_messages.html:20
 msgid "Success"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:18
+#: opwen_webapp/templates/_nav.html:18
 msgid "Toggle navigation"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:21
-msgid "Ascoderu"
+#: opwen_webapp/templates/_nav.html:21
+msgid "Opwen"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:25
+#: opwen_webapp/templates/_nav.html:25
 msgid "Home"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:26
+#: opwen_webapp/templates/_nav.html:26
 msgid "About"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:27
+#: opwen_webapp/templates/_nav.html:27
 msgid "Email"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:31
+#: opwen_webapp/templates/_nav.html:31
 msgid "Logout"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:33
-#: ascoderu_webapp/templates/login.html:7
+#: opwen_webapp/templates/_nav.html:33
+#: opwen_webapp/templates/login.html:7
 msgid "Login"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:34
-#: ascoderu_webapp/templates/register.html:7
+#: opwen_webapp/templates/_nav.html:34
+#: opwen_webapp/templates/register.html:7
 msgid "Register"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:44
+#: opwen_webapp/templates/_nav.html:44
 msgid "Inbox"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:45
+#: opwen_webapp/templates/_nav.html:45
 msgid "Sent"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:46
+#: opwen_webapp/templates/_nav.html:46
 msgid "Outbox"
 msgstr ""
 
-#: ascoderu_webapp/templates/_nav.html:47
+#: opwen_webapp/templates/_nav.html:47
 msgid "Write new"
 msgstr ""
 
-#: ascoderu_webapp/templates/about.html:4
-msgid "Ascoderu mission statement goes here."
+#: opwen_webapp/templates/about.html:4
+msgid "Opwen mission statement goes here."
 msgstr ""
 
-#: ascoderu_webapp/templates/email.html:10
+#: opwen_webapp/templates/email.html:10
 msgid "No emails."
 msgstr ""
 
-#: ascoderu_webapp/templates/home.html:4
+#: opwen_webapp/templates/home.html:4
 msgid "Hello World!"
 msgstr ""
 
-#: ascoderu_webapp/templates/login.html:16
+#: opwen_webapp/templates/login.html:16
 msgid "Don't have an account?"
 msgstr ""
 
-#: ascoderu_webapp/templates/login.html:17
+#: opwen_webapp/templates/login.html:17
 msgid "Register now!"
 msgstr ""
 

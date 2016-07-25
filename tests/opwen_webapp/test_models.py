@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from flask_testing import TestCase
 
-from ascoderu_webapp.models import ModelPacker
+from opwen_webapp.models import ModelPacker
 from utils.testing import AppTestMixin
 
 

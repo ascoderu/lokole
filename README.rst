@@ -1,5 +1,5 @@
-Ascoderu webapp
-===============
+Opwen webapp
+============
 
 Development setup
 -----------------
@@ -8,14 +8,14 @@ First, get the source code.
 
 .. sourcecode :: sh
 
-    git clone git@bitbucket.org:c-w/ascoderu-webapp.git
+    git clone git@bitbucket.org:c-w/opwen-webapp.git
 
 Second, install the dependencies for the package and verify your checkout by
 running the tests.
 
 .. sourcecode :: sh
 
-    cd ascoderu-webapp
+    cd opwen-webapp
 
     virtualenv -p $(which python3) --no-site-packages virtualenv
     . virtualenv/bin/activate
@@ -29,7 +29,7 @@ test data.
 
 .. sourcecode :: sh
 
-    touch ascoderu.db
+    touch opwen.db
     ./manage.py db upgrade
     ./manage.py db migrate
     ./manage.py dbpopulate

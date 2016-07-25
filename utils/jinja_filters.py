@@ -29,7 +29,7 @@ def render_date(utcdate, fmt='%x'):
 
 def is_admin(user):
     """
-    :type user: ascoderu_webapp.models.User
+    :type user: opwen_webapp.models.User
     :rtype: bool
 
     """

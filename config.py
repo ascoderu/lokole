@@ -33,7 +33,7 @@ def ui(key, **kwargs):
         'login': _('Login'),
         'logout': _('Logout'),
         'register': _('Register'),
-        'ascoderu': _('Ascoderu'),
+        'opwen': _('Opwen'),
         'show_menu': _('Toggle navigation'),
         'sync': _('Sync now!'),
         'home': _('Home'),
@@ -65,10 +65,10 @@ class Config(object):
     TESTING = False
 
     ADMIN_ROLE = 'admininstrator'
-    ADMIN_NAME = 'ascoderu-administrator'
+    ADMIN_NAME = 'opwen-administrator'
     ADMIN_PASSWORD = 'OPWEN: emails 4 the world!'
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'ascoderu.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'opwen.db')
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -78,13 +78,13 @@ class Config(object):
 
     REMOTE_STORAGE_CLASS = 'utils.remote_storage.AzureBlob'
     REMOTE_STORAGE_ACCOUNT_NAME = 'clewolff'
-    REMOTE_STORAGE_ACCOUNT_KEY = os.getenv('ASCODERU_REMOTE_ACCOUNT_KEY')
-    REMOTE_STORAGE_CONTAINER = 'ascoderu'
+    REMOTE_STORAGE_ACCOUNT_KEY = os.getenv('OPWEN_REMOTE_ACCOUNT_KEY')
+    REMOTE_STORAGE_CONTAINER = 'opwen'
     REMOTE_UPLOAD_PATH = '%s/from_opwen/new' % CLIENT_NAME
     REMOTE_UPLOAD_FORMAT = '%Y-%m-%d_%H-%M.json.gz'
     REMOTE_DOWNLOAD_PATH = '%s/to_opwen/new.json.gz' % CLIENT_NAME
     REMOTE_SERIALIZATION_CLASS = 'utils.serialization.CompressedJson'
-    REMOTE_PACKER_CLASS = 'ascoderu_webapp.models.ModelPacker'
+    REMOTE_PACKER_CLASS = 'opwen_webapp.models.ModelPacker'
 
     SECRET_KEY = 's3cr3t'
 

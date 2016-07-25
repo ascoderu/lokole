@@ -4,7 +4,7 @@ from flask_security import RoleMixin
 from flask_security import UserMixin
 from sqlalchemy_utils import ScalarListType
 
-from ascoderu_webapp import db
+from opwen_webapp import db
 
 roles_users = db.Table(
     'roles_users',

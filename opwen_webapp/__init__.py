@@ -24,9 +24,9 @@ app.jinja_env.filters['sort_by_date'] = jinja_filters.sort_by_date
 app.jinja_env.filters['ui'] = jinja_filters.ui
 app.jinja_env.filters['is_admin'] = jinja_filters.is_admin
 
-from ascoderu_webapp import views
-from ascoderu_webapp import models
-from ascoderu_webapp import forms
+from opwen_webapp import views
+from opwen_webapp import models
+from opwen_webapp import forms
 
 app.remote_serializer = DynamicFactory(Config.REMOTE_SERIALIZATION_CLASS)()
 app.remote_packer = DynamicFactory(Config.REMOTE_PACKER_CLASS)()
