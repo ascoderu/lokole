@@ -86,11 +86,11 @@ class Config(object):
     REMOTE_SERIALIZATION_CLASS = 'utils.serialization.CompressedJson'
     REMOTE_PACKER_CLASS = 'opwen_webapp.models.ModelPacker'
 
-    SECRET_KEY = 's3cr3t'
+    SECRET_KEY = os.getenv('OPWEN_SECRET_KEY')
 
     SECURITY_USER_IDENTITY_ATTRIBUTES = ('name', 'email')
     SECURITY_PASSWORD_HASH = 'bcrypt'
-    SECURITY_PASSWORD_SALT = 'password-salt'
+    SECURITY_PASSWORD_SALT = os.getenv('OPWEN_PASSWORD_SALT')
     SECURITY_REGISTERABLE = True
     SECURITY_POST_REGISTER_VIEW = 'post_register'
     SECURITY_POST_LOGIN_VIEW = 'post_login'

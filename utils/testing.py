@@ -2,6 +2,7 @@ from datetime import datetime
 
 from opwen_webapp import app
 from opwen_webapp import db
+from opwen_webapp import security
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
 from config import Config
@@ -31,6 +32,8 @@ class DummyRemoteStorage(object):
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    SECRET_KEY = 's3cr3t'
+    SECURITY_PASSWORD_SALT = 'password-salt'
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic,PyArgumentList
@@ -38,6 +41,7 @@ class AppTestMixin(object):
     def create_app(self):
         app.config.from_object(TestConfig)
         app.remote_storage = DummyRemoteStorage()
+        security.init_app(app, register_blueprint=False)
         return app
 
     def setUp(self):
