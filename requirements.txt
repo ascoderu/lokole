@@ -10,3 +10,4 @@ Flask-Testing==0.5.0
 tzlocal==1.2.2
 azure-storage==0.32.0
 Flask-Script==2.0.5
+bleach==1.4.3

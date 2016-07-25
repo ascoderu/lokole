@@ -15,10 +15,17 @@ class TestUser(AppTestMixin, TestCase):
 
 
 class TestEmail(AppTestMixin, TestCase):
-    def test_email_constructor_normalizes_fields(self):
+    def test_email_constructor_normalizes_casing(self):
         email = self.new_email(sender='FOO', to=['BAR'])
         self.assertEqual(email.sender, 'foo')
         self.assertEqual(email.to, ['bar'])
+
+    def test_email_constructor_is_xss_safe(self):
+        email = self.new_email(body='XSS <script>safe</script>')
+        self.assertEqual(email.body, 'XSS safe')
+
+        email = self.new_email(subject='XSS <script>safe</script>')
+        self.assertEqual(email.subject, 'XSS safe')
 
     def test_email_with_all_fields_is_complete(self):
         email = self.create_complete_email()

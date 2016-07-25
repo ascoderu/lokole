@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from bleach import clean
 from flask_security import RoleMixin
 from flask_security import UserMixin
 from sqlalchemy_utils import ScalarListType
@@ -11,6 +12,19 @@ roles_users = db.Table(
     'roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+
+def _normalize(data, keep_case=False):
+    """
+    :type data: str
+    :type keep_case: bool
+    :rtype: str
+
+    """
+    data = clean(data, strip=True)
+    if not keep_case:
+        data = normalize_caseless(data)
+    return data
 
 
 class User(db.Model, UserMixin):
@@ -26,9 +40,10 @@ class User(db.Model, UserMixin):
 
     # noinspection PyArgumentList
     def __init__(self, email=None, name=None, **kwargs):
-        email = normalize_caseless(email)
-        name = normalize_caseless(name)
-        super().__init__(email=email, name=name, **kwargs)
+        super().__init__(
+            email=_normalize(email),
+            name=_normalize(name),
+            **kwargs)
 
 
 class Role(db.Model, RoleMixin):
@@ -45,10 +60,13 @@ class Email(db.Model):
     subject = db.Column(db.String())
     body = db.Column(db.String())
 
-    def __init__(self, to=None, sender=None, **kwargs):
-        to = [normalize_caseless(recipient) for recipient in to] if to else to
-        sender = normalize_caseless(sender)
-        super().__init__(to=to, sender=sender, **kwargs)
+    def __init__(self, to=None, sender=None, subject=None, body=None, **kwargs):
+        super().__init__(
+            to=[_normalize(recipient) for recipient in to] if to else to,
+            sender=_normalize(sender),
+            subject=_normalize(subject, keep_case=True),
+            body=_normalize(body, keep_case=True),
+            **kwargs)
 
     def is_complete(self):
         return (self.sender and
