@@ -21,37 +21,41 @@
 <script>
   (function() {
     $(document).ready(function() {
-      $("#{{ form.body.id }}").wysihtml5({
-        toolbar: {
-          "font-styles": false,
-          "link": false,
-          "image": false,
-          "outdent": false,
-          "indent": false,
-          "blockquote": false,
-          "fa": true,
-        },
-        customTemplates: {
-          emphasis: function(context) {
-            return '<li><div class="btn-group">'
-                    + '<a title="{{ 'bold' | ui }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-bold" aria-hidden="true"></span></a>'
-                    + '<a title="{{ 'italic' | ui }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-italic" aria-hidden="true"></span></a>'
-                    + '<a title="{{ 'underline' | ui }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-underline" aria-hidden="true"></span></a>'
-                    + '</div></li>';
+
+      (function turnEmailBodyFieldIntoRichEditor() {
+        $("#{{ form.body.id }}").wysihtml5({
+          toolbar: {
+            "font-styles": false,
+            "link": false,
+            "image": false,
+            "outdent": false,
+            "indent": false,
+            "blockquote": false,
+            "fa": true,
           },
-          lists: function(context) {
-            return '<li><div class="btn-group">'
-                    + '<a title="{{ 'unordered_list' | ui }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'
-                    + '<a title="{{ 'ordered_list' | ui }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>'
-                    + '</div></li>';
+          customTemplates: {
+            emphasis: function(context) {
+              return '<li><div class="btn-group">'
+                      + '<a title="{{ 'bold' | ui }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '  <span class="fa fa-bold" aria-hidden="true"></span></a>'
+                      + '<a title="{{ 'italic' | ui }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '  <span class="fa fa-italic" aria-hidden="true"></span></a>'
+                      + '<a title="{{ 'underline' | ui }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '  <span class="fa fa-underline" aria-hidden="true"></span></a>'
+                      + '</div></li>';
+            },
+            lists: function(context) {
+              return '<li><div class="btn-group">'
+                      + '<a title="{{ 'unordered_list' | ui }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'
+                      + '<a title="{{ 'ordered_list' | ui }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>'
+                      + '</div></li>';
+            }
           }
-        }
-       });
+         });
+       }());
+
     });
    }());
 </script>
