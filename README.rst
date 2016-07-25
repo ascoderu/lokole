@@ -1,6 +1,9 @@
 Opwen webapp
 ============
 
+.. image:: https://travis-ci.org/OPWEN/opwen-webapp.svg?branch=master
+    :target: https://travis-ci.org/OPWEN/opwen-webapp
+
 Development setup
 -----------------
 
