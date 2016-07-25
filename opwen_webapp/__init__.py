@@ -25,7 +25,7 @@ babel = Babel(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-app.jinja_env.filters['nl2br'] = jinja_filters.nl2br
+app.jinja_env.filters['safe_multiline'] = jinja_filters.safe_multiline
 app.jinja_env.filters['render_date'] = jinja_filters.render_date
 app.jinja_env.filters['sort_by_date'] = jinja_filters.sort_by_date
 app.jinja_env.filters['ui'] = jinja_filters.ui

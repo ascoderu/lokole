@@ -5,7 +5,6 @@ from tzlocal import get_localzone
 import re
 
 from jinja2 import Markup
-from jinja2 import escape
 from jinja2 import evalcontextfilter
 
 import config
@@ -60,7 +59,7 @@ def ui(key):
 
 
 @evalcontextfilter
-def nl2br(eval_ctx, value):
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
-                          for p in _paragraph_re.split(escape(value)))
-    return Markup(result) if eval_ctx.autoescape else result
+def safe_multiline(eval_ctx, value):
+    html = '\n\n'.join('<p>%s</p>' % paragraph.replace('\n', '<br>\n')
+                       for paragraph in _paragraph_re.split(value))
+    return Markup(html) if eval_ctx.autoescape else html

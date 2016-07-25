@@ -24,7 +24,7 @@
                   {% endif %}
                 </div>
                 <div class="col-sm-6">
-                  <span class="email-subject">{{ email.subject }}</span>
+                  <span class="email-subject">{{ email.subject | safe }}</span>
                 </div>
                 <div class="col-sm-2">
                   <span class="email-sent-at">{{ email.date | render_date }}</span>
@@ -35,7 +35,7 @@
         </div>
         <div id="collapse{{ loop.index}}" class="panel-collapse collapse">
           <div class="panel-body">
-            <span class="email-body">{{ email.body | nl2br }}</span>
+            <span class="email-body">{{ email.body | safe_multiline }}</span>
           </div>
         </div>
       </div>
