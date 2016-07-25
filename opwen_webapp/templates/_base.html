@@ -7,6 +7,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <title>
+    {% block title %}
+      {% if request.endpoint | ui %}
+        {{ request.endpoint | ui }}
+      {% else %}
+        {{ 'opwen' | ui }}
+      {% endif %}
+    {% endblock %}
+  </title>
+
   {# bootstrap #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='libs/bootstrap/css/bootstrap.css') }}">
   <!--[if lt IE 9]>

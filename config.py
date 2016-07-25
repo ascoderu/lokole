@@ -58,7 +58,7 @@ def ui(key, **kwargs):
         'login_required': _('Please log in to access this page.'),
         'download_complete': _('Downloaded %(num)d emails.', **kwargs),
         'upload_complete': _('Uploaded %(num)d emails.', **kwargs),
-    }[key]
+    }.get(key)
 
 
 class Config(object):

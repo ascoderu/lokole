@@ -55,7 +55,7 @@ def ui(key):
     :rtype: str
 
     """
-    return config.ui(key) if key else ''
+    return config.ui(key.split('.')[-1]) if key else ''
 
 
 @evalcontextfilter
