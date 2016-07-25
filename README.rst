@@ -11,7 +11,7 @@ First, get the source code.
 
 .. sourcecode :: sh
 
-    git clone git@bitbucket.org:c-w/opwen-webapp.git
+    git clone git@github.com:OPWEN/opwen-webapp.git
 
 Second, install the dependencies for the package and verify your checkout by
 running the tests.
