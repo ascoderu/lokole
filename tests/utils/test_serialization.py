@@ -6,11 +6,6 @@ from utils.serialization import CompressedJson
 
 
 class TestCompressedJson(TestCase):
-    def test_serializer_is_null_safe(self):
-        serializer = CompressedJson()
-        self.assertEqual(b'', serializer.serialize(None))
-        self.assertEqual(None, serializer.deserialize(None))
-
     def test_serializer_handles_non_compressed_data(self):
         serializer = CompressedJson()
         deserialized = serializer.deserialize(b'{"not":"compressed"}')

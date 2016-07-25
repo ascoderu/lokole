@@ -15,10 +15,6 @@ from utils.testing import AppTestMixin
 
 
 class TestUserExists(AppTestMixin, TestCase):
-    def test_returns_false_for_invalid_argument(self):
-        self.assertFalse(user_exists(None))
-        self.assertFalse(user_exists(''))
-
     def test_finds_user_by_name(self):
         name = 'some-name'
         self.new_user(name=name)
