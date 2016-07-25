@@ -58,6 +58,7 @@ def ui(key, **kwargs):
         'login_required': _('Please log in to access this page.'),
         'download_complete': _('Downloaded %(num)d emails.', **kwargs),
         'upload_complete': _('Uploaded %(num)d emails.', **kwargs),
+        'page_not_found': _('The page %(url)s does not exist.', **kwargs),
     }.get(key)
 
 

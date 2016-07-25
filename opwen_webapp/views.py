@@ -2,6 +2,7 @@ from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import session
 from flask import url_for
 from flask_security import current_user
 from flask_security import login_required
@@ -25,6 +26,19 @@ from utils.pagination import paginate
 @babel.localeselector
 def get_locale():
     return request.accept_languages.best_match(LANGUAGES.keys())
+
+
+@app.after_request
+def store_visited_url(response):
+    session['previous_url'] = request.url
+    return response
+
+
+# noinspection PyUnusedLocal
+@app.errorhandler(404)
+def on_404(code_or_exception):
+    flash(ui('page_not_found', url=request.url), category='error')
+    return redirect(session.get('previous_url') or url_for('home'))
 
 
 @app.route('/')
