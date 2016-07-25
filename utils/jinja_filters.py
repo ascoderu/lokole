@@ -13,6 +13,7 @@ import config
 _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
+# noinspection PyUnresolvedReferences
 def render_date(utcdate, fmt='%x'):
     """
     :type utcdate: datetime
