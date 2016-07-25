@@ -5,6 +5,7 @@ from flask_security import UserMixin
 from sqlalchemy_utils import ScalarListType
 
 from opwen_webapp import db
+from utils.strings import normalize_caseless
 
 roles_users = db.Table(
     'roles_users',
@@ -23,6 +24,12 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+    # noinspection PyArgumentList
+    def __init__(self, email=None, name=None, **kwargs):
+        email = normalize_caseless(email)
+        name = normalize_caseless(name)
+        super().__init__(email=email, name=name, **kwargs)
+
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -37,6 +44,11 @@ class Email(db.Model):
     to = db.Column(ScalarListType(), nullable=False)
     subject = db.Column(db.String())
     body = db.Column(db.String())
+
+    def __init__(self, to=None, sender=None, **kwargs):
+        to = [normalize_caseless(recipient) for recipient in to] if to else to
+        sender = normalize_caseless(sender)
+        super().__init__(to=to, sender=sender, **kwargs)
 
     def is_complete(self):
         return (self.sender and

@@ -4,7 +4,7 @@ from opwen_webapp import app
 from opwen_webapp import db
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
-from utils.strings import istreq
+from utils.strings import normalize_caseless
 
 
 def _find_emails_by(user):
@@ -13,10 +13,10 @@ def _find_emails_by(user):
 
     """
     def query_user_email():
-        return Email.sender.ilike(user.email)
+        return Email.sender.is_(user.email)
 
     def query_user_name():
-        return Email.sender.ilike(user.name)
+        return Email.sender.is_(user.name)
 
     if user.email and user.name:
         return query_user_email() | query_user_name()
@@ -35,8 +35,9 @@ def _find_user_by(name_or_email):
     if not name_or_email:
         return None
 
-    return User.query.filter(User.name.ilike(name_or_email) |
-                             User.email.ilike(name_or_email)).first()
+    name_or_email = normalize_caseless(name_or_email)
+    return User.query.filter(User.name.is_(name_or_email) |
+                             User.email.is_(name_or_email)).first()
 
 
 def user_exists(name_or_email):
@@ -75,7 +76,7 @@ def inbox_emails_for(user):
 
     """
     return [mail for mail in Email.query.all()
-            if any(istreq(to, user.email) or istreq(to, user.name)
+            if any(to == user.email or to == user.name
                    for to in mail.to)]
 
 

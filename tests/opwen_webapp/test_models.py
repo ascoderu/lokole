@@ -7,7 +7,19 @@ from opwen_webapp.models import ModelPacker
 from utils.testing import AppTestMixin
 
 
+class TestUser(AppTestMixin, TestCase):
+    def test_user_constructor_normalizes_fields(self):
+        user = self.new_user(name='FOO', email='FOO@BAR.COM')
+        self.assertEqual(user.name, 'foo')
+        self.assertEqual(user.email, 'foo@bar.com')
+
+
 class TestEmail(AppTestMixin, TestCase):
+    def test_email_constructor_normalizes_fields(self):
+        email = self.new_email(sender='FOO', to=['BAR'])
+        self.assertEqual(email.sender, 'foo')
+        self.assertEqual(email.to, ['bar'])
+
     def test_email_with_all_fields_is_complete(self):
         email = self.create_complete_email()
         self.assertTrue(email.is_complete())

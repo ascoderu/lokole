@@ -86,7 +86,7 @@ class TestReadEmails(AppTestMixin, TestCase):
 class TestWriteEmails(AppTestMixin, TestCase):
     def test_creates_new_email_for_local_user(self):
         sender = self.new_user(email='sender@test.net')
-        recipient = self.new_user(name='recipient', email='recipient@test.net')
+        recipient = self.new_user(name='ReciPienT', email='recipient@test.net')
         new_email_for(sender, recipient.name, 'subject', 'body')
         email = next(iter(Email.query.all()), None)
 
