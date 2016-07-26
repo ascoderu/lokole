@@ -7,12 +7,13 @@
 {% block content %}
   {{ email_subnav() }}
 
-  <form action="{{ url_for('email_new') }}" method="post" name="{{ form.name }}">
+  <form action="{{ url_for('email_new') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
 
     {{ render_field_with_label_and_errors(form.to) }}
     {{ render_field_with_label_and_errors(form.subject) }}
     {{ render_field_with_label_and_errors(form.body) }}
+    {{ render_field_with_label_and_errors(form.attachments) }}
     {{ render_button(form.submit) }}
   </form>
 {% endblock %}
@@ -21,6 +22,18 @@
 <script>
   (function() {
     $(document).ready(function() {
+
+      (function styleEmailAttachmentsField() {
+        $("#{{ form.attachments.id }}").fileinput({
+          showPreview: false,
+          showUpload: false,
+          msgSelected: "{n} {{ 'files_selected' | ui }}",
+          removeTitle: "",
+          removeLabel: "{{ 'remove_files' | ui }}",
+          browseLabel: "{{ 'choose_files' | ui }}",
+          browseIcon: '<span class="glyphicon glyphicon-paperclip"></span>',
+        });
+      }());
 
       (function turnEmailBodyFieldIntoRichEditor() {
         $("#{{ form.body.id }}").wysihtml5({

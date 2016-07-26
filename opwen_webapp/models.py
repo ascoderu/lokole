@@ -75,13 +75,16 @@ class Email(db.Model):
     to = db.Column(ScalarListType(), nullable=False)
     subject = db.Column(db.String())
     body = db.Column(db.String())
+    attachments = db.Column(ScalarListType())
 
-    def __init__(self, to=None, sender=None, subject=None, body=None, **kwargs):
+    def __init__(self, to=None, sender=None, subject=None, body=None,
+                 attachments=None, **kwargs):
         super().__init__(
             to=_normalize_list(to),
             sender=_normalize(sender),
             subject=_normalize(subject, keep_case=True),
             body=_normalize(body, keep_case=True),
+            attachments=_normalize_list(attachments),
             **kwargs)
 
     def is_complete(self):

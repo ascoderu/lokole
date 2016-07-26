@@ -1,6 +1,7 @@
 from flask_security import LoginForm as BaseLoginForm
 from flask_security import RegisterForm as BaseRegisterForm
 from flask_wtf import Form
+from wtforms import FileField
 from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -95,6 +96,11 @@ class NewEmailForm(Form):
     body = TextAreaField(
         label=ui('email_body_field'),
         validators=[Optional()])
+
+    attachments = FileField(
+        label=ui('email_attachments_field'),
+        validators=[Optional()],
+        render_kw={'multiple': True})
 
     submit = SubmitField(
         label=ui('email_submit_field'))
