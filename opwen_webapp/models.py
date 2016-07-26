@@ -19,6 +19,16 @@ _HEADERS = ['h%d' % i for i in range(1, 7)]
 _KEEP_TAGS = ALLOWED_TAGS + _HEADERS + ['u']
 
 
+def _normalize_list(items, keep_case=False):
+    """
+    :type items: list[str]
+    :type keep_case: bool
+    :rtype: list[str]
+
+    """
+    return [_normalize(item, keep_case) for item in items] if items else items
+
+
 def _normalize(data, keep_case=False):
     """
     :type data: str
@@ -68,7 +78,7 @@ class Email(db.Model):
 
     def __init__(self, to=None, sender=None, subject=None, body=None, **kwargs):
         super().__init__(
-            to=[_normalize(recipient) for recipient in to] if to else to,
+            to=_normalize_list(to),
             sender=_normalize(sender),
             subject=_normalize(subject, keep_case=True),
             body=_normalize(body, keep_case=True),
