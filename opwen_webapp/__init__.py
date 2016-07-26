@@ -14,7 +14,6 @@ from werkzeug.utils import redirect
 from config import Config
 from config import LANGUAGES
 from config import ui
-from utils import jinja_filters
 from utils.factory import DynamicFactory
 
 app = Flask(__name__)
@@ -24,6 +23,8 @@ babel = Babel(app)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+from utils import jinja_filters
 
 app.jinja_env.filters['safe_multiline'] = jinja_filters.safe_multiline
 app.jinja_env.filters['render_date'] = jinja_filters.render_date
