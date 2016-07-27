@@ -1,6 +1,9 @@
+from os import path
+
 from flask import Flask
 from flask import flash
 from flask import request
+from flask import send_from_directory
 from flask import session
 from flask import url_for
 from flask_babel import Babel
@@ -91,3 +94,9 @@ def _on_413(code_or_exception):
     max_size = naturalsize(Config.MAX_CONTENT_LENGTH)
     flash(ui('attachment_too_large', max_size=max_size), category='error')
     return redirect(session.get('previous_url') or url_for('home'))
+
+
+@app.route('/favicon.ico')
+def _favicon():
+    return send_from_directory(path.join(app.root_path, 'satic'), 'favicon.ico',
+                               mimetype='image/vnd.microsoft.icon')
