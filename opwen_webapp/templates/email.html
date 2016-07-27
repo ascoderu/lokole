@@ -16,7 +16,7 @@
           <h4 class="panel-title">
             <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}">
               <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                   {% if is_outgoing %}
                     <span class="email-sent-to">{{ email.to | join(', ') }}</span>
                   {% else %}
@@ -29,13 +29,33 @@
                 <div class="col-sm-2">
                   <span class="email-sent-at">{{ email.date | render_date }}</span>
                 </div>
+                <div class="col-sm-1 text-right">
+                  {% if email.attachments %}
+                    <span class="glyphicon glyphicon-paperclip"></span>
+                  {% endif %}
+                </div>
               </div>
             </a>
           </h4>
         </div>
         <div id="collapse{{ loop.index}}" class="panel-collapse collapse">
           <div class="panel-body">
-            <span class="email-body">{{ email.body | safe_multiline }}</span>
+            <div class="row">
+              <div class="col-sm-12">
+                <span class="email-body">{{ email.body | safe_multiline }}</span>
+              </div>
+            </div>
+            {% if email.attachments %}
+              <div class="row">
+                <div class="col-sm-12">
+                  <ul class="list-inline">
+                    {% for path in email.attachments %}
+                      <li><a href="{{ path | attachment_url }}">{{ path }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>

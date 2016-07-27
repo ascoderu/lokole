@@ -1,7 +1,10 @@
 from datetime import datetime
 
+from werkzeug.utils import secure_filename
+
 from opwen_webapp import app
 from opwen_webapp import db
+from opwen_webapp import uploads
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
 from utils.strings import normalize_caseless
@@ -80,26 +83,44 @@ def inbox_emails_for(user):
                    for to in mail.to)]
 
 
-def new_email_for(user, to, subject, body):
+def new_email_for(user, to, subject, body, attachments=()):
     """
     :type user: User
     :type to: str
     :type subject: str
     :type body: str
+    :type attachments: list[werkzeug.datastructures.FileStorage]
 
     """
     is_to_local_user = user_exists(to)
     email_date = datetime.utcnow() if is_to_local_user else None
+    attachments = [uploads.save(attachment) for attachment in attachments]
 
     db.session.add(Email(
         date=email_date,
         to=[to],
         sender=user.email or user.name,
         subject=subject,
-        body=body))
+        body=body,
+        attachments=attachments,
+    ))
     db.session.commit()
 
     return is_to_local_user
+
+
+def find_attachment(user, filename):
+    """
+    :type user: User
+    :type filename: str
+    :rtype: str | None
+
+    """
+    attached_name = normalize_caseless(secure_filename(filename))
+    return next((uploads.path(filename)
+                 for email in inbox_emails_for(user)
+                 for attached in email.attachments or []
+                 if attached == attached_name), None)
 
 
 def upload_local_updates():

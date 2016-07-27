@@ -7,6 +7,7 @@ import re
 from jinja2 import Markup
 from jinja2 import evalcontextfilter
 
+from opwen_webapp import uploads
 import config
 
 _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -47,6 +48,15 @@ def sort_by_date(iterable, reverse=False):
     return sorted(iterable,
                   reverse=reverse,
                   key=lambda item: item.date if item and item.date else now)
+
+
+def attachment_url(filename):
+    """
+    :type filename: str
+    :rtype: str
+
+    """
+    return uploads.url(filename) if filename else ''
 
 
 def ui(key):

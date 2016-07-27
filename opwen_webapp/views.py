@@ -1,13 +1,16 @@
+from flask import abort
 from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import send_file
 from flask import url_for
 from flask_security import current_user
 from flask_security import login_required
 from flask_security import roles_required
 
 from opwen_webapp import app
+from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
@@ -18,6 +21,7 @@ from opwen_webapp.forms import NewEmailForm
 from config import Config
 from config import ui
 from utils.pagination import paginate
+from utils.uploads import UploadNotAllowed
 
 
 @app.route('/')
@@ -68,13 +72,18 @@ def email():
 def email_new():
     form = NewEmailForm(request.form)
     if form.validate_on_submit():
-        is_to_local_user = new_email_for(current_user, form.to.data,
-                                         form.subject.data, form.body.data)
-        message = ui('email_done') if is_to_local_user else ui('email_delayed')
-        next_endpoint = 'email_sent' if is_to_local_user else 'email_outbox'
+        try:
+            is_to_local_user = new_email_for(
+                current_user, form.to.data, form.subject.data, form.body.data,
+                request.files.getlist(form.attachments.name))
+        except UploadNotAllowed:
+            flash(ui('upload_not_allowed'), category='error')
+        else:
+            message = 'email_done' if is_to_local_user else 'email_delayed'
+            next_endpoint = 'email_sent' if is_to_local_user else 'email_outbox'
 
-        flash(message, category='success')
-        return redirect(url_for(next_endpoint))
+            flash(ui(message), category='success')
+            return redirect(url_for(next_endpoint))
 
     return render_template('email_new.html', form=form)
 
@@ -115,3 +124,13 @@ def sync():
     flash(ui('upload_complete', num=emails_uploaded), category='success')
     flash(ui('download_complete', num=emails_downloaded), category='success')
     return redirect(url_for('home'))
+
+
+@app.route('/%s/<filename>' % Config.UPLOAD_ENDPOINT)
+@login_required
+def attachments(filename):
+    file_path = find_attachment(current_user, filename)
+    if not file_path:
+        abort(404)
+
+    return send_file(file_path)

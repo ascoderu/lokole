@@ -2,7 +2,9 @@ from datetime import datetime
 
 from flask_testing import TestCase
 
+from opwen_webapp import uploads
 from opwen_webapp.controllers import download_remote_updates
+from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
@@ -177,3 +179,35 @@ class TestRemoteDownload(AppTestMixin, TestCase):
 
         newly_updated_emails = Email.query.all()
         self.assertEqual(len(newly_updated_emails), 0)
+
+
+# noinspection PyUnusedLocal
+class TestFindAttachment(AppTestMixin, TestCase):
+    def test_can_access_attachment_from_email(self):
+        attachment = 'attachment.txt'
+        user = self.new_user(email='user@test.net')
+        email = self.new_email(to=[user.email], attachments=[attachment])
+
+        actual = find_attachment(user, attachment)
+
+        self.assertEqual(actual, uploads.path(attachment))
+
+    def test_cannot_access_attachment_that_does_not_exist(self):
+        user = self.new_user(email='user@test.net')
+        email = self.new_email(to=[user.email], attachments=['some-thing.txt'])
+
+        actual = find_attachment(user, 'other-thing.txt')
+
+        self.assertIsNone(actual)
+
+    def test_cannot_access_attachment_from_email_to_another_user(self):
+        attachment = 'attachment.txt'
+        other_user = self.new_user(email='other_user@test.net')
+        owner_user = self.new_user(email='owner_user@test.net')
+        email = self.new_email(to=[owner_user.email], attachments=[attachment])
+
+        other_lookup = find_attachment(other_user, attachment)
+        owner_lookup = find_attachment(owner_user, attachment)
+
+        self.assertIsNone(other_lookup)
+        self.assertEqual(owner_lookup, uploads.path(attachment))

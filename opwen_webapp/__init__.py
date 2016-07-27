@@ -9,12 +9,14 @@ from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
 from flask_security.registerable import register_user
 from flask_sqlalchemy import SQLAlchemy
+from humanize import naturalsize
 from werkzeug.utils import redirect
 
 from config import Config
 from config import LANGUAGES
 from config import ui
 from utils.factory import DynamicFactory
+from utils.uploads import Uploads
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -24,6 +26,8 @@ babel = Babel(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+uploads = Uploads(app)
+
 from utils import jinja_filters
 
 app.jinja_env.filters['safe_multiline'] = jinja_filters.safe_multiline
@@ -31,6 +35,7 @@ app.jinja_env.filters['render_date'] = jinja_filters.render_date
 app.jinja_env.filters['sort_by_date'] = jinja_filters.sort_by_date
 app.jinja_env.filters['ui'] = jinja_filters.ui
 app.jinja_env.filters['is_admin'] = jinja_filters.is_admin
+app.jinja_env.filters['attachment_url'] = jinja_filters.attachment_url
 
 from opwen_webapp import views
 from opwen_webapp import models
@@ -77,4 +82,12 @@ def _store_visited_url(response):
 @app.errorhandler(404)
 def _on_404(code_or_exception):
     flash(ui('page_not_found', url=request.url), category='error')
+    return redirect(session.get('previous_url') or url_for('home'))
+
+
+# noinspection PyUnusedLocal
+@app.errorhandler(413)
+def _on_413(code_or_exception):
+    max_size = naturalsize(Config.MAX_CONTENT_LENGTH)
+    flash(ui('attachment_too_large', max_size=max_size), category='error')
     return redirect(session.get('previous_url') or url_for('home'))

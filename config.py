@@ -68,6 +68,8 @@ def ui(key, **kwargs):
         'download_complete': _('Downloaded %(num)d emails.', **kwargs),
         'upload_complete': _('Uploaded %(num)d emails.', **kwargs),
         'page_not_found': _('The page %(url)s does not exist.', **kwargs),
+        'attachment_too_large': _('The maximum attachment size is %(max_size)s.', **kwargs),
+        'upload_not_allowed': _('Only texts, images, documents and so forth are allowed as attachments.'),
     }.get(key)
 
 
@@ -81,6 +83,9 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'opwen.db')
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    UPLOAD_DIRECTORY = os.path.join(basedir, 'attachments')
+    UPLOAD_ENDPOINT = 'attachments'
 
     EMAILS_PER_PAGE = 20
 
@@ -96,6 +101,7 @@ class Config(object):
     REMOTE_SERIALIZATION_CLASS = 'utils.serialization.CompressedJson'
     REMOTE_PACKER_CLASS = 'opwen_webapp.models.ModelPacker'
 
+    MAX_CONTENT_LENGTH = 0.5 * 1024 * 1024
     SECRET_KEY = os.getenv('OPWEN_SECRET_KEY')
 
     SECURITY_USER_IDENTITY_ATTRIBUTES = ('name', 'email')
