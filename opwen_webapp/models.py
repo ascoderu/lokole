@@ -56,9 +56,11 @@ class User(db.Model, UserMixin):
 
     # noinspection PyArgumentList
     def __init__(self, email=None, name=None, **kwargs):
+        email = _normalize(email)
+        name = _normalize(name)
         super().__init__(
-            email=_normalize(email),
-            name=_normalize(name),
+            email=email or name,
+            name=name or email,
             **kwargs)
 
 
