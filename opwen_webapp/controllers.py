@@ -94,7 +94,8 @@ def new_email_for(user, to, subject, body, attachments=()):
     """
     is_to_local_user = user_exists(to)
     email_date = datetime.utcnow() if is_to_local_user else None
-    attachments = [uploads.save(attachment) for attachment in attachments]
+    attachments = [uploads.save(attachment) for attachment in attachments
+                   if attachment and attachment.filename]
 
     db.session.add(Email(
         date=email_date,
