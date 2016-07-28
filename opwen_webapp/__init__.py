@@ -98,6 +98,14 @@ def _on_413(code_or_exception):
     return redirect(session.get('previous_url') or url_for('home'))
 
 
+# noinspection PyUnusedLocal
+@app.errorhandler(Exception)
+@app.errorhandler(500)
+def _on_error(code_or_exception):
+    flash(ui('unexpected_error'), category='error')
+    return redirect(session.get('previous_url') or url_for('home'))
+
+
 @app.route('/favicon.ico')
 def _favicon():
     return send_from_directory(path.join(app.root_path, 'satic'), 'favicon.ico',

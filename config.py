@@ -44,6 +44,7 @@ def ui(key, **kwargs):
         'register': _('Register'),
         'opwen': _('Opwen'),
         'show_menu': _('Toggle navigation'),
+        'unexpected_error': _('Unexpected error. Please contact your admin.'),
         'sync': _('Sync now!'),
         'home': _('Home'),
         'about': _('About'),
