@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from werkzeug.datastructures import FileStorage
 
-from utils.testing import AppTestMixin
+from tests.base import AppTestMixin
 from utils.uploads import UploadNotAllowed
 from utils.uploads import Uploads
 

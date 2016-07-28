@@ -4,7 +4,7 @@ from datetime import timedelta
 from flask_testing import TestCase
 
 from opwen_webapp.models import ModelPacker
-from utils.testing import AppTestMixin
+from tests.base import AppTestMixin
 
 
 class TestUser(AppTestMixin, TestCase):

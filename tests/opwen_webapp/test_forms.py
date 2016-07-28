@@ -7,7 +7,7 @@ from wtforms import ValidationError
 
 from opwen_webapp.forms import EmailOrLocalUser
 from opwen_webapp.forms import UserDoesNotAlreadyExist
-from utils.testing import AppTestMixin
+from tests.base import AppTestMixin
 
 
 # noinspection PyPep8Naming

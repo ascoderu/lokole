@@ -13,7 +13,7 @@ from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.controllers import user_exists
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
-from utils.testing import AppTestMixin
+from tests.base import AppTestMixin
 
 
 class TestUserExists(AppTestMixin, TestCase):

@@ -1,7 +1,7 @@
 from flask import request
 from flask_testing import TestCase
 
-from utils.testing import AppTestMixin
+from tests.base import AppTestMixin
 
 
 class TestLoginRequiredViews(AppTestMixin, TestCase):
