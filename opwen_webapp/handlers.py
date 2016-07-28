@@ -24,6 +24,11 @@ def _get_locale():
 
 
 @app.before_first_request
+def _create_db():
+    db.create_all()
+
+
+@app.before_first_request
 def _create_admin():
     admin = user_datastore.find_user(name=Config.ADMIN_NAME)
     if not admin:
