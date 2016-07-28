@@ -20,15 +20,6 @@ migrate = Migrate(app, db)
 
 uploads = Uploads(app)
 
-from utils import jinja_filters
-
-app.jinja_env.filters['safe_multiline'] = jinja_filters.safe_multiline
-app.jinja_env.filters['render_date'] = jinja_filters.render_date
-app.jinja_env.filters['sort_by_date'] = jinja_filters.sort_by_date
-app.jinja_env.filters['ui'] = jinja_filters.ui
-app.jinja_env.filters['is_admin'] = jinja_filters.is_admin
-app.jinja_env.filters['attachment_url'] = jinja_filters.attachment_url
-
 from opwen_webapp import views
 from opwen_webapp import models
 from opwen_webapp import forms
