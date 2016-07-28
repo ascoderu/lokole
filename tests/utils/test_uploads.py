@@ -5,7 +5,6 @@ from unittest import TestCase
 
 from werkzeug.datastructures import FileStorage
 
-from tests.base import AppTestMixin
 from utils.uploads import UploadNotAllowed
 from utils.uploads import Uploads
 
@@ -30,9 +29,9 @@ class TestingFileStorage(FileStorage):
             f.write(self.content)
 
 
-class TestUploads(AppTestMixin, TestCase):
+class TestUploads(TestCase):
     def setUp(self):
-        self.uploads = Uploads(self.create_app(), directory=mkdtemp())
+        self.uploads = Uploads(directory=mkdtemp())
 
     def tearDown(self):
         rmtree(self.uploads.root_directory)

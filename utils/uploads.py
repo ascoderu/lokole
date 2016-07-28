@@ -13,7 +13,7 @@ class UploadNotAllowed(Exception):
 
 
 class Uploads(object):
-    def __init__(self, app, directory=None, disallowed=None):
+    def __init__(self, app=None, directory=None, disallowed=None):
         """
         :type app: flask.Flask
         :type directory: str
