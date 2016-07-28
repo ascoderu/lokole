@@ -99,8 +99,6 @@ class Config(object):
     REMOTE_UPLOAD_PATH = '%s/from_opwen/new' % CLIENT_NAME
     REMOTE_UPLOAD_FORMAT = '%Y-%m-%d_%H-%M.json.gz'
     REMOTE_DOWNLOAD_PATH = '%s/to_opwen/new.json.gz' % CLIENT_NAME
-    REMOTE_SERIALIZATION_CLASS = 'utils.serialization.CompressedJson'
-    REMOTE_PACKER_CLASS = 'opwen_webapp.models.ModelPacker'
 
     MAX_CONTENT_LENGTH = 0.5 * 1024 * 1024
     SECRET_KEY = os.getenv('OPWEN_SECRET_KEY')

@@ -6,7 +6,8 @@ from flask_security import Security
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
-from utils.factory import DynamicFactory
+from utils.remote_storage import AzureBlob
+from utils.serialization import CompressedJson
 from utils.uploads import Uploads
 
 app = Flask(__name__)
@@ -32,9 +33,9 @@ from opwen_webapp import views
 from opwen_webapp import models
 from opwen_webapp import forms
 
-app.remote_serializer = DynamicFactory(Config.REMOTE_SERIALIZATION_CLASS)()
-app.remote_packer = DynamicFactory(Config.REMOTE_PACKER_CLASS)()
-app.remote_storage = DynamicFactory(Config.REMOTE_STORAGE_CLASS)(
+app.remote_serializer = CompressedJson()
+app.remote_packer = models.ModelPacker()
+app.remote_storage = AzureBlob(
     account_name=Config.REMOTE_STORAGE_ACCOUNT_NAME,
     account_key=Config.REMOTE_STORAGE_ACCOUNT_KEY,
     container=Config.REMOTE_STORAGE_CONTAINER,
