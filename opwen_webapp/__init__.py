@@ -59,6 +59,8 @@ security = Security(app, user_datastore,
                     login_form=forms.LoginForm,
                     register_form=forms.RegisterForm)
 
+db.create_all()
+
 
 @babel.localeselector
 def _get_locale():
