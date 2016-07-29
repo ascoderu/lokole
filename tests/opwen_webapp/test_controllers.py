@@ -142,7 +142,7 @@ class TestRemoteDownload(AppTestMixin, TestCase):
         self._prepare_serialized_data(packed)
 
     def test_updates_emails(self):
-        remote_emails = [self.create_complete_email() for _ in range(5)]
+        remote_emails = [self.create_complete_email_fake() for _ in range(5)]
         self._prepare_emails_for_download(remote_emails)
 
         download_remote_updates()

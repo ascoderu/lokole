@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import datetime
 
 from opwen_webapp import app
@@ -38,6 +39,8 @@ class TestConfig(Config):
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic,PyArgumentList
 class AppTestMixin(object):
+    _email = namedtuple('Email', ('to', 'sender', 'date', 'subject', 'body'))
+
     def create_app(self):
         app.config.from_object(TestConfig)
         app.remote_storage = DummyRemoteStorage()
@@ -71,6 +74,15 @@ class AppTestMixin(object):
         db.session.add(email)
         db.session.commit()
         return email
+
+    @classmethod
+    def create_complete_email_fake(cls, **kwargs):
+        return cls._email(
+            to=kwargs.get('to', ['recipient@test.net']),
+            sender=kwargs.get('sender', 'sender@test.net'),
+            date=kwargs.get('date', datetime.utcnow()),
+            subject=kwargs.get('subject', 'the subject'),
+            body=kwargs.get('body', 'the body'))
 
     @classmethod
     def create_complete_email(cls, **kwargs):
