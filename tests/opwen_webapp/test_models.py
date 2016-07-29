@@ -59,6 +59,7 @@ class TestEmail(AppTestMixin, TestCase):
         email.body = email.subject = None
         self.assertFalse(email.is_complete())
 
+    # noinspection PyTypeChecker
     def test_is_same_as_handles_other_types(self):
         email = self.create_complete_email()
         self.assertFalse(email.is_same_as(None))
