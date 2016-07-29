@@ -105,13 +105,15 @@ class Email(db.Model):
         :rtype: bool
 
         """
-        return (isinstance(other, Email) and
-                other.sender == self.sender and
-                other.subject == self.subject and
-                other.body == self.body and
-                ((other.date is None and self.date is None) or
-                 (abs(other.date - self.date).seconds < 60)) and
-                set(other.to) == set(self.to))
+        try:
+            return (other.sender == self.sender and
+                    other.subject == self.subject and
+                    other.body == self.body and
+                    ((other.date is None and self.date is None) or
+                     (abs(other.date - self.date).seconds < 60)) and
+                    set(other.to) == set(self.to))
+        except AttributeError:
+            return False
 
 
 class ModelPacker(object):
