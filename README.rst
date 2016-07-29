@@ -22,6 +22,7 @@ running the tests.
 
   virtualenv -p $(which python3) --no-site-packages virtualenv
   . virtualenv/bin/activate
+  pip install --upgrade pip
   pip install -r requirements.txt
 
   pip install nose
