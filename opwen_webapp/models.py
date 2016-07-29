@@ -90,6 +90,10 @@ class Email(db.Model):
             **kwargs)
 
     def is_complete(self):
+        """
+        :rtype: bool
+
+        """
         return (self.sender and
                 self.to and
                 self.date and
