@@ -52,7 +52,7 @@ class Uploads(object):
         upload_path = self._path_for_save(upload.filename)
         upload_directory, upload_filename = path.split(upload_path)
 
-        makedirs(upload_directory, exist_ok=True)
+        makedirs(upload_directory, mode=0o700, exist_ok=True)
         upload.save(upload_path)
         return upload_filename
 
