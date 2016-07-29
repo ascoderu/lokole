@@ -9,21 +9,20 @@ from flask_security import current_user
 from flask_security import login_required
 from flask_security import roles_required
 
+from config import Config
+from config import ui
 from opwen_webapp import app
-from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import download_remote_updates
+from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
 from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.forms import NewEmailForm
-from config import Config
-from config import ui
 from utils import jinja_filters
 from utils.pagination import paginate
 from utils.uploads import UploadNotAllowed
-
 
 app.jinja_env.filters['attachment_url'] = jinja_filters.attachment_url
 app.jinja_env.filters['is_admin'] = jinja_filters.is_admin

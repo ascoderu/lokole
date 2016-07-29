@@ -1,6 +1,5 @@
-from unittest import TestCase
-
 import zlib
+from unittest import TestCase
 
 from utils.serialization import CompressedJson
 

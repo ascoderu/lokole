@@ -1,12 +1,12 @@
 from collections import namedtuple
 from datetime import datetime
 
+from config import Config
 from opwen_webapp import app
 from opwen_webapp import db
 from opwen_webapp import security
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
-from config import Config
 
 
 # noinspection PyUnusedLocal

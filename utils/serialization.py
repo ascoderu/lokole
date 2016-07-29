@@ -1,7 +1,6 @@
-from gzip import GzipFile
 import json
 import zlib
-
+from gzip import GzipFile
 from io import BytesIO
 
 

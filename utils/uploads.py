@@ -3,7 +3,6 @@ from os import path
 
 from werkzeug.utils import secure_filename
 
-
 SCRIPTS = frozenset('.js .php .pl .py .rb .sh'.split())
 EXECUTABLES = frozenset('.so .exe .dll'.split())
 

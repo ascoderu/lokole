@@ -13,8 +13,8 @@ from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
-from opwen_webapp.controllers import user_exists
 from config import ui
+from opwen_webapp.controllers import user_exists
 
 
 class UserDoesNotAlreadyExist(object):

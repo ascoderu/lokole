@@ -1,14 +1,13 @@
+import re
 from datetime import datetime
 from datetime import timezone
-from tzlocal import get_localzone
-
-import re
 
 from jinja2 import Markup
 from jinja2 import evalcontextfilter
+from tzlocal import get_localzone
 
-from opwen_webapp import uploads
 import config
+from opwen_webapp import uploads
 
 _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 

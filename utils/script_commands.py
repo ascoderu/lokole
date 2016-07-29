@@ -1,9 +1,9 @@
-from argparse import FileType
-from datetime import datetime
-from functools import lru_cache
 import random
 import re
 import sys
+from argparse import FileType
+from datetime import datetime
+from functools import lru_cache
 
 from babel.messages.frontend import CommandLineInterface
 from flask_script import Command
