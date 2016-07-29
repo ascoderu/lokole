@@ -1,0 +1,12 @@
+{
+  "name": "opwen-webapp",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "bootstrap-fileinput": "^4.3.3",
+    "html5shiv": "^3.7.3",
+    "respond": "^1.4.2",
+    "jquery": "^3.1.0",
+    "bootstrap3-wysihtml5-bower": "^0.3.3"
+  }
+}

@@ -1,4 +1,7 @@
 .idea/
+
+/opwen_webapp/static/bower_components/
+
 *.pyc
 
 *.mo

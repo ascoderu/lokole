@@ -24,6 +24,7 @@ running the tests.
   . virtualenv/bin/activate
   pip install --upgrade pip
   pip install -r requirements.txt
+  bower install
 
   pip install nose
   nosetests
