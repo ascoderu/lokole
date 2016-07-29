@@ -5,7 +5,6 @@ Flask-Migrate==1.8.0
 Flask-WTF==0.12
 Flask-Security==1.7.5
 bcrypt==3.1.0
-SQLAlchemy-Utils==0.32.7
 Flask-Testing==0.5.0
 tzlocal==1.2.2
 azure-storage==0.32.0

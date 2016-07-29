@@ -1,11 +1,10 @@
 from datetime import datetime
+from os import path
 
 from flask_security import RoleMixin
 from flask_security import UserMixin
-from sqlalchemy_utils import ScalarListType
 
 from opwen_webapp import db
-from utils.strings import make_all_safe
 from utils.strings import make_safe
 
 roles_users = db.Table(
@@ -46,6 +45,14 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
 
+class Attachment(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    path = db.Column(db.String(255), nullable=False)
+
+    email_id = db.Column(db.Integer(), db.ForeignKey('email.id'))
+
+
 class Addressee(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     val = db.Column(db.String(255), unique=True, nullable=False, index=True)
@@ -74,7 +81,10 @@ class Email(db.Model):
     sender = db.Column(db.String(255), nullable=False)
     subject = db.Column(db.String())
     body = db.Column(db.String())
-    attachments = db.Column(ScalarListType())
+
+    attachment_relationship = db.relationship(
+        'Attachment',
+        backref=db.backref('email'))
 
     to_relationship = db.relationship(
         'Addressee', secondary=emails_addressees,
@@ -84,11 +94,24 @@ class Email(db.Model):
                  attachments=None, **kwargs):
         super().__init__(
             to_relationship=Addressee.get_or_create_all(to),
+            attachment_relationship=self._setup_attachments(attachments),
             sender=make_safe(sender),
             subject=make_safe(subject, keep_case=True),
             body=make_safe(body, keep_case=True),
-            attachments=make_all_safe(attachments),
             **kwargs)
+
+    @classmethod
+    def _setup_attachments(cls, attachments):
+        return [Attachment(name=path.basename(filepath), path=filepath)
+                for filepath in attachments or []]
+
+    @property
+    def attachments(self):
+        """
+        :rtype: list[str]
+
+        """
+        return [attachment.path for attachment in self.attachment_relationship]
 
     @property
     def to(self):
