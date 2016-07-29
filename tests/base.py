@@ -73,14 +73,14 @@ class AppTestMixin(object):
         return email
 
     @classmethod
-    def create_complete_email(cls, now=None):
+    def create_complete_email(cls, **kwargs):
         """
-        :type now: datetime
+        :rtype: Email
 
         """
         return Email(
-            to=['recipient@test.net'],
-            sender='sender@test.net',
-            date=now or datetime.utcnow(),
-            subject='subject',
-            body='body')
+            to=kwargs.get('to', ['recipient@test.net']),
+            sender=kwargs.get('sender', 'sender@test.net'),
+            date=kwargs.get('date', datetime.utcnow()),
+            subject=kwargs.get('subject', 'the subject'),
+            body=kwargs.get('body', 'the body'))

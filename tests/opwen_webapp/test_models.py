@@ -32,31 +32,25 @@ class TestEmail(AppTestMixin, TestCase):
         self.assertTrue(email.is_complete())
 
     def test_email_must_have_recipient_to_be_complete(self):
-        email = self.create_complete_email()
-        email.to = []
+        email = self.create_complete_email(to=[])
         self.assertFalse(email.is_complete())
 
     def test_email_must_have_sender_to_be_complete(self):
-        email = self.create_complete_email()
-        email.sender = None
+        email = self.create_complete_email(sender=None)
         self.assertFalse(email.is_complete())
 
     def test_email_must_have_date_to_be_complete(self):
-        email = self.create_complete_email()
-        email.date = None
+        email = self.create_complete_email(date=None)
         self.assertFalse(email.is_complete())
 
     def test_email_must_have_subject_or_body_to_be_complete(self):
-        email = self.create_complete_email()
-        email.subject = None
+        email = self.create_complete_email(subject=None)
         self.assertTrue(email.is_complete())
 
-        email = self.create_complete_email()
-        email.body = None
+        email = self.create_complete_email(body=None)
         self.assertTrue(email.is_complete())
 
-        email = self.create_complete_email()
-        email.body = email.subject = None
+        email = self.create_complete_email(body=None, subject=None)
         self.assertFalse(email.is_complete())
 
     # noinspection PyTypeChecker
@@ -67,17 +61,17 @@ class TestEmail(AppTestMixin, TestCase):
 
     def test_is_same_as(self):
         now = datetime.utcnow()
-        email1 = self.create_complete_email(now)
-        email2 = self.create_complete_email(now)
+        email1 = self.create_complete_email(date=now)
+        email2 = self.create_complete_email(date=now)
         self.assertTrue(email1.is_same_as(email2))
 
-        email2.to = ['other@test.net']
-        self.assertFalse(email1.is_same_as(email2))
+        email3 = self.create_complete_email(date=now, to=['other@test.net'])
+        self.assertFalse(email1.is_same_as(email3))
 
     def test_is_same_as_must_be_within_same_minute(self):
         now = datetime.utcnow()
-        email1 = self.create_complete_email(now)
-        email2 = self.create_complete_email(now + timedelta(seconds=10))
+        email1 = self.create_complete_email(date=now)
+        email2 = self.create_complete_email(date=now + timedelta(seconds=10))
         self.assertTrue(email1.is_same_as(email2))
 
         email2.date = now - timedelta(seconds=10)
