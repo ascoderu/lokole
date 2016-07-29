@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from bleach import ALLOWED_TAGS
-from bleach import clean
 from flask_security import RoleMixin
 from flask_security import UserMixin
 from sqlalchemy_utils import ScalarListType
 
 from opwen_webapp import db
-from utils.strings import normalize_caseless
+from utils.strings import make_all_safe
+from utils.strings import make_safe
 
 roles_users = db.Table(
     'roles_users',
@@ -18,34 +17,6 @@ emails_addressees = db.Table(
     'emails_addressees',
     db.Column('email_id', db.Integer(), db.ForeignKey('email.id')),
     db.Column('addressee_id', db.Integer(), db.ForeignKey('addressee.id')))
-
-
-_HEADERS = ['h%d' % i for i in range(1, 7)]
-_KEEP_TAGS = ALLOWED_TAGS + _HEADERS + ['u']
-
-
-def _normalize_list(items, keep_case=False):
-    """
-    :type items: list[str]
-    :type keep_case: bool
-    :rtype: list[str]
-
-    """
-    return [_normalize(item, keep_case) for item in items] if items else items
-
-
-def _normalize(data, keep_case=False):
-    """
-    :type data: str
-    :type keep_case: bool
-    :rtype: str
-
-    """
-    data = clean(data, strip=True, tags=_KEEP_TAGS)
-
-    if not keep_case:
-        data = normalize_caseless(data)
-    return data
 
 
 class User(db.Model, UserMixin):
@@ -61,8 +32,8 @@ class User(db.Model, UserMixin):
 
     # noinspection PyArgumentList
     def __init__(self, email=None, name=None, **kwargs):
-        email = _normalize(email)
-        name = _normalize(name)
+        email = make_safe(email)
+        name = make_safe(name)
         super().__init__(
             email=email or name,
             name=name or email,
@@ -82,7 +53,7 @@ class Addressee(db.Model):
     @classmethod
     def get_or_create(cls, name_or_email):
         # FIXME: this is not thread safe
-        name_or_email = _normalize(name_or_email)
+        name_or_email = make_safe(name_or_email)
         instance = Addressee.query.filter_by(val=name_or_email).first()
         if not instance:
             instance = Addressee(val=name_or_email)
@@ -113,10 +84,10 @@ class Email(db.Model):
                  attachments=None, **kwargs):
         super().__init__(
             to_relationship=Addressee.get_or_create_all(to),
-            sender=_normalize(sender),
-            subject=_normalize(subject, keep_case=True),
-            body=_normalize(body, keep_case=True),
-            attachments=_normalize_list(attachments),
+            sender=make_safe(sender),
+            subject=make_safe(subject, keep_case=True),
+            body=make_safe(body, keep_case=True),
+            attachments=make_all_safe(attachments),
             **kwargs)
 
     @property
