@@ -14,6 +14,11 @@ roles_users = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
+emails_addressees = db.Table(
+    'emails_addressees',
+    db.Column('email_id', db.Integer(), db.ForeignKey('email.id')),
+    db.Column('addressee_id', db.Integer(), db.ForeignKey('addressee.id')))
+
 
 _HEADERS = ['h%d' % i for i in range(1, 7)]
 _KEEP_TAGS = ALLOWED_TAGS + _HEADERS + ['u']
@@ -70,24 +75,57 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
 
+class Addressee(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    val = db.Column(db.String(255), unique=True, nullable=False, index=True)
+
+    @classmethod
+    def get_or_create(cls, name_or_email):
+        # FIXME: this is not thread safe
+        name_or_email = _normalize(name_or_email)
+        instance = Addressee.query.filter_by(val=name_or_email).first()
+        if not instance:
+            instance = Addressee(val=name_or_email)
+            db.session.add(instance)
+            db.session.commit()
+        return instance
+
+    @classmethod
+    def get_or_create_all(cls, names_or_emails):
+        if not names_or_emails:
+            return names_or_emails
+        return [cls.get_or_create(to) for to in names_or_emails]
+
+
 class Email(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     date = db.Column(db.DateTime(timezone=True))
     sender = db.Column(db.String(255), nullable=False)
-    to = db.Column(ScalarListType(), nullable=False)
     subject = db.Column(db.String())
     body = db.Column(db.String())
     attachments = db.Column(ScalarListType())
 
+    to_relationship = db.relationship(
+        'Addressee', secondary=emails_addressees,
+        backref=db.backref('emails', lazy='dynamic'))
+
     def __init__(self, to=None, sender=None, subject=None, body=None,
                  attachments=None, **kwargs):
         super().__init__(
-            to=_normalize_list(to),
+            to_relationship=Addressee.get_or_create_all(to),
             sender=_normalize(sender),
             subject=_normalize(subject, keep_case=True),
             body=_normalize(body, keep_case=True),
             attachments=_normalize_list(attachments),
             **kwargs)
+
+    @property
+    def to(self):
+        """
+        :rtype: list[str]
+
+        """
+        return [addressee.val for addressee in self.to_relationship]
 
     def is_complete(self):
         """

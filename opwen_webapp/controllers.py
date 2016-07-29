@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from opwen_webapp import app
 from opwen_webapp import db
 from opwen_webapp import uploads
+from opwen_webapp.models import Addressee
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
 from utils.strings import normalize_caseless
@@ -78,9 +79,8 @@ def inbox_emails_for(user):
     :rtype: collections.Iterable[Email]
 
     """
-    return [mail for mail in Email.query.all()
-            if any(to == user.email or to == user.name
-                   for to in mail.to)]
+    is_to_user = Addressee.val.is_(user.email) | Addressee.val.is_(user.name)
+    return Email.query.join(Email.to_relationship).filter(is_to_user)
 
 
 def new_email_for(user, to, subject, body, attachments=()):
