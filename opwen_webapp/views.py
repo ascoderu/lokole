@@ -21,7 +21,6 @@ from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.forms import NewEmailForm
 from utils import jinja_filters
-from utils.pagination import paginate
 from utils.uploads import UploadNotAllowed
 
 app.jinja_env.filters['attachment_url'] = jinja_filters.attachment_url
@@ -101,7 +100,7 @@ def email_new():
 @login_required
 def email_inbox(page):
     emails = inbox_emails_for(current_user)
-    emails = paginate(emails, page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails, is_outgoing=False)
 
 
@@ -110,7 +109,7 @@ def email_inbox(page):
 @login_required
 def email_outbox(page):
     emails = outbox_emails_for(current_user)
-    emails = paginate(emails, page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails, is_outgoing=True)
 
 
@@ -119,7 +118,7 @@ def email_outbox(page):
 @login_required
 def email_sent(page):
     emails = sent_emails_for(current_user)
-    emails = paginate(emails, page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails, is_outgoing=True)
 
 

@@ -56,7 +56,7 @@ def user_exists(name_or_email):
 def outbox_emails_for(user):
     """
     :type user: User
-    :rtype: collections.Iterable[Email]
+    :rtype: flask_sqlalchemy.BaseQuery
 
     """
     query = Email.date.is_(None) & _find_emails_by(user)
@@ -66,7 +66,7 @@ def outbox_emails_for(user):
 def sent_emails_for(user):
     """
     :type user: User
-    :rtype: collections.Iterable[Email]
+    :rtype: flask_sqlalchemy.BaseQuery
 
     """
     query = Email.date.isnot(None) & _find_emails_by(user)
@@ -76,7 +76,7 @@ def sent_emails_for(user):
 def inbox_emails_for(user):
     """
     :type user: User
-    :rtype: collections.Iterable[Email]
+    :rtype: flask_sqlalchemy.BaseQuery
 
     """
     is_to_user = Addressee.val.is_(user.email) | Addressee.val.is_(user.name)
