@@ -5,23 +5,34 @@ from azure.storage.blob import BlockBlobService
 
 
 class AzureBlob(object):
-    def __init__(self, account_name, account_key, container,
-                 upload_path, download_path, upload_format):
+    def __init__(self, app=None):
         """
-        :type account_name: str
-        :type account_key: str
-        :type container: str
-        :type upload_path: str
-        :type download_path: str
-        :type upload_format: str
+        :type app: flask.Flask
 
         """
-        self.account_name = account_name
-        self.account_key = account_key
-        self.container = container
-        self.upload_path = upload_path
-        self.download_path = download_path
-        self.upload_format = upload_format
+        self.account_name = None
+        self.account_key = None
+        self.container = None
+        self.upload_path = None
+        self.download_path = None
+        self.upload_format = None
+
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """
+        :type app: flask.Flask
+
+        """
+        self.account_name = app.config.get('REMOTE_STORAGE_ACCOUNT_NAME')
+        self.account_key = app.config.get('REMOTE_STORAGE_ACCOUNT_KEY')
+        self.container = app.config.get('REMOTE_STORAGE_CONTAINER')
+        self.upload_path = app.config.get('REMOTE_UPLOAD_PATH')
+        self.download_path = app.config.get('REMOTE_DOWNLOAD_PATH')
+        self.upload_format = app.config.get('REMOTE_UPLOAD_FORMAT')
+
+        app.remote_storage = self
 
     def conn(self):
         return BlockBlobService(self.account_name, self.account_key)

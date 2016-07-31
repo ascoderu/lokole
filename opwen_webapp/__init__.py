@@ -26,13 +26,7 @@ from opwen_webapp import forms
 
 app.remote_serializer = CompressedJson()
 app.remote_packer = models.ModelPacker()
-app.remote_storage = AzureBlob(
-    account_name=Config.REMOTE_STORAGE_ACCOUNT_NAME,
-    account_key=Config.REMOTE_STORAGE_ACCOUNT_KEY,
-    container=Config.REMOTE_STORAGE_CONTAINER,
-    upload_path=Config.REMOTE_UPLOAD_PATH,
-    download_path=Config.REMOTE_DOWNLOAD_PATH,
-    upload_format=Config.REMOTE_UPLOAD_FORMAT)
+remote_storage = AzureBlob(app)
 
 user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore,

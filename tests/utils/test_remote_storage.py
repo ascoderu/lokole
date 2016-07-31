@@ -13,12 +13,12 @@ class DownloadFailedBlockBlobService(object):
 
 class TestAzureBlob(TestCase):
     def test_empty_upload_does_not_hit_network(self):
-        blob = AzureBlob('account', 'key', 'container', 'up', 'down', 'format')
+        blob = AzureBlob()
         blob.conn = lambda: self.fail('called remote service')
         blob.upload(b'')
 
     def test_missing_download_returns_empty_bytes(self):
-        blob = AzureBlob('account', 'key', 'container', 'up', 'down', 'format')
+        blob = AzureBlob()
         blob.conn = lambda: DownloadFailedBlockBlobService()
         actual = blob.download()
         self.assertEqual(actual, b'')
