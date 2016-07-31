@@ -1,5 +1,4 @@
 from datetime import datetime
-from os import path
 
 from flask_security import RoleMixin
 from flask_security import UserMixin
@@ -82,7 +81,7 @@ class Email(db.Model):
     subject = db.Column(db.String())
     body = db.Column(db.String())
 
-    attachment_relationship = db.relationship(
+    attachments = db.relationship(
         'Attachment',
         backref=db.backref('email'))
 
@@ -94,7 +93,7 @@ class Email(db.Model):
                  attachments=None, **kwargs):
         super().__init__(
             to_relationship=Addressee.get_or_create_all(to),
-            attachment_relationship=self._setup_attachments(attachments),
+            attachments=self._setup_attachments(attachments),
             sender=make_safe(sender),
             subject=make_safe(subject, keep_case=True),
             body=make_safe(body, keep_case=True),
@@ -102,16 +101,8 @@ class Email(db.Model):
 
     @classmethod
     def _setup_attachments(cls, attachments):
-        return [Attachment(name=path.basename(filepath), path=filepath)
-                for filepath in attachments or []]
-
-    @property
-    def attachments(self):
-        """
-        :rtype: list[str]
-
-        """
-        return [attachment.path for attachment in self.attachment_relationship]
+        return [Attachment(path=path, name=name)
+                for path, name in attachments or []]
 
     @property
     def to(self):

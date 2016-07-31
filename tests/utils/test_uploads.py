@@ -48,9 +48,9 @@ class TestUploads(TestCase):
         :type file_storage: FileStorage
 
         """
-        uploaded_filename = self.uploads.save(file_storage)
+        uploaded_path = self.uploads.save(file_storage)
         try:
-            with open(self.uploads.path(uploaded_filename)) as fobj:
+            with open(uploaded_path) as fobj:
                 file_content = fobj.read()
         except IOError:
             self.fail('file %s does not exist' % file_storage.filename)

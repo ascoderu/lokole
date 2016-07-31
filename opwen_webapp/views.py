@@ -23,7 +23,6 @@ from opwen_webapp.forms import NewEmailForm
 from utils import jinja_filters
 from utils.uploads import UploadNotAllowed
 
-app.jinja_env.filters['attachment_url'] = jinja_filters.attachment_url
 app.jinja_env.filters['is_admin'] = jinja_filters.is_admin
 app.jinja_env.filters['render_date'] = jinja_filters.render_date
 app.jinja_env.filters['safe_multiline'] = jinja_filters.safe_multiline
@@ -136,8 +135,9 @@ def sync():
 @app.route('/%s/<filename>' % Config.UPLOAD_ENDPOINT)
 @login_required
 def attachments(filename):
-    file_path = find_attachment(current_user, filename)
-    if not file_path:
+    attachment = find_attachment(current_user, filename)
+    if not attachment:
         abort(404)
 
-    return send_file(file_path)
+    return send_file(attachment.path,
+                     as_attachment=True, attachment_filename=attachment.name)

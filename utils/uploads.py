@@ -1,7 +1,9 @@
 from os import makedirs
 from os import path
+from os import rename
+from tempfile import NamedTemporaryFile
 
-from werkzeug.utils import secure_filename
+from utils.checksum import sha256
 
 SCRIPTS = frozenset('.js .php .pl .py .rb .sh'.split())
 EXECUTABLES = frozenset('.so .exe .dll'.split())
@@ -12,7 +14,7 @@ class UploadNotAllowed(Exception):
 
 
 class Uploads(object):
-    def __init__(self, app=None, directory=None, disallowed=None):
+    def __init__(self, app=None, directory=None, disallowed=None, hasher=None):
         """
         :type app: flask.Flask
         :type directory: str
@@ -22,21 +24,7 @@ class Uploads(object):
         self.app = app
         self.root_directory = directory or app.config.get('UPLOAD_DIRECTORY')
         self.disallowed = frozenset(disallowed or SCRIPTS | EXECUTABLES)
-
-    def _path_for_save(self, filename):
-        """
-        :type filename: str
-        :rtype: str
-
-        """
-        upload_name = secure_filename(filename)
-        base, extension = path.splitext(upload_name)
-        i = 1
-        while path.isfile(path.join(self.root_directory, upload_name)):
-            upload_name = '%s_%d%s' % (base, i, extension)
-            i += 1
-
-        return path.join(self.root_directory, upload_name)
+        self.hasher = hasher or sha256
 
     def _check_upload_allowed(self, upload):
         """
@@ -48,6 +36,38 @@ class Uploads(object):
         if extension in self.disallowed:
             raise UploadNotAllowed
 
+    @classmethod
+    def _save_to_temporary_location(cls, upload):
+        """
+        :type upload: werkzeug.datastructures.FileStorage
+        :rtype: str
+
+        """
+        with NamedTemporaryFile('w', delete=False) as tmpfile:
+            upload.save(tmpfile.name)
+        return tmpfile.name
+
+    @classmethod
+    def _move_to(cls, from_path, to_path):
+        """
+        :type from_path: str
+        :type to_path: str
+
+        """
+        makedirs(path.dirname(to_path), mode=0o700, exist_ok=True)
+        rename(from_path, to_path)
+
+    def _move_to_upload_directory(self, uploaded_filename):
+        """
+        :type uploaded_filename: str
+        :rtype: str
+
+        """
+        upload_location = path.join(self.root_directory,
+                                    self.hasher(uploaded_filename))
+        self._move_to(uploaded_filename, upload_location)
+        return upload_location
+
     def save(self, upload):
         """
         :type upload: werkzeug.datastructures.FileStorage
@@ -57,27 +77,6 @@ class Uploads(object):
         """
         self._check_upload_allowed(upload)
 
-        upload_path = self._path_for_save(upload.filename)
-        upload_directory, upload_filename = path.split(upload_path)
+        temporary_filename = self._save_to_temporary_location(upload)
 
-        makedirs(upload_directory, mode=0o700, exist_ok=True)
-        upload.save(upload_path)
-        return upload_filename
-
-    def path(self, filename):
-        """
-        :type filename: str
-        :rtype: str
-
-        """
-        return path.join(self.root_directory, secure_filename(filename))
-
-    def url(self, filename):
-        """
-        :type filename: str
-        :rtype: str
-
-        """
-        endpoint = self.app.config.get('UPLOAD_ENDPOINT')
-        resource = secure_filename(filename)
-        return '/%s/%s' % (endpoint, resource)
+        return self._move_to_upload_directory(temporary_filename)

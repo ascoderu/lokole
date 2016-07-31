@@ -6,6 +6,7 @@ from opwen_webapp import app
 from opwen_webapp import db
 from opwen_webapp import uploads
 from opwen_webapp.models import Addressee
+from opwen_webapp.models import Attachment
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
 from utils.strings import normalize_caseless
@@ -94,7 +95,8 @@ def new_email_for(user, to, subject, body, attachments=()):
     """
     is_to_local_user = user_exists(to)
     email_date = datetime.utcnow() if is_to_local_user else None
-    attachments = [uploads.save(attachment) for attachment in attachments
+    attachments = [(uploads.save(attachment), attachment.filename)
+                   for attachment in attachments
                    if attachment and attachment.filename]
 
     db.session.add(Email(
@@ -114,14 +116,16 @@ def find_attachment(user, filename):
     """
     :type user: User
     :type filename: str
-    :rtype: str | None
+    :rtype: Attachment
 
     """
     attached_name = normalize_caseless(secure_filename(filename))
-    return next((uploads.path(filename)
-                 for email in inbox_emails_for(user)
-                 for attached in email.attachments or []
-                 if attached == attached_name), None)
+    email = (inbox_emails_for(user)
+             .join(Email.attachments)
+             .filter(Attachment.name == attached_name)
+             .first())
+    return next((attachment for attachment in email.attachments
+                 if attachment.name == attached_name), None) if email else None
 
 
 def upload_local_updates():

@@ -2,7 +2,6 @@ from datetime import datetime
 
 from flask_testing import TestCase
 
-from opwen_webapp import uploads
 from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
@@ -184,30 +183,33 @@ class TestRemoteDownload(AppTestMixin, TestCase):
 # noinspection PyUnusedLocal
 class TestFindAttachment(AppTestMixin, TestCase):
     def test_can_access_attachment_from_email(self):
-        attachment = 'attachment.txt'
+        attachment_path, attachment_name = '/path/to/attachment.txt', 'file.txt'
         user = self.new_user(email='user@test.net')
-        email = self.new_email(to=[user.email], attachments=[attachment])
+        email = self.new_email(to=[user.email],
+                               attachments=[(attachment_path, attachment_name)])
 
-        actual = find_attachment(user, attachment)
+        attachment = find_attachment(user, attachment_name)
 
-        self.assertEqual(actual, uploads.path(attachment))
+        self.assertEqual(attachment.path, attachment_path)
 
     def test_cannot_access_attachment_that_does_not_exist(self):
         user = self.new_user(email='user@test.net')
-        email = self.new_email(to=[user.email], attachments=['some-thing.txt'])
+        email = self.new_email(to=[user.email],
+                               attachments=[('/path/to/file.txt', 'file.txt')])
 
-        actual = find_attachment(user, 'other-thing.txt')
+        attachment = find_attachment(user, 'other-thing.txt')
 
-        self.assertIsNone(actual)
+        self.assertIsNone(attachment)
 
     def test_cannot_access_attachment_from_email_to_another_user(self):
-        attachment = 'attachment.txt'
+        attachment_path, attachment_name = '/path/to/file.txt', 'file.txt'
         other_user = self.new_user(email='other_user@test.net')
         owner_user = self.new_user(email='owner_user@test.net')
-        email = self.new_email(to=[owner_user.email], attachments=[attachment])
+        email = self.new_email(to=[owner_user.email],
+                               attachments=[(attachment_path, attachment_name)])
 
-        other_lookup = find_attachment(other_user, attachment)
-        owner_lookup = find_attachment(owner_user, attachment)
+        other_lookup = find_attachment(other_user, attachment_name)
+        owner_lookup = find_attachment(owner_user, attachment_name)
 
         self.assertIsNone(other_lookup)
-        self.assertEqual(owner_lookup, uploads.path(attachment))
+        self.assertEqual(owner_lookup.path, attachment_path)

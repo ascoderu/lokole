@@ -49,8 +49,8 @@
               <div class="row">
                 <div class="col-sm-12">
                   <ul class="list-inline">
-                    {% for path in email.attachments %}
-                      <li><a href="{{ path | attachment_url }}">{{ path }}</a></li>
+                    {% for attachment in email.attachments %}
+                      <li><a href="{{ url_for('attachments', filename=attachment.name) }}">{{ attachment.name }}</a></li>
                     {% endfor %}
                   </ul>
                 </div>
