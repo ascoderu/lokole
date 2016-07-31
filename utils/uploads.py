@@ -38,6 +38,16 @@ class Uploads(object):
 
         return path.join(self.root_directory, upload_name)
 
+    def _check_upload_allowed(self, upload):
+        """
+        :type upload: werkzeug.datastructures.FileStorage
+        :raises UploadNotAllowed
+
+        """
+        extension = path.splitext(upload.filename)[1]
+        if extension in self.disallowed:
+            raise UploadNotAllowed
+
     def save(self, upload):
         """
         :type upload: werkzeug.datastructures.FileStorage
@@ -45,9 +55,7 @@ class Uploads(object):
         :raises UploadNotAllowed
 
         """
-        extension = path.splitext(upload.filename)[1]
-        if extension in self.disallowed:
-            raise UploadNotAllowed
+        self._check_upload_allowed(upload)
 
         upload_path = self._path_for_save(upload.filename)
         upload_directory, upload_filename = path.split(upload_path)
