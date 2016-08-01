@@ -1,98 +1,59 @@
-from collections import namedtuple
-from datetime import datetime
-
-from config import Config
-from opwen_webapp import app
-from opwen_webapp import db
-from opwen_webapp import security
-from opwen_webapp.models import Email
-from opwen_webapp.models import User
+from os import path
+from os import remove
+from shutil import rmtree
+from tempfile import NamedTemporaryFile
+from tempfile import mkdtemp
 
 
-# noinspection PyUnusedLocal
-class DummyRemoteStorage(object):
-    def __init__(self, *args, download=None, **kwargs):
-        """
-        :type download: bytes
-
-        """
-        self.downloaded = download
-        self.uploaded = []
-
-    def upload(self, payload):
-        """
-        :type payload: bytes
-
-        """
-        self.uploaded.append(payload)
-
-    def download(self):
-        return self.downloaded
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite://'
-    SECRET_KEY = 's3cr3t'
-    SECURITY_PASSWORD_SALT = 'password-salt'
-
-
-# noinspection PyPep8Naming,PyMethodMayBeStatic,PyArgumentList
-class AppTestMixin(object):
-    _email = namedtuple('Email', ('to', 'sender', 'date', 'subject', 'body'))
-
-    def create_app(self):
-        app.config.from_object(TestConfig)
-        app.remote_storage = DummyRemoteStorage()
-        security.init_app(app, register_blueprint=False)
-        return app
-
+# noinspection PyPep8Naming
+class FileWritingTestCaseMixin(object):
+    # noinspection PyAttributeOutsideInit
     def setUp(self):
-        db.create_all()
+        self.paths_created = set()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+        for created in self.paths_created:
+            if path.isdir(created):
+                rmtree(created)
+            elif path.isfile(created):
+                remove(created)
 
-    def new_user(self, password='test', **kwargs):
-        """
-        :type password: str
+    # noinspection PyUnresolvedReferences
+    def assertFileExists(self, filepath):
+        self.paths_created.add(filepath)
+        self.assertTrue(path.isfile(filepath), 'file does not exist')
 
-        """
-        user = User(password=password, **kwargs)
-        db.session.add(user)
-        db.session.commit()
-        return user
+    # noinspection PyUnresolvedReferences
+    def assertFileDoesNotExist(self, filepath):
+        self.paths_created.add(filepath)
+        self.assertFalse(path.isfile(filepath), 'file exists')
 
-    def new_email(self, sender='from@test.net', to=('to@test.net',), **kwargs):
-        """
-        :type sender: str
-        :type to: list[str]
+    # noinspection PyUnresolvedReferences
+    def assertDirectoryExists(self, directory):
+        self.paths_created.add(directory)
+        self.assertTrue(path.isdir(directory), 'directory does not exist')
 
-        """
-        email = Email(sender=sender, to=to, **kwargs)
-        db.session.add(email)
-        db.session.commit()
-        return email
+    # noinspection PyUnresolvedReferences
+    def assertDirectoryDoesNotExist(self, directory):
+        self.paths_created.add(directory)
+        self.assertFalse(path.isdir(directory), 'directory exists')
 
-    @classmethod
-    def create_complete_email_fake(cls, **kwargs):
-        return cls._email(
-            to=kwargs.get('to', ['recipient@test.net']),
-            sender=kwargs.get('sender', 'sender@test.net'),
-            date=kwargs.get('date', datetime.utcnow()),
-            subject=kwargs.get('subject', 'the subject'),
-            body=kwargs.get('body', 'the body'))
+    # noinspection PyUnresolvedReferences
+    def assertFileContentEqual(self, filepath, content):
+        self.paths_created.add(filepath)
+        self.assertFileExists(filepath)
+        with open(filepath) as fobj:
+            self.assertEqual(fobj.read(), content, 'file content is different')
 
-    @classmethod
-    def create_complete_email(cls, **kwargs):
-        """
-        :rtype: Email
+    def new_directory(self):
+        directory_path = mkdtemp()
+        self.paths_created.add(directory_path)
+        return directory_path
 
-        """
-        return Email(
-            to=kwargs.get('to', ['recipient@test.net']),
-            sender=kwargs.get('sender', 'sender@test.net'),
-            date=kwargs.get('date', datetime.utcnow()),
-            subject=kwargs.get('subject', 'the subject'),
-            body=kwargs.get('body', 'the body'))
+    def new_file(self, directory=None, content=''):
+        directory = directory or self.new_directory()
+
+        with NamedTemporaryFile('w', delete=False, dir=directory) as fobj:
+            fobj.write(content)
+        self.paths_created.add(fobj.name)
+        return fobj.name

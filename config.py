@@ -97,8 +97,11 @@ class Config(object):
     REMOTE_STORAGE_ACCOUNT_KEY = os.getenv('OPWEN_REMOTE_ACCOUNT_KEY')
     REMOTE_STORAGE_CONTAINER = 'opwen'
     REMOTE_UPLOAD_PATH = '%s/from_opwen/new' % CLIENT_NAME
-    REMOTE_UPLOAD_FORMAT = '%Y-%m-%d_%H-%M.json.gz'
-    REMOTE_DOWNLOAD_PATH = '%s/to_opwen/new.json.gz' % CLIENT_NAME
+    REMOTE_UPLOAD_TIMESTAMP_FORMAT = '%Y-%m-%d_%H-%M'
+    REMOTE_DOWNLOAD_PATH = '%s/to_opwen/new.zip' % CLIENT_NAME
+    REMOTE_SERIALIZER_EMAILS_NAME = 'emails.jsonl'
+    REMOTE_SERIALIZER_ACCOUNTS_NAME = 'accounts.jsonl'
+    REMOTE_SERIALIZER_ATTACHMENTS_NAME = 'attachments'
 
     MAX_CONTENT_LENGTH = 0.5 * 1024 * 1024
     SECRET_KEY = os.getenv('OPWEN_SECRET_KEY')

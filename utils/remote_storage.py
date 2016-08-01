@@ -1,7 +1,10 @@
 from datetime import datetime
+from os import path
 
 from azure.common import AzureMissingResourceHttpError
 from azure.storage.blob import BlockBlobService
+
+from utils.temporary import SafeNamedTemporaryFile
 
 
 class AzureBlob(object):
@@ -15,7 +18,7 @@ class AzureBlob(object):
         self.container = None
         self.upload_path = None
         self.download_path = None
-        self.upload_format = None
+        self.timestamp_format = None
 
         if app:
             self.init_app(app)
@@ -30,32 +33,38 @@ class AzureBlob(object):
         self.container = app.config.get('REMOTE_STORAGE_CONTAINER')
         self.upload_path = app.config.get('REMOTE_UPLOAD_PATH')
         self.download_path = app.config.get('REMOTE_DOWNLOAD_PATH')
-        self.upload_format = app.config.get('REMOTE_UPLOAD_FORMAT')
+        self.timestamp_format = app.config.get('REMOTE_UPLOAD_TIMESTAMP_FORMAT')
 
         app.remote_storage = self
 
     def conn(self):
         return BlockBlobService(self.account_name, self.account_key)
 
-    def upload(self, payload):
+    def upload(self, path_to_payload):
         """
-        :type payload: bytes
+        :type path_to_payload: str
 
         """
-        if not payload:
+        if not path_to_payload or not path.exists(path_to_payload):
             return
 
-        upload_name = datetime.utcnow().strftime(self.upload_format)
-        upload_path = '%s/%s' % (self.upload_path, upload_name)
-        self.conn().create_blob_from_bytes(self.container, upload_path, payload)
+        timestamp = datetime.utcnow().strftime(self.timestamp_format)
+        filename = path.basename(path_to_payload)
+        self.conn().create_blob_from_path(
+            container_name=self.container,
+            blob_name='/'.join((self.upload_path, timestamp, filename)),
+            file_path=path_to_payload)
 
     def download(self):
         """
-        :rtype: bytes
+        :rtype: str
 
         """
         try:
-            return self.conn().get_blob_to_bytes(self.container,
-                                                 self.download_path)
+            with SafeNamedTemporaryFile('w', delete=False) as fobj:
+                return self.conn().get_blob_to_path(
+                    container_name=self.container,
+                    blob_name=self.download_path,
+                    file_path=fobj.name)
         except AzureMissingResourceHttpError:
-            return b''
+            return None

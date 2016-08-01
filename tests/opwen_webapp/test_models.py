@@ -3,8 +3,7 @@ from datetime import timedelta
 
 from flask_testing import TestCase
 
-from opwen_webapp.models import ModelPacker
-from tests.base import AppTestMixin
+from tests.app_base import AppTestMixin
 
 
 class TestUser(AppTestMixin, TestCase):
@@ -82,19 +81,3 @@ class TestEmail(AppTestMixin, TestCase):
 
         email2.date = now + timedelta(seconds=60)
         self.assertFalse(email1.is_same_as(email2))
-
-
-class TestModelPacker(AppTestMixin, TestCase):
-    def test_email_packing_roundtrip(self):
-        packer = ModelPacker()
-        expecteds = [self.create_complete_email() for _ in range(5)]
-        actuals = packer.unpack_emails(packer.pack(expecteds))
-        for expected, actual in zip(expecteds, actuals):
-            self.assertTrue(expected.is_same_as(actual))
-
-    def test_misformed_data_unpacks_gracefully(self):
-        packed = {'definitey_not_emails_field': [1, 2]}
-        self.assertEqual(ModelPacker().unpack_emails(packed), [])
-
-        packed = {'definitey_not_accounts_field': [1, 2]}
-        self.assertEqual(ModelPacker().unpack_accounts(packed), [])

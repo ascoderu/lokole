@@ -10,6 +10,7 @@ from opwen_webapp.models import Attachment
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
 from utils.strings import normalize_caseless
+from utils.temporary import removing
 
 
 def _find_emails_by(user):
@@ -134,28 +135,27 @@ def upload_local_updates():
     for email in emails:
         email.date = now
 
-    packed = app.remote_packer.pack(emails)
-    serialized = app.remote_serializer.serialize(packed)
-    app.remote_storage.upload(serialized)
+    with removing(app.remote_serializer.serialize(emails)) as serialized:
+        app.remote_storage.upload(serialized)
     db.session.commit()
 
     return len(emails)
 
 
 def download_remote_updates():
-    serialized = app.remote_storage.download()
-    packed = app.remote_serializer.deserialize(serialized)
-    emails = app.remote_packer.unpack_emails(packed)
-    accounts = app.remote_packer.unpack_accounts(packed)
+    with removing(app.remote_storage.download()) as downloaded:
+        emails, accounts = app.remote_serializer.deserialize(downloaded)
 
     for email in emails:
         if email.is_complete():
+            for attachment in email.attachments:
+                attachment.path = uploads.save(attachment.path)
             db.session.add(email)
-    for name, email in accounts:
-        user = _find_user_by(name)
-        if user and name and email:
-            user.name = name
-            user.email = email
+    for account in accounts:
+        user = _find_user_by(account.name)
+        if user and account.name and account.email:
+            user.name = account.name
+            user.email = account.email
             db.session.add(user)
     db.session.commit()
 

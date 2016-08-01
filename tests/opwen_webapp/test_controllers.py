@@ -12,7 +12,7 @@ from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.controllers import user_exists
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
-from tests.base import AppTestMixin
+from tests.app_base import AppTestMixin
 
 
 class TestUserExists(AppTestMixin, TestCase):
@@ -108,8 +108,8 @@ class TestWriteEmails(AppTestMixin, TestCase):
 class TestRemoteUpload(AppTestMixin, TestCase):
     def _retrieve_uploaded_emails(self, index):
         uploaded = self.app.remote_storage.uploaded[index]
-        packed = self.app.remote_serializer.deserialize(uploaded)
-        return self.app.remote_packer.unpack_emails(packed)
+        emails, accounts = self.app.remote_serializer.deserialize(uploaded)
+        return emails
 
     def test_transmits_all_new_emails_without_resending_old_emails(self):
         new_emails = [self.new_email(), self.new_email(), self.new_email()]
@@ -128,17 +128,16 @@ class TestRemoteUpload(AppTestMixin, TestCase):
 
 
 class TestRemoteDownload(AppTestMixin, TestCase):
-    def _prepare_serialized_data(self, data):
-        serialized = self.app.remote_serializer.serialize(data)
+    def _prepare_serialized_data(self, emails, accounts):
+        serialized = self.app.remote_serializer.serialize(emails, accounts)
         self.app.remote_storage.downloaded = serialized
 
     def _prepare_emails_for_download(self, emails):
-        packed = self.app.remote_packer.pack(emails)
-        self._prepare_serialized_data(packed)
+        self._prepare_serialized_data(emails=emails, accounts=None)
 
     def _prepare_users_for_download(self, name, email):
-        packed = {'accounts': [{'name': name, 'email': email}]}
-        self._prepare_serialized_data(packed)
+        accounts = [self.create_complete_user(name=name, email=email)]
+        self._prepare_serialized_data(accounts=accounts, emails=None)
 
     def test_updates_emails(self):
         remote_emails = [self.create_complete_email_fake() for _ in range(5)]
@@ -172,7 +171,7 @@ class TestRemoteDownload(AppTestMixin, TestCase):
         self.assertEqual(updated_user.email, email)
 
     def test_ignores_corrupted_remote_data(self):
-        self.app.remote_storage.downloaded = b'\xbe\xef'
+        self.app.remote_storage.downloaded = '/path/does/not/exist'
 
         download_remote_updates()
 

@@ -1,12 +1,29 @@
 from os import makedirs
 from os import path
 from os import rename
-from tempfile import NamedTemporaryFile
+
+from werkzeug.datastructures import FileStorage
 
 from utils.checksum import sha256
+from utils.temporary import SafeNamedTemporaryFile
 
 SCRIPTS = frozenset('.js .php .pl .py .rb .sh'.split())
 EXECUTABLES = frozenset('.so .exe .dll'.split())
+
+
+class LocalFileStorage(FileStorage):
+    # noinspection PyMissingConstructor
+    def __init__(self, localpath):
+        """
+        :type localpath: str
+
+        """
+        self.filename = localpath
+
+    def save(self, dst, buffer_size=16384):
+        # the FileStorage already exists on the file-system
+        # no need to save it again
+        return self.filename
 
 
 class UploadNotAllowed(Exception):
@@ -26,24 +43,24 @@ class Uploads(object):
         self.disallowed = frozenset(disallowed or SCRIPTS | EXECUTABLES)
         self.hasher = hasher or sha256
 
-    def _check_upload_allowed(self, upload):
+    def _check_upload_allowed(self, filename):
         """
-        :type upload: werkzeug.datastructures.FileStorage
+        :type filename: str
         :raises UploadNotAllowed
 
         """
-        extension = path.splitext(upload.filename)[1]
+        extension = path.splitext(filename)[1]
         if extension in self.disallowed:
             raise UploadNotAllowed
 
     @classmethod
     def _save_to_temporary_location(cls, upload):
         """
-        :type upload: werkzeug.datastructures.FileStorage
+        :type upload: FileStorage
         :rtype: str
 
         """
-        with NamedTemporaryFile('w', delete=False) as tmpfile:
+        with SafeNamedTemporaryFile('w', delete=False) as tmpfile:
             upload.save(tmpfile.name)
         return tmpfile.name
 
@@ -70,12 +87,15 @@ class Uploads(object):
 
     def save(self, upload):
         """
-        :type upload: werkzeug.datastructures.FileStorage
+        :type upload: FileStorage | str
         :rtype: str
         :raises UploadNotAllowed
 
         """
-        self._check_upload_allowed(upload)
+        if isinstance(upload, str) and path.exists(upload):
+            upload = LocalFileStorage(upload)
+
+        self._check_upload_allowed(upload.filename)
 
         temporary_filename = self._save_to_temporary_location(upload)
 
