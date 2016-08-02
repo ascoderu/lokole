@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from azure.common import AzureMissingResourceHttpError
 
-from utils.remote_storage import AzureBlob
+from utils.remotestorage import AzureBlob
 
 
 class DownloadFailedBlockBlobService(object):

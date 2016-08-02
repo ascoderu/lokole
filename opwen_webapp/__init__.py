@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from utils.compressor import ZipCompressor
 from utils.fileformatter import JsonLines
-from utils.remote_storage import AzureBlob
+from utils.remotestorage import AzureBlob
 from utils.uploads import Uploads
 
 app = Flask(__name__)
