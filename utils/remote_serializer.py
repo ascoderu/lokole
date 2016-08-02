@@ -135,7 +135,7 @@ class RemoteSerializer(object):
                 self._serialize_email(email, manifest)
                 self._serialize_attachments(email.attachments, workspace)
 
-    def serialize(self, emails, accounts=None):
+    def serialize(self, emails=None, accounts=None):
         """
         :type emails: collections.Iterable[Email]
         :type accounts: collections.Iterable[User]
