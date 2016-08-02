@@ -108,7 +108,7 @@ class TestWriteEmails(AppTestMixin, TestCase):
 class TestRemoteUpload(AppTestMixin, TestCase):
     def _retrieve_uploaded_emails(self, index):
         uploaded = self.app.remote_storage.uploaded[index]
-        emails, accounts = self.app.remote_serializer.deserialize(uploaded)
+        emails, accounts = self.app.serializer.deserialize(uploaded)
         return emails
 
     def test_transmits_all_new_emails_without_resending_old_emails(self):
@@ -129,7 +129,7 @@ class TestRemoteUpload(AppTestMixin, TestCase):
 
 class TestRemoteDownload(AppTestMixin, TestCase):
     def _prepare_serialized_data(self, emails, accounts):
-        serialized = self.app.remote_serializer.serialize(emails, accounts)
+        serialized = self.app.serializer.serialize(emails, accounts)
         self.app.remote_storage.downloaded = serialized
 
     def _prepare_emails_for_download(self, emails):

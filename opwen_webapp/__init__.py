@@ -30,9 +30,9 @@ security = Security(app, user_datastore,
                     login_form=forms.LoginForm,
                     register_form=forms.RegisterForm)
 
-from utils.remote_serializer import RemoteSerializer
+from opwen_webapp.helpers.serializers import Serializer
 
-remote_serializer = RemoteSerializer(JsonLines, ZipCompressor, app)
+serializer = Serializer(JsonLines, ZipCompressor, app)
 remote_storage = AzureBlob(app)
 
 from opwen_webapp.helpers import handlers

@@ -1,10 +1,10 @@
 from unittest import TestCase
 
+from opwen_webapp.helpers.serializers import Serializer
 from tests.app_base import AppTestMixin
 from tests.base import FileWritingTestCaseMixin
 from utils.compressor import ZipCompressor
 from utils.fileformatter import JsonLines
-from utils.remote_serializer import RemoteSerializer
 
 
 class TestRemoteSerializer(FileWritingTestCaseMixin, AppTestMixin, TestCase):
@@ -38,10 +38,10 @@ class TestRemoteSerializer(FileWritingTestCaseMixin, AppTestMixin, TestCase):
     @property
     def serializer(self):
         """
-        :rtype: RemoteSerializer
+        :rtype: Serializer
 
         """
-        return RemoteSerializer(JsonLines, ZipCompressor, self.create_app())
+        return Serializer(JsonLines, ZipCompressor, self.create_app())
 
     def test_serialization_deserialization_roundtrip_for_emails(self):
         expected_emails = [self.create_complete_email() for _ in range(5)]

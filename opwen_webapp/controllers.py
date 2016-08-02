@@ -135,7 +135,7 @@ def upload_local_updates():
     for email in emails:
         email.date = now
 
-    with removing(app.remote_serializer.serialize(emails)) as serialized:
+    with removing(app.serializer.serialize(emails)) as serialized:
         app.remote_storage.upload(serialized)
     db.session.commit()
 
@@ -144,7 +144,7 @@ def upload_local_updates():
 
 def download_remote_updates():
     with removing(app.remote_storage.download()) as downloaded:
-        emails, accounts = app.remote_serializer.deserialize(downloaded)
+        emails, accounts = app.serializer.deserialize(downloaded)
 
     for email in emails:
         if email.is_complete():

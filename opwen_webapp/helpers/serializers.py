@@ -8,7 +8,7 @@ from opwen_webapp.models import User
 from utils.temporary import create_temporary_directory
 
 
-class RemoteSerializer(object):
+class Serializer(object):
     _date_format = '%Y-%m-%d %H:%M'
 
     _account_name_field = 'name'
@@ -47,7 +47,7 @@ class RemoteSerializer(object):
         self.accounts_filename = app.config.get('REMOTE_SERIALIZER_ACCOUNTS_NAME')
         self.emails_filename = app.config.get('REMOTE_SERIALIZER_EMAILS_NAME')
         self.attachments_directoryname = app.config.get('REMOTE_SERIALIZER_ATTACHMENTS_NAME')
-        app.remote_serializer = self
+        app.serializer = self
 
     def _serialize_account(self, account, fobj):
         """
