@@ -12,6 +12,7 @@ from flask_security import roles_required
 from config import Config
 from config import ui
 from opwen_webapp import app
+from opwen_webapp import filters
 from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
@@ -20,14 +21,13 @@ from opwen_webapp.controllers import outbox_emails_for
 from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.forms import NewEmailForm
-from utils import jinja_filters
 from utils.uploads import UploadNotAllowed
 
-app.jinja_env.filters['is_admin'] = jinja_filters.is_admin
-app.jinja_env.filters['render_date'] = jinja_filters.render_date
-app.jinja_env.filters['safe_multiline'] = jinja_filters.safe_multiline
-app.jinja_env.filters['sort_by_date'] = jinja_filters.sort_by_date
-app.jinja_env.filters['ui'] = jinja_filters.ui
+app.jinja_env.filters['is_admin'] = filters.is_admin
+app.jinja_env.filters['render_date'] = filters.render_date
+app.jinja_env.filters['safe_multiline'] = filters.safe_multiline
+app.jinja_env.filters['sort_by_date'] = filters.sort_by_date
+app.jinja_env.filters['ui'] = filters.ui
 
 
 @app.route('/')
