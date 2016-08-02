@@ -11,6 +11,9 @@ def _remove(filepath):
     :type filepath: str
 
     """
+    if not filepath:
+        return
+
     if path.isdir(filepath):
         rmtree(filepath)
     elif path.isfile(filepath):
