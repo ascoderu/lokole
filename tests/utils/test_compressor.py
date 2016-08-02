@@ -47,6 +47,20 @@ class TestDirectoryCompressor(FileWritingTestCaseMixin, TestCase):
         self.assertFileExists(extracted)
         self.assertFileContentEqual(extracted, content)
 
+    def test_raises_valueerror_on_bad_archive(self):
+        archive = self.new_file(content='not-an-archive')
+
+        with self.assertRaises(ValueError):
+            self.compressor.decompress(archive, 'file', self.new_directory())
+
+    def test_raises_keyerror_on_unknown_file(self):
+        filepath = self.new_file(content='some content')
+        archive = self.compressor.compress(path.dirname(filepath))
+        self.paths_created.add(archive)
+
+        with self.assertRaises(ValueError):
+            self.compressor.decompress(archive, 'file', self.new_directory())
+
 
 class TestZipCompressor(TestDirectoryCompressor):
     compressor = ZipCompressor()

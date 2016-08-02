@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from abc import abstractproperty
 from shutil import make_archive
+from zipfile import BadZipfile
 from zipfile import ZipFile
 
 from utils.temporary import SafeNamedTemporaryFile
@@ -33,6 +34,7 @@ class DirectoryCompressor(metaclass=ABCMeta):
         :type filename: str
         :type to_directory: str
         :rtype: str
+        :raises ValueError
 
         """
         raise NotImplementedError
@@ -42,6 +44,11 @@ class ZipCompressor(DirectoryCompressor):
     _format = 'zip'
 
     def decompress(self, archive_path, filename, to_directory):
-        with ZipFile(archive_path) as archive:
-            extracted = archive.extract(filename, to_directory)
-        return extracted
+        try:
+            with ZipFile(archive_path) as archive:
+                extracted = archive.extract(filename, to_directory)
+            return extracted
+        except BadZipfile as exception:
+            raise ValueError('corrupt archive') from exception
+        except KeyError as exception:
+            raise ValueError('file not in archive') from exception

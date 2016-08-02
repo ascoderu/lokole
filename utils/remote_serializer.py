@@ -228,11 +228,11 @@ class RemoteSerializer(object):
 
             try:
                 emails = list(emails)
-            except (FileNotFoundError, KeyError):
+            except (FileNotFoundError, ValueError):
                 emails = []
             try:
                 accounts = list(accounts)
-            except (FileNotFoundError, KeyError):
+            except (FileNotFoundError, ValueError):
                 accounts = []
 
         return emails, accounts
