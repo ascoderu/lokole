@@ -38,10 +38,20 @@ class Uploads(object):
         :type disallowed: collections.Iterable[str]
 
         """
-        self.app = app
-        self.root_directory = directory or app.config.get('UPLOAD_DIRECTORY')
+        self.root_directory = directory
         self.disallowed = frozenset(disallowed or SCRIPTS | EXECUTABLES)
         self.hasher = hasher or sha256
+
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """
+        :type app: flask.Flask
+
+        """
+        if not self.root_directory:
+            self.root_directory = app.config.get('UPLOAD_DIRECTORY')
 
     def _check_upload_allowed(self, filename):
         """
