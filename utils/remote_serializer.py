@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import makedirs
 from os import path
 from shutil import copy
 
@@ -117,6 +118,7 @@ class RemoteSerializer(object):
             return
 
         target_directory = path.join(workspace, self.attachments_directoryname)
+        makedirs(target_directory, mode=0o700, exist_ok=True)
         for attachment in attachments:
             copy(attachment.path, target_directory)
 
