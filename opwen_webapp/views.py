@@ -12,7 +12,6 @@ from flask_security import roles_required
 from config import Config
 from config import ui
 from opwen_webapp import app
-from opwen_webapp import filters
 from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
@@ -20,7 +19,8 @@ from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
 from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import upload_local_updates
-from opwen_webapp.forms import NewEmailForm
+from opwen_webapp.helpers import filters
+from opwen_webapp.helpers.forms import NewEmailForm
 from utils.uploads import UploadNotAllowed
 
 app.jinja_env.filters['is_admin'] = filters.is_admin

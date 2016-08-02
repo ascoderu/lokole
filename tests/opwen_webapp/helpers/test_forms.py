@@ -5,8 +5,8 @@ from collections import namedtuple
 from flask_testing import TestCase
 from wtforms import ValidationError
 
-from opwen_webapp.forms import EmailOrLocalUser
-from opwen_webapp.forms import UserDoesNotAlreadyExist
+from opwen_webapp.helpers.forms import EmailOrLocalUser
+from opwen_webapp.helpers.forms import UserDoesNotAlreadyExist
 from tests.app_base import AppTestMixin
 
 

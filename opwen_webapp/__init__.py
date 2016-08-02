@@ -23,7 +23,7 @@ uploads = Uploads(app)
 
 from opwen_webapp import views
 from opwen_webapp import models
-from opwen_webapp import forms
+from opwen_webapp.helpers import forms
 
 user_datastore = SQLAlchemyUserDatastore(db, models.User, models.Role)
 security = Security(app, user_datastore,
@@ -35,4 +35,4 @@ from utils.remote_serializer import RemoteSerializer
 remote_serializer = RemoteSerializer(JsonLines, ZipCompressor, app)
 remote_storage = AzureBlob(app)
 
-from opwen_webapp import handlers
+from opwen_webapp.helpers import handlers
