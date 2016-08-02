@@ -144,6 +144,9 @@ class RemoteSerializer(object):
         :rtype: str
 
         """
+        if not emails and not accounts:
+            return None
+
         with create_temporary_directory() as workspace:
             self._serialize_emails(emails, workspace)
             self._serialize_accounts(accounts, workspace)
@@ -224,17 +227,20 @@ class RemoteSerializer(object):
         :rtype: (list[Email], list[User])
 
         """
+        if not serialized or not path.isfile(serialized):
+            return [], []
+
         with create_temporary_directory() as workspace:
             emails = self._deserialize_emails(serialized, workspace)
             accounts = self._deserialize_accounts(serialized, workspace)
 
             try:
                 emails = list(emails)
-            except (FileNotFoundError, ValueError):
+            except ValueError:
                 emails = []
             try:
                 accounts = list(accounts)
-            except (FileNotFoundError, ValueError):
+            except ValueError:
                 accounts = []
 
         return emails, accounts
