@@ -18,7 +18,7 @@ class AzureBlob(object):
         self.container = None
         self.upload_path = None
         self.download_path = None
-        self.timestamp_format = None
+        self.filename_format = None
 
         if app:
             self.init_app(app)
@@ -33,7 +33,7 @@ class AzureBlob(object):
         self.container = app.config.get('REMOTE_STORAGE_CONTAINER')
         self.upload_path = app.config.get('REMOTE_UPLOAD_PATH')
         self.download_path = app.config.get('REMOTE_DOWNLOAD_PATH')
-        self.timestamp_format = app.config.get('REMOTE_UPLOAD_TIMESTAMP_FORMAT')
+        self.filename_format = app.config.get('REMOTE_UPLOAD_FILENAME_FORMAT')
 
         app.remote_storage = self
 
@@ -48,11 +48,10 @@ class AzureBlob(object):
         if not path_to_payload or not path.exists(path_to_payload):
             return
 
-        timestamp = datetime.utcnow().strftime(self.timestamp_format)
-        filename = path.basename(path_to_payload)
+        filename = datetime.utcnow().strftime(self.filename_format)
         self.conn().create_blob_from_path(
             container_name=self.container,
-            blob_name='/'.join((self.upload_path, timestamp, filename)),
+            blob_name='/'.join((self.upload_path, filename)),
             file_path=path_to_payload)
 
     def download(self):
