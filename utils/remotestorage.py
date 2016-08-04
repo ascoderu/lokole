@@ -61,9 +61,10 @@ class AzureBlob(object):
         """
         try:
             with SafeNamedTemporaryFile('w', delete=False) as fobj:
-                return self.conn().get_blob_to_path(
+                self.conn().get_blob_to_path(
                     container_name=self.container,
                     blob_name=self.download_path,
                     file_path=fobj.name)
+            return fobj.name
         except AzureMissingResourceHttpError:
             return None
