@@ -75,8 +75,10 @@ class FileFormatter(metaclass=ABCMeta):
 
 
 class JsonLines(FileFormatter):
+    _separators = (',', ':')
+
     def _write(self, obj):
-        serialized = json.dumps(obj)
+        serialized = json.dumps(obj, separators=self._separators)
         line = serialized.encode(self._encoding)
         self.fobj.write(line)
         self.fobj.write(b'\n')
