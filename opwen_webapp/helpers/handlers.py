@@ -69,8 +69,8 @@ def _create_admin():
 
 
 @app.after_request
-def _store_visited_url(response):
-    session['previous_url'] = request.url
+def _store_visited_endpoint(response):
+    session['previous_endpoint'] = request.endpoint
     return response
 
 
@@ -78,7 +78,7 @@ def _store_visited_url(response):
 @app.errorhandler(404)
 def _on_404(code_or_exception):
     flash(_('The page %(url)s does not exist.', url=request.url), category='error')
-    return redirect(session.get('previous_url') or url_for('home'))
+    return redirect(url_for(session.get('previous_endpoint', 'home')))
 
 
 # noinspection PyUnusedLocal
@@ -86,7 +86,7 @@ def _on_404(code_or_exception):
 def _on_413(code_or_exception):
     max_size = naturalsize(Config.MAX_CONTENT_LENGTH)
     flash(_('The maximum attachment size is %(max_size)s.', max_size=max_size), category='error')
-    return redirect(session.get('previous_url') or url_for('home'))
+    return redirect(url_for(session.get('previous_endpoint', 'home')))
 
 
 # noinspection PyUnusedLocal
@@ -94,7 +94,7 @@ def _on_413(code_or_exception):
 @app.errorhandler(500)
 def _on_error(code_or_exception):
     flash(_('Unexpected error. Please contact your admin.'), category='error')
-    return redirect(session.get('previous_url') or url_for('home'))
+    return redirect(url_for(session.get('previous_endpoint', 'home')))
 
 
 @app.route('/favicon.ico')
