@@ -1,3 +1,5 @@
+from functools import lru_cache
+from os import listdir
 from os import path
 
 from flask import flash
@@ -10,7 +12,6 @@ from humanize import naturalsize
 from werkzeug.utils import redirect
 
 from config import Config
-from config import LANGUAGES
 from config import ui
 from opwen_webapp import app
 from opwen_webapp import babel
@@ -18,9 +19,16 @@ from opwen_webapp import db
 from opwen_webapp import user_datastore
 
 
+@lru_cache(maxsize=1)
+def _available_translations():
+    languages = set(listdir(Config.TRANSLATIONS_PATH))
+    languages.add(Config.DEFAULT_TRANSLATION)
+    return languages
+
+
 @babel.localeselector
 def _get_locale():
-    return request.accept_languages.best_match(LANGUAGES.keys())
+    return request.accept_languages.best_match(_available_translations())
 
 
 @app.before_first_request

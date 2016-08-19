@@ -5,11 +5,6 @@ from flask_babel import lazy_gettext as _
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-LANGUAGES = {
-    'en': 'English',
-    'it': 'Italiano',
-}
-
 
 def ui(key, **kwargs):
     return {
@@ -78,6 +73,9 @@ def ui(key, **kwargs):
 
 
 class Config(object):
+    DEFAULT_TRANSLATION = 'en'
+    TRANSLATIONS_PATH = os.path.join(basedir, 'opwen_webapp', 'translations')
+
     TESTING = False
 
     ADMIN_ROLE = 'admininstrator'
