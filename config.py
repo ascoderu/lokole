@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
+from os import getenv
+from os import path
 
 from flask_babel import lazy_gettext as _
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = path.abspath(path.dirname(__file__))
 
 
 def ui(key):
@@ -24,7 +25,7 @@ def ui(key):
 
 class Config(object):
     DEFAULT_TRANSLATION = 'en'
-    TRANSLATIONS_PATH = os.path.join(basedir, 'opwen_webapp', 'translations')
+    TRANSLATIONS_PATH = path.join(basedir, 'opwen_webapp', 'translations')
 
     TESTING = False
 
@@ -32,20 +33,20 @@ class Config(object):
     ADMIN_NAME = 'opwen-administrator'
     ADMIN_PASSWORD = 'OPWEN: emails 4 the world!'
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'opwen.db')
-    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(basedir, 'opwen.db')
+    SQLALCHEMY_MIGRATE_REPO = path.join(basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    UPLOAD_DIRECTORY = os.path.join(basedir, 'attachments')
+    UPLOAD_DIRECTORY = path.join(basedir, 'attachments')
     UPLOAD_ENDPOINT = 'attachments'
 
     EMAILS_PER_PAGE = 20
 
-    CLIENT_NAME = os.getenv('OPWEN_CLIENT_NAME')
+    CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
 
     REMOTE_STORAGE_CLASS = 'utils.remote_storage.AzureBlob'
-    REMOTE_STORAGE_ACCOUNT_NAME = os.getenv('OPWEN_REMOTE_ACCOUNT_NAME')
-    REMOTE_STORAGE_ACCOUNT_KEY = os.getenv('OPWEN_REMOTE_ACCOUNT_KEY')
+    REMOTE_STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
+    REMOTE_STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
     REMOTE_STORAGE_CONTAINER = 'opwen'
     REMOTE_UPLOAD_PATH = '%s/from_opwen/new' % CLIENT_NAME
     REMOTE_UPLOAD_FILENAME_FORMAT = '%Y-%m-%d_%H-%M.zip'
@@ -55,11 +56,11 @@ class Config(object):
     REMOTE_SERIALIZER_ATTACHMENTS_NAME = 'attachments'
 
     MAX_CONTENT_LENGTH = 0.5 * 1024 * 1024
-    SECRET_KEY = os.getenv('OPWEN_SECRET_KEY')
+    SECRET_KEY = getenv('OPWEN_SECRET_KEY')
 
     SECURITY_USER_IDENTITY_ATTRIBUTES = ('name', 'email')
     SECURITY_PASSWORD_HASH = 'bcrypt'
-    SECURITY_PASSWORD_SALT = os.getenv('OPWEN_PASSWORD_SALT')
+    SECURITY_PASSWORD_SALT = getenv('OPWEN_PASSWORD_SALT')
     SECURITY_REGISTERABLE = True
     SECURITY_POST_REGISTER_VIEW = 'post_register'
     SECURITY_POST_LOGIN_VIEW = 'post_login'
