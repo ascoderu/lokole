@@ -70,7 +70,8 @@ def _create_admin():
 
 @app.after_request
 def _store_visited_endpoint(response):
-    session['previous_endpoint'] = request.endpoint
+    if request.endpoint != 'static':
+        session['previous_endpoint'] = request.endpoint
     return response
 
 
