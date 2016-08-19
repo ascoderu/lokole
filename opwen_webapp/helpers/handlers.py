@@ -7,12 +7,12 @@ from flask import request
 from flask import send_from_directory
 from flask import session
 from flask import url_for
+from flask_babel import gettext as _
 from flask_security.registerable import register_user
 from humanize import naturalsize
 from werkzeug.utils import redirect
 
 from config import Config
-from config import ui
 from opwen_webapp import app
 from opwen_webapp import babel
 from opwen_webapp import db
@@ -77,7 +77,7 @@ def _store_visited_url(response):
 # noinspection PyUnusedLocal
 @app.errorhandler(404)
 def _on_404(code_or_exception):
-    flash(ui('page_not_found', url=request.url), category='error')
+    flash(_('The page %(url)s does not exist.', url=request.url), category='error')
     return redirect(session.get('previous_url') or url_for('home'))
 
 
@@ -85,7 +85,7 @@ def _on_404(code_or_exception):
 @app.errorhandler(413)
 def _on_413(code_or_exception):
     max_size = naturalsize(Config.MAX_CONTENT_LENGTH)
-    flash(ui('attachment_too_large', max_size=max_size), category='error')
+    flash(_('The maximum attachment size is %(max_size)s.', max_size=max_size), category='error')
     return redirect(session.get('previous_url') or url_for('home'))
 
 
@@ -93,7 +93,7 @@ def _on_413(code_or_exception):
 @app.errorhandler(Exception)
 @app.errorhandler(500)
 def _on_error(code_or_exception):
-    flash(ui('unexpected_error'), category='error')
+    flash(_('Unexpected error. Please contact your admin.'), category='error')
     return redirect(session.get('previous_url') or url_for('home'))
 
 

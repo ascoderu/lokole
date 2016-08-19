@@ -1,3 +1,4 @@
+from flask_babel import lazy_gettext as _
 from flask_security import LoginForm as BaseLoginForm
 from flask_security import RegisterForm as BaseRegisterForm
 from flask_wtf import Form
@@ -13,7 +14,6 @@ from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
-from config import ui
 from opwen_webapp.controllers import user_exists
 
 
@@ -57,50 +57,50 @@ class EmailOrLocalUser(object):
 
 class LoginForm(BaseLoginForm):
     email = StringField(
-        label=ui('email_field'),
-        validators=[DataRequired(ui('email_field_required'))])
+        label=_('Name or Email'),
+        validators=[DataRequired(_('Please enter your name or email.'))])
 
-    password = PasswordField(ui('password_field'))
+    password = PasswordField(_('Password'))
 
-    submit = SubmitField(ui('login'))
+    submit = SubmitField(_('Login'))
 
 
 class RegisterForm(BaseRegisterForm):
     email = StringField(
-        label=ui('name_field'),
-        validators=[DataRequired(ui('name_field_required')),
-                    UserDoesNotAlreadyExist(ui('name_field_already_exists'))])
+        label=_('Name'),
+        validators=[DataRequired(_('Please enter your name.')),
+                    UserDoesNotAlreadyExist(_('Sorry, this name is already in use.'))])
 
     password = PasswordField(
-        label=ui('password_field'),
-        validators=[DataRequired(ui('password_field_required')),
-                    Length(6, 128, ui('password_field_too_short'))])
+        label=_('Password'),
+        validators=[DataRequired(_('Please provide a password')),
+                    Length(6, 128, _('Password must be at least 6 characters'))])
 
     password_confirm = PasswordField(
-        label=ui('password_confirm_field'),
-        validators=[EqualTo('password', ui('password_field_must_match'))])
+        label=_('Retype password'),
+        validators=[EqualTo('password', _('Password does not match'))])
 
-    submit = SubmitField(ui('register'))
+    submit = SubmitField(_('Register'))
 
 
 class NewEmailForm(Form):
     to = StringField(
-        label=ui('email_to_field'),
-        validators=[DataRequired(ui('email_to_field_required')),
-                    EmailOrLocalUser(ui('email_to_field_invalid'))])
+        label=_('To'),
+        validators=[DataRequired(_('Please specify a recipient.')),
+                    EmailOrLocalUser(_('Must be a user name or email address.'))])
 
     subject = StringField(
-        label=ui('email_subject_field'),
+        label=_('Subject'),
         validators=[Optional()])
 
     body = TextAreaField(
-        label=ui('email_body_field'),
+        label=_('Message'),
         validators=[Optional()])
 
     attachments = FileField(
-        label=ui('email_attachments_field'),
+        label=_('Attachments'),
         validators=[Optional()],
         render_kw={'multiple': True})
 
     submit = SubmitField(
-        label=ui('email_submit_field'))
+        label=_('Send'))

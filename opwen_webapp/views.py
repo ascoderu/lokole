@@ -5,12 +5,12 @@ from flask import render_template
 from flask import request
 from flask import send_file
 from flask import url_for
+from flask_babel import gettext as _
 from flask_security import current_user
 from flask_security import login_required
 from flask_security import roles_required
 
 from config import Config
-from config import ui
 from opwen_webapp import app
 from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import find_attachment
@@ -49,7 +49,7 @@ def about():
 @login_required
 def post_register():
     user = current_user.name or current_user.email
-    flash(ui('welcome_user', user=user), category='success')
+    flash(_('Welcome, %(user)s!', user=user), category='success')
     return redirect(url_for('home'))
 
 
@@ -57,13 +57,13 @@ def post_register():
 @login_required
 def post_login():
     user = current_user.name or current_user.email
-    flash(ui('welcome_back_user', user=user), category='success')
+    flash(_('Welcome back, %(user)s!', user=user), category='success')
     return redirect(url_for('home'))
 
 
 @app.route('/post_logout')
 def post_logout():
-    flash(ui('loggedout_user'), category='success')
+    flash(_('Logged out successfully!'), category='success')
     return redirect(url_for('home'))
 
 
@@ -83,12 +83,16 @@ def email_new():
                 current_user, form.to.data, form.subject.data, form.body.data,
                 request.files.getlist(form.attachments.name))
         except UploadNotAllowed:
-            flash(ui('upload_not_allowed'), category='error')
+            flash(_('Only texts, images, documents and so forth are allowed as attachments.'), category='error')
         else:
-            message = 'email_done' if is_to_local_user else 'email_delayed'
-            next_endpoint = 'email_sent' if is_to_local_user else 'email_outbox'
+            if is_to_local_user:
+                message = _('Email sent!')
+                next_endpoint = 'email_sent'
+            else:
+                message = _('Email will be sent soon!')
+                next_endpoint = 'email_delayed'
 
-            flash(ui(message), category='success')
+            flash(message, category='success')
             return redirect(url_for(next_endpoint))
 
     return render_template('email_new.html', form=form)
@@ -127,8 +131,8 @@ def sync():
     emails_uploaded = upload_local_updates()
     emails_downloaded = download_remote_updates()
 
-    flash(ui('upload_complete', num=emails_uploaded), category='success')
-    flash(ui('download_complete', num=emails_downloaded), category='success')
+    flash(_('Uploaded %(num)d emails.', num=emails_uploaded), category='success')
+    flash(_('Downloaded %(num)d emails.', num=emails_downloaded), category='success')
     return redirect(url_for('home'))
 
 

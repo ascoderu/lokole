@@ -27,10 +27,10 @@
         $("#{{ form.attachments.id }}").fileinput({
           showPreview: false,
           showUpload: false,
-          msgSelected: "{n} {{ 'files_selected' | ui }}",
+          msgSelected: "{n} {{ _('files selected') }}",
           removeTitle: "",
-          removeLabel: "{{ 'remove_files' | ui }}",
-          browseLabel: "{{ 'choose_files' | ui }}",
+          removeLabel: "{{ _('Remove') }}",
+          browseLabel: "{{ _('Choose files') }}",
           browseIcon: '<span class="glyphicon glyphicon-paperclip"></span>',
         });
       }());
@@ -49,19 +49,19 @@
           customTemplates: {
             emphasis: function(context) {
               return '<li><div class="btn-group">'
-                      + '<a title="{{ 'bold' | ui }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '<a title="{{ _('Bold') }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
                       + '  <span class="fa fa-bold"></span></a>'
-                      + '<a title="{{ 'italic' | ui }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '<a title="{{ _('Italic') }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
                       + '  <span class="fa fa-italic"></span></a>'
-                      + '<a title="{{ 'underline' | ui }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '<a title="{{ _('Underline') }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
                       + '  <span class="fa fa-underline"></span></a>'
                       + '</div></li>';
             },
             lists: function(context) {
               return '<li><div class="btn-group">'
-                      + '<a title="{{ 'unordered_list' | ui }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '<a title="{{ _('Un-ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
                       + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'
-                      + '<a title="{{ 'ordered_list' | ui }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
+                      + '<a title="{{ _('Ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
                       + '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>'
                       + '</div></li>';
             }
