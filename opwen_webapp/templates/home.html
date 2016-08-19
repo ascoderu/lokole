@@ -1,5 +1,18 @@
 {% extends "_base.html" %}
 
 {% block content %}
+  {% if current_user.is_authenticated %}
+    <div class="alert alert-info alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <strong>{{ 'note' | ui }}: </strong>
+      {{ 'logged_in_as' | ui }} "{{ current_user.name }}"
+      ({%- if current_user.email and current_user.email != current_user.name -%}
+        {{ current_user.email }}
+      {%- else -%}
+        {{ 'email_coming_soon' | ui }}
+      {%- endif -%}).
+    </div>
+  {% endif %}
+
   <p>{{ _('Hello World!') }}</p>
 {% endblock %}
