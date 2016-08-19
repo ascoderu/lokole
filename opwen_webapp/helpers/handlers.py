@@ -20,7 +20,7 @@ from opwen_webapp import user_datastore
 
 
 @lru_cache(maxsize=1)
-def _available_translations():
+def _translations():
     languages = set(listdir(Config.TRANSLATIONS_PATH))
     languages.add(Config.DEFAULT_TRANSLATION)
     return languages
@@ -28,7 +28,29 @@ def _available_translations():
 
 @babel.localeselector
 def _get_locale():
-    return request.accept_languages.best_match(_available_translations())
+    return session['lang_code']
+
+
+@app.url_defaults
+def _add_language_code(endpoint, values):
+    if 'lang_code' in values:
+        return
+
+    lang_code = session['lang_code']
+    if lang_code not in _translations():
+        lang_code = request.accept_languages.best_match(_translations())
+        session['lang_code'] = lang_code
+
+    if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
+        values['lang_code'] = lang_code
+
+
+# noinspection PyUnusedLocal
+@app.url_value_preprocessor
+def _pull_language_code(endpoint, values):
+    lang_code = values.pop('lang_code', None)
+    if lang_code:
+        session['lang_code'] = lang_code
 
 
 @app.before_first_request
