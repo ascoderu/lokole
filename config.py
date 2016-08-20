@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import getenv
+from os import listdir
 from os import path
 
 from flask_babel import lazy_gettext as _
@@ -26,6 +27,7 @@ def ui(key):
 class Config(object):
     DEFAULT_TRANSLATION = 'en'
     TRANSLATIONS_PATH = path.join(basedir, 'opwen_webapp', 'translations')
+    TRANSLATIONS = frozenset(listdir(TRANSLATIONS_PATH) + [DEFAULT_TRANSLATION])
 
     TESTING = False
 

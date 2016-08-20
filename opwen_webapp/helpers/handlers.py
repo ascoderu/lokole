@@ -1,5 +1,3 @@
-from functools import lru_cache
-from os import listdir
 from os import path
 
 from flask import flash
@@ -19,13 +17,6 @@ from opwen_webapp import db
 from opwen_webapp import user_datastore
 
 
-@lru_cache(maxsize=1)
-def _translations():
-    languages = set(listdir(Config.TRANSLATIONS_PATH))
-    languages.add(Config.DEFAULT_TRANSLATION)
-    return languages
-
-
 @babel.localeselector
 def _get_locale():
     return session['lang_code']
@@ -37,8 +28,8 @@ def _add_language_code(endpoint, values):
         return
 
     lang_code = session['lang_code']
-    if lang_code not in _translations():
-        lang_code = request.accept_languages.best_match(_translations())
+    if lang_code not in Config.TRANSLATIONS:
+        lang_code = request.accept_languages.best_match(Config.TRANSLATIONS)
         session['lang_code'] = lang_code
 
     if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
