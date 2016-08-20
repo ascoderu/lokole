@@ -1,5 +1,53 @@
 {% extends "_base.html" %}
 
 {% block content %}
+  <h2>{{ _('About Opwen') }}</h2>
   <p>{{ _('Opwen mission statement goes here.') }}</p>
+
+  <h2 id="team">{{ _('Meet the team') }}</h2>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-3">
+        <img src="{{ url_for('static', filename='images/nzola.png') }}" class="img-responsive img-circle center-block" alt="{{ _('Nzola') }}">
+        <h4>{{ _('Nzola') }} <small>{{ _('Founder') }} &amp; {{ _('CEO') }}</small></h4>
+        <p class="text-left">
+          {{ _(
+          'Nzola is a native of the DRC in Africa who now lives in Victoria, '
+          'Canada. While being employed by the humanitarian organization '
+          'Mission Aviation Fellowship in the Congo, Angola, Namibia, South '
+          'Africa and Zambia for 19 years, Nzola developed expertise with '
+          'communications devices and an acute understanding of the '
+          'communication problems in rural sub-saharan Africa.'
+          ) }}
+        </p>
+      </div>
+      <div class="col-md-3">
+        <img src="{{ url_for('static', filename='images/laura.png') }}" class="img-responsive img-circle center-block" alt="{{ _('Laura') }}">
+        <h4>{{ _('Laura') }} <small>{{ _('Operations') }}</small></h4>
+        <p class="text-left">
+          {{ _(
+          'Laura is a passionate advocate for positive change and justice with '
+          'a MSc in International Development. Laura has dedicated 10 years of '
+          'her life supporting local and international NGOs that promote the '
+          'current UN agenda of the Sustainable Development Goals. Before '
+          'supporting Ascoderu, she worked at the British Columbia Council for '
+          'Intentional Development and for Amnesty International.'
+          ) }}
+        </p>
+      </div>
+      <div class="col-md-3">
+        <img src="{{ url_for('static', filename='images/clemens.png') }}" class="img-responsive img-circle center-block" alt="{{ _('Clemens') }}">
+        <h4>{{ _('Clemens') }} <small>{{ _('Development') }}</small></h4>
+        <p class="text-left">
+          {{ _(
+          'Clemens is a full-stack software developer who spent much of his '
+          'life in Togo, Mali and Zambia and is now based in Vancouver, '
+          'Canada. He honed his software chops working on large-scale projects '
+          'at Amazon and Microsoft. Clemens now drives the development of all '
+          'technical aspects of the Opwen project.'
+          ) }}
+        </p>
+      </div>
+    </div>
+  </div>
 {% endblock %}
