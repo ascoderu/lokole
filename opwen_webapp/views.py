@@ -28,6 +28,8 @@ app.jinja_env.filters['render_date'] = filters.render_date
 app.jinja_env.filters['safe_multiline'] = filters.safe_multiline
 app.jinja_env.filters['sort_by_date'] = filters.sort_by_date
 app.jinja_env.filters['ui'] = filters.ui
+app.jinja_env.filters['lang2flag'] = filters.lang2flag
+app.jinja_env.filters['lang2name'] = filters.lang2name
 
 
 @app.route('/')

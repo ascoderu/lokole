@@ -10,6 +10,28 @@
   </li>
 {% endmacro %}
 
+{% macro flag_for(lang_code) %}
+  <span class="flag-icon flag-icon-{{ lang_code | lang2flag }}"></span>
+{% endmacro %}
+
+{% macro nav_language_switcher() %}
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      {{ flag_for(session['lang_code']) }}
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+      {% for lang_code in lang_codes | sort %}
+        <li class="{{ 'active' if lang_code == session['lang_code'] else '' }}">
+          <a href="{{ url_for(request.endpoint, lang_code=lang_code) }}">
+            {{ flag_for(lang_code) }} {{ lang_code | lang2name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </li>
+{% endmacro %}
+
 {% macro main_nav() %}
   <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -36,6 +58,7 @@
           {% if current_user | is_admin %}
             {{ nav_link('sync', level=0) }}
           {% endif %}
+          {{ nav_language_switcher() }}
         </ul>
       </div>
     </div>

@@ -44,6 +44,11 @@ def _pull_language_code(endpoint, values):
         session['lang_code'] = lang_code
 
 
+@app.context_processor
+def _inject_available_translations():
+    return dict(lang_codes=Config.TRANSLATIONS)
+
+
 @app.before_first_request
 def _create_db():
     db.create_all()

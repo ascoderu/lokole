@@ -57,6 +57,29 @@ def ui(key):
     return config.ui(key.split('.')[-1]) if key else ''
 
 
+def lang2flag(lang_code):
+    """
+    :type lang_code: str
+    :rtype: str
+
+    """
+    return {
+        'en': 'ca',
+    }.get(lang_code, lang_code)
+
+
+def lang2name(lang_code):
+    """
+    :type lang_code: str
+    :rtype: str
+
+    """
+    return {
+        'en': 'English',
+        'it': 'Italiano',
+    }.get(lang_code, lang_code)
+
+
 @evalcontextfilter
 def safe_multiline(eval_ctx, value):
     html = '\n\n'.join('<p>%s</p>' % paragraph.replace('\n', '<br>\n')
