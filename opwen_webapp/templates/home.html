@@ -33,11 +33,13 @@
               <a class="btn btn-primary btn-lg" href="{{ url_for_security('register') }}">{{ _('Sign up') }}</a>
             {% endif %}
             <a class="btn btn-default btn-lg" href="{{ url_for('about') }}">{{ _('Learn more') }}</a>
-            <div>
-              <small>
-                {{ _('Already have an account?') }} <a href="{{ url_for_security('login') }}">{{ _('Login now') }}</a>.
-              </small>
-            </div>
+            {% if not current_user.is_authenticated %}
+              <div>
+                <small>
+                  {{ _('Already have an account?') }} <a href="{{ url_for_security('login') }}">{{ _('Login now') }}</a>.
+                </small>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
