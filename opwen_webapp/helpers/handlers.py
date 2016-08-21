@@ -1,5 +1,8 @@
 from os import path
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from atexit import register as run_on_app_stop
 from flask import flash
 from flask import request
 from flask import send_from_directory
@@ -15,6 +18,7 @@ from opwen_webapp import app
 from opwen_webapp import babel
 from opwen_webapp import db
 from opwen_webapp import user_datastore
+from opwen_webapp.controllers import sync_with_remote
 
 
 @babel.localeselector
@@ -62,6 +66,20 @@ def _create_admin():
         register_user(name=Config.ADMIN_NAME, password=Config.ADMIN_PASSWORD,
                       roles=[is_admin])
         db.session.commit()
+
+
+@app.before_first_request
+def _setup_remote_sync_cronjob():
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    scheduler.add_job(
+        replace_existing=True,
+        func=sync_with_remote,
+        id='remote_sync_job',
+        name='Upload and download emails from remote stroage',
+        trigger=CronTrigger(hour=Config.REMOTE_SYNC_SCHEDULED_HOUR_UTC,
+                            timezone='utc'))
+    run_on_app_stop(lambda: scheduler.shutdown())
 
 
 @app.after_request
