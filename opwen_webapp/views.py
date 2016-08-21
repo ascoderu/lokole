@@ -12,13 +12,12 @@ from flask_security import roles_required
 
 from config import Config
 from opwen_webapp import app
-from opwen_webapp.controllers import download_remote_updates
 from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
 from opwen_webapp.controllers import sent_emails_for
-from opwen_webapp.controllers import upload_local_updates
+from opwen_webapp.controllers import sync_with_remote
 from opwen_webapp.helpers import filters
 from opwen_webapp.helpers.forms import NewEmailForm
 from utils.uploads import UploadNotAllowed
@@ -130,8 +129,7 @@ def email_sent(page):
 @app.route('/sync')
 @roles_required(Config.ADMIN_ROLE)
 def sync():
-    emails_uploaded = upload_local_updates()
-    emails_downloaded = download_remote_updates()
+    emails_uploaded, emails_downloaded = sync_with_remote()
 
     flash(_('Uploaded %(num)d emails.', num=emails_uploaded), category='success')
     flash(_('Downloaded %(num)d emails.', num=emails_downloaded), category='success')

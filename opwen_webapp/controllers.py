@@ -160,3 +160,10 @@ def download_remote_updates():
     db.session.commit()
 
     return len(emails)
+
+
+def sync_with_remote():
+    emails_uploaded = upload_local_updates()
+    emails_downloaded = download_remote_updates()
+
+    return emails_uploaded, emails_downloaded
