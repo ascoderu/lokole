@@ -130,6 +130,10 @@ def find_attachment(user, filename):
 
 
 def upload_local_updates():
+    """
+    :rtype: int
+
+    """
     emails = Email.query.filter(Email.date.is_(None)).all()
     now = datetime.utcnow()
     for email in emails:
@@ -143,6 +147,10 @@ def upload_local_updates():
 
 
 def download_remote_updates():
+    """
+    :rtype: int
+
+    """
     with removing(app.remote_storage.download()) as downloaded:
         emails, accounts = app.serializer.deserialize(downloaded)
 
@@ -163,6 +171,10 @@ def download_remote_updates():
 
 
 def sync_with_remote():
+    """
+    :rtype: (int, int)
+
+    """
     emails_uploaded = upload_local_updates()
     emails_downloaded = download_remote_updates()
 
