@@ -46,7 +46,6 @@ class Config(object):
 
     CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
 
-    REMOTE_STORAGE_CLASS = 'utils.remote_storage.AzureBlob'
     REMOTE_STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
     REMOTE_STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
     REMOTE_STORAGE_CONTAINER = 'opwen'
