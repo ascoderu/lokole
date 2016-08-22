@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from os import getenv
 from os import listdir
 from os import path
