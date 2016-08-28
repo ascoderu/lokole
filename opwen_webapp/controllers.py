@@ -2,6 +2,7 @@ from datetime import datetime
 
 from werkzeug.utils import secure_filename
 
+from config import Config
 from opwen_webapp import app
 from opwen_webapp import db
 from opwen_webapp import uploads
@@ -9,6 +10,7 @@ from opwen_webapp.models import Addressee
 from opwen_webapp.models import Attachment
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
+from utils.networking import use_interface
 from utils.strings import normalize_caseless
 from utils.temporary import removing
 
@@ -175,7 +177,8 @@ def sync_with_remote():
     :rtype: (int, int)
 
     """
-    emails_uploaded = upload_local_updates()
-    emails_downloaded = download_remote_updates()
+    with use_interface(Config.INTERNET_INTERFACE_NAME):
+        emails_uploaded = upload_local_updates()
+        emails_downloaded = download_remote_updates()
 
     return emails_uploaded, emails_downloaded
