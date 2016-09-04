@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from unittest import TestCase
 
 from opwen_webapp.helpers.serializers import Serializer
@@ -15,6 +16,22 @@ class TestRemoteSerializer(FileWritingTestCaseMixin, AppTestMixin, TestCase):
     def tearDown(self):
         AppTestMixin.tearDown(self)
         FileWritingTestCaseMixin.tearDown(self)
+
+    @contextmanager
+    def failIfCalled(self, obj, method_name):
+        """
+        :type obj: T
+        :type method_name: str
+
+        """
+        # noinspection PyUnusedLocal
+        def fail(*args, **kwargs):
+            self.fail('called method %s' % method_name)
+
+        original_method = getattr(obj, method_name)
+        setattr(obj, method_name, fail)
+        yield
+        setattr(obj, method_name, original_method)
 
     def assertAccountsEqual(self, actual, expected):
         """
@@ -44,6 +61,13 @@ class TestRemoteSerializer(FileWritingTestCaseMixin, AppTestMixin, TestCase):
         serializer = Serializer(JsonLines, ZipCompressor)
         serializer.init_app(app)
         return serializer
+
+    def test_serialization_without_work_does_nothing(self):
+        serializer = self._new_serializer()
+        with self.failIfCalled(serializer, '_serialize_emails'):
+            with self.failIfCalled(serializer, '_serialize_accounts'):
+                serialized = serializer.serialize(emails=[], accounts=[])
+                self.assertIsNone(serialized)
 
     def test_serialization_deserialization_roundtrip_for_emails(self):
         serializer = self._new_serializer()
