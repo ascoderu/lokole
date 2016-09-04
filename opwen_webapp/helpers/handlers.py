@@ -23,7 +23,7 @@ from opwen_webapp.controllers import sync_with_remote
 
 @babel.localeselector
 def _get_locale():
-    return session['lang_code']
+    return session.get('lang_code', Config.DEFAULT_TRANSLATION)
 
 
 @app.url_defaults
@@ -31,7 +31,7 @@ def _add_language_code(endpoint, values):
     if 'lang_code' in values:
         return
 
-    lang_code = session['lang_code']
+    lang_code = session.get('lang_code', Config.DEFAULT_TRANSLATION)
     if lang_code not in Config.TRANSLATIONS:
         lang_code = request.accept_languages.best_match(Config.TRANSLATIONS)
         session['lang_code'] = lang_code
