@@ -41,7 +41,10 @@ class TestRemoteSerializer(FileWritingTestCaseMixin, AppTestMixin, TestCase):
         :rtype: Serializer
 
         """
-        return Serializer(JsonLines, ZipCompressor, self.create_app())
+        app = self.create_app()
+        serializer = Serializer(JsonLines, ZipCompressor)
+        serializer.init_app(app)
+        return serializer
 
     def test_serialization_deserialization_roundtrip_for_emails(self):
         expected_emails = [self.create_complete_email() for _ in range(5)]
