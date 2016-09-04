@@ -4,6 +4,7 @@
 
 *.pyc
 
+.coverage
 *.mo
 *.db
 /attachments/
