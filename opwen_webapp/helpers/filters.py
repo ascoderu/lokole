@@ -35,6 +35,26 @@ def is_admin(user):
     return user and user.has_role(config.Config.ADMIN_ROLE)
 
 
+def _key_for_attribute_sort(attribute, default):
+    """
+    :type attribute: str
+    :type default: T
+    :rtype: T -> T
+
+    """
+    def key(item):
+        if not item:
+            return default
+
+        attribute_value = getattr(item, attribute, None)
+        if not attribute_value:
+            return default
+
+        return attribute_value
+
+    return key
+
+
 def sort_by_date(iterable, reverse=False):
     """
     :type iterable: collections.Iterable[datetime]
@@ -42,10 +62,9 @@ def sort_by_date(iterable, reverse=False):
     :rtype: list[datetime]
 
     """
-    now = datetime.utcnow()
     return sorted(iterable,
                   reverse=reverse,
-                  key=lambda item: item.date if item and item.date else now)
+                  key=_key_for_attribute_sort('date', datetime.utcnow()))
 
 
 def ui(key):
