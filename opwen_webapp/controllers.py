@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from flask import render_template
+from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 
 from config import Config
@@ -166,6 +168,7 @@ def download_remote_updates():
         if user and account.name and account.email:
             user.name = account.name
             user.email = account.email
+            send_account_finalized_email(user)
             db.session.add(user)
     db.session.commit()
 
@@ -182,3 +185,34 @@ def sync_with_remote():
         emails_downloaded = download_remote_updates()
 
     return emails_uploaded, emails_downloaded
+
+
+def send_welcome_email(user):
+    """
+    :type user: User
+
+    """
+    welcome_email = Email(
+        to=[user.name],
+        sender=_('Lokole team'),
+        subject=_('Welcome!'),
+        body=render_template('emails/account_created.html', name=user.name))
+
+    db.session.add(welcome_email)
+    db.session.commit()
+
+
+def send_account_finalized_email(user):
+    """
+    :type user: User
+
+    """
+    account_created_email = Email(
+        to=[user.name],
+        sender=_('Lokole team'),
+        subject=_('Your account is now fully set up.'),
+        body=render_template('emails/account_finalized.html',
+                             name=user.name, email=user.email))
+
+    db.session.add(account_created_email)
+    db.session.commit()

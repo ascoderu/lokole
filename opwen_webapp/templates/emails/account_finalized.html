@@ -1,0 +1,7 @@
+{{ _('Hello again, %(name)s. We just wanted to let you know that your Lokole '
+'account is now fully set up.', name=name) }} {{ _('Your email address is:') }} <b>{{ email }}</b>.
+
+{{ _('Questions?') }} <a href="{{ url_for('email_new', to='info@ascoderu.ca', subject=_('I have a question about Lokole')) }}">{{ ('Get in touch') }}.</a>
+
+{{ _('Have a great day!') }}
+{{ _('Your Lokole Team') }}

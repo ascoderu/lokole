@@ -7,6 +7,8 @@ from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
+from opwen_webapp.controllers import send_account_finalized_email
+from opwen_webapp.controllers import send_welcome_email
 from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import upload_local_updates
 from opwen_webapp.controllers import user_exists
@@ -212,3 +214,27 @@ class TestFindAttachment(AppTestMixin, TestCase):
 
         self.assertIsNone(other_lookup)
         self.assertEqual(owner_lookup.path, attachment_path)
+
+
+# noinspection PyPep8Naming
+class TestUserLifecycleAutomatedEmails(AppTestMixin, TestCase):
+    def assertEmailWasSentTo(self, user):
+        email = inbox_emails_for(user).first()
+        self.assertIsNotNone(email)
+        self.assertTrue(email.sender)
+        self.assertTrue(email.body)
+        self.assertTrue(email.subject)
+
+    def test_welcome_email_is_sent(self):
+        user = self.new_user(name='Felix')
+
+        send_welcome_email(user)
+
+        self.assertEmailWasSentTo(user)
+
+    def test_acccount_finalized_email_is_sent(self):
+        user = self.new_user(name='Felix', email='felix@ascoderu.ca')
+
+        send_account_finalized_email(user)
+
+        self.assertEmailWasSentTo(user)

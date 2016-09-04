@@ -16,6 +16,7 @@ from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
+from opwen_webapp.controllers import send_welcome_email
 from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import sync_with_remote
 from opwen_webapp.helpers import filters
@@ -49,6 +50,7 @@ def about():
 @app.route('/post_register')
 @login_required
 def post_register():
+    send_welcome_email(current_user)
     user = current_user.name or current_user.email
     flash(_('Welcome, %(user)s!', user=user), category='success')
     return redirect(url_for('home'))

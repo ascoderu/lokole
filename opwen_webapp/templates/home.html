@@ -1,19 +1,6 @@
 {% extends "_base.html" %}
 
 {% block content %}
-  {% if current_user.is_authenticated %}
-    <div class="alert alert-info alert-dismissible">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <strong>{{ _('Note:') }} </strong>
-      {{ _('You are logged in as') }} "{{ current_user.name }}"
-      ({%- if current_user.email and current_user.email != current_user.name -%}
-        {{ current_user.email }}
-      {%- else -%}
-        {{ _('Your email address will be created soon!') }}
-      {%- endif -%}).
-    </div>
-  {% endif %}
-
   <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
       <div class="jumbotron">
