@@ -78,6 +78,14 @@ def email():
 @login_required
 def email_new():
     form = NewEmailForm(request.form)
+
+    to = request.args.get('to')
+    subject = request.args.get('subject')
+    if to:
+        form.to.data = to
+    if subject:
+        form.subject.data = subject
+
     if form.validate_on_submit():
         try:
             is_to_local_user = new_email_for(
