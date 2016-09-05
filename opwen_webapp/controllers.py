@@ -20,6 +20,8 @@ from utils.temporary import removing
 def _find_emails_by(user):
     """
     :type user: User
+    :rtype: flask_sqlalchemy.BaseQuery
+    :raises ValueError: if the user instance is invalid
 
     """
     def query_user_email():
@@ -40,6 +42,7 @@ def _find_emails_by(user):
 def _find_user_by(name_or_email):
     """
     :type name_or_email: str
+    :rtype: User | None
 
     """
     if not name_or_email:
