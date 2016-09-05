@@ -221,6 +221,7 @@ class TestUserLifecycleAutomatedEmails(AppTestMixin, TestCase):
     def assertEmailWasSentTo(self, user):
         email = inbox_emails_for(user).first()
         self.assertIsNotNone(email)
+        self.assertTrue(email.date)
         self.assertTrue(email.sender)
         self.assertTrue(email.body)
         self.assertTrue(email.subject)

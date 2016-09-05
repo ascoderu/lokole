@@ -193,6 +193,7 @@ def send_welcome_email(user):
 
     """
     welcome_email = Email(
+        date=datetime.utcnow(),
         to=[user.name],
         sender=_('Lokole team'),
         subject=_('Welcome!'),
@@ -208,6 +209,7 @@ def send_account_finalized_email(user):
 
     """
     account_created_email = Email(
+        date=datetime.utcnow(),
         to=[user.name],
         sender=_('Lokole team'),
         subject=_('Your account is now fully set up.'),
