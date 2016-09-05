@@ -63,7 +63,7 @@ class FileFormatter(metaclass=ABCMeta):
         :rtype: collections.Iterable[object]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def _write(self, obj):
@@ -71,7 +71,7 @@ class FileFormatter(metaclass=ABCMeta):
         :type obj: object
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class JsonLines(FileFormatter):

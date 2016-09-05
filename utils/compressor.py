@@ -25,7 +25,7 @@ class DirectoryCompressor(metaclass=ABCMeta):
         :rtype: str
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def decompress(self, archive_path, filename, to_directory):
@@ -37,7 +37,7 @@ class DirectoryCompressor(metaclass=ABCMeta):
         :raises ValueError
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class ZipCompressor(DirectoryCompressor):
