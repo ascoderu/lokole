@@ -13,6 +13,7 @@ from wtforms.validators import EqualTo
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
+from wtforms.widgets import Input
 
 from opwen_webapp.controllers import user_exists
 
@@ -55,6 +56,14 @@ class EmailOrLocalUser(object):
                 raise
 
 
+class EmailInput(Input):
+    input_type = 'email'
+
+
+class EmailField(StringField):
+    widget = EmailInput()
+
+
 class LoginForm(BaseLoginForm):
     email = StringField(
         label=_('Name or Email'),
@@ -84,7 +93,7 @@ class RegisterForm(BaseRegisterForm):
 
 
 class NewEmailForm(Form):
-    to = StringField(
+    to = EmailField(
         label=_('To'),
         validators=[DataRequired(_('Please specify a recipient.')),
                     EmailOrLocalUser(_('Must be a user name or email address.'))])
