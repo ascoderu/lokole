@@ -64,6 +64,7 @@ class EmailField(StringField):
     widget = EmailInput()
 
 
+# noinspection PyClassHasNoInit
 class LoginForm(BaseLoginForm):
     email = StringField(
         label=_('Name or Email'),
@@ -74,6 +75,7 @@ class LoginForm(BaseLoginForm):
     submit = SubmitField(_('Login'))
 
 
+# noinspection PyClassHasNoInit
 class RegisterForm(BaseRegisterForm):
     email = StringField(
         label=_('Name'),
