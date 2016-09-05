@@ -36,13 +36,6 @@ class TestUploads(TestCase):
     def tearDown(self):
         rmtree(self.uploads.root_directory)
 
-    def _read(self, filename):
-        """
-        :type filename: str
-        :rtype: str
-
-        """
-
     def assertDoesUpload(self, file_storage):
         """
         :type file_storage: FileStorage
