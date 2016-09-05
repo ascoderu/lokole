@@ -10,7 +10,7 @@ def use_interface(ifname):
     :type ifname: str
 
     """
-    ip = _ip_address_for_interface(ifname.encode('ascii'))
+    ip = _ip_address_for_interface(ifname)
     original_socket = socket.socket
 
     def rebound_socket(*args, **kwargs):
@@ -25,10 +25,11 @@ def use_interface(ifname):
 
 def _ip_address_for_interface(ifname):
     """
-    :type ifname: bytes
+    :type ifname: str
     :rtype: str
 
     """
+    ifname = ifname.encode('ascii')
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         sock.fileno(),
