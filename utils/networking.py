@@ -10,7 +10,7 @@ def use_interface(ifname):
     :type ifname: str
 
     """
-    ip = _ip_address_for_interface(ifname)
+    ip = ip_address_for_interface(ifname)
     original_socket = socket.socket
 
     def rebound_socket(*args, **kwargs):
@@ -23,7 +23,7 @@ def use_interface(ifname):
     socket.socket = original_socket
 
 
-def _ip_address_for_interface(ifname):
+def ip_address_for_interface(ifname):
     """
     :type ifname: str
     :rtype: str
