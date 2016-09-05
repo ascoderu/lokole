@@ -202,7 +202,8 @@ class TestFindAttachment(AppTestMixin, TestCase):
         attachment_path, attachment_name = '/path/to/attachment.txt', 'file.txt'
         user = self.new_user(email='user@test.net')
         email = self.new_email(to=[user.email],
-                               attachments=[(attachment_path, attachment_name)])
+                               attachments=[('/path/other.txt', 'other.txt'),
+                                            (attachment_path, attachment_name)])
 
         attachment = find_attachment(user, attachment_name)
 
