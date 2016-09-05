@@ -4,7 +4,6 @@ from flask import render_template
 from flask_babel import gettext as _
 from werkzeug.utils import secure_filename
 
-from config import Config
 from opwen_webapp import app
 from opwen_webapp import db
 from opwen_webapp import uploads
@@ -174,12 +173,13 @@ def download_remote_updates():
     return len(emails)
 
 
-def sync_with_remote():
+def sync_with_remote(internet_interface_name):
     """
+    :type internet_interface_name: str
     :rtype: (int, int)
 
     """
-    with use_interface(Config.INTERNET_INTERFACE_NAME):
+    with use_interface(internet_interface_name):
         emails_uploaded = upload_local_updates()
         emails_downloaded = download_remote_updates()
 

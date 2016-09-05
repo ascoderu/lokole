@@ -74,7 +74,7 @@ def _setup_remote_sync_cronjob():
     scheduler.start()
     scheduler.add_job(
         replace_existing=True,
-        func=sync_with_remote,
+        func=lambda: sync_with_remote(Config.INTERNET_INTERFACE_NAME),
         id='remote_sync_job',
         name='Upload and download emails from remote stroage',
         trigger=CronTrigger(hour=Config.REMOTE_SYNC_SCHEDULED_HOUR_UTC,
