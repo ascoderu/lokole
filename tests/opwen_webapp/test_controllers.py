@@ -63,6 +63,14 @@ class TestReadEmails(AppTestMixin, TestCase):
 
         self.assertIterablesEqual(actual, expected)
 
+    def test_broken_user_raises_exception(self):
+        user = self.new_user(name=None, email=None)
+
+        with self.assertRaises(ValueError):
+            sent_emails_for(user)
+        with self.assertRaises(ValueError):
+            outbox_emails_for(user)
+
     def test_finds_sent_emails_to_name_or_email(self):
         now = datetime.utcnow()
         user = self.new_user(name='someone', email='someone@test.net')
