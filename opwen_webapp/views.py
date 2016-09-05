@@ -139,11 +139,10 @@ def email_sent(page):
 @app.route('/sync')
 @roles_required(Config.ADMIN_ROLE)
 def sync():
-    internet_interface = Config.INTERNET_INTERFACE_NAME
-    emails_uploaded, emails_downloaded = sync_with_remote(internet_interface)
+    sync_report = sync_with_remote(Config.INTERNET_INTERFACE_NAME)
 
-    flash(_('Uploaded %(num)d emails.', num=emails_uploaded), category='success')
-    flash(_('Downloaded %(num)d emails.', num=emails_downloaded), category='success')
+    flash(_('Uploaded %(num)d emails.', num=sync_report.emails_uploaded), category='success')
+    flash(_('Downloaded %(num)d emails.', num=sync_report.emails_downloaded), category='success')
     return redirect(url_for('home'))
 
 

@@ -10,6 +10,7 @@ from opwen_webapp import uploads
 from opwen_webapp.models import Addressee
 from opwen_webapp.models import Attachment
 from opwen_webapp.models import Email
+from opwen_webapp.models import SyncReport
 from opwen_webapp.models import User
 from utils.networking import use_interface
 from utils.strings import normalize_caseless
@@ -176,14 +177,15 @@ def download_remote_updates():
 def sync_with_remote(internet_interface_name):
     """
     :type internet_interface_name: str
-    :rtype: (int, int)
+    :rtype: SyncReport
 
     """
     with use_interface(internet_interface_name):
-        emails_uploaded = upload_local_updates()
-        emails_downloaded = download_remote_updates()
+        number_of_emails_uploaded = upload_local_updates()
+        number_of_emails_downloaded = download_remote_updates()
 
-    return emails_uploaded, emails_downloaded
+    return SyncReport(emails_uploaded=number_of_emails_uploaded,
+                      emails_downloaded=number_of_emails_downloaded)
 
 
 def send_welcome_email(user):

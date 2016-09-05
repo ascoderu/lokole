@@ -1,3 +1,4 @@
+from collections import namedtuple
 from flask_security import RoleMixin
 from flask_security import UserMixin
 
@@ -13,6 +14,12 @@ emails_addressees = db.Table(
     'emails_addressees',
     db.Column('email_id', db.Integer(), db.ForeignKey('email.id')),
     db.Column('addressee_id', db.Integer(), db.ForeignKey('addressee.id')))
+
+
+# noinspection PyClassHasNoInit
+class SyncReport(namedtuple('SyncReport',
+                            'emails_uploaded emails_downloaded')):
+    pass
 
 
 class User(db.Model, UserMixin):
