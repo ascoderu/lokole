@@ -39,6 +39,13 @@ class TestUserExists(AppTestMixin, TestCase):
 
         self.assertFalse(user_exists(non_existing_name))
 
+    def test_does_not_find_user_with_bad_name(self):
+        existing_name = 'some-name'
+        bad_name = ''
+        self.new_user(name=existing_name)
+
+        self.assertFalse(user_exists(bad_name))
+
 
 # noinspection PyUnusedLocal,PyPep8Naming
 class TestReadEmails(AppTestMixin, TestCase):
