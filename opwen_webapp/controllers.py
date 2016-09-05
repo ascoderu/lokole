@@ -120,7 +120,7 @@ def find_attachment(user, filename):
     """
     :type user: User
     :type filename: str
-    :rtype: Attachment
+    :rtype: Attachment | None
 
     """
     attached_name = normalize_caseless(secure_filename(filename))
