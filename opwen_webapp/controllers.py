@@ -128,8 +128,12 @@ def find_attachment(user, filename):
              .join(Email.attachments)
              .filter(Attachment.name == attached_name)
              .first())
+
+    if not email:
+        return None
+
     return next((attachment for attachment in email.attachments
-                 if attachment.name == attached_name), None) if email else None
+                 if attachment.name == attached_name), None)
 
 
 def upload_local_updates():
