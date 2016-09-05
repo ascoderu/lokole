@@ -32,10 +32,6 @@ def _find_emails_by(user):
 
     if user.email and user.name:
         return query_user_email() | query_user_name()
-    elif user.email:
-        return query_user_email()
-    elif user.name:
-        return query_user_name()
     raise ValueError('one of user.email or user.name must be set')
 
 
