@@ -115,7 +115,7 @@ def email_new():
 def email_inbox(page):
     emails = inbox_emails_for(current_user)
     emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
-    return render_template('email.html', emails=emails, is_outgoing=False)
+    return render_template('email.html', emails=emails)
 
 
 @app.route('/<lang_code>/email/outbox', defaults={'page': 1})
@@ -124,7 +124,7 @@ def email_inbox(page):
 def email_outbox(page):
     emails = outbox_emails_for(current_user)
     emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
-    return render_template('email.html', emails=emails, is_outgoing=True)
+    return render_template('email.html', emails=emails)
 
 
 @app.route('/<lang_code>/email/sent', defaults={'page': 1})
@@ -133,7 +133,7 @@ def email_outbox(page):
 def email_sent(page):
     emails = sent_emails_for(current_user)
     emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
-    return render_template('email.html', emails=emails, is_outgoing=True)
+    return render_template('email.html', emails=emails)
 
 
 @app.route('/sync')

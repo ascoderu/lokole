@@ -17,13 +17,12 @@
             <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}">
               <div class="row">
                 <div class="col-sm-3">
-                  {% if is_outgoing %}
                     <span class="email-sent-to">{{ email.to | join(', ') }}</span>
-                  {% else %}
-                    <span class="email-sent-by">{{ email.sender }}</span>
-                  {% endif %}
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-3">
+                  <span class="email-sent-by">{{ email.sender }}</span>
+                </div>
+                <div class="col-sm-3">
                   <span class="email-subject">{{ email.subject | safe }}</span>
                 </div>
                 <div class="col-sm-2">
