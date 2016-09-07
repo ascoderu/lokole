@@ -160,8 +160,8 @@ def find_attachment(user, filename):
     if not email:
         return None
 
-    return next(attachment for attachment in email.attachments  # pragma: no branch
-                if attachment.name == attached_name)
+    return next(attached for attached in email.attachments  # pragma: no branch
+                if attached.name == attached_name)
 
 
 def upload_local_updates():
