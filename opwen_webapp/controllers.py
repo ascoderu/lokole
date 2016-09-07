@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import render_template
 from flask_babel import gettext as _
+from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
 from opwen_webapp import app
@@ -86,6 +87,33 @@ def inbox_emails_for(user):
     """
     is_to_user = Addressee.val.is_(user.email) | Addressee.val.is_(user.name)
     return Email.query.join(Email.to_relationship).filter(is_to_user)
+
+
+def _all_emails_for(user):
+    """
+    :type user: User
+    :rtype: flask_sqlalchemy.BaseQuery
+
+    """
+    return (inbox_emails_for(user)
+            .union_all(outbox_emails_for(user))
+            .union_all(sent_emails_for(user)))
+
+
+def search_emails_for(user, query):
+    """
+    :type user: User
+    :type query: str
+    :rtype: flask_sqlalchemy.BaseQuery
+
+    """
+    query = '%{}%'.format(query)
+    query = or_(Email.subject.ilike(query),
+                Email.body.ilike(query),
+                Email.sender.ilike(query),
+                Email.to_relationship.any(Addressee.val.ilike(query)))
+
+    return _all_emails_for(user).filter(query)
 
 
 def new_email_for(user, to, subject, body, attachments=()):

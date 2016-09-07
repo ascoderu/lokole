@@ -7,6 +7,7 @@ from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
+from opwen_webapp.controllers import search_emails_for
 from opwen_webapp.controllers import send_account_finalized_email
 from opwen_webapp.controllers import send_welcome_email
 from opwen_webapp.controllers import sent_emails_for
@@ -90,6 +91,65 @@ class TestReadEmails(AppTestMixin, TestCase):
         expected = [self.new_email(sender=user.name)]
         not_expected = [self.new_email(sender=user.name, date=now)]
         actual = outbox_emails_for(user)
+
+        self.assertIterablesEqual(actual, expected)
+
+
+# noinspection PyUnusedLocal
+class TestSearchEmails(AppTestMixin, TestCase):
+    def test_finds_emails_by_sender(self):
+        user = self.new_user(name='someone', email='someone@test.net')
+        query = user.name
+
+        expected = [self.new_email(sender=user.name),
+                    self.new_email(sender=user.name, date=datetime.utcnow())]
+        not_expected = [self.new_email(to=user.name)]
+
+        actual = search_emails_for(user, query)
+
+        self.assertIterablesEqual(actual, expected)
+
+    def test_finds_emails_by_recipient(self):
+        user = self.new_user(name='someone', email='someone@test.net')
+        other_user = self.new_user(name='otherone', email='otherone@test.net')
+        query = user.name
+
+        expected = [self.new_email(to=[user.name])]
+        not_expected = [self.new_email(to=[other_user.name])]
+
+        actual = search_emails_for(user, query)
+
+        self.assertIterablesEqual(actual, expected)
+
+    def test_finds_emails_by_subject(self):
+        user = self.new_user(name='someone', email='someone@test.net')
+        other_user = self.new_user(name='otherone', email='otherone@test.net')
+        subject, query = 'this is the short subject of the email', 'subject'
+
+        expected = [self.new_email(to=[user.name], subject=subject),
+                    self.new_email(sender=user.name, subject=subject),
+                    self.new_email(sender=user.name, subject=subject,
+                                   date=datetime.utcnow())]
+        not_expected = [self.new_email(to=[other_user.name], subject=subject),
+                        self.new_email(to=[other_user.email], subject=subject)]
+
+        actual = search_emails_for(user, query)
+
+        self.assertIterablesEqual(actual, expected)
+
+    def test_finds_emails_by_body(self):
+        user = self.new_user(name='someone', email='someone@test.net')
+        other_user = self.new_user(name='otherone', email='otherone@test.net')
+        body, query = 'this is the short body of the email', 'body'
+
+        expected = [self.new_email(to=[user.name], body=body),
+                    self.new_email(sender=user.name, body=body),
+                    self.new_email(sender=user.name, body=body,
+                                   date=datetime.utcnow())]
+        not_expected = [self.new_email(to=[other_user.name], body=body),
+                        self.new_email(to=[other_user.email], body=body)]
+
+        actual = search_emails_for(user, query)
 
         self.assertIterablesEqual(actual, expected)
 

@@ -16,6 +16,7 @@ from opwen_webapp.controllers import find_attachment
 from opwen_webapp.controllers import inbox_emails_for
 from opwen_webapp.controllers import new_email_for
 from opwen_webapp.controllers import outbox_emails_for
+from opwen_webapp.controllers import search_emails_for
 from opwen_webapp.controllers import send_welcome_email
 from opwen_webapp.controllers import sent_emails_for
 from opwen_webapp.controllers import sync_with_remote
@@ -132,6 +133,16 @@ def email_outbox(page):
 @login_required
 def email_sent(page):
     emails = sent_emails_for(current_user)
+    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
+    return render_template('email.html', emails=emails)
+
+
+@app.route('/<lang_code>/email/search', defaults={'page': 1})
+@app.route('/<lang_code>/email/search/<int:page>')
+@login_required
+def email_search(page):
+    query = request.args.get('query')
+    emails = search_emails_for(current_user, query)
     emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
     return render_template('email.html', emails=emails)
 
