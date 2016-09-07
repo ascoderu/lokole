@@ -49,9 +49,6 @@ class TestUserExists(AppTestMixin, TestCase):
 
 # noinspection PyUnusedLocal,PyPep8Naming
 class TestReadEmails(AppTestMixin, TestCase):
-    def assertIterablesEqual(self, actual, expected):
-        self.assertListEqual(list(actual), list(expected))
-
     def test_finds_inbox_emails_to_name_or_email(self):
         user = self.new_user(name='someone', email='someone@test.net')
         other_user = self.new_user(name='otherone', email='otherone@test.net')

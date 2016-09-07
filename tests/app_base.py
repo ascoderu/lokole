@@ -111,3 +111,7 @@ class AppTestMixin(object):
             subject=kwargs.get('subject', 'the subject'),
             attachments=kwargs.get('attachments', []),
             body=kwargs.get('body', 'the body'))
+
+    # noinspection PyUnresolvedReferences
+    def assertIterablesEqual(self, actual, expected):
+        self.assertListEqual(list(actual), list(expected))
