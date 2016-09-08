@@ -124,7 +124,7 @@ class TestSearchEmails(AppTestMixin, TestCase):
     def test_finds_emails_by_subject(self):
         user = self.new_user(name='someone', email='someone@test.net')
         other_user = self.new_user(name='otherone', email='otherone@test.net')
-        subject, query = 'this is the short subject of the email', 'subject'
+        subject, query = 'this is the short subject of the email', 'the subject'
 
         expected = [self.new_email(to=[user.name], subject=subject),
                     self.new_email(sender=user.name, subject=subject),
@@ -140,7 +140,7 @@ class TestSearchEmails(AppTestMixin, TestCase):
     def test_finds_emails_by_body(self):
         user = self.new_user(name='someone', email='someone@test.net')
         other_user = self.new_user(name='otherone', email='otherone@test.net')
-        body, query = 'this is the short body of the email', 'body'
+        body, query = 'this is the short body of the email', 'the body'
 
         expected = [self.new_email(to=[user.name], body=body),
                     self.new_email(sender=user.name, body=body),

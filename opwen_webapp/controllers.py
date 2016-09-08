@@ -107,7 +107,7 @@ def search_emails_for(user, query):
     :rtype: flask_sqlalchemy.BaseQuery
 
     """
-    query = '%{}%'.format(query)
+    query = '%{}%'.format('%'.join(query.split()))
     query = or_(Email.subject.ilike(query),
                 Email.body.ilike(query),
                 Email.sender.ilike(query),
