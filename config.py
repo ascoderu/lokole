@@ -4,7 +4,7 @@ from os import path
 
 from flask_babel import lazy_gettext as _
 
-basedir = path.abspath(path.dirname(__file__))
+app_basedir = path.abspath(path.dirname(__file__))
 
 
 def ui(key):
@@ -25,7 +25,7 @@ def ui(key):
 
 class Config(object):
     DEFAULT_TRANSLATION = 'en'
-    TRANSLATIONS_PATH = path.join(basedir, 'opwen_webapp', 'translations')
+    TRANSLATIONS_PATH = path.join(app_basedir, 'opwen_webapp', 'translations')
     TRANSLATIONS = frozenset(listdir(TRANSLATIONS_PATH) + [DEFAULT_TRANSLATION])
 
     TESTING = False
@@ -34,11 +34,11 @@ class Config(object):
     ADMIN_NAME = 'opwen-administrator'
     ADMIN_PASSWORD = 'OPWEN: emails 4 the world!'
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(basedir, 'opwen.db')
-    SQLALCHEMY_MIGRATE_REPO = path.join(basedir, 'db_repository')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(app_basedir, 'opwen.db')
+    SQLALCHEMY_MIGRATE_REPO = path.join(app_basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    UPLOAD_DIRECTORY = path.join(basedir, 'attachments')
+    UPLOAD_DIRECTORY = path.join(app_basedir, 'attachments')
     UPLOAD_ENDPOINT = 'attachments'
 
     EMAILS_PER_PAGE = 20
