@@ -102,7 +102,7 @@ def email_new():
                 next_endpoint = 'email_sent'
             else:
                 message = _('Email will be sent soon!')
-                next_endpoint = 'email_delayed'
+                next_endpoint = 'email_outbox'
 
             flash(message, category='success')
             return redirect(url_for(next_endpoint))
