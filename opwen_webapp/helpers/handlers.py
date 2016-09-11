@@ -45,7 +45,7 @@ def _add_language_code(endpoint, values):
 # noinspection PyUnusedLocal
 @app.url_value_preprocessor
 def _pull_language_code(endpoint, values):
-    lang_code = values.pop('lang_code', None)
+    lang_code = values.pop('lang_code', None) if values else None
     if lang_code:
         session['lang_code'] = lang_code
 
