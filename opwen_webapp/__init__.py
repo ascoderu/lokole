@@ -6,6 +6,7 @@ from flask_security import Security
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
+from opwen_webapp.helpers.logging import create_logging_handler
 from utils.compressor import ZipCompressor
 from utils.fileformatter import JsonLines
 from utils.remotestorage import AzureBlob
@@ -20,6 +21,8 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 uploads = Uploads(app)
+
+app.logger.addHandler(create_logging_handler())
 
 from opwen_webapp import views
 from opwen_webapp import models

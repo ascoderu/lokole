@@ -1,5 +1,6 @@
 from atexit import register as run_on_app_stop
 from os import path
+from traceback import format_exc
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -19,6 +20,7 @@ from opwen_webapp import babel
 from opwen_webapp import db
 from opwen_webapp import user_datastore
 from opwen_webapp.controllers import sync_with_remote
+from opwen_webapp.helpers.logging import exception_to_logline
 
 
 @babel.localeselector
@@ -70,16 +72,25 @@ def _create_admin():
 
 @app.before_first_request
 def _setup_remote_sync_cronjob():
+    def run_cron():
+        app.logger.info('running scheduled sync')
+        sync_with_remote(Config.INTERNET_INTERFACE_NAME)
+
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
         replace_existing=True,
-        func=lambda: sync_with_remote(Config.INTERNET_INTERFACE_NAME),
+        func=run_cron,
         id='remote_sync_job',
         name='Upload and download emails from remote stroage',
         trigger=CronTrigger(hour=Config.REMOTE_SYNC_SCHEDULED_HOUR_UTC,
                             timezone='utc'))
-    run_on_app_stop(lambda: scheduler.shutdown())
+
+    def stop_cron():
+        app.logger.info('removing scheduled sync')
+        scheduler.shutdown()
+
+    run_on_app_stop(stop_cron)
 
 
 @app.after_request
@@ -92,6 +103,7 @@ def _store_visited_endpoint(response):
 # noinspection PyUnusedLocal
 @app.errorhandler(404)
 def _on_404(code_or_exception):
+    app.logger.info('file not found: %s', request.url)
     flash(_('The page %(url)s does not exist.', url=request.url), category='error')
     return redirect(url_for(session.get('previous_endpoint', 'home')))
 
@@ -104,10 +116,17 @@ def _on_413(code_or_exception):
     return redirect(url_for(session.get('previous_endpoint', 'home')))
 
 
+@app.errorhandler(500)
+def _on_500(code_or_exception):
+    app.logger.error('internal server error: %s', code_or_exception)
+    flash(_('Unexpected error. Please contact your admin.'), category='error')
+    return redirect(url_for(session.get('previous_endpoint', 'home')))
+
+
 # noinspection PyUnusedLocal
 @app.errorhandler(Exception)
-@app.errorhandler(500)
-def _on_error(code_or_exception):
+def _on_exception(code_or_exception):
+    app.logger.error(exception_to_logline(format_exc()))
     flash(_('Unexpected error. Please contact your admin.'), category='error')
     return redirect(url_for(session.get('previous_endpoint', 'home')))
 

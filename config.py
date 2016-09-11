@@ -1,3 +1,4 @@
+import logging
 from os import getenv
 from os import listdir
 from os import path
@@ -28,6 +29,12 @@ class Config(object):
     DEFAULT_TRANSLATION = 'en'
     TRANSLATIONS_PATH = path.join(app_basedir, 'opwen_webapp', 'translations')
     TRANSLATIONS = frozenset(listdir(TRANSLATIONS_PATH) + [DEFAULT_TRANSLATION])
+
+    LOG_FILE = path.join(state_basedir, 'app.log')
+    LOG_NUM_ROTATES = 2
+    LOG_MAX_BYTES = 512 * 1024
+    LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(username)s\t%(message)s'
+    LOG_LEVEL = logging.WARNING
 
     TESTING = False
 
