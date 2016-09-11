@@ -5,6 +5,7 @@ from os import path
 from flask_babel import lazy_gettext as _
 
 app_basedir = path.abspath(path.dirname(__file__))
+state_basedir = path.abspath(getenv('OPWEN_STATE_DIRECTORY', app_basedir))
 
 
 def ui(key):
@@ -34,11 +35,11 @@ class Config(object):
     ADMIN_NAME = 'opwen-administrator'
     ADMIN_PASSWORD = 'OPWEN: emails 4 the world!'
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(app_basedir, 'opwen.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(state_basedir, 'opwen.db')
     SQLALCHEMY_MIGRATE_REPO = path.join(app_basedir, 'db_repository')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    UPLOAD_DIRECTORY = path.join(app_basedir, 'attachments')
+    UPLOAD_DIRECTORY = path.join(state_basedir, 'attachments')
     UPLOAD_ENDPOINT = 'attachments'
 
     EMAILS_PER_PAGE = 20
