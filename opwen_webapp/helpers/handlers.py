@@ -1,8 +1,8 @@
+from atexit import register as run_on_app_stop
 from os import path
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from atexit import register as run_on_app_stop
 from flask import flash
 from flask import request
 from flask import send_from_directory
