@@ -24,7 +24,9 @@ files, manages the actual mailboxes for the users on the Lokole and sends new
 emails back to the Lokole by using the same compressed file exchange format.
 
 The Lokole web-application is intended to run on low-spec Raspberry Pi 3
-hardware.
+hardware. There is a `script <https://github.com/OPWEN/opwen-setup>`_ to set up
+the hardware with all the bits and pieces necessary to run the Lokole
+web-application: web server, wsgi server, etc.
 
 Why is this useful?
 -------------------
