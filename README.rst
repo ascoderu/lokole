@@ -88,7 +88,7 @@ This file contains a JSON object per line. Each JSON object describes an email.
 
   {
     "date": "year-month-day hour:minute",
-    "to": "email",
+    "to": ["email"],
     "from": "lokole-user|email",
     "subject": "str",
     "body": "html",
