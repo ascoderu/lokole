@@ -93,7 +93,7 @@ This file contains a JSON object per line. Each JSON object describes an email.
     "to": ["email"],
     "from": "lokole-user|email",
     "subject": "str",
-    "body": "html",
+    "message": "html",
     "attachments": [{"filename": "str", "relativepath": "path/to/file"}]
   }
 
@@ -112,7 +112,7 @@ Description of fields:
 
 - *subject* encodes the subject of the email as a plain unicode string.
 
-- *body* stores the content of the email, as a html-formatted unicode string.
+- *message* stores the content of the email, as a html-formatted unicode string.
 
 - *attachments* is an optional field that contains the attachments (if any)
   associated with the email. Each JSON object in this list describes one
