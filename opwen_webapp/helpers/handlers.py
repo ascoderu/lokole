@@ -19,7 +19,7 @@ from opwen_webapp import app
 from opwen_webapp import babel
 from opwen_webapp import db
 from opwen_webapp import user_datastore
-from opwen_webapp.controllers import sync_with_remote
+from opwen_webapp.actions import sync_with_remote
 from opwen_webapp.helpers.logging import exception_to_logline
 
 

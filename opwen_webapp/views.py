@@ -12,14 +12,14 @@ from flask_security import roles_required
 
 from config import Config
 from opwen_webapp import app
-from opwen_webapp.controllers import find_attachment
-from opwen_webapp.controllers import inbox_emails_for
-from opwen_webapp.controllers import new_email_for
-from opwen_webapp.controllers import outbox_emails_for
-from opwen_webapp.controllers import search_emails_for
-from opwen_webapp.controllers import send_welcome_email
-from opwen_webapp.controllers import sent_emails_for
-from opwen_webapp.controllers import sync_with_remote
+from opwen_webapp.actions import find_attachment
+from opwen_webapp.actions import inbox_emails_for
+from opwen_webapp.actions import new_email_for
+from opwen_webapp.actions import outbox_emails_for
+from opwen_webapp.actions import search_emails_for
+from opwen_webapp.actions import send_welcome_email
+from opwen_webapp.actions import sent_emails_for
+from opwen_webapp.actions import sync_with_remote
 from opwen_webapp.helpers import filters
 from opwen_webapp.helpers.forms import NewEmailForm
 from utils.uploads import UploadNotAllowed

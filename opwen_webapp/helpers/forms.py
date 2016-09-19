@@ -15,7 +15,7 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 from wtforms.widgets import Input
 
-from opwen_webapp.controllers import user_exists
+from opwen_webapp.actions import user_exists
 
 
 class UserDoesNotAlreadyExist(object):

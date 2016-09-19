@@ -2,17 +2,17 @@ from datetime import datetime
 
 from flask_testing import TestCase
 
-from opwen_webapp.controllers import download_remote_updates
-from opwen_webapp.controllers import find_attachment
-from opwen_webapp.controllers import inbox_emails_for
-from opwen_webapp.controllers import new_email_for
-from opwen_webapp.controllers import outbox_emails_for
-from opwen_webapp.controllers import search_emails_for
-from opwen_webapp.controllers import send_account_finalized_email
-from opwen_webapp.controllers import send_welcome_email
-from opwen_webapp.controllers import sent_emails_for
-from opwen_webapp.controllers import upload_local_updates
-from opwen_webapp.controllers import user_exists
+from opwen_webapp.actions import download_remote_updates
+from opwen_webapp.actions import find_attachment
+from opwen_webapp.actions import inbox_emails_for
+from opwen_webapp.actions import new_email_for
+from opwen_webapp.actions import outbox_emails_for
+from opwen_webapp.actions import search_emails_for
+from opwen_webapp.actions import send_account_finalized_email
+from opwen_webapp.actions import send_welcome_email
+from opwen_webapp.actions import sent_emails_for
+from opwen_webapp.actions import upload_local_updates
+from opwen_webapp.actions import user_exists
 from opwen_webapp.models import Email
 from opwen_webapp.models import User
 from tests.app_base import AppTestMixin
