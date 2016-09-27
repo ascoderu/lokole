@@ -10,7 +10,6 @@ from flask_security import current_user
 from flask_security import login_required
 from flask_security import roles_required
 
-from config import Config
 from opwen_webapp import app
 from opwen_webapp.actions import find_attachment
 from opwen_webapp.actions import inbox_emails_for
@@ -115,7 +114,7 @@ def email_new():
 @login_required
 def email_inbox(page):
     emails = inbox_emails_for(current_user)
-    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, app.config['EMAILS_PER_PAGE'])
     return render_template('email.html', emails=emails)
 
 
@@ -124,7 +123,7 @@ def email_inbox(page):
 @login_required
 def email_outbox(page):
     emails = outbox_emails_for(current_user)
-    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, app.config['EMAILS_PER_PAGE'])
     return render_template('email.html', emails=emails)
 
 
@@ -133,7 +132,7 @@ def email_outbox(page):
 @login_required
 def email_sent(page):
     emails = sent_emails_for(current_user)
-    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, app.config['EMAILS_PER_PAGE'])
     return render_template('email.html', emails=emails)
 
 
@@ -143,21 +142,21 @@ def email_sent(page):
 def email_search(page):
     query = request.args.get('query')
     emails = search_emails_for(current_user, query)
-    emails = emails.paginate(page, Config.EMAILS_PER_PAGE)
+    emails = emails.paginate(page, app.config['EMAILS_PER_PAGE'])
     return render_template('email.html', emails=emails)
 
 
 @app.route('/sync')
-@roles_required(Config.ADMIN_ROLE)
+@roles_required('administrator')
 def sync():
-    sync_report = sync_with_remote(Config.INTERNET_INTERFACE_NAME)
+    sync_report = sync_with_remote(app.config['INTERNET_INTERFACE_NAME'])
 
     flash(_('Uploaded %(num)d emails.', num=sync_report.emails_uploaded), category='success')
     flash(_('Downloaded %(num)d emails.', num=sync_report.emails_downloaded), category='success')
     return redirect(url_for('home'))
 
 
-@app.route('/%s/<filename>' % Config.UPLOAD_ENDPOINT)
+@app.route('/attachments/<filename>')
 @login_required
 def attachments(filename):
     attachment = find_attachment(current_user, filename)

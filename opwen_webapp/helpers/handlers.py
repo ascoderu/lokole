@@ -10,22 +10,19 @@ from flask import send_from_directory
 from flask import session
 from flask import url_for
 from flask_babel import gettext as _
-from flask_security.registerable import register_user
 from humanize import naturalsize
 from werkzeug.utils import redirect
 
-from config import Config
 from opwen_webapp import app
 from opwen_webapp import babel
 from opwen_webapp import db
-from opwen_webapp import user_datastore
 from opwen_webapp.actions import sync_with_remote
 from opwen_webapp.helpers.logging import exception_to_logline
 
 
 @babel.localeselector
 def _get_locale():
-    return session.get('lang_code', Config.DEFAULT_TRANSLATION)
+    return session.get('lang_code', app.config['DEFAULT_TRANSLATION'])
 
 
 @app.url_defaults
@@ -33,9 +30,12 @@ def _add_language_code(endpoint, values):
     if 'lang_code' in values:
         return
 
-    lang_code = session.get('lang_code', Config.DEFAULT_TRANSLATION)
-    if lang_code not in Config.TRANSLATIONS:
-        lang_code = request.accept_languages.best_match(Config.TRANSLATIONS)
+    default_translation = app.config['DEFAULT_TRANSLATION']
+    translations = app.config['TRANSLATIONS']
+
+    lang_code = session.get('lang_code', default_translation)
+    if lang_code not in translations:
+        lang_code = request.accept_languages.best_match(translations)
         session['lang_code'] = lang_code
 
     if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
@@ -52,7 +52,7 @@ def _pull_language_code(endpoint, values):
 
 @app.context_processor
 def _inject_available_translations():
-    return dict(lang_codes=Config.TRANSLATIONS)
+    return dict(lang_codes=app.config['TRANSLATIONS'])
 
 
 @app.before_first_request
@@ -61,20 +61,10 @@ def _create_db():
 
 
 @app.before_first_request
-def _create_admin():
-    admin = user_datastore.find_user(name=Config.ADMIN_NAME)
-    if not admin:
-        is_admin = user_datastore.find_or_create_role(Config.ADMIN_ROLE)
-        register_user(name=Config.ADMIN_NAME, password=Config.ADMIN_PASSWORD,
-                      roles=[is_admin])
-        db.session.commit()
-
-
-@app.before_first_request
 def _setup_remote_sync_cronjob():
     def run_cron():
         app.logger.info('running scheduled sync')
-        sync_with_remote(Config.INTERNET_INTERFACE_NAME)
+        sync_with_remote(app.config['INTERNET_INTERFACE_NAME'])
 
     scheduler = BackgroundScheduler()
     scheduler.start()
@@ -83,7 +73,7 @@ def _setup_remote_sync_cronjob():
         func=run_cron,
         id='remote_sync_job',
         name='Upload and download emails from remote stroage',
-        trigger=CronTrigger(hour=Config.REMOTE_SYNC_SCHEDULED_HOUR_UTC,
+        trigger=CronTrigger(hour=app.config['REMOTE_SYNC_SCHEDULED_HOUR_UTC'],
                             timezone='utc'))
 
     def stop_cron():
@@ -111,7 +101,7 @@ def _on_404(code_or_exception):
 # noinspection PyUnusedLocal
 @app.errorhandler(413)
 def _on_413(code_or_exception):
-    max_size = naturalsize(Config.MAX_CONTENT_LENGTH)
+    max_size = naturalsize(app.config['MAX_CONTENT_LENGTH'])
     flash(_('The maximum attachment size is %(max_size)s.', max_size=max_size), category='error')
     return redirect(url_for(session.get('previous_endpoint', 'home')))
 

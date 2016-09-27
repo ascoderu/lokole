@@ -32,7 +32,7 @@ def is_admin(user):
     :rtype: bool
 
     """
-    return user and user.has_role(config.Config.ADMIN_ROLE)
+    return user and user.has_role('administrator')
 
 
 def _key_for_attribute_sort(attribute, default):

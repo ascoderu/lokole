@@ -47,7 +47,6 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     UPLOAD_DIRECTORY = path.join(state_basedir, 'attachments')
-    UPLOAD_ENDPOINT = 'attachments'
 
     EMAILS_PER_PAGE = 20
 

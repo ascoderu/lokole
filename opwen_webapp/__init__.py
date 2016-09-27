@@ -22,7 +22,7 @@ migrate = Migrate(app, db)
 
 uploads = Uploads(app)
 
-app.logger.addHandler(create_logging_handler())
+create_logging_handler(app)
 
 from opwen_webapp import views
 from opwen_webapp import models

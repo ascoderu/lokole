@@ -4,8 +4,6 @@ from logging.handlers import RotatingFileHandler
 
 from flask_login import current_user
 
-from config import Config
-
 
 class InjectCurrentUserName(Filter):
     def filter(self, record):
@@ -25,21 +23,21 @@ class InjectCurrentUserName(Filter):
         return current_user.name
 
 
-def create_logging_handler():
+def create_logging_handler(app):
     """
-    :rtype: logging.Handler
+    :type app: flask.Flask
 
     """
     handler = RotatingFileHandler(
-        filename=Config.LOG_FILE,
-        maxBytes=Config.LOG_MAX_BYTES,
-        backupCount=Config.LOG_NUM_ROTATES)
+        filename=app.config['LOG_FILE'],
+        maxBytes=app.config['LOG_MAX_BYTES'],
+        backupCount=app.config['LOG_NUM_ROTATES'])
 
     handler.addFilter(InjectCurrentUserName())
-    handler.setLevel(Config.LOG_LEVEL)
-    handler.setFormatter(Formatter(Config.LOG_FORMAT))
+    handler.setLevel(app.config['LOG_LEVEL'])
+    handler.setFormatter(Formatter(app.config['LOG_FORMAT']))
 
-    return handler
+    app.logger.addHandler(handler)
 
 
 def exception_to_logline(exception, newline='<br>'):
