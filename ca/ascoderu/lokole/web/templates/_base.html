@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% from '_nav.html' import main_nav with context %}
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+  <title>
+    {% block title %}
+    {% endblock %}
+  </title>
+
+  {# bootstrap #}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}">
+  <!--[if lt IE 9]>
+    <script src="{{ url_for('static', filename='bower_components/html5shiv/dist/html5shiv.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/respond/dest/respond.min.js') }}"></script>
+  <![endif]-->
+  <script type="text/javascript" src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+
+  {# bootstrap3-wysihtml5 #}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/components-font-awesome/css/font-awesome.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/bootstrap3-wysihtml5-bower/dist/bootstrap3-wysihtml5.min.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='bower_components/bootstrap3-wysihtml5-bower/dist/bootstrap3-wysihtml5.all.min.js') }}"></script>
+
+  {# bootstrap-fileinput #}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/bootstrap-fileinput/css/fileinput.min.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='bower_components/bootstrap-fileinput/js/fileinput.min.js') }}"></script>
+
+  {# flag-icon-css #}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/flag-icon-css/css/flag-icon.min.css') }}">
+
+  {# opwen_webapp #}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/base.css') }}">
+</head>
+<body>
+  <div class="container">
+    {{ main_nav() }}
+
+    {% include '_messages.html' %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

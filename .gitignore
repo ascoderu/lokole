@@ -1,11 +1,9 @@
 .idea/
 
-/opwen_webapp/static/bower_components/
+bower_components/
 
 *.pyc
 
 .coverage
 *.mo
-*.db
-*.log
-/attachments/
+/state/

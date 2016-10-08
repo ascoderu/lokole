@@ -11,4 +11,4 @@ install:
   - pip install -r requirements.txt
 
 script:
-  nosetests --with-coverage --cover-branches --cover-erase --cover-package=opwen_webapp --cover-package=utils
+  nosetests --with-coverage --cover-branches --cover-erase --cover-package=ca.ascoderu.lokole

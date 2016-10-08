@@ -66,49 +66,39 @@ to address this problem by tackling it from three perspectives:
 Data exchange format
 --------------------
 
-In order to communicate between the Opwen server and the Lokole a protocol based
-on zip archives uploaded to Azure Blob Storage is used.
+In order to communicate between the Opwen server and the Lokole, a protocol
+based on gzipped jsonl files uploaded to Azure Blob Storage is used.
 
-There are two locations on Azure Blob Storage where these archives can be found.
+There are two locations on Azure Blob Storage where these files can be found.
 
 - The Opwen server will expect the new emails from the Lokole to be uploaded to:
 
-  ``{blob-root}/{lokole-name}/from_opwen/{year-month-day_hour-minute}.zip``
+  ``{blob-root}/{lokole-name}/from_opwen/{year-month-day_hour-minute}.gz``
 
 - The Lokole will expect new emails from the Opwen server to be uploaded to:
 
-  ``{blob-root}/{lokole-name}/to_opwen/new.zip``
+  ``{blob-root}/{lokole-name}/to_opwen/new.gz``
 
-The archive contains the files described in the following sections.
-
-emails.jsonl
-~~~~~~~~~~~~
-
-This file contains a JSON object per line. Each JSON object describes an email.
+The files contains a JSON object per line. Each JSON object describes an email.
 
 .. sourcecode :: json
 
   {
-    "date": "year-month-day hour:minute",
+    "sent_at": "year-month-day hour:minute",
     "to": ["email"],
-    "from": "lokole-user|email",
+    "from": "email",
     "subject": "str",
     "message": "html",
-    "attachments": [{"filename": "str", "relativepath": "path/to/file"}]
+    "attachments": [{"filename": "str", "content": "base64"}]
   }
 
 Description of fields:
 
-- *date* encodes the time at which the email was sent, in UTC.
+- *sent_at* encodes the time at which the email was sent, in UTC.
 
 - *to* stores the email address to which the email is sent.
 
-- *from* is the sender of the email. If the email was sent from a Lokole account
-  that isn't associated with an email address yet, the account's user name is
-  put in the field instead. In this case, the Lokole will expect the Opwen
-  server to create a new email account for the Lokole account and communicate
-  back the email address now associated with the Lokole account via the
-  ``accounts.jsonl`` file described below.
+- *from* is the sender of the email.
 
 - *subject* encodes the subject of the email as a plain unicode string.
 
@@ -117,34 +107,8 @@ Description of fields:
 - *attachments* is an optional field that contains the attachments (if any)
   associated with the email. Each JSON object in this list describes one
   attachment. The *filename* field is the name of the file that the user
-  attached to the email. The *relativepath* field is the full path in the zip
-  archive including file name where the attachment can be found. Note that most
-  of the time the name of the file that the user attached to the email and the
-  name of the file included in the zip archive will not be the same because
-  attachments get renamed to a content-hash before being included in the zip
-  archive. This is done so that multiple emails that share the same attachments
-  don't lead to redundant information being transmitted in the zip archive.
-
-accounts.jsonl
-~~~~~~~~~~~~~~
-
-This file contains a JSON object per line. Each JSON object describes a fully
-fledged Lokole account.
-
-.. sourcecode :: json
-
-  {
-    "name": "lokole-user",
-    "email": "email"
-  }
-
-Description of fields:
-
-- *name* encodes the name of the Lokole account that was completed by the Opwen
-  server.
-
-- *email* is the newly created email address that is now associated with the
-  Lokole account. This will be persisted in the local database on the Lokole.
+  attached to the email. The *content* field is the base-64 encoded content of
+  the attached file.
 
 Development setup
 -----------------
@@ -171,12 +135,13 @@ running the tests.
   pip install nose
   nosetests
 
-Third, create your local database for development and seed it with some random
-test data.
+Third, create your local database for development.
 
 .. sourcecode :: sh
 
   touch opwen.db
   ./manage.py db upgrade
   ./manage.py db migrate
-  ./manage.py dbpopulate
+
+The routes of the app are defined in ca/ascoderu/lokole/web/views.py so take a
+look there for an overview of the entrypoints into the code.
