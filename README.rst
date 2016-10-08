@@ -86,6 +86,8 @@ The files contains a JSON object per line. Each JSON object describes an email.
   {
     "sent_at": "year-month-day hour:minute",
     "to": ["email"],
+    "cc": ["email"],
+    "bcc": ["email"],
     "from": "email",
     "subject": "str",
     "message": "html",

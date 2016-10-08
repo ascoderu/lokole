@@ -18,6 +18,14 @@ class NewEmailForm(Form):
         validators=[DataRequired(i8n.EMAIL_TO_REQUIRED),
                     Email(i8n.EMAIL_ADDRESS_INVALID)])
 
+    cc = EmailField(
+        validators=[Optional(),
+                    Email(i8n.EMAIL_ADDRESS_INVALID)])
+
+    bcc = EmailField(
+        validators=[Optional(),
+                    Email(i8n.EMAIL_ADDRESS_INVALID)])
+
     subject = StringField(
         validators=[Optional()])
 
@@ -52,6 +60,8 @@ class NewEmailForm(Form):
         form['sent_at'] = None
         form['from'] = current_user.email
         form['to'] = self._split_emails(form.get('to'))
+        form['cc'] = self._split_emails(form.get('cc'))
+        form['bcc'] = self._split_emails(form.get('bcc'))
         form['attachments'] = list(self._attachments_as_dict(attachments, attachment_encoder))
         return form
 

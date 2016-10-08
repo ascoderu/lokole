@@ -11,6 +11,8 @@
   {{ form.hidden_tag() }}
 
   {{ render_field(form.to, _('To')) }}
+  {{ render_field(form.cc, _('Cc')) }}
+  {{ render_field(form.bcc, _('Bcc')) }}
   {{ render_field(form.subject, _('Subject')) }}
   {{ render_field(form.body, _('Message')) }}
   {{ render_field(form.attachments, _('Attachments')) }}

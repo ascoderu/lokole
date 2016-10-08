@@ -13,7 +13,9 @@ class InMemoryEmailStore(EmailStore):
 
     def inbox(self, email_address):
         return (dict(email) for email in self._store
-                if email_address in email.get('to', []))
+                if email_address in email.get('to', [])
+                or email_address in email.get('cc', [])
+                or email_address in email.get('bcc', []))
 
     def outbox(self, email_address):
         return (dict(email) for email in self._store
@@ -33,7 +35,9 @@ class InMemoryEmailStore(EmailStore):
                 if query in email.get('subject')
                 or query in email.get('body')
                 or query in email.get('from')
-                or any(query in to for to in email.get('to', [])))
+                or any(query in to for to in email.get('to', []))
+                or any(query in cc for cc in email.get('cc', []))
+                or any(query in bcc for bcc in email.get('bcc', [])))
 
     def pending(self):
         return (dict(email) for email in self._store
