@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% from '_messages.html' import render_flashed_messages with context %}
 {% from '_nav.html' import main_nav with context %}
 
 <html>
@@ -43,7 +44,7 @@
   <div class="container">
     {{ main_nav() }}
 
-    {% include '_messages.html' %}
+    {{ render_flashed_messages() }}
 
     {% block content %}{% endblock %}
   </div>
