@@ -1,0 +1,87 @@
+{% from '_nav.html' import nav_link %}
+
+{% macro email_search_form() %}
+<form class="email-search-form" action="{{ url_for('email_search') }}" method="get">
+  <div class="input-group">
+    <input type="search" name="query" class="form-control" placeholder="{{ _('Search') }}">
+    <div class="input-group-btn">
+      <button type="submit" class="btn btn-default">
+        <span class="glyphicon glyphicon-search"></span>
+      </button>
+    </div>
+  </div>
+</form>
+{% endmacro %}
+
+{% macro email_display(emails, empty_text) %}
+<div class="panel-group" id="accordion">
+  {% for email in emails %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}">
+          <div class="row">
+            <div class="col-sm-3">
+              <span class="email-sent-to">{{ email['to'] | join(', ') }}</span>
+            </div>
+            <div class="col-sm-3">
+              <span class="email-sent-by">{{ email['sender'] }}</span>
+            </div>
+            <div class="col-sm-3">
+              <span class="email-subject">{{ email['subject'] }}</span>
+            </div>
+            <div class="col-sm-2">
+              <span class="email-sent-at">{{ email['sent_at'] or '' }}</span>
+            </div>
+            <div class="col-sm-1 text-right">
+              {% if email['attachments'] %}
+              <span class="glyphicon glyphicon-paperclip"></span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </h4>
+    </div>
+    <div id="collapse{{ loop.index}}" class="panel-collapse collapse">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <span class="email-body">{{ email['body'] | replace('\n', '<br>') | safe }}</span>
+          </div>
+        </div>
+        {% if email['attachments'] %}
+        <div class="row">
+          <div class="col-sm-12">
+            <ul class="list-inline">
+              {% for attachment in email['attachments'] %}
+              <li>
+                <a href="{{ url_for('download_attachment', attachment_id=attachment['id']) }}">{{ attachment['filename'] }}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <i>{{ empty_text }}</i>
+  {% endfor %}
+</div>
+
+{% if emails.has_prevpage or emails.has_nextpage %}
+<ul class=pagination>
+  <li class="{{ '' if emails.has_prevpage else 'disabled' }}">
+    <a href="{{ url_for(request.endpoint, page=page-1) if emails.has_prevpage else ''}}" title="{{ _('Previous results') }}">
+      <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+  </li>
+  <li class="{{ '' if emails.has_nextpage else 'disabled' }}">
+    <a href="{{ url_for(request.endpoint, page=page+1) if emails.has_nextpage else ''}}" title="{{ _('Next results') }}">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+  </li>
+</ul>
+{% endif %}
+{% endmacro %}

@@ -41,3 +41,13 @@
   </div>
 </nav>
 {% endmacro %}
+
+{% macro email_subnav() %}
+<ul class="nav nav-pills">
+  {{ nav_link('email_inbox', _('Inbox'), level=1) }}
+  {{ nav_link('email_sent', _('Sent'), level=1) }}
+  {{ nav_link('email_outbox', _('Outbox'), level=1) }}
+  {{ nav_link('email_new', _('Write email'), level=1) }}
+  {{ nav_link('email_search', _('Search'), level=1) }}
+</ul>
+{% endmacro %}
