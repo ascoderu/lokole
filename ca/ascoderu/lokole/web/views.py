@@ -82,7 +82,7 @@ def email_search(page):
     user = current_user
     query = request.args.get('query')
 
-    return _emails_view(email_store.search(user.email, query), page)
+    return _emails_view(email_store.search(user.email, query), page, 'email_search.html')
 
 
 @app.route('/email/new', methods=['GET', 'POST'])
@@ -159,10 +159,11 @@ def sync():
     return redirect(url_for('home'))
 
 
-def _emails_view(emails, page):
+def _emails_view(emails, page, template='email.html'):
     """
     :type emails: collections.Iterable[dict]
     :type page: int
+    :type template: str
 
     """
     if page < 1:
@@ -170,7 +171,7 @@ def _emails_view(emails, page):
 
     emails = Pagination(emails, page, UiConfig.EMAILS_PER_PAGE)
     _store_attachments_in_session(emails)
-    return render_template('email.html', emails=emails, page=page)
+    return render_template(template, emails=emails, page=page)
 
 
 def _store_attachments_in_session(emails):

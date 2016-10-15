@@ -1,10 +1,8 @@
 {% extends "_base.html" %}
 
-{% from '_nav.html' import email_subnav %}
+{% from '_nav.html' import nav_link %}
 
-{% block content %}
-{{ email_subnav() }}
-
+{% macro email_display(empty_text) %}
 <div class="panel-group" id="accordion">
   {% for email in emails %}
   <div class="panel panel-default">
@@ -13,7 +11,7 @@
         <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}">
           <div class="row">
             <div class="col-sm-3">
-                <span class="email-sent-to">{{ email['to'] | join(', ') }}</span>
+              <span class="email-sent-to">{{ email['to'] | join(', ') }}</span>
             </div>
             <div class="col-sm-3">
               <span class="email-sent-by">{{ email['sender'] }}</span>
@@ -57,7 +55,7 @@
     </div>
   </div>
   {% else %}
-  <i>{{ _('No emails.') }}</i>
+  <i>{{ empty_text }}</i>
   {% endfor %}
 </div>
 
@@ -75,5 +73,19 @@
   </li>
 </ul>
 {% endif %}
+{% endmacro %}
 
+{% macro email_subnav() %}
+<ul class="nav nav-pills">
+  {{ nav_link('email_inbox', _('Inbox'), level=1) }}
+  {{ nav_link('email_sent', _('Sent'), level=1) }}
+  {{ nav_link('email_outbox', _('Outbox'), level=1) }}
+  {{ nav_link('email_new', _('Write email'), level=1) }}
+  {{ nav_link('email_search', _('Search'), level=1) }}
+</ul>
+{% endmacro %}
+
+{% block content %}
+{{ email_subnav() }}
+{{ email_display(_('No emails.')) }}
 {% endblock %}

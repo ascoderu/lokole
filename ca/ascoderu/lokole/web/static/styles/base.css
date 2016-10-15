@@ -11,3 +11,7 @@
   display: inline-block;
   float: none;
 }
+
+.email-search-form {
+  padding-bottom: 1em;
+}
