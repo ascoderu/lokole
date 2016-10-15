@@ -48,6 +48,8 @@ class FlaskConfig(object):
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
+    LOCAL_EMAIL_STORE = path.join(state_basedir, 'email.store')
+
 
 class UiConfig(object):
     EMAILS_PER_PAGE = 30
