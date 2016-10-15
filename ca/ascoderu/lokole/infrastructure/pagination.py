@@ -9,6 +9,9 @@ class Pagination(object):
         :type page_size: int
 
         """
+        if page < 1:
+            raise ValueError('page must be greater than or equal to 1')
+
         start = (page - 1) * page_size
         stop = page * page_size
         self._items = list(islice(items, start, stop))
