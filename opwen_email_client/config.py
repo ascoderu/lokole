@@ -51,5 +51,6 @@ class FlaskConfig(object):
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
     LOCAL_EMAIL_STORE = path.join(state_basedir, 'email.store')
+    EMAIL_SYNC_HOUR_UTC = '1'
 
     EMAILS_PER_PAGE = 30

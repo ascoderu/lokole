@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 from io import BytesIO
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from flask import abort
 from flask import flash
 from flask import redirect
@@ -13,6 +15,7 @@ from flask import session
 from flask import url_for
 from flask_login import current_user
 from opwen_domain.config import OpwenConfig
+from opwen_infrastructure.logging import log_execution
 from opwen_infrastructure.networking import use_network_interface
 from opwen_infrastructure.pagination import Pagination
 
@@ -147,12 +150,7 @@ def logout_complete():
 @app.route('/sync')
 @admin_required
 def sync():
-    email_sync = app.ioc.email_sync
-    email_store = app.ioc.email_store
-
-    with use_network_interface(OpwenConfig.INTERNET_INTERFACE_NAME):
-        email_sync.upload(email_store.pending())
-        email_store.create(email_sync.download())
+    _emails_sync()
 
     flash(i8n.SYNC_COMPLETE, category='success')
     return redirect(url_for('home'))
@@ -177,6 +175,30 @@ def _on_exception(code_or_exception):
     app.logger.error(code_or_exception)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
+
+
+@app.before_first_request
+def _setup_email_sync_cron():
+    cron_trigger_hour_utc = app.config['EMAIL_SYNC_HOUR_UTC']
+
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+    scheduler.add_job(
+        func=_emails_sync,
+        id=_emails_sync.__name__,
+        replace_existing=True,
+        name='Sync Opwen emails at {} UTC'.format(cron_trigger_hour_utc),
+        trigger=CronTrigger(hour=cron_trigger_hour_utc, timezone='utc'))
+
+
+@log_execution(app.logger)
+def _emails_sync():
+    email_sync = app.ioc.email_sync
+    email_store = app.ioc.email_store
+
+    with use_network_interface(OpwenConfig.INTERNET_INTERFACE_NAME):
+        email_sync.upload(email_store.pending())
+        email_store.create(email_sync.download())
 
 
 def _emails_view(emails, page, template='email.html'):
