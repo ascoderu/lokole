@@ -30,10 +30,10 @@ class FlaskConfig(object):
     SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    SECRET_KEY = getenv('OPWEN_SECRET_KEY', 'NonSecret')
+    SECRET_KEY = getenv('OPWEN_SECRET_KEY')
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'
-    SECURITY_PASSWORD_SALT = getenv('OPWEN_PASSWORD_SALT', 'UnSalted')
+    SECURITY_PASSWORD_SALT = getenv('OPWEN_PASSWORD_SALT')
     SECURITY_REGISTERABLE = True
     SECURITY_POST_REGISTER_VIEW = 'register_complete'
     SECURITY_POST_LOGIN_VIEW = 'login_complete'
