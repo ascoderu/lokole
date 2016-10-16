@@ -128,7 +128,7 @@ running the tests.
 
   cd opwen-webapp
 
-  virtualenv -p $(which python3) --no-site-packages virtualenv
+  virtualenv -p "$(which python3)" --no-site-packages virtualenv
   . virtualenv/bin/activate
   pip install --upgrade pip
   pip install -r requirements.txt
@@ -145,5 +145,5 @@ Third, create your local database for development.
   ./manage.py db upgrade
   ./manage.py db migrate
 
-The routes of the app are defined in ca/ascoderu/lokole/web/views.py so take a
-look there for an overview of the entrypoints into the code.
+The routes of the app are defined in ``ca/ascoderu/lokole/web/views.py`` so take
+a look there for an overview of the entrypoints into the code.
