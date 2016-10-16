@@ -1,11 +1,12 @@
 from flask import request
 from flask_login import current_user
 from flask_wtf import Form
+
 from opwen_infrastructure.wtforms import EmailField
+from opwen_infrastructure.wtforms import HtmlTextAreaField
 from wtforms import FileField
 from wtforms import StringField
 from wtforms import SubmitField
-from wtforms import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import Optional
@@ -29,7 +30,7 @@ class NewEmailForm(Form):
     subject = StringField(
         validators=[Optional()])
 
-    body = TextAreaField(
+    body = HtmlTextAreaField(
         validators=[Optional()])
 
     attachments = FileField(
@@ -62,6 +63,7 @@ class NewEmailForm(Form):
         form['to'] = self._split_emails(form.get('to'))
         form['cc'] = self._split_emails(form.get('cc'))
         form['bcc'] = self._split_emails(form.get('bcc'))
+        form['message'] = form.get('body')
         form['attachments'] = list(self._attachments_as_dict(attachments, attachment_encoder))
         return form
 
