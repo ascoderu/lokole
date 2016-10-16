@@ -52,7 +52,7 @@ class AzureSync(Sync):
     @classmethod
     def _open(cls, fileobj, mode='rb'):
         """
-        :type fileobj: io.IOBase
+        :type fileobj: _io._IOBase
         :type mode: str
         :rtype: io.TextIOBase
 
