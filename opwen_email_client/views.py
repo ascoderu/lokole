@@ -1,3 +1,4 @@
+import atexit
 import os
 from datetime import datetime
 from io import BytesIO
@@ -187,6 +188,7 @@ def _setup_email_sync_cron():
         replace_existing=True,
         name='Sync Opwen emails at {} UTC'.format(OpwenConfig.EMAIL_SYNC_HOUR_UTC),
         trigger=CronTrigger(hour=OpwenConfig.EMAIL_SYNC_HOUR_UTC, timezone='utc'))
+    atexit.register(scheduler.shutdown)
 
 
 @log_execution(app.logger)
