@@ -75,7 +75,7 @@ class PersistentInMemoryEmailStore(InMemoryEmailStore):
         try:
             with open(store_location) as fobj:
                 return json.load(fobj)
-        except (IOError, json.JSONDecodeError):
+        except (IOError, ValueError):
             return []
 
     def _dump_store(self):
