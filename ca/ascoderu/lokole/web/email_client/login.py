@@ -14,7 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from ca.ascoderu.lokole.domain.config import OpwenConfig
 from ca.ascoderu.lokole.infrastructure.wtforms import SuffixedStringField
-from ca.ascoderu.lokole.web import app
+from ca.ascoderu.lokole.web.email_client import app
 
 _db = SQLAlchemy(app)
 

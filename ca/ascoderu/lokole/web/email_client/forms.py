@@ -10,7 +10,7 @@ from wtforms.validators import Email
 from wtforms.validators import Optional
 
 from ca.ascoderu.lokole.infrastructure.wtforms import EmailField
-from ca.ascoderu.lokole.web.config import i8n
+from ca.ascoderu.lokole.web.email_client.config import i8n
 
 
 class NewEmailForm(Form):

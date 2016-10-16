@@ -16,12 +16,12 @@ from flask_login import current_user
 from ca.ascoderu.lokole.domain.config import OpwenConfig
 from ca.ascoderu.lokole.infrastructure.networking import use_network_interface
 from ca.ascoderu.lokole.infrastructure.pagination import Pagination
-from ca.ascoderu.lokole.web import app
-from ca.ascoderu.lokole.web.config import UiConfig
-from ca.ascoderu.lokole.web.config import i8n
-from ca.ascoderu.lokole.web.forms import NewEmailForm
-from ca.ascoderu.lokole.web.login import admin_required
-from ca.ascoderu.lokole.web.login import login_required
+from ca.ascoderu.lokole.web.email_client import app
+from ca.ascoderu.lokole.web.email_client.config import UiConfig
+from ca.ascoderu.lokole.web.email_client.config import i8n
+from ca.ascoderu.lokole.web.email_client.forms import NewEmailForm
+from ca.ascoderu.lokole.web.email_client.login import admin_required
+from ca.ascoderu.lokole.web.email_client.login import login_required
 
 
 @app.route('/favicon.ico')
