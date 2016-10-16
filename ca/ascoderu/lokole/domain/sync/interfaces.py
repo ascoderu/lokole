@@ -9,7 +9,7 @@ class Sync(metaclass=ABCMeta):
         :type items: collections.Iterable[T]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def download(self):
@@ -17,4 +17,4 @@ class Sync(metaclass=ABCMeta):
         :rtype: collections.Iterable[T]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover

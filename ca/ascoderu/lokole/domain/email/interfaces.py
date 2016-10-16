@@ -9,7 +9,7 @@ class EmailStore(metaclass=ABCMeta):
         :type emails: list[dict]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def inbox(self, email_address):
@@ -18,7 +18,7 @@ class EmailStore(metaclass=ABCMeta):
         :rtype: collections.Iterable[dict]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def outbox(self, email_address):
@@ -27,7 +27,7 @@ class EmailStore(metaclass=ABCMeta):
         :rtype: collections.Iterable[dict]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def sent(self, email_address):
@@ -36,7 +36,7 @@ class EmailStore(metaclass=ABCMeta):
         :rtype: collections.Iterable[dict]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def search(self, email_address, query):
@@ -46,7 +46,7 @@ class EmailStore(metaclass=ABCMeta):
         :rtype: collections.Iterable[dict]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def pending(self):
@@ -54,7 +54,7 @@ class EmailStore(metaclass=ABCMeta):
         :rtype: collections.Iterable[dict]
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class AttachmentEncoder(metaclass=ABCMeta):
@@ -65,7 +65,7 @@ class AttachmentEncoder(metaclass=ABCMeta):
         :rtype: str
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def decode(self, encoded):
@@ -74,4 +74,4 @@ class AttachmentEncoder(metaclass=ABCMeta):
         :rtype: bytes
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover

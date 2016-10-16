@@ -10,7 +10,7 @@ class Serializer(metaclass=ABCMeta):
         :rtype: bytes
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def deserialize(self, serialized):
@@ -19,4 +19,4 @@ class Serializer(metaclass=ABCMeta):
         :rtype: T
 
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
