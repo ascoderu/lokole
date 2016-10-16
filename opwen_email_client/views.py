@@ -179,16 +179,14 @@ def _on_exception(code_or_exception):
 
 @app.before_first_request
 def _setup_email_sync_cron():
-    cron_trigger_hour_utc = app.config['EMAIL_SYNC_HOUR_UTC']
-
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(
         func=_emails_sync,
         id=_emails_sync.__name__,
         replace_existing=True,
-        name='Sync Opwen emails at {} UTC'.format(cron_trigger_hour_utc),
-        trigger=CronTrigger(hour=cron_trigger_hour_utc, timezone='utc'))
+        name='Sync Opwen emails at {} UTC'.format(OpwenConfig.EMAIL_SYNC_HOUR_UTC),
+        trigger=CronTrigger(hour=OpwenConfig.EMAIL_SYNC_HOUR_UTC, timezone='utc'))
 
 
 @log_execution(app.logger)
