@@ -11,10 +11,10 @@ from flask_security.forms import email_required
 from flask_security.forms import email_validator
 from flask_security.forms import unique_user_email
 from flask_sqlalchemy import SQLAlchemy
+from opwen_domain.config import OpwenConfig
+from opwen_infrastructure.wtforms import SuffixedStringField
 
-from ca.ascoderu.lokole.domain.config import OpwenConfig
-from ca.ascoderu.lokole.infrastructure.wtforms import SuffixedStringField
-from ca.ascoderu.lokole.web.email_client import app
+from opwen_email_client import app
 
 _db = SQLAlchemy(app)
 

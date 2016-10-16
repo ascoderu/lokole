@@ -3,8 +3,8 @@
 from flask_migrate import MigrateCommand
 from flask_script import Manager
 
-from ca.ascoderu.lokole.infrastructure.management import BabelCommand
-from ca.ascoderu.lokole.web.email_client import app
+from opwen_email_client import app
+from opwen_email_client.management import BabelCommand
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)

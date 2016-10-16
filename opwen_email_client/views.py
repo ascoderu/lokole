@@ -12,16 +12,16 @@ from flask import send_from_directory
 from flask import session
 from flask import url_for
 from flask_login import current_user
+from opwen_domain.config import OpwenConfig
+from opwen_infrastructure.networking import use_network_interface
+from opwen_infrastructure.pagination import Pagination
 
-from ca.ascoderu.lokole.domain.config import OpwenConfig
-from ca.ascoderu.lokole.infrastructure.networking import use_network_interface
-from ca.ascoderu.lokole.infrastructure.pagination import Pagination
-from ca.ascoderu.lokole.web.email_client import app
-from ca.ascoderu.lokole.web.email_client.config import UiConfig
-from ca.ascoderu.lokole.web.email_client.config import i8n
-from ca.ascoderu.lokole.web.email_client.forms import NewEmailForm
-from ca.ascoderu.lokole.web.email_client.login import admin_required
-from ca.ascoderu.lokole.web.email_client.login import login_required
+from opwen_email_client import app
+from opwen_email_client.config import UiConfig
+from opwen_email_client.config import i8n
+from opwen_email_client.forms import NewEmailForm
+from opwen_email_client.login import admin_required
+from opwen_email_client.login import login_required
 
 
 @app.route('/favicon.ico')

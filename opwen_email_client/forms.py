@@ -1,6 +1,7 @@
 from flask import request
 from flask_login import current_user
 from flask_wtf import Form
+from opwen_infrastructure.wtforms import EmailField
 from wtforms import FileField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -9,8 +10,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import Optional
 
-from ca.ascoderu.lokole.infrastructure.wtforms import EmailField
-from ca.ascoderu.lokole.web.email_client.config import i8n
+from opwen_email_client.config import i8n
 
 
 class NewEmailForm(Form):
@@ -50,7 +50,7 @@ class NewEmailForm(Form):
 
     def as_dict(self, attachment_encoder):
         """
-        :type attachment_encoder: ca.ascoderu.lokole.domain.email.interfaces.AttachmentEncoder
+        :type attachment_encoder: opwen_domain.email.interfaces.AttachmentEncoder
         :rtype: dict
 
         """
@@ -78,7 +78,7 @@ class NewEmailForm(Form):
     def _attachments_as_dict(cls, filestorages, attachment_encoder):
         """
         :type filestorages: collections.Iterable[werkzeug.datastructures.FileStorage]
-        :type attachment_encoder: ca.ascoderu.lokole.domain.email.interfaces.AttachmentEncoder
+        :type attachment_encoder: opwen_domain.email.interfaces.AttachmentEncoder
         :rtype: collections.Iterable[dict]
 
         """
@@ -91,7 +91,7 @@ class NewEmailForm(Form):
     @classmethod
     def from_request(cls):
         """
-        :rtype: ca.ascoderu.lokole.web.forms.NewEmailForm
+        :rtype: opwen_web.forms.NewEmailForm
 
         """
         form = cls(request.form)
