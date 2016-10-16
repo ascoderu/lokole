@@ -15,16 +15,16 @@ from flask import send_from_directory
 from flask import session
 from flask import url_for
 from flask_login import current_user
-from opwen_domain.config import OpwenConfig
-from opwen_infrastructure.logging import log_execution
-from opwen_infrastructure.networking import use_network_interface
-from opwen_infrastructure.pagination import Pagination
 
+from opwen_domain.config import OpwenConfig
 from opwen_email_client import app
 from opwen_email_client.config import i8n
 from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import admin_required
 from opwen_email_client.login import login_required
+from opwen_infrastructure.logging import log_execution
+from opwen_infrastructure.networking import use_network_interface
+from opwen_infrastructure.pagination import Pagination
 
 
 @app.route('/favicon.ico')
