@@ -17,7 +17,6 @@ from opwen_infrastructure.networking import use_network_interface
 from opwen_infrastructure.pagination import Pagination
 
 from opwen_email_client import app
-from opwen_email_client.config import UiConfig
 from opwen_email_client.config import i8n
 from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import admin_required
@@ -190,7 +189,7 @@ def _emails_view(emails, page, template='email.html'):
     if page < 1:
         abort(404)
 
-    emails = Pagination(emails, page, UiConfig.EMAILS_PER_PAGE)
+    emails = Pagination(emails, page, app.config['EMAILS_PER_PAGE'])
     _store_attachments_in_session(emails)
     return render_template(template, emails=emails, page=page)
 
