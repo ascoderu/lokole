@@ -34,9 +34,9 @@ class InMemoryEmailStore(EmailStore):
 
     def search(self, email_address, query):
         return (dict(email) for email in self._all_for(email_address)
-                if query in email.get('subject')
-                or query in email.get('body')
-                or query in email.get('from')
+                if query in email.get('subject', '')
+                or query in email.get('body', '')
+                or query in email.get('from', '')
                 or any(query in to for to in email.get('to', []))
                 or any(query in cc for cc in email.get('cc', []))
                 or any(query in bcc for bcc in email.get('bcc', [])))
