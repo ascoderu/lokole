@@ -137,6 +137,15 @@ class Base(object):
             self.assertIn(emails[3], results)
             self.assertIn(emails[4], results)
 
+        def test_search_without_query(self):
+            self.given_emails(
+                {'to': 'foo@bar.com', 'subject': 'bar foo bar'},
+                {'to': 'baz@bar.com', 'subject': 'baz'})
+
+            results = list(self.email_store.search('foo@bar.com', query=None))
+
+            self.assertEqual(results, [])
+
 
 class Base64AttachmentEncoderTests(Base.AttachmentEncoderTests):
     def create_encoder(self):

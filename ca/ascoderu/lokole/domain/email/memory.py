@@ -33,6 +33,9 @@ class InMemoryEmailStore(EmailStore):
         self._store.extend(map(dict, emails))
 
     def search(self, email_address, query):
+        if not query:
+            return []
+
         return (dict(email) for email in self._all_for(email_address)
                 if query in email.get('subject', '')
                 or query in email.get('body', '')

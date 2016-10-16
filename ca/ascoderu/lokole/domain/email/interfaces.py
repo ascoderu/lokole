@@ -42,7 +42,7 @@ class EmailStore(metaclass=ABCMeta):
     def search(self, email_address, query):
         """
         :type email_address: str
-        :type query: str
+        :type query: str | None
         :rtype: collections.Iterable[dict]
 
         """
