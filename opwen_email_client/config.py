@@ -22,6 +22,8 @@ class i8n(object):
     WELCOME = _('Welcome!')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
     SYNC_COMPLETE = _('Email synchronization completed.')
+    UNEXPECTED_ERROR = _('Unexpected error. Please contact your admin.')
+    PAGE_DOES_NOT_EXIST = _('This page does not exist.')
 
 
 class FlaskConfig(object):

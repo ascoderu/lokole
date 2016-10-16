@@ -159,6 +159,27 @@ def sync():
     return redirect(url_for('home'))
 
 
+@app.errorhandler(404)
+def _on_404(code_or_exception):
+    app.logger.error(code_or_exception)
+    flash(i8n.PAGE_DOES_NOT_EXIST, category='error')
+    return redirect(url_for('home'))
+
+
+@app.errorhandler(Exception)
+def _on_exception(code_or_exception):
+    app.logger.error('%s: %s', code_or_exception.__class__.__name__, code_or_exception)
+    flash(i8n.UNEXPECTED_ERROR, category='error')
+    return redirect(url_for('home'))
+
+
+@app.errorhandler(500)
+def _on_exception(code_or_exception):
+    app.logger.error(code_or_exception)
+    flash(i8n.UNEXPECTED_ERROR, category='error')
+    return redirect(url_for('home'))
+
+
 def _emails_view(emails, page, template='email.html'):
     """
     :type emails: collections.Iterable[dict]
