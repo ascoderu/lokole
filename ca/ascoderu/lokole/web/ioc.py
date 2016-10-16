@@ -1,9 +1,12 @@
+from flask import Flask
+from flask_babel import Babel
+
 from ca.ascoderu.lokole.domain.config import OpwenConfig
 from ca.ascoderu.lokole.domain.email.base64 import Base64AttachmentEncoder
 from ca.ascoderu.lokole.domain.email.memory import PersistentInMemoryEmailStore
 from ca.ascoderu.lokole.domain.sync.azure import AzureSync
 from ca.ascoderu.lokole.infrastructure.serialization.json import JsonSerializer
-from ca.ascoderu.lokole.web import FlaskConfig
+from ca.ascoderu.lokole.web.config import FlaskConfig
 
 
 class Ioc(object):
@@ -19,3 +22,17 @@ class Ioc(object):
         serializer=JsonSerializer())
 
     attachment_encoder = Base64AttachmentEncoder()
+
+
+def create_app():
+    """
+    :rtype: flask.Flask
+
+    """
+    app = Flask(__name__)
+    app.config.from_object(FlaskConfig)
+    app.ioc = Ioc()
+
+    Babel(app)
+
+    return app
