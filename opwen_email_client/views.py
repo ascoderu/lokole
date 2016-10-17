@@ -15,13 +15,14 @@ from flask_login import current_user
 
 from opwen_domain.config import OpwenConfig
 from opwen_email_client import app
+from opwen_email_client.actions import SendWelcomeEmail
+from opwen_email_client.actions import SyncEmails
 from opwen_email_client.config import i8n
 from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import admin_required
 from opwen_email_client.login import login_required
 from opwen_infrastructure.cron import setup_cronjob
 from opwen_infrastructure.logging import log_execution
-from opwen_infrastructure.networking import use_network_interface
 from opwen_infrastructure.pagination import Pagination
 
 
@@ -118,16 +119,12 @@ def download_attachment(attachment_id):
 @app.route('/register_complete')
 @login_required
 def register_complete():
-    email_store = app.ioc.email_store
-    user = current_user
+    send_welcome_email = SendWelcomeEmail(
+        time=datetime.utcnow(),
+        to=current_user.email,
+        email_store=app.ioc.email_store)
 
-    email_store.create({
-        'sent_at': datetime.utcnow(),
-        'to': [user.email],
-        'from': i8n.LOKOLE_TEAM,
-        'subject': i8n.WELCOME,
-        'body': render_template('_account_finalized.html', email=user.email),
-    })
+    send_welcome_email()
 
     flash(i8n.ACCOUNT_CREATED, category='success')
     return redirect(url_for('email_inbox'))
@@ -188,14 +185,12 @@ def _setup_email_sync_cron():
 
 @log_execution(app.logger)
 def _emails_sync():
-    email_sync = app.ioc.email_sync
-    email_store = app.ioc.email_store
+    sync_emails = SyncEmails(
+        email_sync=app.ioc.email_sync,
+        email_store=app.ioc.email_store,
+        internet_interface=OpwenConfig.INTERNET_INTERFACE_NAME)
 
-    with use_network_interface(OpwenConfig.INTERNET_INTERFACE_NAME):
-        uploaded = email_store.pending()
-        email_sync.upload(uploaded)
-        email_store.mark_sent(uploaded)
-        email_store.create(email_sync.download())
+    sync_emails()
 
 
 def _emails_view(emails, page, template='email.html'):
