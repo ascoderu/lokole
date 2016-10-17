@@ -199,7 +199,9 @@ def _emails_sync():
     email_store = app.ioc.email_store
 
     with use_network_interface(OpwenConfig.INTERNET_INTERFACE_NAME):
-        email_sync.upload(email_store.pending())
+        uploaded = email_store.pending()
+        email_sync.upload(uploaded)
+        email_store.mark_sent(uploaded)
         email_store.create(email_sync.download())
 
 
