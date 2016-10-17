@@ -1,10 +1,7 @@
-import atexit
 import os
 from datetime import datetime
 from io import BytesIO
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from flask import abort
 from flask import flash
 from flask import redirect
@@ -22,6 +19,7 @@ from opwen_email_client.config import i8n
 from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import admin_required
 from opwen_email_client.login import login_required
+from opwen_infrastructure.cron import setup_cronjob
 from opwen_infrastructure.logging import log_execution
 from opwen_infrastructure.networking import use_network_interface
 from opwen_infrastructure.pagination import Pagination
@@ -182,15 +180,10 @@ def _on_exception(code_or_exception):
 @log_execution(app.logger)
 def _setup_email_sync_cron():
     sync_hour = str(OpwenConfig.EMAIL_SYNC_HOUR_UTC)
-    scheduler = BackgroundScheduler()
-    scheduler.start()
-    scheduler.add_job(
-        func=_emails_sync,
-        id=_emails_sync.__name__,
-        replace_existing=True,
-        name='Sync Opwen emails at {} UTC'.format(sync_hour),
-        trigger=CronTrigger(hour=sync_hour, timezone='utc'))
-    atexit.register(log_execution(app.logger)(scheduler.shutdown))
+    setup_cronjob(hour_utc=sync_hour,
+                  method=_emails_sync,
+                  logger=app.logger,
+                  description='Sync Opwen emails at {} UTC'.format(sync_hour))
 
 
 @log_execution(app.logger)
