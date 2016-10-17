@@ -90,7 +90,7 @@ The files contains a JSON object per line. Each JSON object describes an email.
     "bcc": ["email"],
     "from": "email",
     "subject": "str",
-    "message": "html",
+    "body": "html",
     "attachments": [{"filename": "str", "content": "base64"}]
   }
 
@@ -104,7 +104,7 @@ Description of fields:
 
 - *subject* encodes the subject of the email as a plain unicode string.
 
-- *message* stores the content of the email, as a html-formatted unicode string.
+- *body* stores the content of the email, as a html-formatted unicode string.
 
 - *attachments* is an optional field that contains the attachments (if any)
   associated with the email. Each JSON object in this list describes one
