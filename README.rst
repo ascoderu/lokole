@@ -137,13 +137,5 @@ running the tests.
   pip install nose
   nosetests
 
-Third, create your local database for development.
-
-.. sourcecode :: sh
-
-  touch opwen.db
-  ./manage.py db upgrade
-  ./manage.py db migrate
-
-The routes of the app are defined in ``ca/ascoderu/lokole/web/views.py`` so take
+The routes of the app are defined in ``opwen_email_client/views.py`` so take
 a look there for an overview of the entrypoints into the code.
