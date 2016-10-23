@@ -39,7 +39,7 @@ class NewEmailForm(Form):
 
     submit = SubmitField()
 
-    def _set_fields_from_request(self, *fields):
+    def set_fields_from_request(self, *fields):
         """
         :type fields: list[str]
 
@@ -97,5 +97,5 @@ class NewEmailForm(Form):
 
         """
         form = cls(request.form)
-        form._set_fields_from_request('to', 'subject')
+        form.set_fields_from_request('to', 'subject')
         return form

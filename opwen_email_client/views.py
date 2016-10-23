@@ -167,7 +167,7 @@ def _on_exception(code_or_exception):
 
 
 @app.errorhandler(500)
-def _on_exception(code_or_exception):
+def _on_500(code_or_exception):
     app.logger.error(code_or_exception)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))

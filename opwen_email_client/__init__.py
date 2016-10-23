@@ -1,3 +1,4 @@
+# pylint: disable=wrong-import-position
 from opwen_email_client.ioc import create_app
 
 app = create_app()

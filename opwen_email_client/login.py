@@ -1,3 +1,5 @@
+# pylint: disable=no-member
+
 from flask_migrate import Migrate
 from flask_security import LoginForm as _LoginForm
 from flask_security import RegisterForm as _RegisterForm
@@ -47,12 +49,14 @@ class Role(_db.Model, RoleMixin):
     description = _db.Column(_db.String(255))
 
 
+# pylint: disable=too-many-ancestors
 # noinspection PyClassHasNoInit
 class LoginForm(_LoginForm):
     email = SuffixedStringField(
         suffix='@{}'.format(OpwenConfig.CLIENT_EMAIL_HOST))
 
 
+# pylint: disable=too-many-ancestors
 # noinspection PyClassHasNoInit
 class RegisterForm(_RegisterForm):
     email = SuffixedStringField(

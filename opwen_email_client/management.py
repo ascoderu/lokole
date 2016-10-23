@@ -7,6 +7,7 @@ from flask_script import Command
 class BabelCommand(Command):
     capture_all_args = True
 
+    # pylint: disable=arguments-differ,method-hidden
     # noinspection PyMethodOverriding
     def run(self, args):
         """
