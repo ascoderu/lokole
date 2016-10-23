@@ -95,7 +95,7 @@ def email_new():
     form = NewEmailForm.from_request()
 
     if form.validate_on_submit():
-        email_store.create(form.as_dict(attachment_encoder))
+        email_store.create([form.as_dict(attachment_encoder)])
         flash(i8n.EMAIL_SENT, category='success')
 
     return render_template('email_new.html', form=form)
