@@ -63,54 +63,10 @@ to address this problem by tackling it from three perspectives:
    hundreds of people via the Lokole. Spreading the cost in this way makes
    email access sustainable for local communities.
 
-Data exchange format
---------------------
+Technical overview
+------------------
 
-In order to communicate between the Opwen server and the Lokole, a protocol
-based on gzipped jsonl files uploaded to Azure Blob Storage is used.
-
-There are two locations on Azure Blob Storage where these files can be found.
-
-- The Opwen server will expect the new emails from the Lokole to be uploaded to:
-
-  ``{blob-root}/{lokole-name}/from_opwen/{year-month-day_hour-minute}.gz``
-
-- The Lokole will expect new emails from the Opwen server to be uploaded to:
-
-  ``{blob-root}/{lokole-name}/to_opwen/new.gz``
-
-The files contains a JSON object per line. Each JSON object describes an email.
-
-.. sourcecode :: json
-
-  {
-    "sent_at": "year-month-day hour:minute",
-    "to": ["email"],
-    "cc": ["email"],
-    "bcc": ["email"],
-    "from": "email",
-    "subject": "str",
-    "body": "html",
-    "attachments": [{"filename": "str", "content": "base64"}]
-  }
-
-Description of fields:
-
-- *sent_at* encodes the time at which the email was sent, in UTC.
-
-- *to* stores the email address to which the email is sent.
-
-- *from* is the sender of the email.
-
-- *subject* encodes the subject of the email as a plain unicode string.
-
-- *body* stores the content of the email, as a html-formatted unicode string.
-
-- *attachments* is an optional field that contains the attachments (if any)
-  associated with the email. Each JSON object in this list describes one
-  attachment. The *filename* field is the name of the file that the user
-  attached to the email. The *content* field is the base-64 encoded content of
-  the attached file.
+Can be found in the `opwen-shared readme <https://github.com/OPWEN/opwen-shared/blob/master/README.rst>`_.
 
 Development setup
 -----------------
