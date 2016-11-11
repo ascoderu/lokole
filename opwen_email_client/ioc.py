@@ -19,8 +19,8 @@ class Ioc(object):
             account=OpwenConfig.STORAGE_ACCOUNT_NAME,
             key=OpwenConfig.STORAGE_ACCOUNT_KEY,
             container=OpwenConfig.STORAGE_CONTAINER),
-        download_location=OpwenConfig.STORAGE_DOWNLOAD_PATH,
-        upload_location=OpwenConfig.STORAGE_UPLOAD_PATH,
+        download_locations=[OpwenConfig.STORAGE_DOWNLOAD_PATH],
+        upload_locations=[OpwenConfig.STORAGE_UPLOAD_PATH],
         serializer=JsonSerializer())
 
     attachment_encoder = Base64AttachmentEncoder()
