@@ -38,7 +38,7 @@ class SendWelcomeEmail(object):
 
     def __call__(self, *args, **kwargs):
         self._email_store.create([{
-            'sent_at': self._time,
+            'sent_at': self._time.strftime("%Y-%m-%d %H:%M"),
             'to': [self._to],
             'from': i8n.LOKOLE_TEAM,
             'subject': i8n.WELCOME,
