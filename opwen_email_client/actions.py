@@ -19,7 +19,7 @@ class SyncEmails(object):
     def __call__(self):
         with use_network_interface(self._internet_interface):
             uploaded = self._email_store.pending()
-            self._email_sync.upload(uploaded)
+            self._email_sync.upload([uploaded])
             self._email_store.mark_sent(uploaded)
             self._email_store.create(self._email_sync.download())
 
