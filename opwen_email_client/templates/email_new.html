@@ -12,8 +12,8 @@
 
   <div class="row">
     <div class="col-sm-12 col-md-4">{{ render_field(form.to, _('To')) }}</div>
-    <div class="col-sm-12 col-md-4">{{ render_field(form.to, _('Cc')) }}</div>
-    <div class="col-sm-12 col-md-4">{{ render_field(form.to, _('Bcc')) }}</div>
+    <div class="col-sm-12 col-md-4">{{ render_field(form.cc, _('Cc')) }}</div>
+    <div class="col-sm-12 col-md-4">{{ render_field(form.bcc, _('Bcc')) }}</div>
   </div>
   {{ render_field(form.subject, _('Subject')) }}
   {{ render_field(form.body, _('Message')) }}
