@@ -76,14 +76,14 @@ user_datastore.commit()
 
 
 def login_required(func):
-    if app.config['TESTING']:
+    if app.config.get('TESTING'):
         return func
 
     return _login_required(func)
 
 
 def admin_required(func):
-    if app.config['TESTING']:
+    if app.config.get('TESTING'):
         return func
 
     return roles_required(admin_role)(func)
