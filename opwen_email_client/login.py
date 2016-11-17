@@ -13,10 +13,11 @@ from flask_security.forms import email_required
 from flask_security.forms import email_validator
 from flask_security.forms import unique_user_email
 from flask_sqlalchemy import SQLAlchemy
-from opwen_domain.config import OpwenConfig
+
 from opwen_infrastructure.wtforms import SuffixedStringField
 
 from opwen_email_client import app
+from opwen_email_client.config import AppConfig
 
 _db = SQLAlchemy(app)
 
@@ -53,14 +54,14 @@ class Role(_db.Model, RoleMixin):
 # noinspection PyClassHasNoInit
 class LoginForm(_LoginForm):
     email = SuffixedStringField(
-        suffix='@{}'.format(OpwenConfig.CLIENT_EMAIL_HOST))
+        suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST))
 
 
 # pylint: disable=too-many-ancestors
 # noinspection PyClassHasNoInit
 class RegisterForm(_RegisterForm):
     email = SuffixedStringField(
-        suffix='@{}'.format(OpwenConfig.CLIENT_EMAIL_HOST),
+        suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
         validators=[email_required, email_validator, unique_user_email])
 
 

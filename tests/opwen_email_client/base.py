@@ -3,11 +3,11 @@ from tempfile import NamedTemporaryFile
 
 from flask_testing import TestCase
 
-from opwen_email_client.config import FlaskConfig
+from opwen_email_client.config import AppConfig
 from opwen_email_client.ioc import create_app
 
 
-class TestConfig(FlaskConfig):
+class TestConfig(AppConfig):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     SECURITY_PASSWORD_SALT = 'UnSalted'

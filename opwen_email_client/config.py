@@ -2,6 +2,8 @@ from os import path
 from tempfile import gettempdir
 
 from flask_babel import gettext as _
+
+from opwen_domain.config import OpwenConfig
 from opwen_infrastructure.env import getenv
 
 state_basedir = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
@@ -26,7 +28,7 @@ class i8n(object):
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
 
 
-class FlaskConfig(object):
+class AppConfig(OpwenConfig):
     SQLITE_PATH = path.join(state_basedir, 'app.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
     SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
