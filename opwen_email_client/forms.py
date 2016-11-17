@@ -87,8 +87,9 @@ class NewEmailForm(Form):
         for filestorage in filestorages:
             filename = filestorage.filename
             content = attachment_encoder.encode(filestorage.stream.read())
-            yield {'filename': filename,
-                   'content': content}
+            if filename and content:
+                yield {'filename': filename,
+                       'content': content}
 
     @classmethod
     def from_request(cls):
