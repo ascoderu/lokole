@@ -15,14 +15,11 @@ from flask_login import current_user
 
 from opwen_email_client import app
 from opwen_email_client.actions import SendWelcomeEmail
-from opwen_email_client.actions import SyncEmails
-from opwen_email_client.config import AppConfig
 from opwen_email_client.config import i8n
+from opwen_email_client.crons import emails_sync
 from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import admin_required
 from opwen_email_client.login import login_required
-from opwen_infrastructure.cron import setup_cronjob
-from opwen_infrastructure.logging import log_execution
 from opwen_infrastructure.pagination import Pagination
 
 
@@ -146,7 +143,7 @@ def logout_complete():
 @app.route('/sync')
 @admin_required
 def sync():
-    _emails_sync()
+    emails_sync()
 
     flash(i8n.SYNC_COMPLETE, category='success')
     return redirect(url_for('home'))
@@ -171,26 +168,6 @@ def _on_500(code_or_exception):
     app.logger.error(code_or_exception)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
-
-
-@app.before_first_request
-@log_execution(app.logger)
-def _setup_email_sync_cron():
-    sync_hour = str(AppConfig.EMAIL_SYNC_HOUR_UTC)
-    setup_cronjob(hour_utc=sync_hour,
-                  method=_emails_sync,
-                  logger=app.logger,
-                  description='Sync Opwen emails at {} UTC'.format(sync_hour))
-
-
-@log_execution(app.logger)
-def _emails_sync():
-    sync_emails = SyncEmails(
-        email_sync=app.ioc.email_sync,
-        email_store=app.ioc.email_store,
-        internet_interface=AppConfig.INTERNET_INTERFACE_NAME)
-
-    sync_emails()
 
 
 def _emails_view(emails, page, template='email.html'):
