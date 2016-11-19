@@ -1,3 +1,6 @@
+from logging import Formatter
+from logging import StreamHandler
+
 from flask import Flask
 from flask_babel import Babel
 from opwen_domain.email.base64 import Base64AttachmentEncoder
@@ -33,6 +36,11 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     app.ioc = Ioc()
+
+    logger = StreamHandler()
+    logger.setFormatter(Formatter(AppConfig.LOG_FORMAT))
+    app.logger.addHandler(logger)
+    app.logger.setLevel(AppConfig.LOG_LEVEL)
 
     Babel(app)
 

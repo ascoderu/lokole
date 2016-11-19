@@ -1,3 +1,4 @@
+from logging import ERROR
 from os import path
 from tempfile import gettempdir
 
@@ -55,3 +56,6 @@ class AppConfig(OpwenConfig):
     LOCAL_EMAIL_STORE = path.join(state_basedir, 'email.store')
 
     EMAILS_PER_PAGE = 30
+
+    LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(pathname)s:%(lineno)d\t%(message)s'
+    LOG_LEVEL = ERROR
