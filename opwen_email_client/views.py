@@ -102,15 +102,28 @@ def email_new():
 @login_required
 def download_attachment(attachment_id):
     attachment_encoder = app.ioc.attachment_encoder
+    email_store = app.ioc.email_store
+    email_id, attachment_idx = session.get('attachments', {}).get(attachment_id, (None, None))
 
-    filename_content = session.get('attachment_{}'.format(attachment_id))
-
-    if not filename_content:
+    if email_id is None or attachment_idx is None:
         abort(404)
 
-    filename = filename_content[0]
-    content = BytesIO(attachment_encoder.decode(filename_content[1]))
-    return send_file(content, attachment_filename=filename, as_attachment=True)
+    email = email_store.get(email_id)
+    if email is None:
+        abort(404)
+
+    attachments = email.get('attachments', [])
+    if attachment_idx >= len(attachments):
+        abort(404)
+
+    attachment = attachments[attachment_idx]
+    filename = attachment.get('filename')
+    content = attachment.get('content')
+    if not filename or not content:
+        abort(404)
+
+    downloadable = BytesIO(attachment_encoder.decode(content))
+    return send_file(downloadable, attachment_filename=filename, as_attachment=True)
 
 
 @app.route('/register_complete')
@@ -190,10 +203,15 @@ def _store_attachments_in_session(emails):
     :type emails: collections.Iterable[dict]
 
     """
+    session_attachments = session.get('attachments')
+    if not session_attachments:
+        session_attachments = session['attachments'] = {}
+
     for i, email in enumerate(emails):
+        email_id = email['_uid']
         attachments = email.get('attachments', [])
         for j, attachment in enumerate(attachments):
-            attachment_id = '{}{}'.format(i, j)
-            session_data = attachment.get('filename'), attachment.get('content')
-            session['attachment_{}'.format(attachment_id)] = session_data
+            attachment_filename = attachment.get('filename', '')
+            attachment_id = '{}-{}'.format(i + 1, attachment_filename)
             attachment['id'] = attachment_id
+            session_attachments[attachment_id] = (email_id, j)
