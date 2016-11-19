@@ -9,7 +9,6 @@ from flask import render_template
 from flask import request
 from flask import send_file
 from flask import send_from_directory
-from flask import session
 from flask import url_for
 from flask_login import current_user
 
@@ -102,29 +101,15 @@ def email_new():
 @app.route('/attachment/<attachment_id>', methods=['GET'])
 @login_required
 def download_attachment(attachment_id):
-    attachment_encoder = app.ioc.attachment_encoder
-    email_store = app.ioc.email_store
-    email_id, attachment_idx = session.get('attachments', {}).get(attachment_id, (None, None))
+    attachments_session = app.ioc.attachments_session
 
-    if email_id is None or attachment_idx is None:
+    attachment = attachments_session.lookup(attachment_id)
+    if attachment is None:
         abort(404)
 
-    email = email_store.get(email_id)
-    if email is None:
-        abort(404)
-
-    attachments = email.get('attachments', [])
-    if attachment_idx >= len(attachments):
-        abort(404)
-
-    attachment = attachments[attachment_idx]
-    filename = attachment.get('filename')
-    content = attachment.get('content')
-    if not filename or not content:
-        abort(404)
-
-    downloadable = BytesIO(attachment_encoder.decode(content))
-    return send_file(downloadable, attachment_filename=filename, as_attachment=True)
+    return send_file(BytesIO(attachment.content),
+                     attachment_filename=attachment.name,
+                     as_attachment=True)
 
 
 @app.route('/register_complete')
@@ -191,28 +176,11 @@ def _emails_view(emails, page, template='email.html'):
     :type template: str
 
     """
+    attachments_session = app.ioc.attachments_session
+
     if page < 1:
         abort(404)
 
     emails = Pagination(emails, page, AppConfig.EMAILS_PER_PAGE)
-    _store_attachments_in_session(emails)
+    attachments_session.store(emails)
     return render_template(template, emails=emails, page=page)
-
-
-def _store_attachments_in_session(emails):
-    """
-    :type emails: collections.Iterable[dict]
-
-    """
-    session_attachments = session.get('attachments')
-    if not session_attachments:
-        session_attachments = session['attachments'] = {}
-
-    for i, email in enumerate(emails):
-        email_id = email['_uid']
-        attachments = email.get('attachments', [])
-        for j, attachment in enumerate(attachments):
-            attachment_filename = attachment.get('filename', '')
-            attachment_id = '{}-{}'.format(i + 1, attachment_filename)
-            attachment['id'] = attachment_id
-            session_attachments[attachment_id] = (email_id, j)

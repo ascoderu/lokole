@@ -10,6 +10,7 @@ from opwen_domain.sync.azure import AzureSync
 from opwen_infrastructure.serialization.json import JsonSerializer
 
 from opwen_email_client.config import AppConfig
+from opwen_email_client.session import AttachmentsStore
 
 
 class Ioc(object):
@@ -26,6 +27,10 @@ class Ioc(object):
         serializer=JsonSerializer())
 
     attachment_encoder = Base64AttachmentEncoder()
+
+    attachments_session = AttachmentsStore(
+        email_store=email_store,
+        attachment_encoder=attachment_encoder)
 
 
 def create_app():
