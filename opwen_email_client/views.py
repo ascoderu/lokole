@@ -15,6 +15,7 @@ from flask_login import current_user
 
 from opwen_email_client import app
 from opwen_email_client.actions import SendWelcomeEmail
+from opwen_email_client.config import AppConfig
 from opwen_email_client.config import i8n
 from opwen_email_client.crons import emails_sync
 from opwen_email_client.forms import NewEmailForm
@@ -193,7 +194,7 @@ def _emails_view(emails, page, template='email.html'):
     if page < 1:
         abort(404)
 
-    emails = Pagination(emails, page, app.config['EMAILS_PER_PAGE'])
+    emails = Pagination(emails, page, AppConfig.EMAILS_PER_PAGE)
     _store_attachments_in_session(emails)
     return render_template(template, emails=emails, page=page)
 
