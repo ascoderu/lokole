@@ -13,6 +13,7 @@ from flask_security.forms import email_required
 from flask_security.forms import email_validator
 from flask_security.forms import unique_user_email
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import OperationalError
 
 from opwen_infrastructure.wtforms import SuffixedStringField
 
@@ -67,7 +68,11 @@ class RegisterForm(_RegisterForm):
 
 user_datastore = SQLAlchemyUserDatastore(_db, User, Role)
 
-_db.create_all()
+try:
+    _db.create_all()
+except OperationalError:
+    pass
+
 Migrate(app, _db)
 Security(app, user_datastore, register_form=RegisterForm, login_form=LoginForm)
 
