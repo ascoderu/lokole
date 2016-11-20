@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-09-10 19:28-0700\n"
+"POT-Creation-Date: 2016-11-19 21:16-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,227 +17,188 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: config.py:14
-msgid "Logout"
-msgstr ""
-
-#: config.py:15 opwen_webapp/helpers/forms.py:75
-#: opwen_webapp/templates/login.html:7
-msgid "Login"
-msgstr ""
-
-#: config.py:16 opwen_webapp/helpers/forms.py:94
-#: opwen_webapp/templates/register.html:7
-msgid "Register"
-msgstr ""
-
-#: config.py:17
-msgid "Sync now!"
-msgstr ""
-
-#: config.py:18
-msgid "Home"
-msgstr ""
-
-#: config.py:19
-msgid "About"
-msgstr ""
-
-#: config.py:20
-msgid "Email"
-msgstr ""
-
-#: config.py:21
-msgid "Write new"
-msgstr ""
-
-#: config.py:22
-msgid "Inbox"
-msgstr ""
-
-#: config.py:23
-msgid "Sent"
-msgstr ""
-
-#: config.py:24
-msgid "Outbox"
-msgstr ""
-
-#: config.py:81
+#: opwen_email_client/config.py:15
 msgid "Please log in to access this page."
 msgstr ""
 
-#: config.py:82
+#: opwen_email_client/config.py:16
 msgid "You do not have permission to view this page."
 msgstr ""
 
-#: config.py:83
-msgid "Invalid password"
+#: opwen_email_client/config.py:17
+msgid "Invalid password."
 msgstr ""
 
-#: opwen_webapp/controllers.py:231 opwen_webapp/controllers.py:247
-msgid "Lokole team"
+#: opwen_email_client/config.py:18
+msgid "The password must have at least 6 characters."
 msgstr ""
 
-#: opwen_webapp/controllers.py:232
-msgid "Welcome!"
-msgstr ""
-
-#: opwen_webapp/controllers.py:248
-msgid "Your account is now fully set up."
-msgstr ""
-
-#: opwen_webapp/views.py:56
-#, python-format
-msgid "Welcome, %(user)s!"
-msgstr ""
-
-#: opwen_webapp/views.py:64
-#, python-format
-msgid "Welcome back, %(user)s!"
-msgstr ""
-
-#: opwen_webapp/views.py:70
-msgid "Logged out successfully!"
-msgstr ""
-
-#: opwen_webapp/views.py:98
-msgid "Only texts, images, documents and so forth are allowed as attachments."
-msgstr ""
-
-#: opwen_webapp/views.py:101
+#: opwen_email_client/config.py:19
 msgid "Email sent!"
 msgstr ""
 
-#: opwen_webapp/views.py:104
-msgid "Email will be sent soon!"
+#: opwen_email_client/config.py:20
+msgid "Invalid email address."
 msgstr ""
 
-#: opwen_webapp/views.py:155
-#, python-format
-msgid "Uploaded %(num)d emails."
-msgstr ""
-
-#: opwen_webapp/views.py:156
-#, python-format
-msgid "Downloaded %(num)d emails."
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:70
-msgid "Name or Email"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:71
-msgid "Please enter your name or email."
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:73 opwen_webapp/helpers/forms.py:86
-msgid "Password"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:81
-msgid "Name"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:82
-msgid "Please enter your name."
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:83
-msgid "Sorry, this name is already in use."
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:87
-msgid "Please provide a password"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:88
-msgid "Password must be at least 6 characters"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:91
-msgid "Retype password"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:92
-msgid "Password does not match"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:99
-msgid "To"
-msgstr ""
-
-#: opwen_webapp/helpers/forms.py:100
+#: opwen_email_client/config.py:21
 msgid "Please specify a recipient."
 msgstr ""
 
-#: opwen_webapp/helpers/forms.py:101
-msgid "Must be a user name or email address."
+#: opwen_email_client/config.py:22
+msgid "You are now logged in."
 msgstr ""
 
-#: opwen_webapp/helpers/forms.py:104
-msgid "Subject"
+#: opwen_email_client/config.py:23
+msgid "You have logged out successfully."
 msgstr ""
 
-#: opwen_webapp/helpers/forms.py:108
-msgid "Message"
+#: opwen_email_client/config.py:24
+msgid "Lokole Team"
 msgstr ""
 
-#: opwen_webapp/helpers/forms.py:112
-msgid "Attachments"
+#: opwen_email_client/config.py:25
+msgid "Welcome!"
 msgstr ""
 
-#: opwen_webapp/helpers/forms.py:117
-msgid "Send"
+#: opwen_email_client/config.py:26
+msgid "Your Lokole account has been created successfully!"
 msgstr ""
 
-#: opwen_webapp/helpers/handlers.py:107
-#, python-format
-msgid "The page %(url)s does not exist."
+#: opwen_email_client/config.py:27
+msgid "Email synchronization completed."
 msgstr ""
 
-#: opwen_webapp/helpers/handlers.py:115
-#, python-format
-msgid "The maximum attachment size is %(max_size)s."
-msgstr ""
-
-#: opwen_webapp/helpers/handlers.py:122 opwen_webapp/helpers/handlers.py:130
+#: opwen_email_client/config.py:28
 msgid "Unexpected error. Please contact your admin."
 msgstr ""
 
-#: opwen_webapp/templates/_base.html:18
-msgid "Opwen"
+#: opwen_email_client/config.py:29
+msgid "This page does not exist."
 msgstr ""
 
-#: opwen_webapp/templates/_messages.html:4
-msgid "Error"
+#: opwen_email_client/templates/_account_finalized.html:1
+msgid "Welcome to your Lokole account!"
 msgstr ""
 
-#: opwen_webapp/templates/_messages.html:12
-msgid "Information"
+#: opwen_email_client/templates/_account_finalized.html:3
+msgid ""
+"With your account you can send and receive emails with unlimited "
+"attachments.You can learn more about how Lokole works"
 msgstr ""
 
-#: opwen_webapp/templates/_messages.html:20
-msgid "Success"
+#: opwen_email_client/templates/_account_finalized.html:6
+msgid "here"
 msgstr ""
 
-#: opwen_webapp/templates/_nav.html:40
-msgid "Toggle navigation"
+#: opwen_email_client/templates/_account_finalized.html:8
+msgid "Your Lokole account is fully set up and your email address is:"
 msgstr ""
 
-#: opwen_webapp/templates/_nav.html:43
-msgid "Ascoderu"
+#: opwen_email_client/templates/_account_finalized.html:10
+msgid "Using this email address, you can talk to people from all over the world!"
 msgstr ""
 
-#: opwen_webapp/templates/_nav.html:72
+#: opwen_email_client/templates/_account_finalized.html:14
+msgid ""
+"If you have any questions about your Lokole account, please get in touch "
+"by sending us a"
+msgstr ""
+
+#: opwen_email_client/templates/_account_finalized.html:16
+msgid "I have a question about Lokole"
+msgstr ""
+
+#: opwen_email_client/templates/_account_finalized.html:18
+msgid "All the best."
+msgstr ""
+
+#: opwen_email_client/templates/_account_finalized.html:19
+msgid "Your Lokole Team"
+msgstr ""
+
+#: opwen_email_client/templates/_email.html:6
+#: opwen_email_client/templates/_nav.html:51
 msgid "Search"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:30
+#: opwen_email_client/templates/_email.html:77
+msgid "Previous results"
+msgstr ""
+
+#: opwen_email_client/templates/_email.html:82
+msgid "Next results"
+msgstr ""
+
+#: opwen_email_client/templates/_messages.html:4
+msgid "Error"
+msgstr ""
+
+#: opwen_email_client/templates/_messages.html:12
+msgid "Information"
+msgstr ""
+
+#: opwen_email_client/templates/_messages.html:20
+msgid "Success"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:18
+msgid "Toggle navigation"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:21
+msgid "Ascoderu"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:25
+msgid "Home"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:26
+msgid "About"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:27
+msgid "Email"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:31
+msgid "Logout"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:33
+#: opwen_email_client/templates/login.html:7
+#: opwen_email_client/templates/login.html:13
+msgid "Login"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:34
+#: opwen_email_client/templates/register.html:7
+#: opwen_email_client/templates/register.html:14
+msgid "Register"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:47
+msgid "Inbox"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:48
+msgid "Sent"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:49
+msgid "Outbox"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:50
+msgid "Write email"
+msgstr ""
+
+#: opwen_email_client/templates/about.html:30
 msgid "What is Lokole?"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:35
+#: opwen_email_client/templates/about.html:35
 msgid ""
 "Lokole is a project of the Canadian-Congolese non-profit organization "
 "Ascoderu that enables rural communities to cheaply and sustainably access"
@@ -246,11 +207,11 @@ msgid ""
 "Goal 9: achieving global sustainable communications infrastructure."
 msgstr ""
 
-#: opwen_webapp/templates/about.html:53
+#: opwen_email_client/templates/about.html:53
 msgid "How does it work?"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:58
+#: opwen_email_client/templates/about.html:58
 msgid ""
 "The Lokole is a small device that creates a local network: the Lokole "
 "WiFi. You can connect to this network with any device: your phone, your "
@@ -261,19 +222,19 @@ msgid ""
 "resources to make email available for everyone."
 msgstr ""
 
-#: opwen_webapp/templates/about.html:79
+#: opwen_email_client/templates/about.html:79
 msgid "Meet the team"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:106
+#: opwen_email_client/templates/about.html:106
 msgid "Founder"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:106
+#: opwen_email_client/templates/about.html:106
 msgid "CEO"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:107
+#: opwen_email_client/templates/about.html:107
 msgid ""
 "Nzola is a native of the DRC in Africa who now lives in Victoria, Canada."
 " While being employed by the humanitarian organization Mission Aviation "
@@ -282,24 +243,24 @@ msgid ""
 " understanding of the communication problems in rural sub-saharan Africa."
 msgstr ""
 
-#: opwen_webapp/templates/about.html:122
+#: opwen_email_client/templates/about.html:122
 msgid "Operations"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:123
+#: opwen_email_client/templates/about.html:123
 msgid ""
-"Laura is a self-taugt developer and passionate advocate for positive "
+"Laura is a self-taught developer and passionate advocate for positive "
 "change and justice with a MSc in International Development. Laura has "
 "dedicated 10 years of her life supporting local and international NGOs. "
 "Before supporting Ascoderu, she worked at the British Columbia Council "
 "for International Cooperation (BCCIC) and for Amnesty International."
 msgstr ""
 
-#: opwen_webapp/templates/about.html:138
+#: opwen_email_client/templates/about.html:138
 msgid "Development"
 msgstr ""
 
-#: opwen_webapp/templates/about.html:139
+#: opwen_email_client/templates/about.html:139
 msgid ""
 "Clemens is a full-stack software developer who spent much of his life in "
 "Togo, Mali and Zambia and is now based in Vancouver, Canada. He honed his"
@@ -309,152 +270,131 @@ msgid ""
 "projects."
 msgstr ""
 
-#: opwen_webapp/templates/email.html:10
+#: opwen_email_client/templates/email.html:8
 msgid "No emails."
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:30
+#: opwen_email_client/templates/email_new.html:14
+msgid "To"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:15
+msgid "Cc"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:16
+msgid "Bcc"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:18
+msgid "Subject"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:19
+msgid "Message"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:20
+msgid "Attachments"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:21
+msgid "Send"
+msgstr ""
+
+#: opwen_email_client/templates/email_new.html:34
 msgid "files selected"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:32
+#: opwen_email_client/templates/email_new.html:36
 msgid "Remove"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:33
+#: opwen_email_client/templates/email_new.html:37
 msgid "Choose files"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:53
+#: opwen_email_client/templates/email_new.html:57
 msgid "Bold"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:55
+#: opwen_email_client/templates/email_new.html:59
 msgid "Italic"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:57
+#: opwen_email_client/templates/email_new.html:61
 msgid "Underline"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:63
+#: opwen_email_client/templates/email_new.html:67
 msgid "Un-ordered list"
 msgstr ""
 
-#: opwen_webapp/templates/email_new.html:65
+#: opwen_email_client/templates/email_new.html:69
 msgid "Ordered list"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:8
+#: opwen_email_client/templates/home.html:8
 msgid "Lokole"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:9
+#: opwen_email_client/templates/home.html:9
 msgid "Email for all"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:12
+#: opwen_email_client/templates/home.html:12
 msgid "People using a computer in Africa."
 msgstr ""
 
-#: opwen_webapp/templates/home.html:15
+#: opwen_email_client/templates/home.html:15
 msgid "Send and receive emails with unlimited attachments for free."
 msgstr ""
 
-#: opwen_webapp/templates/home.html:20
+#: opwen_email_client/templates/home.html:20
 msgid "Sign up"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:22
+#: opwen_email_client/templates/home.html:22
 msgid "Check your emails"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:24
+#: opwen_email_client/templates/home.html:24
 msgid "Learn more"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:28
+#: opwen_email_client/templates/home.html:28
 msgid "Already have an account?"
 msgstr ""
 
-#: opwen_webapp/templates/home.html:28
+#: opwen_email_client/templates/home.html:28
 msgid "Login now"
 msgstr ""
 
-#: opwen_webapp/templates/login.html:16
+#: opwen_email_client/templates/login.html:11
+msgid "Enter your Ascoderu email address or account name"
+msgstr ""
+
+#: opwen_email_client/templates/login.html:12
+msgid "Enter your password"
+msgstr ""
+
+#: opwen_email_client/templates/login.html:16
 msgid "Don't have an account?"
 msgstr ""
 
-#: opwen_webapp/templates/login.html:17
+#: opwen_email_client/templates/login.html:17
 msgid "Register now!"
 msgstr ""
 
-#: opwen_webapp/templates/emails/account_created.html:1
-#, python-format
-msgid "Welcome, %(name)s, to your Lokole account!"
+#: opwen_email_client/templates/register.html:11
+msgid "Enter your name"
 msgstr ""
 
-#: opwen_webapp/templates/emails/account_created.html:3
-msgid ""
-"With your account you can send and receive emails with unlimited "
-"attachments."
+#: opwen_email_client/templates/register.html:12
+msgid "Choose a password"
 msgstr ""
 
-#: opwen_webapp/templates/emails/account_created.html:5
-msgid "You can learn more about how Lokole works"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_created.html:5
-msgid "here"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_created.html:7
-msgid ""
-"We still have to do a bit of work to finalize your account... as soon as "
-"everything is ready, we will send you another message to confirm your "
-"very own Lokole email address. Using this email address, you will be able"
-" to talk to people from all over the world!"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_created.html:14
-msgid ""
-"If you have any questions about your Lokole account, please get in touch "
-"by sending us a"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_created.html:16
-#: opwen_webapp/templates/emails/account_finalized.html:4
-msgid "I have a question about Lokole"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_created.html:18
-msgid "All the best."
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_created.html:19
-msgid "Lokole Team"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_finalized.html:1
-#, python-format
-msgid ""
-"Hello again, %(name)s. We just wanted to let you know that your Lokole "
-"account is now fully set up."
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_finalized.html:2
-msgid "Your email address is:"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_finalized.html:4
-msgid "Questions?"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_finalized.html:6
-msgid "Have a great day!"
-msgstr ""
-
-#: opwen_webapp/templates/emails/account_finalized.html:7
-msgid "Your Lokole Team"
+#: opwen_email_client/templates/register.html:13
+msgid "Repeat password"
 msgstr ""
 
