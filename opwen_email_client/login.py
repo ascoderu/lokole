@@ -13,6 +13,7 @@ from flask_security.forms import email_required
 from flask_security.forms import email_validator
 from flask_security.forms import unique_user_email
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
 
 from opwen_infrastructure.wtforms import SuffixedStringField
@@ -78,7 +79,11 @@ Security(app, user_datastore, register_form=RegisterForm, login_form=LoginForm)
 
 admin_role = 'admin'
 user_datastore.find_or_create_role(name=admin_role)
-user_datastore.commit()
+
+try:
+    user_datastore.commit()
+except IntegrityError:
+    user_datastore.db.session.rollback()
 
 
 def login_required(func):
