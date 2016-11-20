@@ -13,4 +13,4 @@ install:
 
 script:
   - pylint --rcfile=.pylintrc opwen_email_client
-  - nosetests --with-coverage --cover-branches --cover-erase --cover-package=opwen_email_client
+  - nosetests $(find tests -name '*.py') --with-coverage --cover-branches --cover-erase --cover-package=opwen_email_client
