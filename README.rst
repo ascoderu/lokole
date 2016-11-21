@@ -4,6 +4,9 @@ Opwen webapp
 .. image:: https://travis-ci.org/OPWEN/opwen-webapp.svg?branch=master
   :target: https://travis-ci.org/OPWEN/opwen-webapp
 
+.. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
+  :target: https://pypi.python.org/pypi/opwen_email_client/
+
 What's this?
 ------------
 
