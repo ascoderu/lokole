@@ -3,6 +3,9 @@
 bower_components/
 
 *.pyc
+/build/
+/dist/
+/*.egg-info/
 
 .coverage
 *.mo
