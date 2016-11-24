@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
 
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-bower-concat');
 
@@ -10,6 +11,19 @@ module.exports = function(grunt) {
       all: {
         dest: {
           js: 'build/all.js',
+          css: 'build/all.css'
+        }
+      },
+    },
+
+    cssmin: {
+      options: {
+        shorthandCompacting: false,
+        roundingPrecision: -1
+      },
+      target: {
+        files: {
+          'opwen_email_client/static/app.min.css': ['build/all.css']
         }
       }
     },
@@ -30,6 +44,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('buildbower', [
     'bower_concat',
+    'cssmin',
     'uglify:bower'
   ]);
 
