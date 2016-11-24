@@ -158,7 +158,12 @@ def sync():
 @app.route('/admin')
 @admin_required
 def admin():
-    return render_template('admin.html', users=User.query.all())
+    email_store = app.ioc.email_store
+
+    return render_template('admin.html',
+                           users=User.query.all(),
+                           pending_emails=len(email_store.pending()),
+                           sync_time=AppConfig.EMAIL_SYNC_HOUR_UTC)
 
 
 @app.route('/admin/suspend/<userid>')
