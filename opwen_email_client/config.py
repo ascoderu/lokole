@@ -24,9 +24,13 @@ class i8n(object):
     LOKOLE_TEAM = _('Lokole Team')
     WELCOME = _('Welcome!')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
+    ACCOUNT_SUSPENDED = _('Your account has been suspended. Please contact your administrator.')
     SYNC_COMPLETE = _('Email synchronization completed.')
     UNEXPECTED_ERROR = _('Unexpected error. Please contact your admin.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
+    USER_DOES_NOT_EXIST = _('This user does not exist.')
+    USER_SUSPENDED = _('The user was suspended.')
+    USER_UNSUSPENDED = _('The user was un-suspended.')
 
 
 class AppConfig(OpwenConfig):
@@ -49,6 +53,7 @@ class AppConfig(OpwenConfig):
     SECURITY_MSG_LOGIN = i8n.LOGIN_REQUIRED, 'error'
     SECURITY_MSG_UNAUTHORIZED = i8n.UNAUTHORIZED, 'error'
     SECURITY_MSG_INVALID_PASSWORD = i8n.INVALID_PASSWORD, 'error'
+    SECURITY_MSG_DISABLED_ACCOUNT = i8n.ACCOUNT_SUSPENDED, 'error'
     SECURITY_MSG_PASSWORD_INVALID_LENGTH = i8n.SHORT_PASSWORD, 'error'
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)

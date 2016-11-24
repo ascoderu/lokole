@@ -1,0 +1,29 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<h2>{{ _('Registered accounts') }}</h2>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <td>{{ _('Email') }}</td>
+      <td>{{ _('Action') }}</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for user in users %}
+  <tr>
+    <td>
+      {{ user.email }}
+    </td>
+    <td>
+      {% if user.is_active %}
+      <a class="btn btn-default" href="{{ url_for('suspend', userid=user.get_id()) }}">{{ _('Suspend') }}</a>
+      {% else %}
+      <a class="btn btn-danger" href="{{ url_for('unsuspend', userid=user.get_id()) }}">{{ _('Activate') }}</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

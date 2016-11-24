@@ -18,6 +18,7 @@ from opwen_email_client.config import AppConfig
 from opwen_email_client.config import i8n
 from opwen_email_client.crons import emails_sync
 from opwen_email_client.forms import NewEmailForm
+from opwen_email_client.login import User
 from opwen_email_client.login import admin_required
 from opwen_email_client.login import login_required
 from opwen_infrastructure.pagination import Pagination
@@ -146,6 +147,44 @@ def sync():
 
     flash(i8n.SYNC_COMPLETE, category='success')
     return redirect(url_for('home'))
+
+
+@app.route('/admin')
+@admin_required
+def admin():
+    return render_template('admin.html', users=User.query.all())
+
+
+@app.route('/admin/suspend/<userid>')
+@admin_required
+def suspend(userid):
+    user = User.query.filter_by(id=userid).first()
+
+    if user is None:
+        flash(i8n.USER_DOES_NOT_EXIST, category='error')
+        return redirect(url_for('admin'))
+
+    user.active = False
+    user.save()
+
+    flash(i8n.USER_SUSPENDED, category='success')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/unsuspend/<userid>')
+@admin_required
+def unsuspend(userid):
+    user = User.query.filter_by(id=userid).first()
+
+    if user is None:
+        flash(i8n.USER_DOES_NOT_EXIST, category='error')
+        return redirect(url_for('admin'))
+
+    user.active = True
+    user.save()
+
+    flash(i8n.USER_UNSUSPENDED, category='success')
+    return redirect(url_for('admin'))
 
 
 @app.errorhandler(404)

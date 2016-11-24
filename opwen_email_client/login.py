@@ -45,6 +45,10 @@ class User(_db.Model, UserMixin):
         """
         return self.has_role('admin')
 
+    def save(self):
+        _db.session.add(self)
+        _db.session.commit()
+
 
 class Role(_db.Model, RoleMixin):
     id = _db.Column(_db.Integer(), primary_key=True)
