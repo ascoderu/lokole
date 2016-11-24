@@ -93,8 +93,6 @@ running the tests.
   pip install -r requirements.txt
 
   npm install
-  bower install
-
   grunt
 
   pip install nose
