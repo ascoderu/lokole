@@ -95,6 +95,8 @@ running the tests.
   npm install
   bower install
 
+  grunt
+
   pip install nose
   nosetests
 
