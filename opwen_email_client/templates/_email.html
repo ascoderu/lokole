@@ -1,7 +1,7 @@
 {% from '_nav.html' import nav_link %}
 
 {% macro email_search_form() %}
-<form class="email-search-form" action="{{ url_for('email_search') }}" method="get">
+<form class="email-search-form" action="{{ url_for('email_search') }}" method="get" style="padding-bottom:1em;">
   <div class="input-group">
     <input type="search" name="query" class="form-control" placeholder="{{ _('Search') }}">
     <div class="input-group-btn">
