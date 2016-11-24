@@ -123,6 +123,9 @@ def register_complete():
 
     send_welcome_email()
 
+    current_user.last_login = datetime.now()
+    current_user.save()
+
     flash(i8n.ACCOUNT_CREATED, category='success')
     return redirect(url_for('email_inbox'))
 
@@ -130,6 +133,9 @@ def register_complete():
 @app.route('/login_complete')
 @login_required
 def login_complete():
+    current_user.last_login = datetime.now()
+    current_user.save()
+
     flash(i8n.LOGGED_IN, category='success')
     return redirect(url_for('home'))
 

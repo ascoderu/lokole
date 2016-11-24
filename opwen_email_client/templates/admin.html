@@ -6,6 +6,7 @@
   <thead>
     <tr>
       <td>{{ _('Email') }}</td>
+      <td>{{ _('Last login') }}</td>
       <td>{{ _('Action') }}</td>
     </tr>
   </thead>
@@ -14,6 +15,9 @@
   <tr>
     <td>
       {{ user.email }}
+    </td>
+    <td>
+      {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
     </td>
     <td>
       {% if user.is_active %}

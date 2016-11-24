@@ -34,6 +34,7 @@ class User(_db.Model, UserMixin):
     email = _db.Column(_db.String(255), unique=True, index=True)
     password = _db.Column(_db.String(255), nullable=False)
     active = _db.Column(_db.Boolean(), default=True)
+    last_login = _db.Column(_db.DateTime())
     roles = _db.relationship('Role', secondary=_roles_users,
                              backref=_db.backref('users', lazy='dynamic'))
 
