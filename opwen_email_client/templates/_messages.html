@@ -1,6 +1,6 @@
 {% macro render_flashed_error(message) %}
 <div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+  <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
   <span class="sr-only">{{ _('Error') }}:</span>
   {{ message }}
 </div>
@@ -8,7 +8,7 @@
 
 {% macro render_flashed_info(message) %}
 <div class="alert alert-info" role="alert">
-  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+  <span class="fa fa-info-circle" aria-hidden="true"></span>
   <span class="sr-only">{{ _('Information') }}:</span>
   {{ message }}
 </div>
@@ -16,7 +16,7 @@
 
 {% macro render_flashed_success(message) %}
 <div class="alert alert-success" role="alert">
-  <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+  <span class="fa fa-check-circle" aria-hidden="true"></span>
   <span class="sr-only">{{ _('Success') }}:</span>
   {{ message }}
 </div>

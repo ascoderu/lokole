@@ -37,13 +37,6 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['bower_components/bootstrap/fonts/*'],
-            dest:'opwen_email_client/static/fonts/',
-            filter: 'isFile'
-          },
-          {
-            expand: true,
-            flatten: true,
             src: ['bower_components/components-font-awesome/fonts/*'],
             dest:'opwen_email_client/static/fonts/',
             filter: 'isFile'
