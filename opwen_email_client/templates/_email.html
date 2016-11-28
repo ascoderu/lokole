@@ -23,7 +23,13 @@
           <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}">
             <div class="row">
               <div class="col-sm-3">
-                <span class="email-sent-to">{{ email['to'] | join(', ') }}</span>
+                <span class="email-sent-to">
+                  {% if email['from'] == current_user.email %}
+                    {{ email['to'] | join(', ') }}
+                  {% else %}
+                    {{ email['from'] }}
+                  {% endif %}
+                </span>
               </div>
               <div class="col-sm-3">
                 <span class="email-sent-by">{{ email['sender'] }}</span>
