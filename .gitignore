@@ -2,8 +2,9 @@
 
 bower_components/
 node_modules/
-*.min.js
-*.min.css
+opwen_email_client/static/css
+opwen_email_client/static/js
+opwen_email_client/static/fonts
 
 *.pyc
 /build/
