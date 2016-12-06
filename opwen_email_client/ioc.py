@@ -5,7 +5,7 @@ from flask import Flask
 from flask_babel import Babel
 from opwen_domain.email.base64 import Base64AttachmentEncoder
 from opwen_domain.email.tinydb import TinyDbEmailStore
-from opwen_domain.sync.azure import AzureBlobAuth
+from opwen_domain.sync.azure import AzureAuth
 from opwen_domain.sync.azure import AzureSync
 from opwen_infrastructure.serialization.json import JsonSerializer
 
@@ -18,7 +18,7 @@ class Ioc(object):
         store_location=AppConfig.LOCAL_EMAIL_STORE)
 
     email_sync = AzureSync(
-        auth=AzureBlobAuth(
+        auth=AzureAuth(
             account=AppConfig.STORAGE_ACCOUNT_NAME,
             key=AppConfig.STORAGE_ACCOUNT_KEY,
             container=AppConfig.STORAGE_CONTAINER),
