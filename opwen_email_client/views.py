@@ -36,12 +36,12 @@ def favicon():
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    return _view('home.html')
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return _view('about.html')
 
 
 @app.route('/email')
@@ -97,7 +97,7 @@ def email_new():
         email_store.create([form.as_dict(attachment_encoder)])
         flash(i8n.EMAIL_SENT, category='success')
 
-    return render_template('email_new.html', form=form)
+    return _view('email_new.html', form=form)
 
 
 @app.route('/attachment/<attachment_id>', methods=['GET'])
@@ -161,10 +161,10 @@ def sync():
 def admin():
     email_store = app.ioc.email_store
 
-    return render_template('admin.html',
-                           users=User.query.all(),
-                           pending_emails=length(email_store.pending()),
-                           sync_time=AppConfig.EMAIL_SYNC_HOUR_UTC)
+    return _view('admin.html',
+                 users=User.query.all(),
+                 pending_emails=length(email_store.pending()),
+                 sync_time=AppConfig.EMAIL_SYNC_HOUR_UTC)
 
 
 @app.route('/admin/suspend/<userid>')
@@ -234,4 +234,8 @@ def _emails_view(emails, page, template='email.html'):
 
     emails = Pagination(emails, page, AppConfig.EMAILS_PER_PAGE)
     attachments_session.store(emails)
-    return render_template(template, emails=emails, page=page)
+    return _view(template, emails=emails, page=page)
+
+
+def _view(template, **kwargs):
+    return render_template(template, **kwargs)
