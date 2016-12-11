@@ -2,6 +2,7 @@ from logging import ERROR
 from os import path
 from tempfile import gettempdir
 
+from babel import Locale
 from flask_babel import gettext as _
 
 from opwen_domain.config import OpwenConfig
@@ -65,3 +66,9 @@ class AppConfig(OpwenConfig):
 
     LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(pathname)s:%(lineno)d\t%(message)s'
     LOG_LEVEL = ERROR
+
+    DEFAULT_LOCALE = Locale.parse('en_ca')
+    LOCALES = [Locale.parse(code) for code in (
+        'en_ca',
+        'fr_fr',
+    )]

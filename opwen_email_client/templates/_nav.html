@@ -1,3 +1,5 @@
+{% from '_flag.html' import render_flag %}
+
 {% macro nav_link_security(endpoint, text) %}
 <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
   <a href="{{ url_for_security(endpoint) }}">{{ text }}</a>
@@ -7,6 +9,22 @@
 {% macro nav_link(endpoint, text, level) %}
 <li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
   <a href="{{ url_for(endpoint) }}">{{ text }}</a>
+</li>
+{% endmacro %}
+
+{% macro language_switcher() %}
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+    {{ render_flag(current_locale) }}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu">
+    {% for locale in locales | rejectattr('language', 'equalto', current_locale.language) %}
+    <li><a href="{{ url_for('language', locale=locale.language) }}">
+      {{ render_flag(locale) }} {{ locale.language_name | capitalize }}
+    </a></li>
+    {% endfor %}
+  </ul>
 </li>
 {% endmacro %}
 
@@ -27,6 +45,7 @@
         {{ nav_link('email_inbox', _('Email'), level=0) }}
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        {{ language_switcher() }}
         {% if current_user.is_authenticated %}
         {{ nav_link_security('logout', _('Logout')) }}
         {% else %}

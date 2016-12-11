@@ -1,6 +1,10 @@
 from collections import namedtuple
 
+from babel import Locale
+from flask import request
 from flask import session
+
+from opwen_email_client.config import AppConfig
 
 
 # noinspection PyClassHasNoInit
@@ -70,3 +74,46 @@ class AttachmentsStore(object):
             return None
 
         return FileInfo(name=filename, content=self._attachment_encoder.decode(content))
+
+
+class Session(object):
+    _current_locale_key = 'current_locale'
+    _last_visited_url_key = 'last_visited_url'
+
+    @classmethod
+    def _session(cls):
+        """
+        :rtype: dict[str, str]
+
+        """
+        return session or {}
+
+    @classmethod
+    def store_last_visited_url(cls):
+        if request.endpoint not in ('favicon', 'static'):
+            cls._session()[cls._last_visited_url_key] = request.url
+
+    @classmethod
+    def get_last_visited_url(cls):
+        """
+        :rtype: str | None
+
+        """
+        return cls._session().get(cls._last_visited_url_key)
+
+    @classmethod
+    def store_current_locale(cls, locale):
+        """
+        :type locale: str
+
+        """
+        cls._session()[cls._current_locale_key] = locale
+
+    @classmethod
+    def get_current_locale(cls):
+        """
+        :rtype: babel.Locale
+
+        """
+        locale = cls._session().get(cls._current_locale_key)
+        return Locale.parse(locale) if locale else AppConfig.DEFAULT_LOCALE

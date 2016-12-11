@@ -50,6 +50,6 @@ def create_app():
     app.logger.addHandler(logger)
     app.logger.setLevel(AppConfig.LOG_LEVEL)
 
-    Babel(app)
+    app.babel = Babel(app)
 
     return app

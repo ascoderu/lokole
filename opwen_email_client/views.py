@@ -12,6 +12,7 @@ from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
 from opwen_infrastructure.generator import length
+from opwen_infrastructure.pagination import Pagination
 
 from opwen_email_client import app
 from opwen_email_client.actions import SendWelcomeEmail
@@ -22,7 +23,7 @@ from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import User
 from opwen_email_client.login import admin_required
 from opwen_email_client.login import login_required
-from opwen_infrastructure.pagination import Pagination
+from opwen_email_client.session import Session
 
 
 @app.route('/favicon.ico')
@@ -156,6 +157,13 @@ def sync():
     return redirect(url_for('home'))
 
 
+@app.route('/user/language/<locale>')
+@login_required
+def language(locale):
+    Session.store_current_locale(locale)
+    return redirect(Session.get_last_visited_url() or url_for('home'))
+
+
 @app.route('/admin')
 @admin_required
 def admin():
@@ -218,6 +226,25 @@ def _on_500(code_or_exception):
     app.logger.error(code_or_exception)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
+
+
+@app.context_processor
+def _inject_locales():
+    return {
+        'locales': AppConfig.LOCALES,
+        'current_locale': Session.get_current_locale(),
+    }
+
+
+@app.after_request
+def _store_last_visited_url(response):
+    Session.store_last_visited_url()
+    return response
+
+
+@app.babel.localeselector
+def _localeselector():
+    return Session.get_current_locale().language
 
 
 def _emails_view(emails, page, template='email.html'):

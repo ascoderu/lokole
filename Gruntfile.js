@@ -41,6 +41,16 @@ module.exports = function(grunt) {
             dest:'opwen_email_client/static/fonts/',
             filter: 'isFile'
           },
+          {
+            expand: true,
+            flatten: true,
+            src: [
+              'bower_components/flag-icon-css/flags/4x3/ca.svg',
+              'bower_components/flag-icon-css/flags/4x3/fr.svg',
+            ],
+            dest:'opwen_email_client/static/flags/4x3/',
+            filter: 'isFile'
+          },
         ]
       }
     },

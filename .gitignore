@@ -5,6 +5,7 @@ node_modules/
 opwen_email_client/static/css
 opwen_email_client/static/js
 opwen_email_client/static/fonts
+opwen_email_client/static/flags
 
 *.pyc
 /build/
