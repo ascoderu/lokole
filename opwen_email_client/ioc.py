@@ -4,7 +4,7 @@ from logging import StreamHandler
 from flask import Flask
 from flask_babel import Babel
 from opwen_domain.email.base64 import Base64AttachmentEncoder
-from opwen_domain.email.tinydb import TinyDbEmailStore
+from opwen_domain.email.sqlite import SqliteEmailStore
 from opwen_domain.sync.azure import AzureAuth
 from opwen_domain.sync.azure import AzureSync
 from opwen_infrastructure.serialization.json import JsonSerializer
@@ -14,8 +14,11 @@ from opwen_email_client.session import AttachmentsStore
 
 
 class Ioc(object):
-    email_store = TinyDbEmailStore(
-        store_location=AppConfig.LOCAL_EMAIL_STORE)
+    serializer = JsonSerializer()
+
+    email_store = SqliteEmailStore(
+        database_path=AppConfig.LOCAL_EMAIL_STORE,
+        serializer=serializer)
 
     email_sync = AzureSync(
         auth=AzureAuth(
@@ -24,7 +27,7 @@ class Ioc(object):
             container=AppConfig.STORAGE_CONTAINER),
         download_locations=[AppConfig.STORAGE_DOWNLOAD_PATH],
         upload_locations=[AppConfig.STORAGE_UPLOAD_PATH],
-        serializer=JsonSerializer())
+        serializer=serializer)
 
     attachment_encoder = Base64AttachmentEncoder()
 
