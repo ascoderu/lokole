@@ -23,6 +23,7 @@ class i8n(object):
     LOGGED_OUT = _('You have logged out successfully.')
     LOKOLE_TEAM = _('Lokole Team')
     WELCOME = _('Welcome!')
+    EMAIL_CHARACTERS = _('Please only use letters, numbers, dots and dashes.')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
     ACCOUNT_SUSPENDED = _('Your account has been suspended. Please contact your administrator.')
     SYNC_COMPLETE = _('Email synchronization completed.')

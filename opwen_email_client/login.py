@@ -15,11 +15,13 @@ from flask_security.forms import unique_user_email
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
+from wtforms.validators import Regexp
 
 from opwen_infrastructure.wtforms import SuffixedStringField
 
 from opwen_email_client import app
 from opwen_email_client.config import AppConfig
+from opwen_email_client.config import i8n
 
 _db = SQLAlchemy(app)
 
@@ -69,7 +71,8 @@ class LoginForm(_LoginForm):
 class RegisterForm(_RegisterForm):
     email = SuffixedStringField(
         suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
-        validators=[email_required, email_validator, unique_user_email])
+        validators=[Regexp('^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS),
+                    email_required, email_validator, unique_user_email])
 
 
 user_datastore = SQLAlchemyUserDatastore(_db, User, Role)
