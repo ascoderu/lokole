@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-11-19 21:16-0800\n"
+"POT-Creation-Date: 2016-12-11 12:56-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,64 +17,84 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: opwen_email_client/config.py:15
+#: opwen_email_client/config.py:19
 msgid "Please log in to access this page."
 msgstr ""
 
-#: opwen_email_client/config.py:16
+#: opwen_email_client/config.py:20
 msgid "You do not have permission to view this page."
 msgstr ""
 
-#: opwen_email_client/config.py:17
+#: opwen_email_client/config.py:21
 msgid "Invalid password."
 msgstr ""
 
-#: opwen_email_client/config.py:18
+#: opwen_email_client/config.py:22
 msgid "The password must have at least 6 characters."
 msgstr ""
 
-#: opwen_email_client/config.py:19
+#: opwen_email_client/config.py:23
 msgid "Email sent!"
 msgstr ""
 
-#: opwen_email_client/config.py:20
+#: opwen_email_client/config.py:24
 msgid "Invalid email address."
 msgstr ""
 
-#: opwen_email_client/config.py:21
+#: opwen_email_client/config.py:25
 msgid "Please specify a recipient."
 msgstr ""
 
-#: opwen_email_client/config.py:22
+#: opwen_email_client/config.py:26
 msgid "You are now logged in."
 msgstr ""
 
-#: opwen_email_client/config.py:23
+#: opwen_email_client/config.py:27
 msgid "You have logged out successfully."
 msgstr ""
 
-#: opwen_email_client/config.py:24
+#: opwen_email_client/config.py:28
 msgid "Lokole Team"
 msgstr ""
 
-#: opwen_email_client/config.py:25
+#: opwen_email_client/config.py:29
 msgid "Welcome!"
 msgstr ""
 
-#: opwen_email_client/config.py:26
+#: opwen_email_client/config.py:30
+msgid "Please only use letters, numbers, dots and dashes."
+msgstr ""
+
+#: opwen_email_client/config.py:31
 msgid "Your Lokole account has been created successfully!"
 msgstr ""
 
-#: opwen_email_client/config.py:27
+#: opwen_email_client/config.py:32
+msgid "Your account has been suspended. Please contact your administrator."
+msgstr ""
+
+#: opwen_email_client/config.py:33
 msgid "Email synchronization completed."
 msgstr ""
 
-#: opwen_email_client/config.py:28
+#: opwen_email_client/config.py:34
 msgid "Unexpected error. Please contact your admin."
 msgstr ""
 
-#: opwen_email_client/config.py:29
+#: opwen_email_client/config.py:35
 msgid "This page does not exist."
+msgstr ""
+
+#: opwen_email_client/config.py:36
+msgid "This user does not exist."
+msgstr ""
+
+#: opwen_email_client/config.py:37
+msgid "The user was suspended."
+msgstr ""
+
+#: opwen_email_client/config.py:38
+msgid "The user was un-suspended."
 msgstr ""
 
 #: opwen_email_client/templates/_account_finalized.html:1
@@ -118,15 +138,15 @@ msgid "Your Lokole Team"
 msgstr ""
 
 #: opwen_email_client/templates/_email.html:6
-#: opwen_email_client/templates/_nav.html:51
+#: opwen_email_client/templates/_nav.html:70
 msgid "Search"
 msgstr ""
 
-#: opwen_email_client/templates/_email.html:77
+#: opwen_email_client/templates/_email.html:83
 msgid "Previous results"
 msgstr ""
 
-#: opwen_email_client/templates/_email.html:82
+#: opwen_email_client/templates/_email.html:88
 msgid "Next results"
 msgstr ""
 
@@ -142,55 +162,60 @@ msgstr ""
 msgid "Success"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:18
+#: opwen_email_client/templates/_nav.html:36
 msgid "Toggle navigation"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:21
+#: opwen_email_client/templates/_nav.html:39
 msgid "Ascoderu"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:25
+#: opwen_email_client/templates/_nav.html:43
 msgid "Home"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:26
+#: opwen_email_client/templates/_nav.html:44
 msgid "About"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:27
+#: opwen_email_client/templates/_nav.html:45
+#: opwen_email_client/templates/admin.html:8
 msgid "Email"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:31
+#: opwen_email_client/templates/_nav.html:50
 msgid "Logout"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:33
+#: opwen_email_client/templates/_nav.html:52
 #: opwen_email_client/templates/login.html:7
 #: opwen_email_client/templates/login.html:13
 msgid "Login"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:34
+#: opwen_email_client/templates/_nav.html:53
 #: opwen_email_client/templates/register.html:7
 #: opwen_email_client/templates/register.html:14
 msgid "Register"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:47
+#: opwen_email_client/templates/_nav.html:56
+msgid "Admin panel"
+msgstr ""
+
+#: opwen_email_client/templates/_nav.html:66
 msgid "Inbox"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:48
+#: opwen_email_client/templates/_nav.html:67
 msgid "Sent"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:49
+#: opwen_email_client/templates/_nav.html:68
 msgid "Outbox"
 msgstr ""
 
-#: opwen_email_client/templates/_nav.html:50
+#: opwen_email_client/templates/_nav.html:69
 msgid "Write email"
 msgstr ""
 
@@ -270,6 +295,41 @@ msgid ""
 "projects."
 msgstr ""
 
+#: opwen_email_client/templates/admin.html:4
+msgid "Registered accounts"
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:9
+msgid "Last login"
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:10
+msgid "Action"
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:24
+msgid "Suspend"
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:26
+msgid "Activate"
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:34
+msgid "Email status"
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:36
+#, python-format
+msgid ""
+"The next sync is scheduled for %(hour)d:00 UTC and will upload %(num)d "
+"email(s)."
+msgstr ""
+
+#: opwen_email_client/templates/admin.html:38
+msgid "Sync now"
+msgstr ""
+
 #: opwen_email_client/templates/email.html:8
 msgid "No emails."
 msgstr ""
@@ -343,7 +403,7 @@ msgid "Email for all"
 msgstr ""
 
 #: opwen_email_client/templates/home.html:12
-msgid "People using a computer in Africa."
+msgid "Lokole logo."
 msgstr ""
 
 #: opwen_email_client/templates/home.html:15
