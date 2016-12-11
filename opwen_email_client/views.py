@@ -11,6 +11,7 @@ from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
+from opwen_infrastructure.generator import length
 
 from opwen_email_client import app
 from opwen_email_client.actions import SendWelcomeEmail
@@ -162,7 +163,7 @@ def admin():
 
     return render_template('admin.html',
                            users=User.query.all(),
-                           pending_emails=len(email_store.pending()),
+                           pending_emails=length(email_store.pending()),
                            sync_time=AppConfig.EMAIL_SYNC_HOUR_UTC)
 
 
