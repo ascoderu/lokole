@@ -1,7 +1,13 @@
 import sys
+from logging import getLogger
 
 from babel.messages.frontend import CommandLineInterface
 from flask_script import Command
+
+from opwen_email_client.actions import SyncEmails
+from opwen_email_client.config import AppConfig
+from opwen_email_client.ioc import Ioc
+from opwen_infrastructure.cron import CronCommandMixin
 
 
 class BabelCommand(Command):
@@ -17,3 +23,22 @@ class BabelCommand(Command):
         args.insert(0, sys.argv[0])
         cli = CommandLineInterface()
         cli.run(args)
+
+
+class SyncDaemonCommand(CronCommandMixin, Command):
+    def __init__(self):
+        sync_hour = str(AppConfig.EMAIL_SYNC_HOUR_UTC)
+
+        logger = getLogger()
+        logger.setLevel(AppConfig.LOG_LEVEL)
+        logger.info('Setting up Opwen email sync for {} UTC'.format(sync_hour))
+
+        CronCommandMixin.__init__(
+            self=self,
+            func=SyncEmails(
+                email_sync=Ioc.email_sync,
+                email_store=Ioc.email_store,
+                internet_interface=AppConfig.INTERNET_INTERFACE_NAME),
+            description='Sync Opwen emails at {} UTC'.format(sync_hour),
+            scheduled_hour=sync_hour,
+            logger=logger)

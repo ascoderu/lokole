@@ -16,9 +16,9 @@ from opwen_infrastructure.pagination import Pagination
 
 from opwen_email_client import app
 from opwen_email_client.actions import SendWelcomeEmail
+from opwen_email_client.actions import SyncEmails
 from opwen_email_client.config import AppConfig
 from opwen_email_client.config import i8n
-from opwen_email_client.crons import emails_sync
 from opwen_email_client.forms import NewEmailForm
 from opwen_email_client.login import User
 from opwen_email_client.login import admin_required
@@ -151,7 +151,12 @@ def logout_complete():
 @app.route('/sync')
 @admin_required
 def sync():
-    emails_sync()
+    sync_emails = SyncEmails(
+        email_sync=app.ioc.email_sync,
+        email_store=app.ioc.email_store,
+        internet_interface=AppConfig.INTERNET_INTERFACE_NAME)
+
+    sync_emails()
 
     flash(i8n.SYNC_COMPLETE, category='success')
     return redirect(url_for('home'))
