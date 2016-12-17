@@ -212,9 +212,10 @@ def unsuspend(userid):
     return redirect(url_for('admin'))
 
 
+# noinspection PyUnusedLocal
 @app.errorhandler(404)
 def _on_404(code_or_exception):
-    app.logger.error(code_or_exception)
+    app.logger.warning('404: %s', request.path)
     flash(i8n.PAGE_DOES_NOT_EXIST, category='error')
     return redirect(url_for('home'))
 
