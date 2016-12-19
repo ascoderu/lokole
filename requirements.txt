@@ -8,4 +8,4 @@ bcrypt==3.1.0
 Flask-Testing==0.5.0
 tzlocal==1.2.2
 Flask-Script==2.0.5
-opwen_shared==0.0.16
+opwen_shared==0.0.20
