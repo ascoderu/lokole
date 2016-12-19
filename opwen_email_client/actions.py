@@ -17,12 +17,19 @@ class SyncEmails(object):
         self._email_sync = email_sync
         self._internet_interface = internet_interface
 
+    def _upload(self):
+        pending = self._email_store.pending()
+        uploaded = self._email_sync.upload([pending])
+        self._email_store.mark_sent(uploaded)
+
+    def _download(self):
+        downloaded = self._email_sync.download()
+        self._email_store.create(downloaded)
+
     def __call__(self):
         with use_network_interface(self._internet_interface):
-            pending = self._email_store.pending()
-            uploaded = self._email_sync.upload([pending])
-            self._email_store.mark_sent(uploaded)
-            self._email_store.create(self._email_sync.download())
+            self._upload()
+            self._download()
 
 
 class SendWelcomeEmail(object):
