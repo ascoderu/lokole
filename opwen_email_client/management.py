@@ -1,4 +1,5 @@
 import sys
+from logging import StreamHandler
 from logging import getLogger
 
 from babel.messages.frontend import CommandLineInterface
@@ -28,7 +29,10 @@ class BabelCommand(Command):
 
 class SyncDaemonCommand(CronCommandMixin, Command):
     def __init__(self):
-        logger = getLogger()
+        logger = getLogger(self.__class__.__name__)
+        handler = StreamHandler()
+        handler.setFormatter(AppConfig.LOG_FORMAT)
+        logger.addHandler(handler)
         logger.setLevel(AppConfig.LOG_LEVEL)
 
         CronCommandMixin.__init__(
