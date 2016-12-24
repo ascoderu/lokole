@@ -45,9 +45,9 @@ def create_app():
     app.config.from_object(AppConfig)
     app.ioc = Ioc()
 
-    logger = StreamHandler()
-    logger.setFormatter(Formatter(AppConfig.LOG_FORMAT))
-    app.logger.addHandler(logger)
+    handler = StreamHandler()
+    handler.setFormatter(Formatter(AppConfig.LOG_FORMAT))
+    app.logger.addHandler(handler)
     app.logger.setLevel(AppConfig.LOG_LEVEL)
 
     app.babel = Babel(app)
