@@ -53,7 +53,7 @@ class NewEmailForm(Form):
         :type email: dict
 
         """
-        self.to.data = self._join_emails(email.get('from'), *email.get('cc', []))
+        self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
 
     def _handle_forward(self, email):
@@ -96,45 +96,12 @@ class NewEmailForm(Form):
         form.pop('submit', None)
         form['sent_at'] = None
         form['from'] = current_user.email
-        form['to'] = self._split_emails(form.get('to'))
-        form['cc'] = self._split_emails(form.get('cc'))
-        form['bcc'] = self._split_emails(form.get('bcc'))
+        form['to'] = _split_emails(form.get('to'))
+        form['cc'] = _split_emails(form.get('cc'))
+        form['bcc'] = _split_emails(form.get('bcc'))
         form['body'] = form.get('body')
-        form['attachments'] = list(self._attachments_as_dict(attachments, attachment_encoder))
+        form['attachments'] = list(_attachments_as_dict(attachments, attachment_encoder))
         return form
-
-    @classmethod
-    def _join_emails(cls, *emails):
-        """
-        :type emails: list[str]
-        :rtype: str
-
-        """
-        return ', '.join(filter(None, emails))
-
-    @classmethod
-    def _split_emails(cls, emails):
-        """
-        :type emails: str | None
-        :rtype: list[str]
-
-        """
-        return list(map(str.strip, emails.split(','))) if emails else []
-
-    @classmethod
-    def _attachments_as_dict(cls, filestorages, attachment_encoder):
-        """
-        :type filestorages: collections.Iterable[werkzeug.datastructures.FileStorage]
-        :type attachment_encoder: opwen_domain.email.interfaces.AttachmentEncoder
-        :rtype: collections.Iterable[dict]
-
-        """
-        for filestorage in filestorages:
-            filename = filestorage.filename
-            content = attachment_encoder.encode(filestorage.stream.read())
-            if filename and content:
-                yield {'filename': filename,
-                       'content': content}
 
     @classmethod
     def from_request(cls, email_store):
@@ -146,3 +113,35 @@ class NewEmailForm(Form):
         form = cls(request.form)
         form.handle_action(email_store)
         return form
+
+
+def _attachments_as_dict(filestorages, attachment_encoder):
+    """
+    :type filestorages: collections.Iterable[werkzeug.datastructures.FileStorage]
+    :type attachment_encoder: opwen_domain.email.interfaces.AttachmentEncoder
+    :rtype: collections.Iterable[dict]
+
+    """
+    for filestorage in filestorages:
+        filename = filestorage.filename
+        content = attachment_encoder.encode(filestorage.stream.read())
+        if filename and content:
+            yield {'filename': filename, 'content': content}
+
+
+def _join_emails(*emails):
+    """
+    :type emails: list[str]
+    :rtype: str
+
+    """
+    return ', '.join(filter(None, emails))
+
+
+def _split_emails(emails):
+    """
+    :type emails: str | None
+    :rtype: list[str]
+
+    """
+    return list(map(str.strip, emails.split(','))) if emails else []
