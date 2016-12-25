@@ -62,7 +62,7 @@ class NewEmailForm(Form):
 
         """
         self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
-        self.body.data = render_template('_forwarded.html', email=email)
+        self.body.data = render_template('emails/forward.html', email=email)
 
     def handle_action(self, email_store):
         """

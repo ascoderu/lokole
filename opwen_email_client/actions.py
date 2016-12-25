@@ -50,5 +50,5 @@ class SendWelcomeEmail(object):
             'to': [self._to],
             'from': 'info@ascoderu.ca',
             'subject': i8n.WELCOME,
-            'body': render_template('_account_finalized.html', email=self._to),
+            'body': render_template('emails/account_finalized.html', email=self._to),
         }])
