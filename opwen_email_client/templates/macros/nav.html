@@ -1,4 +1,4 @@
-{% from '_flag.html' import render_flag %}
+{% from 'macros/flag.html' import render_flag %}
 
 {% macro nav_link_security(endpoint, text) %}
 <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">

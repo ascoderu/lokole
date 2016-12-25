@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 
-{% from '_email.html' import email_display with context %}
-{% from '_nav.html' import email_subnav with context %}
+{% from 'macros/email.html' import email_display with context %}
+{% from 'macros/nav.html' import email_subnav with context %}
 
 {% block content %}
 {{ email_subnav() }}
