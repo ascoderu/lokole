@@ -52,6 +52,20 @@ class User(_db.Model, UserMixin):
         _db.session.add(self)
         _db.session.commit()
 
+    def can_access(self, email):
+        """
+        :type email: dict
+        :rtype: bool
+
+        """
+        actors = set()
+        actors.add(email.get('from'))
+        actors.update(email.get('to', []))
+        actors.update(email.get('cc', []))
+        actors.update(email.get('bcc', []))
+
+        return self.email in actors
+
 
 class Role(_db.Model, RoleMixin):
     id = _db.Column(_db.Integer(), primary_key=True)

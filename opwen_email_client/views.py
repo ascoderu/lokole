@@ -92,7 +92,8 @@ def email_search(page):
 def email_new():
     email_store = app.ioc.email_store
     attachment_encoder = app.ioc.attachment_encoder
-    form = NewEmailForm.from_request()
+
+    form = NewEmailForm.from_request(email_store)
 
     if form.validate_on_submit():
         email_store.create([form.as_dict(attachment_encoder)])

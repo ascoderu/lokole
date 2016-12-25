@@ -48,7 +48,7 @@ class SendWelcomeEmail(object):
         self._email_store.create([{
             'sent_at': self._time.strftime("%Y-%m-%d %H:%M"),
             'to': [self._to],
-            'from': i8n.LOKOLE_TEAM,
+            'from': 'info@ascoderu.ca',
             'subject': i8n.WELCOME,
             'body': render_template('_account_finalized.html', email=self._to),
         }])

@@ -1,3 +1,4 @@
+from flask import render_template
 from flask import request
 from flask_login import current_user
 from flask_wtf import Form
@@ -39,15 +40,50 @@ class NewEmailForm(Form):
 
     submit = SubmitField()
 
-    def set_fields_from_request(self, *fields):
+    def _handle_reply(self, email):
         """
-        :type fields: list[str]
+        :type email: dict
 
         """
-        for field in fields:
-            value = request.args.get(field)
-            if value:
-                getattr(self, field).data = value
+        self.to.data = email.get('from', '')
+        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+
+    def _handle_reply_all(self, email):
+        """
+        :type email: dict
+
+        """
+        self.to.data = self._join_emails(email.get('from'), *email.get('cc', []))
+        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+
+    def _handle_forward(self, email):
+        """
+        :type email: dict
+
+        """
+        self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
+        self.body.data = render_template('_forwarded.html', email=email)
+
+    def handle_action(self, email_store):
+        """
+        :type email_store: opwen_domain.email.EmailStore
+
+        """
+        uid = request.args.get('uid')
+        action = request.args.get('action')
+        if not uid or not action:
+            return
+
+        reference = email_store.get(uid)
+        if not reference or not current_user.can_access(reference):
+            return
+
+        if action == 'reply':
+            self._handle_reply(reference)
+        elif action == 'reply_all':
+            self._handle_reply_all(reference)
+        elif action == 'forward':
+            self._handle_forward(reference)
 
     def as_dict(self, attachment_encoder):
         """
@@ -68,13 +104,22 @@ class NewEmailForm(Form):
         return form
 
     @classmethod
+    def _join_emails(cls, *emails):
+        """
+        :type emails: list[str]
+        :rtype: str
+
+        """
+        return ', '.join(filter(None, emails))
+
+    @classmethod
     def _split_emails(cls, emails):
         """
         :type emails: str | None
         :rtype: list[str]
 
         """
-        return list(map(str.strip, emails.split(';'))) if emails else []
+        return list(map(str.strip, emails.split(','))) if emails else []
 
     @classmethod
     def _attachments_as_dict(cls, filestorages, attachment_encoder):
@@ -92,11 +137,12 @@ class NewEmailForm(Form):
                        'content': content}
 
     @classmethod
-    def from_request(cls):
+    def from_request(cls, email_store):
         """
+        :type email_store: opwen_domain.email.EmailStore
         :rtype: opwen_web.forms.NewEmailForm
 
         """
         form = cls(request.form)
-        form.set_fields_from_request('to', 'subject')
+        form.handle_action(email_store)
         return form

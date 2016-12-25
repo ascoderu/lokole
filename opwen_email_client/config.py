@@ -22,7 +22,6 @@ class i8n(object):
     EMAIL_TO_REQUIRED = _('Please specify a recipient.')
     LOGGED_IN = _('You are now logged in.')
     LOGGED_OUT = _('You have logged out successfully.')
-    LOKOLE_TEAM = _('Lokole Team')
     WELCOME = _('Welcome!')
     EMAIL_CHARACTERS = _('Please only use letters, numbers, dots and dashes.')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')

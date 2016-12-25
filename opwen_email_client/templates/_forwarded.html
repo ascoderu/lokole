@@ -1,0 +1,14 @@
+<br>
+<br>
+---------- {{ _('Forwarded message') }} ----------<br>
+{{ _('From') }}: {{ email.get('from', '') }}<br>
+{% if email.get('sent_at') %}
+{{ _('Date') }}: {{ email.get('sent_at') }}<br>
+{% endif %}
+{{ _('Subject') }}: {{ email.get('subject', '') }}<br>
+{{ _('To') }}: {{ email.get('to') | join(', ') }}<br>
+{% if email.get('cc') %}
+{{ _('Cc') }}: {{ email.get('cc') | join(', ') }}<br>
+{% endif %}
+<br>
+{{ email.get('body', '') | replace('\n', '<br>') }}

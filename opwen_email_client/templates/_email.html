@@ -69,6 +69,24 @@
             </div>
           </div>
           {% endif %}
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="btn-group" style="margin-top:1em;">
+                <a class="btn btn-default" title="{{ _('Reply') }}"
+                   href="{{ url_for('email_new', uid=email['_uid'], action='reply') }}">
+                  <span class="fa fa-reply"></span>
+                </a>
+                <a class="btn btn-default" title="{{ _('Reply all') }}"
+                   href="{{ url_for('email_new', uid=email['_uid'], action='reply_all') }}">
+                  <span class="fa fa-reply-all"></span>
+                </a>
+                <a class="btn btn-default" title="{{ _('Forward') }}"
+                   href="{{ url_for('email_new', uid=email['_uid'], action='forward') }}">
+                  <span class="fa fa-share"></span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
