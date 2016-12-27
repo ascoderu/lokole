@@ -26,10 +26,16 @@ class SyncEmails(object):
         downloaded = self._email_sync.download()
         self._email_store.create(downloaded)
 
+    def _sync(self):
+        self._upload()
+        self._download()
+
     def __call__(self):
-        with use_network_interface(self._internet_interface):
-            self._upload()
-            self._download()
+        if self._internet_interface:
+            with use_network_interface(self._internet_interface):
+                self._sync()
+        else:
+            self._sync()
 
 
 class SendWelcomeEmail(object):
