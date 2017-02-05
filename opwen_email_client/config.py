@@ -71,3 +71,5 @@ class AppConfig(OpwenConfig):
         'en_ca',
         'fr_fr',
     )]
+
+    INTERNET_INTERFACE_NAME = getenv('OPWEN_INTERNET_INTERFACE_NAME')
