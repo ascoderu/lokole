@@ -44,4 +44,6 @@ class SyncDaemonCommand(CronCommandMixin, Command):
                 command=SyncEmails(
                     email_sync=Ioc.email_sync,
                     email_store=Ioc.email_store,
-                    internet_interface=AppConfig.INTERNET_INTERFACE_NAME)))
+                    internet_interface=AppConfig.INTERNET_INTERFACE_NAME,
+                    internet_dialup_script=(AppConfig.INTERNET_UP_SCRIPT,
+                                            AppConfig.INTERNET_DOWN_SCRIPT))))

@@ -1,21 +1,23 @@
 from flask import render_template
 
 from opwen_email_client.config import i8n
-
 from opwen_infrastructure.networking import use_network_interface
+from opwen_infrastructure.shell import before_after
 
 
 class SyncEmails(object):
-    def __init__(self, email_store, email_sync, internet_interface):
+    def __init__(self, email_store, email_sync, internet_interface, internet_dialup_script):
         """
         :type email_store: opwen_domain.email.EmailStore
         :type email_sync: opwen_domain.sync.Sync
-        :type internet_interface: str
+        :type internet_interface: str|None
+        :type internet_dialup_script: (str,str)|None
 
         """
         self._email_store = email_store
         self._email_sync = email_sync
         self._internet_interface = internet_interface
+        self._internet_dialup_script = internet_dialup_script
 
     def _upload(self):
         pending = self._email_store.pending()
@@ -31,7 +33,10 @@ class SyncEmails(object):
         self._download()
 
     def __call__(self):
-        if self._internet_interface:
+        if self._internet_dialup_script:
+            with before_after(*self._internet_dialup_script):
+                self._sync()
+        elif self._internet_interface:
             with use_network_interface(self._internet_interface):
                 self._sync()
         else:

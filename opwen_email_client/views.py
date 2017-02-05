@@ -155,7 +155,9 @@ def sync():
     sync_emails = SyncEmails(
         email_sync=app.ioc.email_sync,
         email_store=app.ioc.email_store,
-        internet_interface=AppConfig.INTERNET_INTERFACE_NAME)
+        internet_interface=AppConfig.INTERNET_INTERFACE_NAME,
+        internet_dialup_script=(AppConfig.INTERNET_UP_SCRIPT,
+                                AppConfig.INTERNET_DOWN_SCRIPT))
 
     sync_emails()
 
