@@ -7,8 +7,10 @@ from flask_babel import gettext as _
 
 from opwen_domain.config import OpwenConfig
 from opwen_infrastructure.env import getenv
+from opwen_infrastructure.os import subdirectories
 
 state_basedir = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
+app_basedir = path.abspath(path.dirname(__file__))
 
 
 # noinspection PyPep8Naming
@@ -66,11 +68,9 @@ class AppConfig(OpwenConfig):
     LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(pathname)s:%(lineno)d\t%(message)s'
     LOG_LEVEL = ERROR
 
+    LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')
-    LOCALES = [Locale.parse(code) for code in (
-        'en_ca',
-        'fr_fr',
-    )]
+    LOCALES = [DEFAULT_LOCALE] + [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)]
 
     INTERNET_INTERFACE_NAME = getenv('OPWEN_INTERNET_INTERFACE_NAME')
     INTERNET_UP_SCRIPT = getenv('OPWEN_INTERNET_UP_SCRIPT')
