@@ -72,3 +72,8 @@ class AppConfig(OpwenConfig):
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')
     LOCALES = [DEFAULT_LOCALE] + [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)]
+
+    CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
+    CLIENT_EMAIL_HOST = OpwenConfig.EMAIL_HOST_FORMAT.format(CLIENT_NAME)
+    STORAGE_UPLOAD_PATH = OpwenConfig.STORAGE_UPLOAD_FORMAT.format(CLIENT_NAME)
+    STORAGE_DOWNLOAD_PATH = OpwenConfig.STORAGE_DOWNLOAD_FORMAT.format(CLIENT_NAME)
