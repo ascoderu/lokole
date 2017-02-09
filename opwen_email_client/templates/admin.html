@@ -33,7 +33,7 @@
 
 <h2>{{ _('Email status') }}</h2>
 <p>
-  {{ _('The next sync is scheduled for %(hour)d:00 UTC and will upload %(num)d email(s).', hour=sync_time, num=pending_emails) }}
+  {{ _('The next sync will upload %(num)d email(s).', num=pending_emails) }}
 </p>
 <a class="btn btn-default" href="{{ url_for('sync') }}">{{ _('Sync now') }}</a>
 {% endblock %}

@@ -1,3 +1,4 @@
+# pylint:disable=no-member
 import os
 from datetime import datetime
 from io import BytesIO
@@ -176,8 +177,7 @@ def admin():
 
     return _view('admin.html',
                  users=User.query.all(),
-                 pending_emails=length(email_store.pending()),
-                 sync_time=AppConfig.EMAIL_SYNC_HOUR_UTC)
+                 pending_emails=length(email_store.pending()))
 
 
 @app.route('/admin/suspend/<userid>')
@@ -213,6 +213,7 @@ def unsuspend(userid):
 
 
 # noinspection PyUnusedLocal
+# pylint:disable=unused-argument
 @app.errorhandler(404)
 def _on_404(code_or_exception):
     app.logger.warning('404: %s', request.path)
