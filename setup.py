@@ -15,7 +15,7 @@ packages = find_packages(exclude=['tests*'])
 
 setup(
     name='opwen_email_client',
-    version='0.0.1',
+    version='0.0.2',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
@@ -23,4 +23,5 @@ setup(
     license='LICENSE.txt',
     description='Email client for the Opwen project',
     long_description=long_description,
+    include_package_data=True,
     install_requires=install_requires)
