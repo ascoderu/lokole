@@ -72,7 +72,3 @@ class AppConfig(OpwenConfig):
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')
     LOCALES = [DEFAULT_LOCALE] + [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)]
-
-    INTERNET_INTERFACE_NAME = getenv('OPWEN_INTERNET_INTERFACE_NAME')
-    INTERNET_UP_SCRIPT = getenv('OPWEN_INTERNET_UP_SCRIPT')
-    INTERNET_DOWN_SCRIPT = getenv('OPWEN_INTERNET_DOWN_SCRIPT')
