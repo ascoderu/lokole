@@ -1,8 +1,8 @@
 Opwen webapp
 ============
 
-.. image:: https://travis-ci.org/OPWEN/opwen-webapp.svg?branch=master
-  :target: https://travis-ci.org/OPWEN/opwen-webapp
+.. image:: https://travis-ci.org/ascoderu/opwen-webapp.svg?branch=master
+  :target: https://travis-ci.org/ascoderu/opwen-webapp
 
 .. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
   :target: https://pypi.python.org/pypi/opwen_email_client/
@@ -22,12 +22,12 @@ The Lokole is a simple email client that has functionality like:
 All emails are stored in a local SQLite database. Once per day, the emails that
 were written during the past 24 hours get exported from the database, stored in
 a JSON file, compressed and uploaded to a location on Azure Blob Storage. The
-`Opwen Server <https://github.com/OPWEN/opwen-cloudserver>`_ picks up these JSON
+`Opwen Server <https://github.com/ascoderu/opwen-cloudserver>`_ picks up these JSON
 files, manages the actual mailboxes for the users on the Lokole and sends new
 emails back to the Lokole by using the same compressed file exchange format.
 
 The Lokole web-application is intended to run on low-spec Raspberry Pi 3
-hardware. There is a `script <https://github.com/OPWEN/opwen-setup>`_ to set up
+hardware. There is a `script <https://github.com/ascoderu/opwen-setup>`_ to set up
 the hardware with all the bits and pieces necessary to run the Lokole
 web-application: web server, wsgi server, etc.
 
@@ -69,7 +69,7 @@ to address this problem by tackling it from three perspectives:
 Technical overview
 ------------------
 
-Can be found in the `opwen-shared readme <https://github.com/OPWEN/opwen-shared/blob/master/README.rst>`_.
+Can be found in the `opwen-shared readme <https://github.com/ascoderu/opwen-shared/blob/master/README.rst>`_.
 
 Development setup
 -----------------
@@ -78,7 +78,7 @@ First, get the source code.
 
 .. sourcecode :: sh
 
-  git clone git@github.com:OPWEN/opwen-webapp.git
+  git clone git@github.com:ascoderu/opwen-webapp.git
 
 Second, install the dependencies for the package and verify your checkout by
 running the tests.

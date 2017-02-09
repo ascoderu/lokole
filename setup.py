@@ -19,7 +19,7 @@ setup(
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
-    url='https://github.com/OPWEN/opwen-webapp',
+    url='https://github.com/ascoderu/opwen-webapp',
     license='LICENSE.txt',
     description='Email client for the Opwen project',
     long_description=long_description,
