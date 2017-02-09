@@ -66,7 +66,7 @@ class AppConfig(OpwenConfig):
 
     EMAILS_PER_PAGE = 30
 
-    LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(pathname)s:%(lineno)d\t%(message)s'
+    LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
     LOG_LEVEL = ERROR
 
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
