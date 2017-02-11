@@ -1,10 +1,10 @@
-{% extends "_base.html" %}
+{% extends "_base_email.html" %}
 
 {% from 'macros/form.html' import render_field %}
 {% from 'macros/form.html' import render_button %}
 {% from 'macros/nav.html' import email_subnav with context %}
 
-{% block content %}
+{% block email_content %}
 {{ email_subnav() }}
 
 <form action="{{ url_for('email_new') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
@@ -22,7 +22,7 @@
 </form>
 {% endblock %}
 
-{% block scripts %}
+{% block email_scripts %}
 <script>
   (function() {
     $(document).ready(function() {

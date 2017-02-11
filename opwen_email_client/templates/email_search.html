@@ -1,10 +1,10 @@
-{% extends "_base.html" %}
+{% extends "_base_email.html" %}
 
 {% from 'macros/email.html' import email_display with context %}
 {% from 'macros/email.html' import email_search_form %}
 {% from 'macros/nav.html' import email_subnav with context %}
 
-{% block content %}
+{% block email_content %}
 {{ email_subnav() }}
 
 <div class="row">
