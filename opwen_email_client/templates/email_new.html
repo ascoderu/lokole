@@ -24,61 +24,61 @@
 
 {% block email_scripts %}
 <script>
-  (function() {
-    $(document).ready(function() {
+(function($) {
+  $(document).ready(function() {
 
-      (function styleEmailAttachmentsField() {
-        $("#{{ form.attachments.id }}").fileinput({
-          showPreview: false,
-          showUpload: false,
-          msgSelected: "{n} {{ _('files selected') }}",
-          layoutTemplates: {
-            fileIcon: '<span class="fa fa-file-o"></span>&nbsp;',
-          },
-          removeTitle: "",
-          removeIcon: '<span class="fa fa-trash-o"></span>',
-          removeLabel: "{{ _('Remove') }}",
-          browseLabel: "{{ _('Choose files') }}",
-          browseIcon: '<span class="fa fa-paperclip"></span>',
-          browseClass: 'btn btn-default'
-        });
-      }());
+    (function styleEmailAttachmentsField() {
+      $("#{{ form.attachments.id }}").fileinput({
+        showPreview: false,
+        showUpload: false,
+        msgSelected: "{n} {{ _('files selected') }}",
+        layoutTemplates: {
+          fileIcon: '<span class="fa fa-file-o"></span>&nbsp;',
+        },
+        removeTitle: "",
+        removeIcon: '<span class="fa fa-trash-o"></span>',
+        removeLabel: "{{ _('Remove') }}",
+        browseLabel: "{{ _('Choose files') }}",
+        browseIcon: '<span class="fa fa-paperclip"></span>',
+        browseClass: 'btn btn-default'
+      });
+    }());
 
-      (function turnEmailBodyFieldIntoRichEditor() {
-        $("#{{ form.body.id }}").wysihtml5({
-          toolbar: {
-            "font-styles": false,
-            "link": false,
-            "image": false,
-            "outdent": false,
-            "indent": false,
-            "blockquote": false,
-            "fa": true,
+    (function turnEmailBodyFieldIntoRichEditor() {
+      $("#{{ form.body.id }}").wysihtml5({
+        toolbar: {
+          "font-styles": false,
+          "link": false,
+          "image": false,
+          "outdent": false,
+          "indent": false,
+          "blockquote": false,
+          "fa": true,
+        },
+        customTemplates: {
+          emphasis: function(context) {
+            return '<li><div class="btn-group">'
+                    + '<a title="{{ _('Bold') }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
+                    + '  <span class="fa fa-bold"></span></a>'
+                    + '<a title="{{ _('Italic') }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
+                    + '  <span class="fa fa-italic"></span></a>'
+                    + '<a title="{{ _('Underline') }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
+                    + '  <span class="fa fa-underline"></span></a>'
+                    + '</div></li>';
           },
-          customTemplates: {
-            emphasis: function(context) {
-              return '<li><div class="btn-group">'
-                      + '<a title="{{ _('Bold') }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
-                      + '  <span class="fa fa-bold"></span></a>'
-                      + '<a title="{{ _('Italic') }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
-                      + '  <span class="fa fa-italic"></span></a>'
-                      + '<a title="{{ _('Underline') }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
-                      + '  <span class="fa fa-underline"></span></a>'
-                      + '</div></li>';
-            },
-            lists: function(context) {
-              return '<li><div class="btn-group">'
-                      + '<a title="{{ _('Un-ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
-                      + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'
-                      + '<a title="{{ _('Ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
-                      + '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>'
-                      + '</div></li>';
-            }
+          lists: function(context) {
+            return '<li><div class="btn-group">'
+                    + '<a title="{{ _('Un-ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
+                    + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'
+                    + '<a title="{{ _('Ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
+                    + '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>'
+                    + '</div></li>';
           }
-         });
-       }());
+        }
+       });
+     }());
 
-    });
-   }());
+  });
+ })(window.jQuery);
 </script>
 {% endblock %}

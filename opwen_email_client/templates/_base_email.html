@@ -5,6 +5,7 @@
 
 {% block scripts %}
 <script>
+(function($) {
 $(".panel-info").click(function() {
   var $el = $(this);
   if ($el.hasClass("panel-info")) {
@@ -19,6 +20,7 @@ $(".panel-info").click(function() {
     }
   }
 });
+})(window.jQuery);
 </script>
 
 {% block email_scripts %}{% endblock %}
