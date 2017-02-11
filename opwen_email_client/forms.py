@@ -12,6 +12,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import Optional
 
+from opwen_email_client.config import AppConfig
 from opwen_email_client.config import i8n
 
 
@@ -135,7 +136,8 @@ def _join_emails(*emails):
     :rtype: str
 
     """
-    return ', '.join(filter(None, emails))
+    delimiter = '{0} '.format(AppConfig.EMAIL_ADDRESS_DELIMITER)
+    return delimiter.join(email for email in emails if email)
 
 
 def _split_emails(emails):
@@ -144,4 +146,8 @@ def _split_emails(emails):
     :rtype: list[str]
 
     """
-    return list(map(str.strip, emails.split(','))) if emails else []
+    if not emails:
+        return []
+
+    addresses = emails.split(AppConfig.EMAIL_ADDRESS_DELIMITER)
+    return [address.strip() for address in addresses]

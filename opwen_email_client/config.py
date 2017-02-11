@@ -64,6 +64,7 @@ class AppConfig(OpwenConfig):
 
     LOCAL_EMAIL_STORE = path.join(state_basedir, 'email.store')
 
+    EMAIL_ADDRESS_DELIMITER = ','
     EMAILS_PER_PAGE = 30
 
     LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
