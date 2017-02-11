@@ -96,6 +96,7 @@ class NewEmailForm(Form):
         form = {key: value for (key, value) in self.data.items() if value}
         form.pop('submit', None)
         form['sent_at'] = None
+        form['read'] = True
         form['from'] = current_user.email
         form['to'] = _split_emails(form.get('to'))
         form['cc'] = _split_emails(form.get('cc'))

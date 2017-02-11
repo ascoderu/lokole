@@ -6,4 +6,21 @@
 {% block content %}
 {{ email_subnav() }}
 {{ email_display(emails, _('No emails.')) }}
+
+<script>
+$(".panel-info").click(function() {
+  var $el = $(this);
+  if ($el.hasClass("panel-info")) {
+    var email_id = $el.data("email_id");
+    if (email_id != null) {
+      $.ajax({
+        url: "/email/read/" + email_id,
+        success: function() {
+          $el.removeClass("panel-info").addClass("panel-default");
+        }
+      });
+    }
+  }
+});
+</script>
 {% endblock %}

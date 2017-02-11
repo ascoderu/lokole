@@ -88,6 +88,17 @@ def email_search(page):
     return _emails_view(email_store.search(user.email, query), page, 'email_search.html')
 
 
+@app.route('/email/read/<email_uid>')
+@login_required
+def email_read(email_uid):
+    email_store = app.ioc.email_store
+    user = current_user
+
+    email_store.mark_read(user.email, [email_uid])
+
+    return 'OK'
+
+
 @app.route('/email/new', methods=['GET', 'POST'])
 @login_required
 def email_new():
