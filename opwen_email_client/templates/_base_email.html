@@ -1,5 +1,27 @@
 {% extends "_base.html" %}
 
+{% block style %}
+<style>
+#email-subnav {
+  padding-bottom: 1em;
+}
+
+#email-search-form {
+   padding-bottom: 1em;
+}
+
+.btn-group.email-actions {
+  margin-top: 1em;
+}
+
+.panel-title .email-row {
+  text-decoration: none;
+}
+</style>
+
+{% block email_style %}{% endblock %}
+{% endblock %}
+
 {% block content %}
 {% block email_content %}{% endblock %}
 {% endblock %}

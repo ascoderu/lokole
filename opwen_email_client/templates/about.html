@@ -2,11 +2,16 @@
 
 {% block style %}
 <style>
-  @media screen and (max-width: 768px) {
-    .row .text-left {
-      text-align: center;
-    }
+@media screen and (max-width: 768px) {
+  .row .about-content.text-left {
+    text-align: center;
   }
+}
+
+#team-row {
+  padding-left: 5em;
+  padding-right: 5em;
+}
 </style>
 {% endblock %}
 
@@ -90,7 +95,7 @@
       </div>
     </div>
 
-    <div class="row" style="padding-left:5em;padding-right:5em;">
+    <div class="row" id="team-row">
       <div class="col-sm-4">{{ _meet_nzola() }}</div>
       <div class="col-sm-4">{{ _meet_laura() }}</div>
       <div class="col-sm-4">{{ _meet_clemens() }}</div>
@@ -103,7 +108,7 @@
 <div>
   <img src="{{ url_for('static', filename='images/%s.png' % who.lower()) }}" class="img-responsive img-circle center-block" alt="{{ who }}">
   <h4>{{ who }} <small>{{ roles | join(' & ') }}</small></h4>
-  <p class="text-left">
+  <p class="text-left about-content">
     {{ description }}
   </p>
 </div>

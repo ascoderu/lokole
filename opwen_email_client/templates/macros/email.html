@@ -1,7 +1,7 @@
 {% from 'macros/nav.html' import nav_link %}
 
 {% macro email_search_form() %}
-<form class="email-search-form" action="{{ url_for('email_search') }}" method="get" style="padding-bottom:1em;">
+<form id="email-search-form" action="{{ url_for('email_search') }}" method="get">
   <div class="input-group">
     <input type="search" name="query" class="form-control" placeholder="{{ _('Search') }}" value="{{ request.args.get('query', '') }}">
     <div class="input-group-btn">
@@ -20,7 +20,7 @@
     <div class="panel panel-{{ 'default' if email['read'] else 'info' }}" data-email_id="{{ email['_uid'] }}">
       <div class="panel-heading">
         <h4 class="panel-title">
-          <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" style="text-decoration:none;">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" class="email-row">
             <div class="row">
               <div class="col-sm-3">
                 <span class="email-sent-to">
@@ -71,7 +71,7 @@
           {% endif %}
           <div class="row">
             <div class="col-sm-12">
-              <div class="btn-group" style="margin-top:1em;">
+              <div class="btn-group email-actions">
                 <a class="btn btn-default" title="{{ _('Reply') }}"
                    href="{{ url_for('email_new', uid=email['_uid'], action='reply') }}">
                   <span class="fa fa-reply"></span>

@@ -64,7 +64,7 @@
 {% endmacro %}
 
 {% macro email_subnav() %}
-<ul class="nav nav-pills" style="padding-bottom:1em;">
+<ul class="nav nav-pills" id="email-subnav">
   {{ nav_link('email_inbox', _('Inbox'), level=1) }}
   {{ nav_link('email_sent', _('Sent'), level=1) }}
   {{ nav_link('email_outbox', _('Outbox'), level=1) }}
