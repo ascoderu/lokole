@@ -13,5 +13,5 @@
   </div>
 </div>
 
-{{ email_display(emails, 'No emails matching query.') }}
+{{ email_display(emails, 'No emails matching query.' if request.args.get('query') else '') }}
 {% endblock %}
