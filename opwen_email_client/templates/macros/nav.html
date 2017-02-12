@@ -19,10 +19,12 @@
     <span class="fa fa-caret-down"></span>
   </a>
   <ul class="dropdown-menu">
-    {% for locale in locales | rejectattr('language', 'equalto', current_locale.language) %}
-    <li><a href="{{ url_for('language', locale=locale.language) }}">
-      {{ render_flag(locale) }} {{ locale.language_name | capitalize }}
-    </a></li>
+    {% for locale in locales %}
+    <li class="{{ 'active' if locale.language == current_locale.language else ''}}">
+      <a href="{{ url_for('language', locale=locale.language) }}">
+        {{ render_flag(locale) }} {{ locale.language_name | capitalize }}
+      </a>
+    </li>
     {% endfor %}
   </ul>
 </li>
