@@ -49,7 +49,7 @@
       <ul class="nav navbar-nav navbar-right">
         {{ language_switcher() }}
         {% if current_user.is_authenticated %}
-        {{ nav_link_security('logout', _('Logout')) }}
+        {{ nav_link_security('logout', _('Logout') + ' (' + current_user.email + ')') }}
         {% else %}
         {{ nav_link_security('login', _('Login')) }}
         {{ nav_link_security('register', _('Register')) }}
