@@ -18,6 +18,8 @@
 
   <script type="text/javascript" src="{{ url_for('static', filename='js/app.min.js') }}"></script>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.min.css') }}">
+
+  {% block style %}{% endblock %}
 </head>
 <body>
   <div class="container">

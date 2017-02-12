@@ -1,5 +1,15 @@
 {% extends "_base.html" %}
 
+{% block style %}
+<style>
+  @media screen and (max-width: 768px) {
+    .row .text-left {
+      text-align: center;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
 
