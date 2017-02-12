@@ -1,6 +1,7 @@
 {% extends '_base.html' %}
 
 {% from 'macros/form.html' import render_field %}
+{% from 'macros/form.html' import render_hidden_field %}
 {% from 'macros/form.html' import render_button %}
 
 {% block content %}
@@ -11,6 +12,16 @@
   {{ render_field(register_user_form.email, _('Enter your name')) }}
   {{ render_field(register_user_form.password, _('Choose a password')) }}
   {{ render_field(register_user_form.password_confirm, _('Repeat password')) }}
+  {{ render_hidden_field(register_user_form.timezone_offset_minutes) }}
   {{ render_button(register_user_form.submit, _('Register')) }}
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+var timezoneOffsetMinutes = (new Date()).getTimezoneOffset();
+document.getElementById(register_user_form.timezone_offset_minutes.id).value = timezoneOffsetMinutes;
+})()
+</script>
 {% endblock %}

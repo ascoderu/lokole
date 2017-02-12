@@ -17,6 +17,7 @@ from flask_security.forms import unique_user_email
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
+from wtforms import IntegerField
 from wtforms.validators import Regexp
 
 from opwen_infrastructure.wtforms import SuffixedStringField
@@ -39,6 +40,7 @@ class User(_db.Model, UserMixin):
     password = _db.Column(_db.String(255), nullable=False)
     active = _db.Column(_db.Boolean(), default=True)
     last_login = _db.Column(_db.DateTime())
+    timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False, default=0)
     roles = _db.relationship('Role', secondary=_roles_users,
                              backref=_db.backref('users', lazy='dynamic'))
 
@@ -89,6 +91,8 @@ class RegisterForm(_RegisterForm):
         suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
         validators=[Regexp('^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS),
                     email_required, email_validator, unique_user_email])
+
+    timezone_offset_minutes = IntegerField()
 
 
 user_datastore = SQLAlchemyUserDatastore(_db, User, Role)

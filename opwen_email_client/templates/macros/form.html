@@ -1,3 +1,7 @@
+{% macro render_hidden_field(field) %}
+{{ field(class_='form-control hidden') }}
+{% endmacro %}
+
 {% macro render_field(field, text) %}
 <div class="form-group {{ 'has-error' if field.errors else ''}}">
   {{ field.label(class_='control-label', text=text) }}

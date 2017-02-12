@@ -1,6 +1,7 @@
 # pylint:disable=no-member
 import os
 from datetime import datetime
+from datetime import timedelta
 from io import BytesIO
 
 from flask import abort
@@ -273,11 +274,19 @@ def _emails_view(emails, page, template='email.html'):
 
     """
     attachments_session = app.ioc.attachments_session
+    timezone_offset = timedelta(minutes=current_user.timezone_offset_minutes)
 
     if page < 1:
         abort(404)
 
     emails = Pagination(emails, page, AppConfig.EMAILS_PER_PAGE)
+
+    for email in emails:
+        sent_at = email.get('sent_at')
+        if sent_at:
+            sent_at = datetime.strptime(sent_at, '%Y-%m-%d %H:%M')
+            email['sent_at'] = (sent_at - timezone_offset).strftime('%Y-%m-%d %H:%M')
+
     attachments_session.store(emails)
     return _view(template, emails=emails, page=page)
 
