@@ -7,7 +7,9 @@ from flask_babel import gettext as _
 
 from opwen_domain.config import OpwenConfig
 from opwen_infrastructure.env import getenv
-from opwen_infrastructure.os import subdirectories
+
+from opwen_email_client.util.os import subdirectories
+
 
 state_basedir = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
 app_basedir = path.abspath(path.dirname(__file__))

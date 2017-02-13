@@ -20,11 +20,11 @@ from sqlalchemy.exc import OperationalError
 from wtforms import IntegerField
 from wtforms.validators import Regexp
 
-from opwen_infrastructure.wtforms import SuffixedStringField
-
+from opwen_email_client.util.wtforms import SuffixedStringField
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
+
 
 _db = SQLAlchemy(app)
 

@@ -9,9 +9,8 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import Optional
 
-from opwen_infrastructure.wtforms import EmailField
-from opwen_infrastructure.wtforms import HtmlTextAreaField
-
+from opwen_email_client.util.wtforms import EmailField
+from opwen_email_client.util.wtforms import HtmlTextAreaField
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 

@@ -14,9 +14,8 @@ from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
 
-from opwen_infrastructure.generator import length
-from opwen_infrastructure.pagination import Pagination
-
+from opwen_email_client.util.generator import length
+from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.actions import SendWelcomeEmail
 from opwen_email_client.webapp.actions import SyncEmails
