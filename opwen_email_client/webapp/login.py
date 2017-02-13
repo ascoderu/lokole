@@ -22,9 +22,9 @@ from wtforms.validators import Regexp
 
 from opwen_infrastructure.wtforms import SuffixedStringField
 
-from opwen_email_client import app
-from opwen_email_client.config import AppConfig
-from opwen_email_client.config import i8n
+from opwen_email_client.webapp import app
+from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.config import i8n
 
 _db = SQLAlchemy(app)
 

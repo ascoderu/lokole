@@ -3,14 +3,15 @@ from logging import StreamHandler
 
 from flask import Flask
 from flask_babel import Babel
+
 from opwen_domain.email.base64 import Base64AttachmentEncoder
 from opwen_domain.email.sqlite import SqliteEmailStore
 from opwen_domain.sync.azure import AzureAuth
 from opwen_domain.sync.azure import AzureSync
 from opwen_infrastructure.serialization.json import JsonSerializer
 
-from opwen_email_client.config import AppConfig
-from opwen_email_client.session import AttachmentsStore
+from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.session import AttachmentsStore
 
 
 class Ioc(object):

@@ -1,8 +1,8 @@
 # pylint:disable=no-member
-import os
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
+from os import path
 
 from flask import abort
 from flask import flash
@@ -13,25 +13,26 @@ from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
+
 from opwen_infrastructure.generator import length
 from opwen_infrastructure.pagination import Pagination
 
-from opwen_email_client import app
-from opwen_email_client.actions import SendWelcomeEmail
-from opwen_email_client.actions import SyncEmails
-from opwen_email_client.config import AppConfig
-from opwen_email_client.config import i8n
-from opwen_email_client.forms import NewEmailForm
-from opwen_email_client.login import User
-from opwen_email_client.login import admin_required
-from opwen_email_client.login import login_required
-from opwen_email_client.session import Session
+from opwen_email_client.webapp import app
+from opwen_email_client.webapp.actions import SendWelcomeEmail
+from opwen_email_client.webapp.actions import SyncEmails
+from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.config import i8n
+from opwen_email_client.webapp.forms import NewEmailForm
+from opwen_email_client.webapp.login import User
+from opwen_email_client.webapp.login import admin_required
+from opwen_email_client.webapp.login import login_required
+from opwen_email_client.webapp.session import Session
 
 
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(
-        directory=os.path.join(app.root_path, 'static'),
+        directory=path.join(app.root_path, 'static'),
         filename='favicon.ico',
         mimetype='image/vnd.microsoft.icon')
 

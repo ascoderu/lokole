@@ -1,6 +1,6 @@
 from flask import render_template
 
-from opwen_email_client.config import i8n
+from opwen_email_client.webapp.config import i8n
 
 
 class SyncEmails(object):

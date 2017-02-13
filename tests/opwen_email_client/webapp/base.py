@@ -3,8 +3,8 @@ from tempfile import NamedTemporaryFile
 
 from flask_testing import TestCase
 
-from opwen_email_client.config import AppConfig
-from opwen_email_client.ioc import create_app
+from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.ioc import create_app
 
 
 class TestConfig(AppConfig):

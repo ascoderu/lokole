@@ -1,4 +1,4 @@
-from tests.opwen_email_client.base import Base
+from tests.opwen_email_client.webapp.base import Base
 
 
 class ViewTests(Base.AppTests):

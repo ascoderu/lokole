@@ -2,9 +2,6 @@ from flask import render_template
 from flask import request
 from flask_login import current_user
 from flask_wtf import Form
-
-from opwen_infrastructure.wtforms import EmailField
-from opwen_infrastructure.wtforms import HtmlTextAreaField
 from wtforms import FileField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -12,8 +9,11 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import Optional
 
-from opwen_email_client.config import AppConfig
-from opwen_email_client.config import i8n
+from opwen_infrastructure.wtforms import EmailField
+from opwen_infrastructure.wtforms import HtmlTextAreaField
+
+from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.config import i8n
 
 
 class NewEmailForm(Form):

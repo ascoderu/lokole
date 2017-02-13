@@ -38,7 +38,7 @@ module.exports = function(grunt) {
             expand: true,
             flatten: true,
             src: ['bower_components/components-font-awesome/fonts/*'],
-            dest:'opwen_email_client/static/fonts/',
+            dest:'opwen_email_client/webapp/static/fonts/',
             filter: 'isFile'
           },
           {
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
               'bower_components/flag-icon-css/flags/4x3/ca.svg',
               'bower_components/flag-icon-css/flags/4x3/fr.svg',
             ],
-            dest:'opwen_email_client/static/flags/4x3/',
+            dest:'opwen_email_client/webapp/static/flags/4x3/',
             filter: 'isFile'
           },
         ]
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'opwen_email_client/static/css/app.min.css': [
+          'opwen_email_client/webapp/static/css/app.min.css': [
             'build/css/_bower.css'
           ]
         }
@@ -76,7 +76,7 @@ module.exports = function(grunt) {
           compress: true
         },
         files: {
-          'opwen_email_client/static/js/app.min.js': [
+          'opwen_email_client/webapp/static/js/app.min.js': [
             'build/js/_bower.js'
           ]
         }

@@ -1,6 +1,6 @@
-from opwen_email_client.login import admin_role
-from opwen_email_client.login import user_datastore
-from tests.opwen_email_client.base import Base
+from opwen_email_client.webapp.login import admin_role
+from opwen_email_client.webapp.login import user_datastore
+from tests.opwen_email_client.webapp.base import Base
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic

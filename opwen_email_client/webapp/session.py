@@ -4,7 +4,7 @@ from babel import Locale
 from flask import request
 from flask import session
 
-from opwen_email_client.config import AppConfig
+from opwen_email_client.webapp.config import AppConfig
 
 
 # noinspection PyClassHasNoInit
