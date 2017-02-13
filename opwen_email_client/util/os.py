@@ -9,4 +9,7 @@ def subdirectories(root):
     :rtype: collections.Iterable[str]
 
     """
-    return (sub for sub in listdir(root) if isdir(join(root, sub)))
+    try:
+        return (sub for sub in listdir(root) if isdir(join(root, sub)))
+    except OSError:
+        return []
