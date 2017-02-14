@@ -111,22 +111,14 @@ class _Email(_Base):
             sender=email.get('from'))
 
     @classmethod
-    def is_sent_by(cls, email_address, approx=False):
-        if approx:
-            return cls.sender.ilike(email_address)
-
-        return cls.sender == email_address
+    def is_sent_by(cls, email_address):
+        return cls.sender.ilike(email_address)
 
     @classmethod
-    def is_received_by(cls, email_address, approx=False):
-        if approx:
-            return (cls.to.any(_To.address.ilike(email_address)) |
-                    cls.cc.any(_Cc.address.ilike(email_address)) |
-                    cls.bcc.any(_Bcc.address.ilike(email_address)))
-
-        return (cls.to.any(address=email_address) |
-                cls.cc.any(address=email_address) |
-                cls.bcc.any(address=email_address))
+    def is_received_by(cls, email_address):
+        return (cls.to.any(_To.address.ilike(email_address)) |
+                cls.cc.any(_Cc.address.ilike(email_address)) |
+                cls.bcc.any(_Bcc.address.ilike(email_address)))
 
 
 class _SqlalchemyEmailStore(EmailStore):
@@ -194,8 +186,8 @@ class _SqlalchemyEmailStore(EmailStore):
         textquery = '%{}%'.format(query)
         contains_query = or_(*(_Email.subject.ilike(textquery),
                                _Email.body.ilike(textquery),
-                               _Email.is_received_by(textquery, approx=True),
-                               _Email.is_sent_by(textquery, approx=True)))
+                               _Email.is_received_by(textquery),
+                               _Email.is_sent_by(textquery)))
         can_access = _Email.is_received_by(email_address) | _Email.is_sent_by(email_address)
         return self._query(can_access & contains_query)
 
