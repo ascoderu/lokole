@@ -1,0 +1,79 @@
+swagger: '2.0'
+
+info:
+  title: Opwen Cloudserver Email API.
+  version: '0.1'
+
+basePath: /api/email
+
+paths:
+
+  /sendgrid:
+
+    post:
+      operationId: opwen_email_server.api.sendgrid.receive
+      summary: Webhook listening to emails received via Sendgrid.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: email
+          description: Email represented as a MIME string.
+          type: string
+          in: formData
+          required: true
+      responses:
+        200:
+          description: The email was successfully received. No need to retry it.
+
+  /lokole:
+
+    post:
+      operationId: opwen_email_server.api.lokole.upload
+      summary: Endpoint where Lokole clients notify the server that they wish to send/upload some emails.
+      consumes:
+        - application/json
+      parameters:
+        - name: upload_info
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              client_id:
+                description: Id of the Lokole client that wishes to send some emails.
+                type: string
+              resource_id:
+                description: Id of the resource containing the emails to send from the Lokole client.
+                type: string
+              resource_type:
+                description: The provider where the resource containing emails can be found.
+                type: string
+                enum: [ 'azure-blob' ]
+      responses:
+        200:
+          description: The emails were successfully uploaded from the Lokole.
+
+    get:
+      operationId: opwen_email_server.api.lokole.download
+      summary: Endpoint that the Lokole clients call to get their new emails from the server.
+      produces:
+        - application/json
+      parameters:
+        - name: client_id
+          description: Id of the Lokole client that wishes to recieve some emails.
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: The emails for the Lokole are ready to be downloaded.
+          schema:
+            type: object
+            properties:
+              resource_id:
+                description: Id of the resource containing the emails to download to the Lokole client.
+                type: string
+              resource_type:
+                description: The provider where the resource containing emails can be found.
+                type: string
+                enum: [ 'azure-blob' ]
