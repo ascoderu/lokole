@@ -72,4 +72,3 @@ def receive(email):
     BLOB_SERVICE.create_blob_from_text(CONTAINER_NAME, email_id, email)
 
     QUEUE_SERVICE.put_message(QUEUE_NAME, create_message(email_id))
-
