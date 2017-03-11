@@ -1,2 +1,3 @@
 azure-storage==0.34.0
 connexion==1.1.5
+pyzmail==1.0.3
