@@ -1,10 +1,10 @@
-from json import dumps
 from uuid import uuid4
 
 from azure.storage.blob import BlockBlobService
 from azure.storage.queue import QueueService
 
 from opwen_email_server.api import config
+from opwen_email_server.utils.serialization import to_json
 
 CONTAINER_NAME = 'SendgridInboundEmails'
 QUEUE_NAME = 'SengridInboundEmails'
@@ -41,13 +41,13 @@ def create_message(email_id):
     :rtype: str
 
     """
-    return dumps({
+    return to_json({
         '_version': '0.1',
         '_type': 'mime_email_received',
         '_received_by': 'sendgrid',
         'blob_name': email_id,
         'container_name': CONTAINER_NAME,
-    }, separators=(',', ':'))
+    })
 
 
 def receive(email):
