@@ -63,3 +63,21 @@ class ParseMimeEmailTests(TestCase):
         if not actual.startswith(prefix):
             self.fail('string "{actual}..." does not start with "{prefix}"'
                       .format(actual=actual[:len(prefix)], prefix=prefix))
+
+
+class GetDomainsTests(TestCase):
+    def test_gets_domains(self):
+        email = {'to': ['foo@bar.com', 'baz@bar.com', 'foo@com']}
+
+        domains = email_parser.get_domains(email)
+
+        self.assertSetEqual(domains, {'bar.com', 'com'})
+
+    def test_gets_domains_with_cc_and_bcc(self):
+        email = {'to': ['foo@bar.com'],
+                 'cc': ['baz@bar.com'],
+                 'bcc': ['foo@com']}
+
+        domains = email_parser.get_domains(email)
+
+        self.assertSetEqual(domains, {'bar.com', 'com'})

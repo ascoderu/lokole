@@ -1,3 +1,4 @@
+from json import loads
 from uuid import uuid4
 
 from azure.storage.blob import BlockBlobService
@@ -33,6 +34,15 @@ def initialize(storage_account=config.STORAGE_ACCOUNT,
     if QUEUE_SERVICE is None:
         QUEUE_SERVICE = QueueService(storage_account, storage_key)
         QUEUE_SERVICE.create_queue(queue_name)
+
+
+def parse_message(message):
+    """
+    :type message: str
+    :rtype: str
+
+    """
+    return loads(message)['blob_name']
 
 
 def create_message(email_id):

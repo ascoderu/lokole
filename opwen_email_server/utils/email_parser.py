@@ -1,4 +1,5 @@
 from base64 import b64encode
+from itertools import chain
 
 from pyzmail import PyzMessage
 
@@ -55,3 +56,24 @@ def parse_mime_email(mime_email):
         'body': _parse_body(message),
         'attachments': list(_parse_attachments(message.mailparts)),
     }
+
+
+def _get_recipients(email):
+    """
+    :type email: dict
+    :rtype: collections.Iterable[str]
+
+    """
+    return chain(email.get('to') or [],
+                 email.get('cc') or [],
+                 email.get('bcc') or [])
+
+
+def get_domains(email):
+    """
+    :type email: dict
+    :rtype: collections.Iterable[str]
+
+    """
+    return frozenset(address.split('@')[-1]
+                     for address in _get_recipients(email))
