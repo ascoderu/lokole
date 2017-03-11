@@ -1,13 +1,11 @@
 from json import dumps
-from os import getenv
 from uuid import uuid4
 
 from azure.storage.blob import BlockBlobService
 from azure.storage.queue import QueueService
 
+from opwen_email_server.api import config
 
-STORAGE_ACCOUNT = getenv('OPWEN_EMAIL_SERVER_AZURE_STORAGE_ACCOUNT_NAME')
-STORAGE_KEY = getenv('OPWEN_EMAIL_SERVER_AZURE_STORAGE_ACCOUNT_KEY')
 CONTAINER_NAME = 'SendgridInboundEmails'
 QUEUE_NAME = 'SengridInboundEmails'
 
@@ -15,8 +13,10 @@ BLOB_SERVICE = None  # type: BlockBlobService
 QUEUE_SERVICE = None  # type: QueueService
 
 
-def initialize(storage_account=STORAGE_ACCOUNT, storage_key=STORAGE_KEY,
-               container_name=CONTAINER_NAME, queue_name=QUEUE_NAME):
+def initialize(storage_account=config.STORAGE_ACCOUNT,
+               storage_key=config.STORAGE_KEY,
+               container_name=CONTAINER_NAME,
+               queue_name=QUEUE_NAME):
     """
     :type storage_account: str
     :type storage_key: str
