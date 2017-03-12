@@ -38,6 +38,26 @@ def _parse_attachments(mailparts):
             yield {'filename': filename, 'content': content}
 
 
+def _parse_addresses(message, address_type):
+    """
+    :type message: pyzmail.PyzMessage
+    :type address_type: str
+    :rtype: list[str]
+
+    """
+    return [email for _, email in message.get_addresses(address_type) if email]
+
+
+def _parse_address(message, address_type):
+    """
+    :type message: pyzmail.PyzMessage
+    :type address_type: str
+    :rtype: str|None
+
+    """
+    return next(iter(_parse_addresses(message, address_type)), None)
+
+
 def parse_mime_email(mime_email):
     """
     :type mime_email: str
@@ -48,10 +68,10 @@ def parse_mime_email(mime_email):
 
     return {
         'sent_at': message.get_decoded_header('date'),
-        'to': [email for _, email in message.get_addresses('to') if email],
-        'cc': [email for _, email in message.get_addresses('cc') if email],
-        'bcc': [email for _, email in message.get_addresses('bcc') if email],
-        'from': message.get_address('from')[-1],
+        'to': _parse_addresses(message, 'to'),
+        'cc': _parse_addresses(message, 'cc'),
+        'bcc': _parse_addresses(message, 'bcc'),
+        'from': _parse_address(message, 'from'),
         'subject': message.get_subject(),
         'body': _parse_body(message),
         'attachments': list(_parse_attachments(message.mailparts)),
