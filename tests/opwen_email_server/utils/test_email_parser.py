@@ -20,8 +20,6 @@ class ParseMimeEmailTests(TestCase):
 
         self.assertEqual(email.get('from'), 'clemens.wolff@gmail.com')
         self.assertEqual(email.get('subject'), 'Two recipients')
-        self.assertEqual(email.get('cc'), [])
-        self.assertEqual(email.get('bcc'), [])
         self.assertEqual(email.get('to'), ['clemens@victoria.ascoderu.ca',
                                            'laura@victoria.ascoderu.ca'])
 
