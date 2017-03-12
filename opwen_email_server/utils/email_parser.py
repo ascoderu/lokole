@@ -1,6 +1,10 @@
 from base64 import b64encode
+from datetime import datetime
+from email.utils import mktime_tz
+from email.utils import parsedate_tz
 from itertools import chain
 
+from pytz import utc
 from pyzmail import PyzMessage
 
 
@@ -58,6 +62,18 @@ def _parse_address(message, address_type):
     return next(iter(_parse_addresses(message, address_type)), None)
 
 
+def _parse_sent_at(message):
+    """
+    :type message: pyzmail.PyzMessage
+    :rtype: str
+
+    """
+    rfc_822 = message.get_decoded_header('date')
+    timestamp = mktime_tz(parsedate_tz(rfc_822))
+    date_utc = datetime.fromtimestamp(timestamp, utc)
+    return date_utc.strftime('%Y-%m-%d %H:%M')
+
+
 def parse_mime_email(mime_email):
     """
     :type mime_email: str
@@ -67,7 +83,7 @@ def parse_mime_email(mime_email):
     message = PyzMessage.factory(mime_email)
 
     return {
-        'sent_at': message.get_decoded_header('date'),
+        'sent_at': _parse_sent_at(message),
         'to': _parse_addresses(message, 'to'),
         'cc': _parse_addresses(message, 'cc'),
         'bcc': _parse_addresses(message, 'bcc'),
