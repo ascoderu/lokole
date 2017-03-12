@@ -56,3 +56,7 @@ def run_forever(poll_seconds=10, batch_size=1, lock_seconds=60):
     while True:
         run_once(batch_size, lock_seconds)
         sleep(poll_seconds)
+
+
+if __name__ == '__main__':
+    run_forever()
