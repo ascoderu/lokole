@@ -14,6 +14,10 @@ TABLES = {
     'cc': lambda _: _.get('cc') or [],
     'bcc': lambda _: _.get('bcc') or [],
     'from': lambda _: to_iterable(_.get('from')),
+
+    'domainXdelivered': lambda _: (
+        '{}_{}'.format(domain, _.get('_delivered') or False)
+        for domain in get_domains(_)),
 }
 
 BLOB_SERVICE = None  # type: BlockBlobService

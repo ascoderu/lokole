@@ -16,6 +16,7 @@ def _load_email_content(message: str) -> Tuple[str, str]:
 def _process_message(message: str):
     email_id, mime_email = _load_email_content(message)
     email = parse_mime_email(mime_email)
+    email['_delivered'] = False
     datastore.store_email(email_id, email)
 
 
