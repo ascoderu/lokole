@@ -20,12 +20,7 @@ BLOB_SERVICE = None  # type: BlockBlobService
 TABLE_SERVICE = None  # type: TableService
 
 
-def _index_email(email_id, email):
-    """
-    :type email_id: str
-    :type email: dict
-
-    """
+def _index_email(email_id: str, email: dict):
     for table, values_getter in TABLES.items():
         batch = TableBatch()
         for value in values_getter(email):
@@ -36,25 +31,14 @@ def _index_email(email_id, email):
         TABLE_SERVICE.commit_batch(table, batch)
 
 
-def _store_email(email_id, email):
-    """
-    :type email_id: str
-    :type email: dict
-
-    """
+def _store_email(email_id: str, email: dict):
     serialized = to_json(email)
     BLOB_SERVICE.create_blob_from_text(CONTAINER_NAME, email_id, serialized)
 
 
-def initialize(storage_account=config.STORAGE_ACCOUNT,
-               storage_key=config.STORAGE_KEY,
-               container_name=CONTAINER_NAME):
-    """
-    :type storage_account: str
-    :type storage_key: str
-    :type container_name: str
-
-    """
+def initialize(storage_account: str=config.STORAGE_ACCOUNT,
+               storage_key: str=config.STORAGE_KEY,
+               container_name: str=CONTAINER_NAME):
     global BLOB_SERVICE
     if BLOB_SERVICE is None:
         BLOB_SERVICE = BlockBlobService(storage_account, storage_key)
@@ -67,12 +51,7 @@ def initialize(storage_account=config.STORAGE_ACCOUNT,
             TABLE_SERVICE.create_table(table)
 
 
-def store_email(email_id, email):
-    """
-    :type email_id: str
-    :type email: dict
-
-    """
+def store_email(email_id: str, email: dict):
     initialize()
 
     email['_uid'] = email_id

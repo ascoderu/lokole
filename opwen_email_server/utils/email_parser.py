@@ -3,18 +3,16 @@ from datetime import datetime
 from email.utils import mktime_tz
 from email.utils import parsedate_tz
 from itertools import chain
+from typing import Iterable
+from typing import List
+from typing import Optional
 
 from pytz import utc
 from pyzmail import PyzMessage
+from pyzmail.parse import MailPart
 
 
-def _parse_body(message, default_charset='ascii'):
-    """
-    :type message: pyzmail.PyzMessage
-    :type default_charset: str
-    :rtype: str
-
-    """
+def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
     body_parts = (message.html_part, message.text_part)
     for part in body_parts:
         if part is None:
@@ -27,12 +25,7 @@ def _parse_body(message, default_charset='ascii'):
     return ''
 
 
-def _parse_attachments(mailparts):
-    """
-    :type mailparts: collections.Iterable[pyzmail.parse.MailPart]
-    :rtype: collections.Iterable[dict]
-
-    """
+def _parse_attachments(mailparts: Iterable[MailPart]) -> Iterable[dict]:
     attachment_parts = (part for part in mailparts if not part.is_body)
     for part in attachment_parts:
         filename = part.sanitized_filename
@@ -42,44 +35,22 @@ def _parse_attachments(mailparts):
             yield {'filename': filename, 'content': content}
 
 
-def _parse_addresses(message, address_type):
-    """
-    :type message: pyzmail.PyzMessage
-    :type address_type: str
-    :rtype: list[str]
-
-    """
+def _parse_addresses(message: PyzMessage, address_type: str) -> List[str]:
     return [email for _, email in message.get_addresses(address_type) if email]
 
 
-def _parse_address(message, address_type):
-    """
-    :type message: pyzmail.PyzMessage
-    :type address_type: str
-    :rtype: str|None
-
-    """
+def _parse_address(message: PyzMessage, address_type: str) -> Optional[str]:
     return next(iter(_parse_addresses(message, address_type)), None)
 
 
-def _parse_sent_at(message):
-    """
-    :type message: pyzmail.PyzMessage
-    :rtype: str
-
-    """
+def _parse_sent_at(message: PyzMessage) -> str:
     rfc_822 = message.get_decoded_header('date')
     timestamp = mktime_tz(parsedate_tz(rfc_822))
     date_utc = datetime.fromtimestamp(timestamp, utc)
     return date_utc.strftime('%Y-%m-%d %H:%M')
 
 
-def parse_mime_email(mime_email):
-    """
-    :type mime_email: str
-    :rtype: dict
-
-    """
+def parse_mime_email(mime_email: str) -> dict:
     message = PyzMessage.factory(mime_email)
 
     return {
@@ -94,22 +65,12 @@ def parse_mime_email(mime_email):
     }
 
 
-def _get_recipients(email):
-    """
-    :type email: dict
-    :rtype: collections.Iterable[str]
-
-    """
+def _get_recipients(email: dict) -> Iterable[str]:
     return chain(email.get('to') or [],
                  email.get('cc') or [],
                  email.get('bcc') or [])
 
 
-def get_domains(email):
-    """
-    :type email: dict
-    :rtype: collections.Iterable[str]
-
-    """
+def get_domains(email: dict) -> Iterable[str]:
     return frozenset(address.split('@')[-1]
                      for address in _get_recipients(email))

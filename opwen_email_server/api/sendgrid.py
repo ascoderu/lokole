@@ -14,17 +14,10 @@ BLOB_SERVICE = None  # type: BlockBlobService
 QUEUE_SERVICE = None  # type: QueueService
 
 
-def initialize(storage_account=config.STORAGE_ACCOUNT,
-               storage_key=config.STORAGE_KEY,
-               container_name=CONTAINER_NAME,
-               queue_name=QUEUE_NAME):
-    """
-    :type storage_account: str
-    :type storage_key: str
-    :type container_name: str
-    :type queue_name: str
-
-    """
+def initialize(storage_account: str=config.STORAGE_ACCOUNT,
+               storage_key: str=config.STORAGE_KEY,
+               container_name: str=CONTAINER_NAME,
+               queue_name: str=QUEUE_NAME):
     global BLOB_SERVICE
     if BLOB_SERVICE is None:
         BLOB_SERVICE = BlockBlobService(storage_account, storage_key)
@@ -36,21 +29,11 @@ def initialize(storage_account=config.STORAGE_ACCOUNT,
         QUEUE_SERVICE.create_queue(queue_name)
 
 
-def parse_message(message):
-    """
-    :type message: str
-    :rtype: str
-
-    """
+def parse_message(message: str) -> str:
     return loads(message)['blob_name']
 
 
-def create_message(email_id):
-    """
-    :type email_id: str
-    :rtype: str
-
-    """
+def create_message(email_id: str) -> str:
     return to_json({
         '_version': '0.1',
         '_type': 'mime_email_received',
@@ -60,11 +43,7 @@ def create_message(email_id):
     })
 
 
-def receive(email):
-    """
-    :type email: str
-
-    """
+def receive(email: str):
     initialize()
 
     email_id = str(uuid4())
