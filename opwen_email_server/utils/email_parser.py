@@ -46,7 +46,7 @@ def _parse_address(message: PyzMessage, address_type: str) -> Optional[str]:
 def _parse_sent_at(message: PyzMessage) -> str:
     rfc_822 = message.get_decoded_header('date')
     timestamp = mktime_tz(parsedate_tz(rfc_822))
-    date_utc = datetime.fromtimestamp(timestamp, utc)
+    date_utc = datetime.fromtimestamp(timestamp, utc)  # type: ignore
     return date_utc.strftime('%Y-%m-%d %H:%M')
 
 

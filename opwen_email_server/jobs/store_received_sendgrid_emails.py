@@ -9,7 +9,7 @@ from opwen_email_server.utils.email_parser import parse_mime_email
 def _load_email_content(message: str) -> Tuple[str, str]:
     email_id = sendgrid.parse_message(message)
     mime_email = sendgrid.BLOB_SERVICE.get_blob_to_text(
-        sendgrid.CONTAINER_NAME, email_id)
+        sendgrid.CONTAINER_NAME, email_id).content
     return email_id, mime_email
 
 
