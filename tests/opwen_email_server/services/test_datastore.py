@@ -5,8 +5,8 @@ from opwen_email_server.services import datastore
 
 
 class StoreEmailTests(TestCase):
-    @patch('opwen_email_server.services.datastore.STORAGE')
-    @patch('opwen_email_server.services.datastore.INDEX')
+    @patch.object(datastore, 'STORAGE')
+    @patch.object(datastore, 'INDEX')
     def test_stores_and_indexes_email(self, index_mock, storage_mock):
         datastore.store_email('c08ddf62-b27c-4de1-ab6f-474d75dc0bfd', {
             'to': ['foo@bar.com'],

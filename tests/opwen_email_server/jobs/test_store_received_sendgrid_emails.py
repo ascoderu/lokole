@@ -1,13 +1,15 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from opwen_email_server.api import sendgrid
 from opwen_email_server.jobs import store_received_sendgrid_emails
+from opwen_email_server.services import datastore
 
 
 class StoreReceivedSendgridEmailsTests(TestCase):
-    @patch('opwen_email_server.api.sendgrid.QUEUE')
-    @patch('opwen_email_server.api.sendgrid.STORAGE')
-    @patch('opwen_email_server.services.datastore.store_email')
+    @patch.object(sendgrid, 'QUEUE')
+    @patch.object(sendgrid, 'STORAGE')
+    @patch.object(datastore, 'store_email')
     @patch.object(store_received_sendgrid_emails, 'parse_mime_email')
     def test_reads_message_and_stores_email(
             self, parser_mock, store_mock, storage_mock, queue_mock):
