@@ -4,10 +4,3 @@ def upload(upload_info: dict):
     resource_type = upload_info['resource_type']  # noqa: F841
 
     raise NotImplementedError
-
-
-def download(client_id: str) -> dict:  # noqa: F841
-    return {
-        'resource_id': None,
-        'resource_type': None,
-    }
