@@ -1,3 +1,4 @@
+from typing import Tuple
 from uuid import uuid4
 
 from opwen_email_server import config
@@ -11,7 +12,7 @@ QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                    name='SengridInboundEmails')
 
 
-def receive(email: str):
+def receive(email: str) -> Tuple[str, int]:
     email_id = str(uuid4())
 
     STORAGE.store_text(email_id, email)
@@ -23,3 +24,5 @@ def receive(email: str):
         'resource_id': email_id,
         'container_name': STORAGE.container,
     })
+
+    return 'received', 200
