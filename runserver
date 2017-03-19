@@ -4,9 +4,13 @@ from connexion import App
 from argparse import ArgumentParser
 from argparse import FileType
 
+from opwen_email_server.utils.imports import can_import
+
+servers = list(filter(can_import, ('tornado', 'gevent', 'flask')))
+
 parser = ArgumentParser()
 parser.add_argument('--port', type=int, default=8080)
-parser.add_argument('--server', choices=['tornado'], default='tornado')
+parser.add_argument('--server', choices=servers, default=servers[0])
 parser.add_argument('--ui', action='store_true', default=False)
 parser.add_argument('apis', nargs='+', type=FileType('r'))
 args = parser.parse_args()
