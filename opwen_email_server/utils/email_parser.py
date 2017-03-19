@@ -43,8 +43,10 @@ def _parse_address(message: PyzMessage, address_type: str) -> Optional[str]:
     return next(iter(_parse_addresses(message, address_type)), None)
 
 
-def _parse_sent_at(message: PyzMessage) -> str:
+def _parse_sent_at(message: PyzMessage) -> Optional[str]:
     rfc_822 = message.get_decoded_header('date')
+    if not rfc_822:
+        return None
     timestamp = mktime_tz(parsedate_tz(rfc_822))
     # noinspection PyUnresolvedReferences
     date_utc = datetime.fromtimestamp(timestamp, timezone.utc)
