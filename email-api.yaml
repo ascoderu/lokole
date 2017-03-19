@@ -45,6 +45,9 @@ paths:
               resource_id:
                 description: Id of the resource containing the emails to send from the Lokole client.
                 type: string
+              resource_container:
+                description: Container where the resource containing emails can be found.
+                type: string
               resource_type:
                 description: The provider where the resource containing emails can be found.
                 type: string
@@ -52,6 +55,8 @@ paths:
       responses:
         200:
           description: The emails were successfully uploaded from the Lokole.
+        403:
+          description: Request from unregistered client.
 
     get:
       operationId: opwen_email_server.api.lokole_read.download
@@ -77,3 +82,5 @@ paths:
                 description: The provider where the resource containing emails can be found.
                 type: string
                 enum: [ 'azure-blob' ]
+        403:
+          description: Request from unregistered client.
