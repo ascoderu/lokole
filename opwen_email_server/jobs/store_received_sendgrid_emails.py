@@ -1,8 +1,8 @@
 from time import sleep
 from typing import Tuple
 
-from opwen_email_server.api import datastore
 from opwen_email_server.api import sendgrid
+from opwen_email_server.services import datastore
 from opwen_email_server.utils.email_parser import parse_mime_email
 
 
