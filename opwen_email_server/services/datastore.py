@@ -1,4 +1,4 @@
-from opwen_email_server.api import config
+from opwen_email_server import config
 from opwen_email_server.services.index import AzureIndex
 from opwen_email_server.services.storage import AzureStorage
 from opwen_email_server.utils.collections import to_iterable

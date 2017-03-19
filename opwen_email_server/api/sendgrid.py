@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from opwen_email_server.api import config
+from opwen_email_server import config
 from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.services.storage import AzureStorage
 
