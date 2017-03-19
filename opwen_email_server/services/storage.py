@@ -6,7 +6,8 @@ from azure.storage.blob import BlockBlobService
 class AzureStorage(object):
     def __init__(self, account: str, key: str, container: str,
                  client: BlockBlobService=None,
-                 factory: Callable[..., BlockBlobService]=BlockBlobService):
+                 factory: Callable[..., BlockBlobService]=BlockBlobService
+                 ) -> None:
 
         self._account = account
         self._key = key

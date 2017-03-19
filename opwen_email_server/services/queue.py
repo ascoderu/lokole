@@ -10,7 +10,7 @@ from opwen_email_server.utils.serialization import to_json
 class AzureQueue(object):
     def __init__(self, account: str, key: str, name: str,
                  client: QueueService=None,
-                 factory: Callable[..., QueueService]=QueueService):
+                 factory: Callable[..., QueueService]=QueueService) -> None:
 
         self._account = account
         self._key = key

@@ -15,7 +15,7 @@ class AzureIndex(Generic[T]):
                  tables: Mapping[str, Callable[[T], Iterable[str]]],
                  client: TableService=None,
                  client_factory: Callable[..., TableService]=TableService,
-                 batch_factory: Callable[..., TableBatch]=TableBatch):
+                 batch_factory: Callable[..., TableBatch]=TableBatch) -> None:
 
         self._account = account
         self._key = key

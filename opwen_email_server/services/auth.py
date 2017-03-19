@@ -7,7 +7,7 @@ from typing import Mapping
 class EnvironmentAuth(object):
     def __init__(self, client_to_domain: Mapping[str, str]=None,
                  envgetter: Callable[[str, str], str]=environ.get,
-                 envkey: str='OPWEN_CLIENTS'):
+                 envkey: str='OPWEN_CLIENTS') -> None:
 
         if client_to_domain is None:
             client_to_domain = dict(literal_eval(envgetter(envkey, '{}')))
