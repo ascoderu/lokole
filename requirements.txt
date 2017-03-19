@@ -1,5 +1,4 @@
 azure-storage==0.34.0
 connexion==1.1.5
-pytz==2016.10
 pyzmail==1.0.3
 tornado==4.4.2

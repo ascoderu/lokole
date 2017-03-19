@@ -1,5 +1,6 @@
 from base64 import b64encode
 from datetime import datetime
+from datetime import timezone
 from email.utils import mktime_tz
 from email.utils import parsedate_tz
 from itertools import chain
@@ -7,7 +8,6 @@ from typing import Iterable
 from typing import List
 from typing import Optional
 
-from pytz import utc
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
 
@@ -46,7 +46,8 @@ def _parse_address(message: PyzMessage, address_type: str) -> Optional[str]:
 def _parse_sent_at(message: PyzMessage) -> str:
     rfc_822 = message.get_decoded_header('date')
     timestamp = mktime_tz(parsedate_tz(rfc_822))
-    date_utc = datetime.fromtimestamp(timestamp, utc)  # type: ignore
+    # noinspection PyUnresolvedReferences
+    date_utc = datetime.fromtimestamp(timestamp, timezone.utc)
     return date_utc.strftime('%Y-%m-%d %H:%M')
 
 
