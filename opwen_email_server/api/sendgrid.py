@@ -1,53 +1,25 @@
-from json import loads
 from uuid import uuid4
 
-from azure.storage.blob import BlockBlobService
-from azure.storage.queue import QueueService
-
 from opwen_email_server.api import config
-from opwen_email_server.utils.serialization import to_json
+from opwen_email_server.services.queue import AzureQueue
+from opwen_email_server.services.storage import AzureStorage
 
-CONTAINER_NAME = 'SendgridInboundEmails'
-QUEUE_NAME = 'SengridInboundEmails'
+STORAGE = AzureStorage(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+                       container='SendgridInboundEmails')
 
-BLOB_SERVICE = None  # type: BlockBlobService
-QUEUE_SERVICE = None  # type: QueueService
-
-
-def initialize(storage_account: str=config.STORAGE_ACCOUNT,
-               storage_key: str=config.STORAGE_KEY,
-               container_name: str=CONTAINER_NAME,
-               queue_name: str=QUEUE_NAME):
-    global BLOB_SERVICE
-    if BLOB_SERVICE is None:
-        BLOB_SERVICE = BlockBlobService(storage_account, storage_key)
-        BLOB_SERVICE.create_container(container_name)
-
-    global QUEUE_SERVICE
-    if QUEUE_SERVICE is None:
-        QUEUE_SERVICE = QueueService(storage_account, storage_key)
-        QUEUE_SERVICE.create_queue(queue_name)
-
-
-def parse_message(message: str) -> str:
-    return loads(message)['blob_name']
-
-
-def create_message(email_id: str) -> str:
-    return to_json({
-        '_version': '0.1',
-        '_type': 'mime_email_received',
-        '_received_by': 'sendgrid',
-        'blob_name': email_id,
-        'container_name': CONTAINER_NAME,
-    })
+QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+                   name='SengridInboundEmails')
 
 
 def receive(email: str):
-    initialize()
-
     email_id = str(uuid4())
 
-    BLOB_SERVICE.create_blob_from_text(CONTAINER_NAME, email_id, email)
+    STORAGE.store_text(email_id, email)
 
-    QUEUE_SERVICE.put_message(QUEUE_NAME, create_message(email_id))
+    QUEUE.enqueue({
+        '_version': '0.1',
+        '_type': 'mime_email_received',
+        '_received_by': 'sendgrid',
+        'resource_id': email_id,
+        'container_name': STORAGE.container,
+    })
