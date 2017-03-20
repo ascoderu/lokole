@@ -1,34 +1,37 @@
-from time import sleep
+from typing import Any
+from typing import Callable
 from typing import Tuple
 
 from opwen_email_server.api import sendgrid
 from opwen_email_server.services import datastore
+from opwen_email_server.services.queue import AzureQueue
+from opwen_email_server.services.storage import AzureStorage
 from opwen_email_server.utils.email_parser import parse_mime_email
+from opwen_email_server.utils.queue_consumer import QueueConsumer
 
 
-def _load_email_content(message: dict) -> Tuple[str, str]:
-    email_id = message['resource_id']
-    mime_email = sendgrid.STORAGE.fetch_text(email_id)
-    return email_id, mime_email
+class SendgridQueueConsumer(QueueConsumer):
+    def __init__(self, queue: AzureQueue, storage: AzureStorage,
+                 store_email: Callable[[str, dict], Any]) -> None:
 
+        super().__init__(queue.dequeue)
+        self._storage = storage
+        self._store_email = store_email
 
-def _process_message(message: dict):
-    email_id, mime_email = _load_email_content(message)
-    email = parse_mime_email(mime_email)
-    email['_delivered'] = False
-    datastore.store_email(email_id, email)
+    def _process_message(self, message: dict):
+        email_id, mime_email = self._load_email_content(message)
+        email = parse_mime_email(mime_email)
+        email['_delivered'] = False
+        self._store_email(email_id, email)
 
-
-def run_once(batch_size: int=1, lock_seconds: int=60):
-    for message in sendgrid.QUEUE.dequeue(batch_size, lock_seconds):
-        _process_message(message)
-
-
-def run_forever(poll_seconds: int=10, batch_size: int=1, lock_seconds: int=60):
-    while True:
-        run_once(batch_size, lock_seconds)
-        sleep(poll_seconds)
+    def _load_email_content(self, message: dict) -> Tuple[str, str]:
+        email_id = message['resource_id']
+        mime_email = self._storage.fetch_text(email_id)
+        return email_id, mime_email
 
 
 if __name__ == '__main__':
-    run_forever()
+    consumer = SendgridQueueConsumer(sendgrid.QUEUE,
+                                     sendgrid.STORAGE,
+                                     datastore.store_email)
+    consumer.run_forever()
