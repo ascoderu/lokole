@@ -10,13 +10,13 @@ VIRTUALENV=/usr/local/bin/virtualenv
 api_port=8080
 api_server=tornado
 api_specs=swagger/email-api.yaml
-api_runner=./runserver --port=$(api_port) --server=$(api_server) $(api_specs)
 
 #
 # You shouldn't need to touch anything below this line.
 #
 py_env=venv
 py_packages=opwen_email_server
+api_runner=$(py_env)/bin/python runserver --port=$(api_port) --server=$(api_server) $(api_specs)
 
 .PHONY: default
 default: server
