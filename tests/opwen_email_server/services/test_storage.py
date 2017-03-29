@@ -1,7 +1,9 @@
 from collections import namedtuple
+from os import remove
 from unittest import TestCase
 from unittest.mock import MagicMock
 
+from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureStorage
 
 
@@ -43,3 +45,34 @@ class AzureStorageTests(TestCase):
             client_mock.get_blob_to_text.return_value = build_blob(content)
 
         return storage, client_mock
+
+
+class AzureFileStorageTests(TestCase):
+    def test_fetches_file(self):
+        storage, client_mock = self._given_storage()
+
+        self.when_fetching_file(storage)
+
+        self.assertEqual(client_mock.get_blob_to_path.call_count, 1)
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def _given_storage(cls):
+        client_mock = MagicMock()
+        storage = AzureFileStorage(
+            account='account', key='key', container='name',
+            factory=lambda *args, **kwargs: client_mock)
+
+        return storage, client_mock
+
+    def when_fetching_file(self, storage):
+        filename = storage.fetch_file('id1')
+        self._filenames.add(filename)
+        return filename
+
+    def setUp(self):
+        self._filenames = set()
+
+    def tearDown(self):
+        for filename in self._filenames:
+            remove(filename)
