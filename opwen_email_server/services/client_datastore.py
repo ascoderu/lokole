@@ -8,7 +8,7 @@ from opwen_email_server.services.storage import AzureFileStorage
 
 STORAGE = AzureFileStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                            key=config.CLIENT_STORAGE_KEY,
-                           container='CompressedPackages')
+                           container=config.CONTAINER_CLIENT_PACKAGES)
 
 
 def unpack_emails(resource_id: str) -> Iterable[dict]:

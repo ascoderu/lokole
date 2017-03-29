@@ -6,10 +6,10 @@ from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.services.storage import AzureStorage
 
 STORAGE = AzureStorage(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
-                       container='SendgridInboundEmails')
+                       container=config.CONTAINER_SENDGRID_MIME)
 
 QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
-                   name='SengridInboundEmails')
+                   name=config.QUEUE_SENDGRID_MIME)
 
 
 def receive(email: str) -> Tuple[str, int]:

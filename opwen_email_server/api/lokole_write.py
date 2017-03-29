@@ -5,7 +5,7 @@ from opwen_email_server.services.auth import EnvironmentAuth
 from opwen_email_server.services.queue import AzureQueue
 
 QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
-                   name='LokoleInboundEmails')
+                   name=config.QUEUE_CLIENT_PACKAGE)
 
 CLIENTS = EnvironmentAuth()
 

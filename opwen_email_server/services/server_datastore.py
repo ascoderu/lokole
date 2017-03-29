@@ -6,19 +6,20 @@ from opwen_email_server.utils.email_parser import get_domains
 from opwen_email_server.utils.serialization import to_json
 
 STORAGE = AzureStorage(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
-                       container='Emails')
+                       container=config.CONTAINER_EMAILS)
 
-INDEX = AzureIndex(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
-                   tables={
-                       'domain': get_domains,
-                       'to': lambda _: _.get('to') or [],
-                       'cc': lambda _: _.get('cc') or [],
-                       'bcc': lambda _: _.get('bcc') or [],
-                       'from': lambda _: to_iterable(_.get('from')),
-                       'domainXdelivered': lambda _: (
-                           '{}_{}'.format(domain, _.get('_delivered') or False)
-                           for domain in get_domains(_)),
-                   })
+INDEX = AzureIndex(
+    account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+    tables={
+        config.TABLE_DOMAIN: get_domains,
+        config.TABLE_TO: lambda _: _.get('to') or [],
+        config.TABLE_CC: lambda _: _.get('cc') or [],
+        config.TABLE_BCC: lambda _: _.get('bcc') or [],
+        config.TABLE_FROM: lambda _: to_iterable(_.get('from')),
+        config.TABLE_DOMAIN_X_DELIVERED: lambda _: (
+            '{}_{}'.format(domain, _.get('_delivered') or False)
+            for domain in get_domains(_)),
+        })
 
 
 def store_email(email_id: str, email: dict):
