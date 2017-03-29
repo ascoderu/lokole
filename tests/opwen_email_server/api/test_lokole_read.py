@@ -12,7 +12,7 @@ class DownloadTests(TestCase):
     @classmethod
     @contextmanager
     def _given_clients(cls, clients: str):
-        environ['OPWEN_CLIENTS'] = clients
+        environ['LOKOLE_CLIENTS'] = clients
         from opwen_email_server.api import lokole_read
         yield lokole_read.download
         del lokole_read

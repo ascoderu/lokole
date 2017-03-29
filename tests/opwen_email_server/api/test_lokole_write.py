@@ -19,7 +19,7 @@ class UploadTests(TestCase):
     @classmethod
     @contextmanager
     def _given_clients(cls, clients: str):
-        environ['OPWEN_CLIENTS'] = clients
+        environ['LOKOLE_CLIENTS'] = clients
         from opwen_email_server.api import lokole_write
         with patch.object(lokole_write, 'QUEUE') as mock_queue:
             yield lokole_write.upload, mock_queue
