@@ -11,5 +11,7 @@ class EnvironmentAuthTest(TestCase):
         self.assertNotIn("client2", auth)
 
     def test_raises_when_environment_misconfigured(self):
+        auth = EnvironmentAuth(envgetter=lambda key, default: default)
+
         with self.assertRaises(ValueError):
-            EnvironmentAuth(envgetter=lambda key, default: default)
+            auth.__contains__('something')
