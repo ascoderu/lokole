@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from opwen_email_server.api import sendgrid
-from opwen_email_server.services import datastore
+from opwen_email_server.services import server_datastore
 from opwen_email_server.utils.email_parser import parse_mime_email
 from opwen_email_server.utils.queue_consumer import QueueConsumer
 
@@ -14,7 +14,7 @@ class SendgridQueueConsumer(QueueConsumer):
         email_id, mime_email = self._load_email_content(message)
         email = parse_mime_email(mime_email)
         email['_delivered'] = False
-        datastore.store_email(email_id, email)
+        server_datastore.store_email(email_id, email)
 
     @classmethod
     def _load_email_content(cls, message: dict) -> Tuple[str, str]:
