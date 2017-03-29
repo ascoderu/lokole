@@ -5,8 +5,8 @@ from opwen_email_server.jobs import store_received_sendgrid_emails
 
 
 class StoreReceivedSendgridEmailsTests(TestCase):
-    @patch.object(store_received_sendgrid_emails.sendgrid, 'QUEUE')
-    @patch.object(store_received_sendgrid_emails.sendgrid, 'STORAGE')
+    @patch.object(store_received_sendgrid_emails.sendgrid_receiver, 'QUEUE')
+    @patch.object(store_received_sendgrid_emails.sendgrid_receiver, 'STORAGE')
     @patch.object(store_received_sendgrid_emails.server_datastore, 'store_email')
     @patch.object(store_received_sendgrid_emails, 'parse_mime_email')
     def test_reads_message_and_stores_email(
