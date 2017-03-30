@@ -1,14 +1,14 @@
 from typing import Tuple
 
-from opwen_email_server.api import sendgrid_receiver
+from opwen_email_server.api import email_receiver
 from opwen_email_server.services import server_datastore
 from opwen_email_server.utils.email_parser import parse_mime_email
 from opwen_email_server.utils.queue_consumer import QueueConsumer
 
 
-class SendgridQueueConsumer(QueueConsumer):
+class InboundEmailQueueConsumer(QueueConsumer):
     def __init__(self):
-        super().__init__(sendgrid_receiver.QUEUE.dequeue)
+        super().__init__(email_receiver.QUEUE.dequeue)
 
     def _process_message(self, message: dict):
         email_id, mime_email = self._load_email_content(message)
@@ -19,10 +19,10 @@ class SendgridQueueConsumer(QueueConsumer):
     @classmethod
     def _load_email_content(cls, message: dict) -> Tuple[str, str]:
         email_id = message['resource_id']
-        mime_email = sendgrid_receiver.STORAGE.fetch_text(email_id)
+        mime_email = email_receiver.STORAGE.fetch_text(email_id)
         return email_id, mime_email
 
 
 if __name__ == '__main__':
-    consumer = SendgridQueueConsumer()
+    consumer = InboundEmailQueueConsumer()
     consumer.run_forever()

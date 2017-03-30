@@ -1,21 +1,21 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from opwen_email_server.jobs import store_received_sendgrid_emails
+from opwen_email_server.jobs import store_inbound_emails
 
 
-class StoreReceivedSendgridEmailsTests(TestCase):
-    @patch.object(store_received_sendgrid_emails.sendgrid_receiver, 'QUEUE')
-    @patch.object(store_received_sendgrid_emails.sendgrid_receiver, 'STORAGE')
-    @patch.object(store_received_sendgrid_emails.server_datastore, 'store_email')
-    @patch.object(store_received_sendgrid_emails, 'parse_mime_email')
+class StoreInboundEmailsTests(TestCase):
+    @patch.object(store_inbound_emails.email_receiver, 'QUEUE')
+    @patch.object(store_inbound_emails.email_receiver, 'STORAGE')
+    @patch.object(store_inbound_emails.server_datastore, 'store_email')
+    @patch.object(store_inbound_emails, 'parse_mime_email')
     def test_reads_message_and_stores_email(
             self, parser_mock, store_mock, storage_mock, queue_mock):
 
         email_id = '7ad33d8a-c1ee-44c7-a655-fb0d167dc380'
         email = {'to': ['foo@bar.com']}
         self._given_message(email, email_id, parser_mock, queue_mock)
-        consumer = store_received_sendgrid_emails.SendgridQueueConsumer()
+        consumer = store_inbound_emails.InboundEmailQueueConsumer()
 
         consumer._run_once()
 

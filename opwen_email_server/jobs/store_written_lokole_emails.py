@@ -1,5 +1,5 @@
+from opwen_email_server.api import email_sender
 from opwen_email_server.api import lokole_write
-from opwen_email_server.api import sendgrid_sender
 from opwen_email_server.services import client_datastore
 from opwen_email_server.services import server_datastore
 from opwen_email_server.utils.queue_consumer import QueueConsumer
@@ -13,7 +13,7 @@ class LokoleWriteQueueConsumer(QueueConsumer):
         for email in client_datastore.unpack_emails(message['resource_id']):
             server_datastore.store_email(email['_uid'], email)
 
-            sendgrid_sender.QUEUE.enqueue({
+            email_sender.QUEUE.enqueue({
                 '_version': '0.1',
                 '_type': 'email_to_send',
                 'resource_id': email['_uid'],

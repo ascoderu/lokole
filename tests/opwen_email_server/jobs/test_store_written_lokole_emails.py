@@ -6,7 +6,7 @@ from opwen_email_server.jobs import store_written_lokole_emails
 
 class StoreWrittenLokoleEmailsTests(TestCase):
     @patch.object(store_written_lokole_emails.lokole_write, 'QUEUE')
-    @patch.object(store_written_lokole_emails.sendgrid_sender, 'QUEUE')
+    @patch.object(store_written_lokole_emails.email_sender, 'QUEUE')
     @patch.object(store_written_lokole_emails.client_datastore,
                   'unpack_emails')
     @patch.object(store_written_lokole_emails.server_datastore, 'store_email')

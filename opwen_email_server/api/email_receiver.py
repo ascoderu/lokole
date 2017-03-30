@@ -20,7 +20,6 @@ def receive(email: str) -> Tuple[str, int]:
     QUEUE.enqueue({
         '_version': '0.1',
         '_type': 'mime_email_received',
-        '_received_by': 'sendgrid',
         'resource_id': email_id,
         'container_name': STORAGE.container,
     })
