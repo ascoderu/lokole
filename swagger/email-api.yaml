@@ -28,7 +28,7 @@ paths:
   /lokole:
 
     post:
-      operationId: opwen_email_server.api.lokole_write.upload
+      operationId: opwen_email_server.api.client_write.upload
       summary: Endpoint where Lokole clients notify the server that they wish to send/upload some emails.
       consumes:
         - application/json
@@ -59,7 +59,7 @@ paths:
           description: Request from unregistered client.
 
     get:
-      operationId: opwen_email_server.api.lokole_read.download
+      operationId: opwen_email_server.api.client_read.download
       summary: Endpoint that the Lokole clients call to get their new emails from the server.
       produces:
         - application/json

@@ -1,15 +1,15 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from opwen_email_server.jobs import store_written_lokole_emails
+from opwen_email_server.jobs import store_written_client_emails
 
 
-class StoreWrittenLokoleEmailsTests(TestCase):
-    @patch.object(store_written_lokole_emails.lokole_write, 'QUEUE')
-    @patch.object(store_written_lokole_emails.email_sender, 'QUEUE')
-    @patch.object(store_written_lokole_emails.client_datastore,
+class StoreWrittenClientEmailsTests(TestCase):
+    @patch.object(store_written_client_emails.client_write, 'QUEUE')
+    @patch.object(store_written_client_emails.email_sender, 'QUEUE')
+    @patch.object(store_written_client_emails.client_datastore,
                   'unpack_emails')
-    @patch.object(store_written_lokole_emails.server_datastore, 'store_email')
+    @patch.object(store_written_client_emails.server_datastore, 'store_email')
     def test_reads_message_and_stores_email(
             self, store_mock, unpack_mock, send_queue_mock, write_queue_mock):
 
@@ -20,7 +20,7 @@ class StoreWrittenLokoleEmailsTests(TestCase):
         email2 = {'to': ['bar@test.com'], '_uid': email2_id}
         emails = [email1, email2]
         self._given_message(emails, resource_id, unpack_mock, write_queue_mock)
-        consumer = store_written_lokole_emails.LokoleWriteQueueConsumer()
+        consumer = store_written_client_emails.ClientWriteQueueConsumer()
 
         consumer._run_once()
 

@@ -20,7 +20,7 @@ class UploadTests(TestCase):
     @contextmanager
     def _given_clients(cls, clients: str):
         environ['LOKOLE_CLIENTS'] = clients
-        from opwen_email_server.api import lokole_write
-        with patch.object(lokole_write, 'QUEUE') as mock_queue:
-            yield lokole_write.upload, mock_queue
-        del lokole_write
+        from opwen_email_server.api import client_write
+        with patch.object(client_write, 'QUEUE') as mock_queue:
+            yield client_write.upload, mock_queue
+        del client_write

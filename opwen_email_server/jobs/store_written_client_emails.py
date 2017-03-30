@@ -1,13 +1,13 @@
 from opwen_email_server.api import email_sender
-from opwen_email_server.api import lokole_write
+from opwen_email_server.api import client_write
 from opwen_email_server.services import client_datastore
 from opwen_email_server.services import server_datastore
 from opwen_email_server.utils.queue_consumer import QueueConsumer
 
 
-class LokoleWriteQueueConsumer(QueueConsumer):
+class ClientWriteQueueConsumer(QueueConsumer):
     def __init__(self):
-        super().__init__(lokole_write.QUEUE.dequeue)
+        super().__init__(client_write.QUEUE.dequeue)
 
     def _process_message(self, message: dict):
         for email in client_datastore.unpack_emails(message['resource_id']):
@@ -22,5 +22,5 @@ class LokoleWriteQueueConsumer(QueueConsumer):
 
 
 if __name__ == '__main__':
-    consumer = LokoleWriteQueueConsumer()
+    consumer = ClientWriteQueueConsumer()
     consumer.run_forever()
