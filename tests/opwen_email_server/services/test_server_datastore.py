@@ -16,3 +16,16 @@ class StoreEmailTests(TestCase):
 
         self.assertEqual(storage_mock.store_text.call_count, 1)
         self.assertEqual(index_mock.insert.call_count, 1)
+
+
+class FetchEmailTests(TestCase):
+    @patch.object(server_datastore.STORAGE, 'fetch_text')
+    def test_retrieves_email(self, fetch_mock):
+        email_id = '124966bc-150b-11e7-93ae-92361f002671'
+        email = {'to': ['test@foo.com']}
+        fetch_mock.return_value = '{"to": ["test@foo.com"]}'
+
+        actual = server_datastore.fetch_email(email_id)
+
+        self.assertEqual(email, actual)
+        fetch_mock.assert_called_once_with(email_id)

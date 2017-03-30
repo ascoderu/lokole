@@ -1,3 +1,5 @@
+from json import loads
+
 from opwen_email_server import config
 from opwen_email_server.services.index import AzureIndex
 from opwen_email_server.services.storage import AzureStorage
@@ -20,6 +22,12 @@ INDEX = AzureIndex(
             '{}_{}'.format(domain, _.get('_delivered') or False)
             for domain in get_domains(_)),
         })
+
+
+def fetch_email(email_id: str) -> dict:
+    serialized = STORAGE.fetch_text(email_id)
+    email = loads(serialized)
+    return email
 
 
 def store_email(email_id: str, email: dict):
