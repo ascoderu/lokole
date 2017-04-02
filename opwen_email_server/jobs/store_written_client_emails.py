@@ -1,4 +1,4 @@
-from opwen_email_server.api import email_sender
+from opwen_email_server.api import email_send
 from opwen_email_server.api import client_write
 from opwen_email_server.services import client_datastore
 from opwen_email_server.services import server_datastore
@@ -13,7 +13,7 @@ class ClientWriteQueueConsumer(QueueConsumer):
         for email in client_datastore.unpack_emails(message['resource_id']):
             server_datastore.store_email(email['_uid'], email)
 
-            email_sender.QUEUE.enqueue({
+            email_send.QUEUE.enqueue({
                 '_version': '0.1',
                 '_type': 'email_to_send',
                 'resource_id': email['_uid'],

@@ -6,7 +6,7 @@ from opwen_email_server.jobs import store_written_client_emails
 
 class StoreWrittenClientEmailsTests(TestCase):
     @patch.object(store_written_client_emails.client_write, 'QUEUE')
-    @patch.object(store_written_client_emails.email_sender, 'QUEUE')
+    @patch.object(store_written_client_emails.email_send, 'QUEUE')
     @patch.object(store_written_client_emails.client_datastore,
                   'unpack_emails')
     @patch.object(store_written_client_emails.server_datastore, 'store_email')

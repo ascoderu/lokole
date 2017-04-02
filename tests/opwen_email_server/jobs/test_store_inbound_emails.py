@@ -5,8 +5,8 @@ from opwen_email_server.jobs import store_inbound_emails
 
 
 class StoreInboundEmailsTests(TestCase):
-    @patch.object(store_inbound_emails.email_receiver, 'QUEUE')
-    @patch.object(store_inbound_emails.email_receiver, 'STORAGE')
+    @patch.object(store_inbound_emails.email_receive, 'QUEUE')
+    @patch.object(store_inbound_emails.email_receive, 'STORAGE')
     @patch.object(store_inbound_emails.server_datastore, 'store_email')
     @patch.object(store_inbound_emails, 'parse_mime_email')
     def test_reads_message_and_stores_email(

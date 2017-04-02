@@ -5,9 +5,9 @@ from opwen_email_server.jobs import send_outbound_emails
 
 
 class SendOutboundEmailsTests(TestCase):
-    @patch.object(send_outbound_emails.email_sender, 'QUEUE')
+    @patch.object(send_outbound_emails.email_send, 'QUEUE')
     @patch.object(send_outbound_emails.server_datastore, 'fetch_email')
-    @patch.object(send_outbound_emails.email_sender, 'send')
+    @patch.object(send_outbound_emails.email_send, 'send')
     def test_reads_message_and_stores_email(
             self, send_mock, fetch_mock, queue_mock):
 

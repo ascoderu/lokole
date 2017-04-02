@@ -11,7 +11,7 @@ paths:
   /sendgrid:
 
     post:
-      operationId: opwen_email_server.api.email_receiver.receive
+      operationId: opwen_email_server.api.email_receive.receive
       summary: Webhook listening to emails received via Sendgrid.
       consumes:
         - multipart/form-data
