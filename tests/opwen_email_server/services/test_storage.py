@@ -10,7 +10,7 @@ from opwen_email_server.services.storage import AzureStorage
 class AzureStorageTests(TestCase):
     def test_creates_container_only_once(self):
         expected_content = 'some content'
-        storage, client_mock = self._given_storage(expected_content)
+        storage, client_mock = self.given_storage(expected_content)
 
         storage.fetch_text('id1')
         storage.fetch_text('id1')
@@ -19,7 +19,7 @@ class AzureStorageTests(TestCase):
 
     def test_fetches_text(self):
         expected_content = 'some content'
-        storage, client_mock = self._given_storage(expected_content)
+        storage, client_mock = self.given_storage(expected_content)
 
         content = storage.fetch_text('id1')
 
@@ -27,7 +27,7 @@ class AzureStorageTests(TestCase):
         self.assertEqual(content, expected_content)
 
     def test_stores_text(self):
-        storage, client_mock = self._given_storage()
+        storage, client_mock = self.given_storage()
 
         storage.store_text('id1', 'content')
 
@@ -35,7 +35,7 @@ class AzureStorageTests(TestCase):
 
     # noinspection PyTypeChecker
     @classmethod
-    def _given_storage(cls, content=None):
+    def given_storage(cls, content=None):
         client_mock = MagicMock()
         storage = AzureStorage(account='account', key='key', container='name',
                                factory=lambda *args, **kwargs: client_mock)
@@ -49,7 +49,7 @@ class AzureStorageTests(TestCase):
 
 class AzureFileStorageTests(TestCase):
     def test_fetches_file(self):
-        storage, client_mock = self._given_storage()
+        storage, client_mock = self.given_storage()
 
         self.when_fetching_file(storage)
 
@@ -57,7 +57,7 @@ class AzureFileStorageTests(TestCase):
 
     # noinspection PyTypeChecker
     @classmethod
-    def _given_storage(cls):
+    def given_storage(cls):
         client_mock = MagicMock()
         storage = AzureFileStorage(
             account='account', key='key', container='name',
