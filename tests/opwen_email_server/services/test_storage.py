@@ -7,10 +7,10 @@ from unittest.mock import MagicMock
 
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
-from opwen_email_server.services.storage import AzureStorage
+from opwen_email_server.services.storage import AzureTextStorage
 
 
-class AzureStorageTests(TestCase):
+class AzureTextStorageTests(TestCase):
     def test_creates_container_only_once(self):
         expected_content = 'some content'
         storage, client_mock = self.given_storage(expected_content)
@@ -40,8 +40,8 @@ class AzureStorageTests(TestCase):
     @classmethod
     def given_storage(cls, content=None):
         client_mock = MagicMock()
-        storage = AzureStorage(account='account', key='key', container='name',
-                               factory=lambda *args, **kwargs: client_mock)
+        storage = AzureTextStorage(account='account', key='key', container='name',
+                                   factory=lambda *args, **kwargs: client_mock)
 
         if content:
             build_blob = namedtuple('Blob', 'content')

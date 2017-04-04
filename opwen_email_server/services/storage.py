@@ -37,7 +37,7 @@ class _BaseAzureStorage(object):
         return self._container
 
 
-class AzureStorage(_BaseAzureStorage):
+class AzureTextStorage(_BaseAzureStorage):
     def store_text(self, resource_id: str, text: str):
         self._client.create_blob_from_text(self._container, resource_id, text)
 

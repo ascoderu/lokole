@@ -3,10 +3,11 @@ from uuid import uuid4
 
 from opwen_email_server import config
 from opwen_email_server.services.queue import AzureQueue
-from opwen_email_server.services.storage import AzureStorage
+from opwen_email_server.services.storage import AzureTextStorage
 
-STORAGE = AzureStorage(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
-                       container=config.CONTAINER_SENDGRID_MIME)
+STORAGE = AzureTextStorage(account=config.STORAGE_ACCOUNT,
+                           key=config.STORAGE_KEY,
+                           container=config.CONTAINER_SENDGRID_MIME)
 
 QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                    name=config.QUEUE_SENDGRID_MIME)
