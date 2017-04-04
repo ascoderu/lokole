@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from contextlib import suppress
 from os import close
 from os import remove
 from tempfile import mkstemp
@@ -15,4 +16,9 @@ def removing(path: str) -> str:
     try:
         yield path
     finally:
+        _remove_if_exists(path)
+
+
+def _remove_if_exists(path: str):
+    with suppress(FileNotFoundError):
         remove(path)

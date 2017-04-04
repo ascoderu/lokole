@@ -54,6 +54,12 @@ class RemovingTests(TestCase):
                 pass
             self.assertFileDoesNotExist(path)
 
+    def test_removes_file_only_if_exists(self):
+        with NamedTemporaryFile(delete=False) as fobj:
+            with temporary.removing(fobj.name) as path:
+                remove(path)
+            self.assertFileDoesNotExist(path)
+
     def test_removes_file_on_exception(self):
         with NamedTemporaryFile(delete=False) as fobj:
             with self.assertRaises(ValueError):
