@@ -1,6 +1,5 @@
 from gzip import open as gzip_open
 from json import loads
-from os import remove
 from typing import Callable
 from typing import Iterable
 from uuid import uuid4
@@ -9,6 +8,7 @@ from azure.storage.blob import BlockBlobService
 
 from opwen_email_server.utils.serialization import to_json
 from opwen_email_server.utils.temporary import create_tempfilename
+from opwen_email_server.utils.temporary import removing
 
 
 class _BaseAzureStorage(object):
@@ -64,27 +64,22 @@ class AzureObjectStorage(object):
 
     def store_objects(self, objs: Iterable[dict]) -> str:
         resource_id = str(uuid4())
-        path = create_tempfilename()
-        try:
+
+        with removing(create_tempfilename()) as path:
             with gzip_open(path, 'wb') as fobj:
                 for obj in objs:
                     serialized = to_json(obj)
                     encoded = serialized.encode(self._encoding)
                     fobj.write(encoded)
                     fobj.write(b'\n')
-        finally:
-            remove(path)
+            self._file_storage.store_file(resource_id, path)
 
-        self._file_storage.store_file(resource_id, path)
         return resource_id
 
     def fetch_objects(self, resource_id: str) -> Iterable[dict]:
-        path = self._file_storage.fetch_file(resource_id)
-        try:
+        with removing(self._file_storage.fetch_file(resource_id)) as path:
             with gzip_open(path, 'rb') as fobj:
                 for encoded in fobj:
                     serialized = encoded.decode(self._encoding)
                     obj = loads(serialized)
                     yield obj
-        finally:
-            remove(path)

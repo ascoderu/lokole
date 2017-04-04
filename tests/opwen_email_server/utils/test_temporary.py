@@ -1,5 +1,6 @@
 from os import remove
 from os.path import isfile
+from tempfile import NamedTemporaryFile
 from unittest import TestCase
 
 from opwen_email_server.utils import temporary
@@ -44,3 +45,22 @@ class CreateTempFilenameTests(TestCase):
                 pass
         except EnvironmentError:
             self.fail('unable to open {0}'.format(filename))
+
+
+class RemovingTests(TestCase):
+    def test_removes_file_when_done(self):
+        with NamedTemporaryFile(delete=False) as fobj:
+            with temporary.removing(fobj.name) as path:
+                pass
+            self.assertFileDoesNotExist(path)
+
+    def test_removes_file_on_exception(self):
+        with NamedTemporaryFile(delete=False) as fobj:
+            with self.assertRaises(ValueError):
+                with temporary.removing(fobj.name) as path:
+                    raise ValueError
+            self.assertFileDoesNotExist(path)
+
+    def assertFileDoesNotExist(self, filename):
+        if isfile(filename):
+            self.fail('file {0} does exists'.format(filename))
