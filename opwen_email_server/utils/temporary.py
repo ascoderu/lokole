@@ -3,6 +3,7 @@ from contextlib import suppress
 from os import close
 from os import remove
 from tempfile import mkstemp
+from typing import Generator
 
 
 def create_tempfilename() -> str:
@@ -12,7 +13,7 @@ def create_tempfilename() -> str:
 
 
 @contextmanager
-def removing(path: str) -> str:
+def removing(path: str) -> Generator[str, None, None]:
     try:
         yield path
     finally:
