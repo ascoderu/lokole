@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from opwen_email_server.api import email_send
+from opwen_email_server.backend import email_send
 
 
 class SendTests(TestCase):

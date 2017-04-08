@@ -1,13 +1,15 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from opwen_email_server.backend import email_send
+from opwen_email_server.backend import server_datastore
 from opwen_email_server.jobs import send_outbound_emails
 
 
 class SendOutboundEmailsTests(TestCase):
-    @patch.object(send_outbound_emails.email_send, 'QUEUE')
-    @patch.object(send_outbound_emails.server_datastore, 'fetch_email')
-    @patch.object(send_outbound_emails.email_send, 'send')
+    @patch.object(email_send, 'QUEUE')
+    @patch.object(server_datastore, 'fetch_email')
+    @patch.object(email_send, 'send')
     def test_reads_message_and_stores_email(
             self, send_mock, fetch_mock, queue_mock):
 

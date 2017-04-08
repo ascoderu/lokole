@@ -2,7 +2,7 @@ from typing import Tuple
 from typing import Union
 
 from opwen_email_server import config
-from opwen_email_server.services import server_datastore
+from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import EnvironmentAuth
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage

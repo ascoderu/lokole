@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from opwen_email_server.services import client_datastore
+from opwen_email_server.backend import client_datastore
 
 
 class UnpackEmailsTests(TestCase):

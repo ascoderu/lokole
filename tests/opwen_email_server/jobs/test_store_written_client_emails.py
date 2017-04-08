@@ -1,15 +1,17 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from opwen_email_server.backend import client_datastore
+from opwen_email_server.backend import email_send
+from opwen_email_server.backend import server_datastore
 from opwen_email_server.jobs import store_written_client_emails
 
 
 class StoreWrittenClientEmailsTests(TestCase):
     @patch.object(store_written_client_emails.client_write, 'QUEUE')
-    @patch.object(store_written_client_emails.email_send, 'QUEUE')
-    @patch.object(store_written_client_emails.client_datastore,
-                  'unpack_emails')
-    @patch.object(store_written_client_emails.server_datastore, 'store_email')
+    @patch.object(email_send, 'QUEUE')
+    @patch.object(client_datastore, 'unpack_emails')
+    @patch.object(server_datastore, 'store_email')
     def test_reads_message_and_stores_email(
             self, store_mock, unpack_mock, send_queue_mock, write_queue_mock):
 
