@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-from connexion import App
 from argparse import ArgumentParser
 from argparse import FileType
+
+from connexion import App
 
 from opwen_email_server.utils.imports import can_import
 
