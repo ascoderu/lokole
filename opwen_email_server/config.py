@@ -18,17 +18,17 @@ LOG_LEVEL = environ.get('LOKOLE_LOG_LEVEL', 'INFO')
 # Azure configuration values
 #
 
-CONTAINER_CLIENT_PACKAGES = 'CompressedPackages'
-CONTAINER_EMAILS = 'Emails'
-CONTAINER_SENDGRID_MIME = 'SendgridInboundEmails'
+CONTAINER_CLIENT_PACKAGES = 'compressedpackages'
+CONTAINER_EMAILS = 'emails'
+CONTAINER_SENDGRID_MIME = 'sendgridinboundemails'
 
-TABLE_DOMAIN = 'domain'
-TABLE_TO = 'to'
-TABLE_CC = 'cc'
-TABLE_BCC = 'bcc'
-TABLE_FROM = 'from'
-TABLE_DOMAIN_X_DELIVERED = 'domainXdelivered'
+TABLE_DOMAIN = 'emaildomain'
+TABLE_TO = 'emailto'
+TABLE_CC = 'emailcc'
+TABLE_BCC = 'emailbcc'
+TABLE_FROM = 'emailfrom'
+TABLE_DOMAIN_X_DELIVERED = 'emaildomainxdelivered'
 
-QUEUE_CLIENT_PACKAGE = 'LokoleInboundEmails'
-QUEUE_EMAIL_SEND = 'SengridOutboundEmails'
-QUEUE_SENDGRID_MIME = 'SengridInboundEmails'
+QUEUE_CLIENT_PACKAGE = 'lokoleinboundemails'
+QUEUE_EMAIL_SEND = 'sengridoutboundemails'
+QUEUE_SENDGRID_MIME = 'sengridinboundemails'
