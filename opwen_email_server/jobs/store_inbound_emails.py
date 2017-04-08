@@ -2,8 +2,8 @@ from typing import Tuple
 
 from opwen_email_server.api import email_receive
 from opwen_email_server.backend import server_datastore
+from opwen_email_server.services.queue_consumer import QueueConsumer
 from opwen_email_server.utils.email_parser import parse_mime_email
-from opwen_email_server.utils.queue_consumer import QueueConsumer
 
 
 class InboundEmailQueueConsumer(QueueConsumer):

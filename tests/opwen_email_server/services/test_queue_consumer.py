@@ -1,10 +1,10 @@
 from queue import Queue
-from threading import Thread
 from sys import exc_info
+from threading import Thread
 from time import sleep
 from unittest import TestCase
 
-from opwen_email_server.utils.queue_consumer import QueueConsumer
+from opwen_email_server.services.queue_consumer import QueueConsumer
 
 
 class TestQueueConsumer(QueueConsumer):

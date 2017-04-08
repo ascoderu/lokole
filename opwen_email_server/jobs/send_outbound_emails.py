@@ -1,6 +1,6 @@
 from opwen_email_server.backend import email_send
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.utils.queue_consumer import QueueConsumer
+from opwen_email_server.services.queue_consumer import QueueConsumer
 
 
 class OutboundEmailQueueConsumer(QueueConsumer):
