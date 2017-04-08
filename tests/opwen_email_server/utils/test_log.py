@@ -37,6 +37,6 @@ class LogMixinTests(TestCase):
             self.fail('unable to format string: %s %% %r' % (fmt, args))
 
     def setUp(self):
-        self.log_patcher = patch('opwen_email_server.utils.log._LOG')
+        self.log_patcher = patch.object(log, '_LOG')
         self.logger_mock = self.log_patcher.start()
         self.addCleanup(self.log_patcher.stop)
