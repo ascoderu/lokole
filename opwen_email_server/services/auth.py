@@ -1,10 +1,13 @@
 from ast import literal_eval
+
 from os import environ
 from typing import Callable
 from typing import Mapping
 
+from opwen_email_server.utils.log import LogMixin
 
-class EnvironmentAuth(object):
+
+class EnvironmentAuth(LogMixin):
     def __init__(self, client_to_domain: Mapping[str, str]=None,
                  envgetter: Callable[[str, str], str]=environ.get,
                  envkey: str='LOKOLE_CLIENTS') -> None:
@@ -16,6 +19,7 @@ class EnvironmentAuth(object):
     @property
     def _client_to_domain(self):
         if not self.__client_to_domain:
+            self.log_debug('initialized auth to %r', self.__client_to_domain)
             self.__client_to_domain = self._create_client_to_domain()
         return self.__client_to_domain
 

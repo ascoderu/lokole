@@ -7,10 +7,12 @@ from typing import TypeVar
 from azure.storage.table import TableBatch
 from azure.storage.table import TableService
 
+from opwen_email_server.utils.log import LogMixin
+
 T = TypeVar('T')
 
 
-class AzureIndex(Generic[T]):
+class AzureIndex(LogMixin, Generic[T]):
     def __init__(self, account: str, key: str,
                  tables: Mapping[str, Callable[[T], Iterable[str]]],
                  client: TableService=None,
@@ -45,6 +47,7 @@ class AzureIndex(Generic[T]):
                     'RowKey': item_id,
                 })
                 commit_required = True
+                self.log_debug('inserted %s into %s/%s', item_id, table, value)
 
             if commit_required:
                 self._client.commit_batch(table, batch)
@@ -52,12 +55,18 @@ class AzureIndex(Generic[T]):
     def query(self, table: str, partition: str) -> Iterable[str]:
         search_query = "PartitionKey eq '{}'".format(partition)
         entities = self._client.query_entities(table, search_query)
+        num_fetched = 0
         for entity in entities:
             item_id = entity['RowKey']
+            num_fetched += 1
             yield item_id
+        self.log_debug('fetched %d from %s/%s', num_fetched, table, partition)
 
     def delete(self, table: str, partition: str, item_ids: Iterable[str]):
         batch = self._batch_factory()
+        num_deleted = 0
         for item_id in item_ids:
             batch.delete_entity(partition, item_id)
+            num_deleted += 1
         self._client.commit_batch(table, batch)
+        self.log_debug('deleted %d from %s/%s', num_deleted, table, partition)

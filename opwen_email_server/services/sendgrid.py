@@ -11,8 +11,10 @@ from sendgrid.helpers.mail import Email
 from sendgrid.helpers.mail import Mail
 from sendgrid.helpers.mail import Personalization
 
+from opwen_email_server.utils.log import LogMixin
 
-class SendgridEmailSender(object):
+
+class SendgridEmailSender(LogMixin):
     def __init__(self, key: str,
                  on_error: Callable[[int, str], None]=None,
                  client: SendGridAPIClient=None,
@@ -42,16 +44,20 @@ class SendgridEmailSender(object):
         return success
 
     def _send_email(self, email: Mail) -> Tuple[int, str]:
+        self.log_debug('about to send email')
         request = email.get()
         try:
             response = self._client.client.mail.send.post(request_body=request)
         except HTTPError as exception:
+            self.log_exception('error sending email')
             status = exception.code
             message = str(exception.read())
         except URLError as exception:
+            self.log_exception('error sending email')
             status = None
             message = str(exception.reason)
         else:
+            self.log_debug('sent email')
             status = response.status_code
             message = str(response.headers)
 

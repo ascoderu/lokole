@@ -1,13 +1,14 @@
 from json import loads
+
+from azure.storage.queue import QueueService
 from typing import Callable
 from typing import Iterable
 
-from azure.storage.queue import QueueService
-
+from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import to_json
 
 
-class AzureQueue(object):
+class AzureQueue(LogMixin):
     def __init__(self, account: str, key: str, name: str,
                  client: QueueService=None,
                  factory: Callable[..., QueueService]=QueueService) -> None:
@@ -42,6 +43,7 @@ class AzureQueue(object):
     def enqueue(self, content: dict):
         message = self._pack(content)
         self._client.put_message(self._name, message)
+        self.log_debug('received message')
 
     # noinspection PyBroadException
     def dequeue(self, batch: int=1, lock_seconds: int=10) -> Iterable[dict]:
@@ -50,11 +52,17 @@ class AzureQueue(object):
             try:
                 payload = self._unpack(message.content)
             except Exception:
+                self.log_exception('error unpacking message')
                 pass
             else:
                 try:
                     yield payload
                 except Exception:
+                    self.log_exception('error processing message payload')
                     continue
             self._client.delete_message(self._name, message.id,
                                         message.pop_receipt)
+            self.log_debug('done with message %r, deleting', message.id)
+
+    def extra_log_args(self):
+        yield 'queue %s', self._name

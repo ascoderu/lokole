@@ -1,9 +1,12 @@
 from time import sleep
+
 from typing import Callable
 from typing import Iterable
 
+from opwen_email_server.utils.log import LogMixin
 
-class QueueConsumer(object):
+
+class QueueConsumer(LogMixin):
     def __init__(self, dequeue: Callable[[], Iterable[dict]],
                  poll_seconds: float=10) -> None:
 
@@ -20,10 +23,14 @@ class QueueConsumer(object):
             self._process_message(message)
 
     def run_forever(self):
+        self.log_debug('queue consumer listening')
         while self._is_running:
+            self.log_debug('starting polling queue')
             # noinspection PyBroadException
             try:
                 self._run_once()
             except Exception:
+                self.log_exception('error polling queue')
                 pass
+            self.log_debug('done polling queue')
             sleep(self._poll_seconds)

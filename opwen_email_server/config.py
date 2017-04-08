@@ -12,6 +12,8 @@ CLIENT_STORAGE_KEY = environ.get('LOKOLE_CLIENT_AZURE_STORAGE_KEY')
 
 EMAIL_SENDER_KEY = environ.get('LOKOLE_SENDGRID_KEY')
 
+LOG_LEVEL = environ.get('LOKOLE_LOG_LEVEL', 'INFO')
+
 #
 # Azure configuration values
 #
