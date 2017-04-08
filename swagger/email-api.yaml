@@ -78,6 +78,9 @@ paths:
               resource_id:
                 description: Id of the resource containing the emails to download to the Lokole client.
                 type: string
+              resource_container:
+                description: Container where the resource containing emails can be found.
+                type: string
               resource_type:
                 description: The provider where the resource containing emails can be found.
                 type: string

@@ -29,3 +29,23 @@ class FetchEmailTests(TestCase):
 
         self.assertEqual(email, actual)
         fetch_mock.assert_called_once_with(email_id)
+
+
+class MarkEmailsAsDeliveredTests(TestCase):
+    @patch.object(server_datastore, 'INDEX')
+    def test_deletes_emails(self, index_mock):
+        server_datastore.mark_emails_as_delivered('foo.com', ['1', '2'])
+
+        self.assertEqual(index_mock.delete.call_count, 1)
+
+
+class FetchPendingEmailsTests(TestCase):
+    @patch.object(server_datastore, 'fetch_email')
+    @patch.object(server_datastore, 'INDEX')
+    def test_deletes_emails(self, index_mock, fetch_mock):
+        email_ids = ['1', '2', '3']
+        index_mock.query.return_value = email_ids
+
+        list(server_datastore.fetch_pending_emails('foo.com'))
+
+        self.assertEqual(fetch_mock.call_count, len(email_ids))

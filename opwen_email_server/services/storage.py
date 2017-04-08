@@ -62,6 +62,10 @@ class AzureObjectStorage(object):
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
 
+    @property
+    def container(self) -> str:
+        return self._file_storage.container
+
     def store_objects(self, objs: Iterable[dict]) -> str:
         resource_id = str(uuid4())
 

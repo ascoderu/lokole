@@ -27,3 +27,6 @@ class EnvironmentAuth(object):
 
     def __contains__(self, client: str) -> bool:
         return client in self._client_to_domain
+
+    def domain_for(self, client: str) -> str:
+        return self._client_to_domain[client]

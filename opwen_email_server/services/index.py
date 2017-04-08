@@ -48,3 +48,16 @@ class AzureIndex(Generic[T]):
 
             if commit_required:
                 self._client.commit_batch(table, batch)
+
+    def query(self, table: str, partition: str) -> Iterable[str]:
+        search_query = "PartitionKey eq '{}'".format(partition)
+        entities = self._client.query_entities(table, search_query)
+        for entity in entities:
+            item_id = entity['RowKey']
+            yield item_id
+
+    def delete(self, table: str, partition: str, item_ids: Iterable[str]):
+        batch = self._batch_factory()
+        for item_id in item_ids:
+            batch.delete_entity(partition, item_id)
+        self._client.commit_batch(table, batch)

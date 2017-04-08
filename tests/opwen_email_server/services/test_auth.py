@@ -15,3 +15,10 @@ class EnvironmentAuthTest(TestCase):
 
         with self.assertRaises(ValueError):
             auth.__contains__('something')
+
+    def test_gets_domain_for_client(self):
+        auth = EnvironmentAuth(envgetter=lambda _, __: '{"client":"domain"}')
+
+        domain = auth.domain_for('client')
+
+        self.assertEqual(domain, 'domain')
