@@ -49,7 +49,7 @@ dependencies into a virtual environment.
 
   cd opwen-cloudserver
 
-  make test
+  make tests
   make server
   make workers
 

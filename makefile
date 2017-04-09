@@ -31,7 +31,7 @@ venv: $(py_env)/bin/activate
 unit-tests: venv
 	$(py_env)/bin/nosetests
 
-test: unit-tests
+tests: unit-tests
 
 lint: venv
 	$(py_env)/bin/flake8 $(py_packages)
@@ -39,7 +39,7 @@ lint: venv
 typecheck: venv
 	$(py_env)/bin/mypy --silent-imports $(py_packages)
 
-ci: test lint typecheck
+ci: tests lint typecheck
 
 server: venv
 	$(api_runner)
