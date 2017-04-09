@@ -10,14 +10,13 @@ QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
 CLIENTS = EnvironmentAuth()
 
 
-def upload(upload_info: dict) -> Tuple[str, int]:
-    client_id = upload_info.get('client_id')
+def upload(client_id: str, upload_info: dict) -> Tuple[str, int]:
+    if client_id not in CLIENTS:
+        return 'client is not registered', 403
+
     resource_type = upload_info.get('resource_type')
     resource_id = upload_info.get('resource_id')
     resource_container = upload_info.get('resource_container')
-
-    if client_id not in CLIENTS:
-        return 'client is not registered', 403
 
     QUEUE.enqueue({
         '_version': '0.1',

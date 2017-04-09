@@ -33,15 +33,17 @@ paths:
       consumes:
         - application/json
       parameters:
+        - name: client_id
+          in: header
+          required: true
+          description: Id of the Lokole client that wishes to send some emails.
+          type: string
         - name: upload_info
           in: body
           required: true
           schema:
             type: object
             properties:
-              client_id:
-                description: Id of the Lokole client that wishes to send some emails.
-                type: string
               resource_id:
                 description: Id of the resource containing the emails to send from the Lokole client.
                 type: string
@@ -67,7 +69,7 @@ paths:
         - name: client_id
           description: Id of the Lokole client that wishes to recieve some emails.
           type: string
-          in: query
+          in: header
           required: true
       responses:
         200:

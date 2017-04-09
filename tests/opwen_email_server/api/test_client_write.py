@@ -7,13 +7,13 @@ from unittest.mock import patch
 class UploadTests(TestCase):
     def test_schedules_upload_for_client(self):
         with self._given_clients('{"client1": "id1"}') as (upload, mock_queue):
-            message, status = upload({'client_id': 'client1'})
+            message, status = upload('client1', {})
             self.assertEqual(status, 200)
             self.assertEqual(mock_queue.enqueue.call_count, 1)
 
     def test_denies_unknown_client(self):
         with self._given_clients('{"client1": "id1"}') as (upload, _):
-            message, status = upload({'client_id': 'unknown'})
+            message, status = upload('unknown', {})
             self.assertEqual(status, 403)
 
     @classmethod
