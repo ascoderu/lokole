@@ -11,8 +11,8 @@ What's this?
 ------------
 
 This repository contains the source code for the Opwen cloud server. Its purpose
-is to connect the `application <https://github.com/ascoderu/opwen-webapp>`_ running
-on the Opwen Lokole devices to the rest of the world.
+is to connect the `application <https://github.com/ascoderu/opwen-webapp>`_
+running on the Opwen Lokole devices to the rest of the world.
 
 The server has two main responsibilities:
 
