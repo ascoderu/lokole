@@ -2,6 +2,7 @@ from gzip import open as gzip_open
 from json import loads
 from typing import Callable
 from typing import Iterable
+from typing import Optional
 from uuid import uuid4
 
 from azure.storage.blob import BlockBlobService
@@ -75,7 +76,7 @@ class AzureObjectStorage(LogMixin):
     def container(self) -> str:
         return self._file_storage.container
 
-    def store_objects(self, objs: Iterable[dict]) -> str:
+    def store_objects(self, objs: Iterable[dict]) -> Optional[str]:
         resource_id = str(uuid4())
 
         num_stored = 0
@@ -87,10 +88,12 @@ class AzureObjectStorage(LogMixin):
                     fobj.write(encoded)
                     fobj.write(b'\n')
                     num_stored += 1
-            self._file_storage.store_file(resource_id, path)
+
+            if num_stored > 0:
+                self._file_storage.store_file(resource_id, path)
 
         self.log_debug('stored %d objects at %s', num_stored, resource_id)
-        return resource_id
+        return resource_id if num_stored > 0 else None
 
     def fetch_objects(self, resource_id: str) -> Iterable[dict]:
         num_fetched = 0

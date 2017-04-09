@@ -96,9 +96,19 @@ class AzureObjectStorageTests(TestCase):
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
         storage, client_mock = self.given_storage()
 
-        storage.store_objects(objs)
+        resource_id = storage.store_objects(objs)
 
+        self.assertIsNotNone(resource_id)
         self.assertEqual(client_mock.store_file.call_count, 1)
+
+    def test_does_not_create_file_without_objects(self):
+        objs = []
+        storage, client_mock = self.given_storage()
+
+        resource_id = storage.store_objects(objs)
+
+        self.assertIsNone(resource_id)
+        self.assertEqual(client_mock.store_file.call_count, 0)
 
     # noinspection PyTypeChecker
     @classmethod
