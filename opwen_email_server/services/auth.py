@@ -19,8 +19,8 @@ class EnvironmentAuth(LogMixin):
     @property
     def _client_to_domain(self):
         if not self.__client_to_domain:
-            self.log_debug('initialized auth to %r', self.__client_to_domain)
             self.__client_to_domain = self._create_client_to_domain()
+            self.log_debug('initialized auth to %r', self.__client_to_domain)
         return self.__client_to_domain
 
     def _create_client_to_domain(self) -> Mapping[str, str]:
