@@ -37,20 +37,17 @@ First, get the source code.
 
   git clone git@github.com:ascoderu/opwen-cloudserver.git
 
-Second, install the dependencies for the package and verify your checkout by
-running the tests.
+Second, use the makefile to verify your installation by running the tests and
+starting up the server. The makefile will automatically install all required
+dependencies into a virtual environment.
 
 .. sourcecode :: sh
 
   cd opwen-cloudserver
 
-  virtualenv -p "$(which python3)" --no-site-packages virtualenv
-  . virtualenv/bin/activate
-  pip install --upgrade pip
-  pip install -r requirements.txt
+  make unit-tests
+  make server
 
-  pip install nose
-  nosetests
-
-The routes of the app are defined in ``opwen_email_server/views.py`` so take
-a look there for an overview of the entrypoints into the code.
+There is an `OpenAPI specification <https://github.com/ascoderu/opwen-cloudserver/blob/master/docs/email-api-spec.yaml>`_
+that documents the functionality of the application and provides pointers to the
+entry points into the code.
