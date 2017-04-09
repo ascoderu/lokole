@@ -17,6 +17,24 @@ class AzureIndexTests(TestCase):
         self.assertEqual(client_mock.insert_or_replace_entity.call_count, 7)
         self.assertEqual(client_mock.create_table.call_count, 2)
 
+    def test_sanitizes_forbidden_values(self):
+        index, client_mock, batch_mock = self._given_index(
+            {'table1': lambda _: [_['col1']]})
+
+        index.insert('id1', {'col1': 'san?\\#\nit\t\rized'})
+
+        client_mock.insert_or_replace_entity.assert_called_once_with(
+            'table1', {'RowKey': 'id1', 'PartitionKey': 'sanitized'})
+
+    def test_shortens_long_values(self):
+        index, client_mock, batch_mock = self._given_index(
+            {'table1': lambda _: [_['col1']]})
+        index.insert('id1', {'col1': 'very long' * 1024})
+
+        call_args = client_mock.insert_or_replace_entity.call_args[0]
+        self.assertEqual(call_args[0], 'table1')
+        self.assertLessEqual(len(call_args[1]['PartitionKey']), 1000)
+
     def test_delete(self):
         index, client_mock, batch_mock = self._given_index(
             {'table1': lambda _: [_['col1']]})

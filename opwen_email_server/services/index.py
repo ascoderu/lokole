@@ -1,3 +1,4 @@
+from re import compile as re_compile
 from typing import Callable
 from typing import Iterable
 from typing import Mapping
@@ -12,6 +13,9 @@ T = TypeVar('T')
 
 
 class AzureIndex(LogMixin):
+    _PARTITIONKEY_MAX_LENGTH = 1000
+    _PARTITIONKEY_INVALID = re_compile('[\\\\/#?\u0000-\u001f\u007f-\u009f]')
+
     def __init__(self, account: str, key: str,
                  tables: Mapping[str, Callable[[T], Iterable[str]]],
                  client: TableService=None,
@@ -38,6 +42,7 @@ class AzureIndex(LogMixin):
     def insert(self, item_id: str, item: T):
         for table, values_getter in self._tables.items():
             for value in values_getter(item):
+                value = self._sanitize(value)
                 self._client.insert_or_replace_entity(table, {
                     'PartitionKey': value,
                     'RowKey': item_id,
@@ -62,3 +67,12 @@ class AzureIndex(LogMixin):
             num_deleted += 1
         self._client.commit_batch(table, batch)
         self.log_debug('deleted %d from %s/%s', num_deleted, table, partition)
+
+    @classmethod
+    def _sanitize(cls, value: str) -> str:
+        if not value:
+            return value
+
+        value = cls._PARTITIONKEY_INVALID.sub('', value)
+        value = value[:cls._PARTITIONKEY_MAX_LENGTH]
+        return value
