@@ -23,10 +23,14 @@ The server has two main responsibilities:
 This package is intended to run on an Ubuntu server. There is a `script <https://github.com/ascoderu/opwen-setup>`_
 to set up a server with all the bits and pieces necessary for deployment.
 
-Technical overview
-------------------
+System overview
+---------------
 
-Can be found in the `opwen-shared readme <https://github.com/ascoderu/opwen-shared/blob/master/README.rst>`_.
+.. image:: docs/system-overview.png
+  :width: 800
+  :align: center
+  :alt: Overview of the Lokole system
+  :target: https://raw.githubusercontent.com/ascoderu/opwen-cloudserver/master/docs/system-overview.png
 
 Development setup
 -----------------
