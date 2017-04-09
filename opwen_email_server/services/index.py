@@ -38,19 +38,12 @@ class AzureIndex(LogMixin, Generic[T]):
 
     def insert(self, item_id: str, item: T):
         for table, values_getter in self._tables.items():
-            commit_required = False
-
-            batch = self._batch_factory()
             for value in values_getter(item):
-                batch.insert_or_replace_entity({
+                self._client.insert_or_replace_entity(table, {
                     'PartitionKey': value,
                     'RowKey': item_id,
                 })
-                commit_required = True
                 self.log_debug('inserted %s into %s/%s', item_id, table, value)
-
-            if commit_required:
-                self._client.commit_batch(table, batch)
 
     def query(self, table: str, partition: str) -> Iterable[str]:
         search_query = "PartitionKey eq '{}'".format(partition)

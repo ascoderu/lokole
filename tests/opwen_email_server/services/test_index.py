@@ -14,8 +14,7 @@ class AzureIndexTests(TestCase):
         index.insert('id2', {'col1': 'val2_1', 'col2': '12'})
         index.insert('id3', {'col1': 'val2_1'})
 
-        self.assertEqual(batch_mock.insert_or_replace_entity.call_count, 7)
-        self.assertEqual(client_mock.commit_batch.call_count, 5)
+        self.assertEqual(client_mock.insert_or_replace_entity.call_count, 7)
         self.assertEqual(client_mock.create_table.call_count, 2)
 
     def test_delete(self):
