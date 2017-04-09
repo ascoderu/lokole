@@ -9,7 +9,7 @@ VIRTUALENV=/usr/local/bin/virtualenv
 #
 api_port=8080
 api_server=tornado
-api_specs=swagger/email-api.yaml
+api_specs=docs/email-api-spec.yaml
 
 #
 # You shouldn't need to touch anything below this line.
