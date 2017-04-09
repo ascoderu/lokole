@@ -15,7 +15,7 @@ packages = find_packages(exclude=['tests*'])
 
 setup(
     name='opwen_email_server',
-    version='0.0.13',
+    version='0.1.0',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
