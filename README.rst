@@ -49,7 +49,7 @@ dependencies into a virtual environment.
 
   cd opwen-cloudserver
 
-  make unit-tests
+  make test
   make server
 
 There is an `OpenAPI specification <https://github.com/ascoderu/opwen-cloudserver/blob/master/docs/email-api-spec.yaml>`_

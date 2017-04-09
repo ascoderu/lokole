@@ -31,13 +31,15 @@ venv: $(py_env)/bin/activate
 unit-tests: venv
 	$(py_env)/bin/nosetests
 
+test: unit-tests
+
 lint: venv
 	$(py_env)/bin/flake8 $(py_packages)
 
 typecheck: venv
 	$(py_env)/bin/mypy --silent-imports $(py_packages)
 
-ci: unit-tests lint typecheck
+ci: test lint typecheck
 
 server: venv
 	$(api_runner)
