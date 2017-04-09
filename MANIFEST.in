@@ -1,3 +1,2 @@
-include runserver
 include requirements.txt
 recursive-include docs *.yaml
