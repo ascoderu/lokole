@@ -1,5 +1,4 @@
 from typing import Callable
-from typing import Generic
 from typing import Iterable
 from typing import Mapping
 from typing import TypeVar
@@ -12,7 +11,7 @@ from opwen_email_server.utils.log import LogMixin
 T = TypeVar('T')
 
 
-class AzureIndex(LogMixin, Generic[T]):
+class AzureIndex(LogMixin):
     def __init__(self, account: str, key: str,
                  tables: Mapping[str, Callable[[T], Iterable[str]]],
                  client: TableService=None,
