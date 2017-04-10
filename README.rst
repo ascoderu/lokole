@@ -80,23 +80,17 @@ First, get the source code.
 
   git clone git@github.com:ascoderu/opwen-webapp.git
 
-Second, install the dependencies for the package and verify your checkout by
-running the tests.
+Second, use the makefile to verify your installation by running the tests and
+starting up the server. The makefile will automatically install all required
+dependencies into a virtual environment.
 
 .. sourcecode :: sh
 
   cd opwen-webapp
 
-  virtualenv -p "$(which python3)" --no-site-packages virtualenv
-  . virtualenv/bin/activate
-  pip install --upgrade pip
-  pip install -r requirements.txt
-
-  npm install
-  grunt
-
-  pip install nose
-  nosetests
+  make tests
+  make build-js
+  make server
 
 The routes of the app are defined in ``opwen_email_client/views.py`` so take
 a look there for an overview of the entrypoints into the code.
