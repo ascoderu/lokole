@@ -34,5 +34,9 @@ typecheck: venv
 
 ci: tests lint typecheck
 
+build-js: package.json bower.json Gruntfile.js
+	npm install
+	grunt
+
 server: venv
 	$(app_runner)
