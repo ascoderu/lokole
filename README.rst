@@ -92,5 +92,5 @@ dependencies into a virtual environment.
   make build-js
   make server
 
-The routes of the app are defined in ``opwen_email_client/views.py`` so take
-a look there for an overview of the entrypoints into the code.
+The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
+so take a look there for an overview of the entrypoints into the code.
