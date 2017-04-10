@@ -34,10 +34,12 @@ class SendWelcomeEmail(object):
         self._email_store = email_store
 
     def __call__(self, *args, **kwargs):
+        email_body = render_template('emails/account_finalized.html',
+                                     email=self._to)
         self._email_store.create([{
             'sent_at': self._time.strftime("%Y-%m-%d %H:%M"),
             'to': [self._to],
             'from': 'info@ascoderu.ca',
             'subject': i8n.WELCOME,
-            'body': render_template('emails/account_finalized.html', email=self._to),
+            'body': email_body,
         }])

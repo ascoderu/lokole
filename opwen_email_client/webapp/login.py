@@ -40,28 +40,20 @@ class User(_db.Model, UserMixin):
     password = _db.Column(_db.String(255), nullable=False)
     active = _db.Column(_db.Boolean(), default=True)
     last_login = _db.Column(_db.DateTime())
-    timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False, default=0)
+    timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False,
+                                         default=0)
     roles = _db.relationship('Role', secondary=_roles_users,
                              backref=_db.backref('users', lazy='dynamic'))
 
     @property
-    def is_admin(self):
-        """
-        :rtype: bool
-
-        """
+    def is_admin(self) -> bool:
         return self.has_role('admin')
 
     def save(self):
         _db.session.add(self)
         _db.session.commit()
 
-    def can_access(self, email):
-        """
-        :type email: dict
-        :rtype: bool
-
-        """
+    def can_access(self, email: dict) -> bool:
         actors = set()
         actors.add(email.get('from'))
         actors.update(email.get('to', []))

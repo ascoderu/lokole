@@ -87,7 +87,8 @@ def email_search(page):
     user = current_user
     query = request.args.get('query')
 
-    return _emails_view(email_store.search(user.email, query), page, 'email_search.html')
+    return _emails_view(email_store.search(user.email, query), page,
+                        'email_search.html')
 
 
 @app.route('/email/read/<email_uid>')
@@ -236,7 +237,8 @@ def _on_404(code_or_exception):
 
 @app.errorhandler(Exception)
 def _on_exception(code_or_exception):
-    app.logger.error('%s: %s', code_or_exception.__class__.__name__, code_or_exception)
+    app.logger.error('%s: %s', code_or_exception.__class__.__name__,
+                     code_or_exception)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
 
@@ -267,7 +269,8 @@ def _localeselector():
     return Session.get_current_locale().language
 
 
-def _emails_view(emails: Iterable[dict], page: int, template: str='email.html'):
+def _emails_view(emails: Iterable[dict], page: int,
+                 template: str='email.html'):
     attachments_session = app.ioc.attachments_session
     timezone_offset = timedelta(minutes=current_user.timezone_offset_minutes)
 
@@ -279,8 +282,9 @@ def _emails_view(emails: Iterable[dict], page: int, template: str='email.html'):
     for email in emails:
         sent_at = email.get('sent_at')
         if sent_at:
-            sent_at = datetime.strptime(sent_at, '%Y-%m-%d %H:%M')
-            email['sent_at'] = (sent_at - timezone_offset).strftime('%Y-%m-%d %H:%M')
+            sent_at_utc = datetime.strptime(sent_at, '%Y-%m-%d %H:%M')
+            sent_at_local = sent_at_utc - timezone_offset
+            email['sent_at'] = sent_at_local.strftime('%Y-%m-%d %H:%M')
 
     attachments_session.store(emails)
     return _view(template, emails=emails, page=page)

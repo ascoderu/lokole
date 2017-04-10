@@ -31,7 +31,8 @@ class EmailStore(metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def search(self, email_address: str, query: Optional[str]) -> Iterable[dict]:
+    def search(self, email_address: str,
+               query: Optional[str]) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
@@ -42,7 +43,8 @@ class EmailStore(metaclass=ABCMeta):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_sent(uids)
 
-    def mark_read(self, email_address: str, emails_or_uids: Union[Iterable[dict], Iterable[str]]):
+    def mark_read(self, email_address: str,
+                  emails_or_uids: Union[Iterable[dict], Iterable[str]]):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_read(email_address, uids)
 

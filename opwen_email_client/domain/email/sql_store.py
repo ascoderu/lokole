@@ -77,7 +77,8 @@ class _Email(_Base):
 
     def to_dict(self, serializer):
         attachments = self.attachments
-        attachments = serializer.deserialize(attachments) if attachments else None
+        attachments = (serializer.deserialize(attachments)
+                       if attachments else None)
 
         return {k: v for (k, v) in (
             ('from', self.sender),
@@ -95,13 +96,17 @@ class _Email(_Base):
     @classmethod
     def from_dict(cls, db, serializer, email):
         attachments = email.get('attachments')
-        attachments = serializer.serialize(attachments) if attachments else None
+        attachments = (serializer.serialize(attachments)
+                       if attachments else None)
 
         return _Email(
             uid=email['_uid'],
-            to=[get_or_create(db, _To, address=_) for _ in email.get('to', [])],
-            cc=[get_or_create(db, _Cc, address=_) for _ in email.get('cc', [])],
-            bcc=[get_or_create(db, _Bcc, address=_) for _ in email.get('bcc', [])],
+            to=[get_or_create(db, _To, address=_)
+                for _ in email.get('to', [])],
+            cc=[get_or_create(db, _Cc, address=_)
+                for _ in email.get('cc', [])],
+            bcc=[get_or_create(db, _Bcc, address=_)
+                 for _ in email.get('bcc', [])],
             subject=email.get('subject'),
             body=email.get('body'),
             sent_at=email.get('sent_at'),
@@ -142,7 +147,8 @@ class _SqlalchemyEmailStore(EmailStore):
                     db.add(_Email.from_dict(db, self._serializer, email))
 
     def _mark_sent(self, uids):
-        set_sent_at = {_Email.sent_at: datetime.utcnow().strftime('%Y-%m-%d %H:%M')}
+        now = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+        set_sent_at = {_Email.sent_at: now}
         match_email_uid = or_(*(_Email.uid == uid for uid in uids))
 
         with self._dbwrite() as db:
@@ -152,7 +158,8 @@ class _SqlalchemyEmailStore(EmailStore):
     def _mark_read(self, email_address, uids):
         set_read = {_Email.read: True}
         match_email_uid = or_(*(_Email.uid == uid for uid in uids))
-        can_access = _Email.is_sent_by(email_address) | _Email.is_received_by(email_address)
+        can_access = (_Email.is_sent_by(email_address)
+                      | _Email.is_received_by(email_address))
 
         with self._dbwrite() as db:
             db.query(_Email).filter(match_email_uid & can_access)\
@@ -174,7 +181,8 @@ class _SqlalchemyEmailStore(EmailStore):
         return self._query(_Email.is_received_by(email_address))
 
     def outbox(self, email_address):
-        return self._query(_Email.is_sent_by(email_address) & _Email.sent_at.is_(None))
+        return self._query(_Email.is_sent_by(email_address)
+                           & _Email.sent_at.is_(None))
 
     def search(self, email_address, query):
         textquery = '%{}%'.format(query)
@@ -182,7 +190,8 @@ class _SqlalchemyEmailStore(EmailStore):
                                _Email.body.ilike(textquery),
                                _Email.is_received_by(textquery),
                                _Email.is_sent_by(textquery)))
-        can_access = _Email.is_received_by(email_address) | _Email.is_sent_by(email_address)
+        can_access = (_Email.is_received_by(email_address)
+                      | _Email.is_sent_by(email_address))
         return self._query(can_access & contains_query)
 
     def pending(self):
@@ -192,7 +201,8 @@ class _SqlalchemyEmailStore(EmailStore):
         return self._find(_Email.uid == uid)
 
     def sent(self, email_address):
-        return self._query(_Email.is_sent_by(email_address) & _Email.sent_at.isnot(None))
+        return self._query(_Email.is_sent_by(email_address)
+                           & _Email.sent_at.isnot(None))
 
 
 class SqliteEmailStore(_SqlalchemyEmailStore):

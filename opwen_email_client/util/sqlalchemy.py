@@ -18,7 +18,8 @@ def create_database(uri: str, base):
     return engine
 
 
-def get_or_create(db, model, create_method: str='', create_method_kwargs=None, **kwargs):
+def get_or_create(db, model, create_method: str='',
+                  create_method_kwargs=None, **kwargs):
     try:
         return db.query(model).filter_by(**kwargs).one()
     except NoResultFound:

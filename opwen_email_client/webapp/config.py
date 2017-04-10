@@ -27,7 +27,8 @@ class i8n(object):
     WELCOME = _('Welcome!')
     EMAIL_CHARACTERS = _('Please only use letters, numbers, dots and dashes.')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
-    ACCOUNT_SUSPENDED = _('Your account has been suspended. Please contact your administrator.')
+    ACCOUNT_SUSPENDED = _('Your account has been suspended. '
+                          'Please contact your administrator.')
     SYNC_COMPLETE = _('Email synchronization completed.')
     UNEXPECTED_ERROR = _('Unexpected error. Please contact your admin.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
@@ -36,7 +37,7 @@ class i8n(object):
     USER_UNSUSPENDED = _('The user was un-suspended.')
 
 
-class OpwenConfig(object):
+class AppConfig(object):
     EMAIL_HOST_FORMAT = '{}.lokole.ca'
     STORAGE_UPLOAD_FORMAT = '{}/from_opwen/new.gz'
     STORAGE_DOWNLOAD_FORMAT = '{}/to_opwen/new.gz'
@@ -45,8 +46,6 @@ class OpwenConfig(object):
     STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
     STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
 
-
-class AppConfig(OpwenConfig):
     SQLITE_PATH = path.join(state_basedir, 'app.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
     SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
@@ -82,9 +81,11 @@ class AppConfig(OpwenConfig):
 
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')
-    LOCALES = [DEFAULT_LOCALE] + [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)]
+    LOCALES = (
+        [DEFAULT_LOCALE] +
+        [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)])
 
     CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
-    CLIENT_EMAIL_HOST = OpwenConfig.EMAIL_HOST_FORMAT.format(CLIENT_NAME)
-    STORAGE_UPLOAD_PATH = OpwenConfig.STORAGE_UPLOAD_FORMAT.format(CLIENT_NAME)
-    STORAGE_DOWNLOAD_PATH = OpwenConfig.STORAGE_DOWNLOAD_FORMAT.format(CLIENT_NAME)
+    CLIENT_EMAIL_HOST = EMAIL_HOST_FORMAT.format(CLIENT_NAME)
+    STORAGE_UPLOAD_PATH = STORAGE_UPLOAD_FORMAT.format(CLIENT_NAME)
+    STORAGE_DOWNLOAD_PATH = STORAGE_DOWNLOAD_FORMAT.format(CLIENT_NAME)

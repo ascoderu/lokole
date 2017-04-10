@@ -90,7 +90,8 @@ class AzureSync(Sync):
     def upload(self, items):
         uploaded_ids = []
 
-        for upload_location, items_for_location in zip(self._upload_locations, items):
+        uploads = zip(self._upload_locations, items)
+        for upload_location, items_for_location in uploads:
             upload_required = False
 
             with self._workspace() as workspace:

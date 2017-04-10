@@ -55,13 +55,13 @@ class AttachmentsStore(object):
         if attachment_idx >= len(attachments):
             return None
 
-        attachment = attachments[attachment_idx]
+        attachment = attachments[attachment_idx]  # type: Dict
         filename = attachment.get('filename')
         content = attachment.get('content')
         if not filename or not content:
             return None
 
-        return FileInfo(name=filename, content=self._attachment_encoder.decode(content))
+        return FileInfo(filename, self._attachment_encoder.decode(content))
 
 
 class Session(object):
