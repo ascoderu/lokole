@@ -1,15 +1,12 @@
 from flask import render_template
 
+from opwen_email_client.domain.email.store import EmailStore
+from opwen_email_client.domain.email.sync import Sync
 from opwen_email_client.webapp.config import i8n
 
 
 class SyncEmails(object):
-    def __init__(self, email_store, email_sync):
-        """
-        :type email_store: opwen_domain.email.EmailStore
-        :type email_sync: opwen_domain.sync.Sync
-
-        """
+    def __init__(self, email_store: EmailStore, email_sync: Sync):
         self._email_store = email_store
         self._email_sync = email_sync
 
@@ -31,13 +28,7 @@ class SyncEmails(object):
 
 
 class SendWelcomeEmail(object):
-    def __init__(self, to, time, email_store):
-        """
-        :type to: str
-        :type time: datetime.datetime
-        :type email_store: opwen_domain.email.EmailStore
-
-        """
+    def __init__(self, to: str, time, email_store: EmailStore):
         self._to = to
         self._time = time
         self._email_store = email_store

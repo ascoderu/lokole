@@ -1,7 +1,11 @@
+from typing import Optional as Maybe, Iterable
+from typing import List
+
 from flask import render_template
 from flask import request
 from flask_login import current_user
 from flask_wtf import Form
+from werkzeug.datastructures import FileStorage
 from wtforms import FileField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -9,6 +13,8 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import Optional
 
+from opwen_email_client.domain.email.attachment import AttachmentEncoder
+from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.util.wtforms import EmailField
 from opwen_email_client.util.wtforms import HtmlTextAreaField
 from opwen_email_client.webapp.config import AppConfig
@@ -40,35 +46,19 @@ class NewEmailForm(Form):
 
     submit = SubmitField()
 
-    def _handle_reply(self, email):
-        """
-        :type email: dict
-
-        """
+    def _handle_reply(self, email: dict):
         self.to.data = email.get('from', '')
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
 
-    def _handle_reply_all(self, email):
-        """
-        :type email: dict
-
-        """
+    def _handle_reply_all(self, email: dict):
         self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
 
-    def _handle_forward(self, email):
-        """
-        :type email: dict
-
-        """
+    def _handle_forward(self, email: dict):
         self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
         self.body.data = render_template('emails/forward.html', email=email)
 
-    def handle_action(self, email_store):
-        """
-        :type email_store: opwen_domain.email.EmailStore
-
-        """
+    def handle_action(self, email_store: EmailStore):
         uid = request.args.get('uid')
         action = request.args.get('action')
         if not uid or not action:
@@ -85,12 +75,7 @@ class NewEmailForm(Form):
         elif action == 'forward':
             self._handle_forward(reference)
 
-    def as_dict(self, attachment_encoder):
-        """
-        :type attachment_encoder: opwen_domain.email.interfaces.AttachmentEncoder
-        :rtype: dict
-
-        """
+    def as_dict(self, attachment_encoder: AttachmentEncoder) -> dict:
         attachments = request.files.getlist(self.attachments.name)
         form = {key: value for (key, value) in self.data.items() if value}
         form.pop('submit', None)
@@ -105,24 +90,16 @@ class NewEmailForm(Form):
         return form
 
     @classmethod
-    def from_request(cls, email_store):
-        """
-        :type email_store: opwen_domain.email.EmailStore
-        :rtype: opwen_web.forms.NewEmailForm
-
-        """
+    def from_request(cls, email_store: EmailStore):
         form = cls(request.form)
         form.handle_action(email_store)
         return form
 
 
-def _attachments_as_dict(filestorages, attachment_encoder):
-    """
-    :type filestorages: collections.Iterable[werkzeug.datastructures.FileStorage]
-    :type attachment_encoder: opwen_domain.email.interfaces.AttachmentEncoder
-    :rtype: collections.Iterable[dict]
+def _attachments_as_dict(
+        filestorages: Iterable[FileStorage],
+        attachment_encoder: AttachmentEncoder) -> Iterable[dict]:
 
-    """
     for filestorage in filestorages:
         filename = filestorage.filename
         content = attachment_encoder.encode(filestorage.stream.read())
@@ -130,22 +107,12 @@ def _attachments_as_dict(filestorages, attachment_encoder):
             yield {'filename': filename, 'content': content}
 
 
-def _join_emails(*emails):
-    """
-    :type emails: list[str]
-    :rtype: str
-
-    """
+def _join_emails(*emails: str) -> str:
     delimiter = '{0} '.format(AppConfig.EMAIL_ADDRESS_DELIMITER)
     return delimiter.join(email for email in emails if email)
 
 
-def _split_emails(emails):
-    """
-    :type emails: str | None
-    :rtype: list[str]
-
-    """
+def _split_emails(emails: Maybe[str]) -> List[str]:
     if not emails:
         return []
 

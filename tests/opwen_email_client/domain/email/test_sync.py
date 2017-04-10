@@ -22,22 +22,12 @@ class AzureSyncTests(TestCase):
             upload_locations=['upload_location'],
             serializer=JsonSerializer())
 
-    def assertUploadIs(self, actual, expected):
-        """
-        :type actual: _io._IOBase
-        :type expected: bytes
-
-        """
+    def assertUploadIs(self, actual: BytesIO, expected: bytes):
         with self.sync._open(actual) as uploaded:
             self.assertEqual(expected, uploaded.read())
 
     # noinspection PyMethodMayBeStatic
-    def given_upload(self, create_client):
-        """
-        :type create_client: unittest.mock.Mock
-        :rtype: io.BytesIO
-
-        """
+    def given_upload(self, create_client: Mock) -> BytesIO:
         mock_client = Mock()
         create_client.return_value = mock_client
 
@@ -51,12 +41,7 @@ class AzureSyncTests(TestCase):
         mock_client.create_blob_from_stream.side_effect = side_effect
         return buffer
 
-    def given_download(self, payload, create_client):
-        """
-        :type payload: bytes
-        :type create_client: unittest.mock.Mock
-
-        """
+    def given_download(self, payload: bytes, create_client: Mock):
         mock_client = Mock()
         create_client.return_value = mock_client
 
@@ -72,11 +57,7 @@ class AzureSyncTests(TestCase):
         mock_client.get_blob_to_stream.side_effect = side_effect
 
     # noinspection PyMethodMayBeStatic
-    def given_download_exception(self, create_client):
-        """
-        :type create_client: unittest.mock.Mock
-
-        """
+    def given_download_exception(self, create_client: Mock):
         mock_client = Mock()
         create_client.return_value = mock_client
         mock_client.get_blob_to_stream.side_effect = AzureMissingResourceHttpError('injected error', 404)
@@ -86,7 +67,7 @@ class AzureSyncTests(TestCase):
 
         self.assertIsNotNone(client)
 
-    @patch('opwen_domain.sync.azure.AzureSync._create_client')
+    @patch.object(AzureSync, '_create_client')
     def test_upload(self, create_client):
         uploaded = self.given_upload(create_client)
 
@@ -94,7 +75,7 @@ class AzureSyncTests(TestCase):
 
         self.assertUploadIs(uploaded, b'{"foo":"bar"}\n')
 
-    @patch('opwen_domain.sync.azure.AzureSync._create_client')
+    @patch.object(AzureSync, '_create_client')
     def test_upload_excludes_null_values(self, create_client):
         uploaded = self.given_upload(create_client)
 
@@ -102,7 +83,7 @@ class AzureSyncTests(TestCase):
 
         self.assertUploadIs(uploaded, b'{"foo":0}\n')
 
-    @patch('opwen_domain.sync.azure.AzureSync._create_client')
+    @patch.object(AzureSync, '_create_client')
     def test_upload_with_no_content_does_not_hit_network(self, create_client):
         create_client.return_value = Mock()
 
@@ -111,7 +92,7 @@ class AzureSyncTests(TestCase):
         self.assertFalse(create_client.return_value.create_blob_from_stream.called)
         self.assertTrue(create_client.return_value.delete_blob.called)
 
-    @patch('opwen_domain.sync.azure.AzureSync._create_client')
+    @patch.object(AzureSync, '_create_client')
     def test_download(self, create_client):
         self.given_download(b'{"foo":"bar"}\n{"baz":1}', create_client)
 
@@ -122,7 +103,7 @@ class AzureSyncTests(TestCase):
         self.assertIn({'baz': 1}, downloaded)
         self.assertTrue(create_client.return_value.delete_blob.called)
 
-    @patch('opwen_domain.sync.azure.AzureSync._create_client')
+    @patch.object(AzureSync, '_create_client')
     def test_download_missing_resource(self, create_client):
         self.given_download_exception(create_client)
 

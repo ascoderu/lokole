@@ -4,7 +4,9 @@ except ImportError:
     from html.parser import HTMLParser
     unescape = HTMLParser().unescape  # type: ignore
 
-import re
+from re import IGNORECASE
+from re import compile as re_compile
+from typing import Optional
 
 from wtforms import StringField
 from wtforms import TextAreaField
@@ -20,7 +22,7 @@ class EmailField(StringField):
 
 
 class HtmlTextAreaField(TextAreaField):
-    _script_tags_re = re.compile(r'<script[\s\S]+?/script>', re.IGNORECASE)
+    _script_tags_re = re_compile(r'<script[\s\S]+?/script>', IGNORECASE)
 
     # pylint:disable=attribute-defined-outside-init
     # noinspection PyAttributeOutsideInit
@@ -33,12 +35,7 @@ class HtmlTextAreaField(TextAreaField):
         return self._to_safe_html(value)
 
     @classmethod
-    def _remove_script_tags(cls, data):
-        """
-        :type data: str
-        :rtype: str
-
-        """
+    def _remove_script_tags(cls, data: str) -> str:
         match = cls._script_tags_re.search(data)
         while match:
             start = match.start()
@@ -49,12 +46,7 @@ class HtmlTextAreaField(TextAreaField):
         return data
 
     @classmethod
-    def _to_safe_html(cls, data):
-        """
-        :type data: str | None
-        :rtype: str
-
-        """
+    def _to_safe_html(cls, data: Optional[str]) -> str:
         if not data:
             return ''
 
@@ -64,11 +56,7 @@ class HtmlTextAreaField(TextAreaField):
 
 
 class SuffixedStringField(StringField):
-    def __init__(self, suffix='', *args, **kwargs):
-        """
-        :type suffix: str
-
-        """
+    def __init__(self, suffix: str='', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._suffix = suffix
 
@@ -82,12 +70,7 @@ class SuffixedStringField(StringField):
         value = super()._value()
         return self._ensure_suffix(value)
 
-    def _ensure_suffix(self, value):
-        """
-        :type value: str
-        :rtype: str
-
-        """
+    def _ensure_suffix(self, value: str) -> str:
         if value and not value.endswith(self._suffix):
             return value + self._suffix
         else:

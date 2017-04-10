@@ -3,15 +3,13 @@ from os import getenv as _getenv
 from os import listdir
 from os.path import isdir
 from os.path import join
+from typing import Iterable
+from typing import TypeVar
+
+T = TypeVar('T')
 
 
-def getenv(key, default=None):
-    """
-    :type key: str
-    :type default: T
-    :rtype: T
-
-    """
+def getenv(key: str, default: T=None) -> T:
     value = _getenv(key, default)
     try:
         return literal_eval(value)
@@ -19,12 +17,7 @@ def getenv(key, default=None):
         return value
 
 
-def subdirectories(root):
-    """
-    :type root: str
-    :rtype: collections.Iterable[str]
-
-    """
+def subdirectories(root: str) -> Iterable[str]:
     try:
         return (sub for sub in listdir(root) if isdir(join(root, sub)))
     except OSError:

@@ -7,7 +7,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.exc import NoResultFound
 
 
-def create_database(uri, base):
+def create_database(uri: str, base):
     engine = create_engine(uri)
 
     try:
@@ -18,7 +18,7 @@ def create_database(uri, base):
     return engine
 
 
-def get_or_create(db, model, create_method='', create_method_kwargs=None, **kwargs):
+def get_or_create(db, model, create_method: str='', create_method_kwargs=None, **kwargs):
     try:
         return db.query(model).filter_by(**kwargs).one()
     except NoResultFound:
@@ -38,7 +38,7 @@ def get_or_create(db, model, create_method='', create_method_kwargs=None, **kwar
 
 
 @contextmanager
-def session(session_maker, commit=False):
+def session(session_maker, commit: bool=False):
     session_factory = scoped_session(session_maker)
     db = session_factory()
 

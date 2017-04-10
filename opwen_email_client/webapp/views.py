@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
 from os import path
+from typing import Iterable
 
 from flask import abort
 from flask import flash
@@ -266,13 +267,7 @@ def _localeselector():
     return Session.get_current_locale().language
 
 
-def _emails_view(emails, page, template='email.html'):
-    """
-    :type emails: collections.Iterable[dict]
-    :type page: int
-    :type template: str
-
-    """
+def _emails_view(emails: Iterable[dict], page: int, template: str='email.html'):
     attachments_session = app.ioc.attachments_session
     timezone_offset = timedelta(minutes=current_user.timezone_offset_minutes)
 

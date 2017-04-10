@@ -5,7 +5,7 @@ from flask import Flask
 from flask_babel import Babel
 
 from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder
-from opwen_email_client.domain.email.store import SqliteEmailStore
+from opwen_email_client.domain.email.sql_store import SqliteEmailStore
 from opwen_email_client.domain.email.sync import AzureAuth
 from opwen_email_client.domain.email.sync import AzureSync
 from opwen_email_client.util.serialization import JsonSerializer

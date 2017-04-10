@@ -1,40 +1,26 @@
 from abc import ABCMeta
 from abc import abstractmethod
-from os import remove
-from tempfile import NamedTemporaryFile
 from unittest import TestCase
+from typing import Iterable
+from typing import List
 
-from opwen_email_client.domain.email.store import SqliteEmailStore
+from opwen_email_client.domain.email.store import EmailStore
 
 
 class Base(object):
     class EmailStoreTests(TestCase, metaclass=ABCMeta):
         @abstractmethod
-        def create_email_store(self):
-            """
-            :rtype: opwen_domain.email.EmailStore
-
-            """
+        def create_email_store(self) -> EmailStore:
             raise NotImplementedError
 
         def setUp(self):
             self.email_store = self.create_email_store()
 
-        def given_emails(self, *emails):
-            """
-            :type emails: list[dict]
-            :rtype: list[dict]
-
-            """
+        def given_emails(self, *emails: dict) -> List[dict]:
             self.email_store.create(emails)
-            return emails
+            return list(emails)
 
-        def assertContainsEmail(self, expected, collection):
-            """
-            :type expected: dict
-            :type collection: collections.Iterable[dict]
-
-            """
+        def assertContainsEmail(self, expected: dict, collection: Iterable[dict]):
             def cleanup(email):
                 return {key: value for (key, value) in email.items() if value}
 
@@ -220,28 +206,3 @@ class Base(object):
             actual = self.email_store.get('uid-does-not-exist')
 
             self.assertIsNone(actual)
-
-
-class SqliteEmailStoreTests(Base.EmailStoreTests):
-    def create_email_store(self):
-        return SqliteEmailStore(self.store_location, JsonSerializer())
-
-    @classmethod
-    def setUpClass(cls):
-        with NamedTemporaryFile(delete=False) as fobj:
-            cls.store_location = fobj.queue_name
-
-    @classmethod
-    def tearDownClass(cls):
-        # noinspection PyUnresolvedReferences
-        remove(cls.store_location)
-
-    def tearDown(self):
-        # noinspection PyUnresolvedReferences
-        dbwrite = self.email_store._dbwrite
-        # noinspection PyUnresolvedReferences
-        base = self.email_store._base
-
-        with dbwrite() as db:
-            for table in reversed(base.metadata.sorted_tables):
-                db.execute(table.delete())

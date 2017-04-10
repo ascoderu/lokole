@@ -1,4 +1,5 @@
 from os import environ
+from typing import Iterable
 from unittest import TestCase
 
 from opwen_email_client.util.os import getenv
@@ -19,31 +20,18 @@ class GetenvTests(TestCase):
             del environ[env]
 
     @classmethod
-    def unknown_types(cls):
-        """
-        :rtype: collections.Iterable[object]
-
-        """
+    def unknown_types(cls) -> Iterable[object]:
         yield "foo"
         yield "[1,"
 
     @classmethod
-    def known_types(cls):
-        """
-        :rtype: collections.Iterable[object]
-
-        """
+    def known_types(cls) -> Iterable[object]:
         yield True
         yield [1, 2]
         yield {'a': 'b'}
 
-    def given_env(self, key, value):
-        """
-        :type key: str
-        :type value: object
-
-        """
-        os.environ[key] = str(value)
+    def given_env(self, key: str, value: object):
+        environ[key] = str(value)
         self.envs.add(key)
 
     def test_parses_known_types(self):

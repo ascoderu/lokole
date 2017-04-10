@@ -1,14 +1,12 @@
 from itertools import islice
+from typing import Iterable
+from typing import TypeVar
+
+T = TypeVar('T')
 
 
 class Pagination(object):
-    def __init__(self, items, page, page_size):
-        """
-        :type items: collections.Iterable[T]
-        :type page: int
-        :type page_size: int
-
-        """
+    def __init__(self, items: Iterable[T], page: int, page_size: int):
         if page < 1:
             raise ValueError('page must be greater than or equal to 1')
 
@@ -22,17 +20,9 @@ class Pagination(object):
         return iter(self._items)
 
     @property
-    def has_prevpage(self):
-        """
-        :rtype: bool
-
-        """
+    def has_prevpage(self) -> bool:
         return self.page != 1
 
     @property
-    def has_nextpage(self):
-        """
-        :rtype: bool
-
-        """
+    def has_nextpage(self) -> bool:
         return len(self._items) == self.page_size

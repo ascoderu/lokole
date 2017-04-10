@@ -1,9 +1,14 @@
 from collections import namedtuple
+from typing import Dict
+from typing import Iterable
+from typing import Optional
 
 from babel import Locale
 from flask import request
 from flask import session
 
+from opwen_email_client.domain.email.attachment import AttachmentEncoder
+from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.webapp.config import AppConfig
 
 
@@ -13,32 +18,20 @@ class FileInfo(namedtuple('FileInfo', 'name content')):
 
 
 class AttachmentsStore(object):
-    def __init__(self, attachment_encoder, email_store):
-        """
-        :type attachment_encoder: opwen_domain.email.AttachmentEncoder
-        :type email_store: opwen_domain.email.EmailStore
-
-        """
+    def __init__(self, attachment_encoder: AttachmentEncoder,
+                 email_store: EmailStore):
         self._attachment_encoder = attachment_encoder
         self._email_store = email_store
 
     @property
-    def _session_store(self):
-        """
-        :rtype: dict
-
-        """
+    def _session_store(self) -> dict:
         session_attachments = session.get('attachments')
         if not session_attachments:
             session_attachments = session['attachments'] = {}
 
         return session_attachments
 
-    def store(self, emails):
-        """
-        :type emails: collections.Iterable[dict]
-
-        """
+    def store(self, emails: Iterable[dict]):
         for i, email in enumerate(emails):
             email_id = email['_uid']
             attachments = email.get('attachments', [])
@@ -48,12 +41,7 @@ class AttachmentsStore(object):
                 attachment['id'] = attachment_id
                 self._session_store[attachment_id] = (email_id, j)
 
-    def lookup(self, attachment_id):
-        """
-        :type attachment_id: str
-        :rtype: opwen_email_client.session.FileInfo | None
-
-        """
+    def lookup(self, attachment_id: str) -> Optional[FileInfo]:
         try:
             email_id, attachment_idx = self._session_store[attachment_id]
         except KeyError:
@@ -81,11 +69,7 @@ class Session(object):
     _last_visited_url_key = 'last_visited_url'
 
     @classmethod
-    def _session(cls):
-        """
-        :rtype: dict[str, str]
-
-        """
+    def _session(cls) -> Dict[str, str]:
         return session or {}
 
     @classmethod
@@ -94,26 +78,14 @@ class Session(object):
             cls._session()[cls._last_visited_url_key] = request.url
 
     @classmethod
-    def get_last_visited_url(cls):
-        """
-        :rtype: str | None
-
-        """
+    def get_last_visited_url(cls) -> Optional[str]:
         return cls._session().get(cls._last_visited_url_key)
 
     @classmethod
-    def store_current_locale(cls, locale):
-        """
-        :type locale: str
-
-        """
+    def store_current_locale(cls, locale: str):
         cls._session()[cls._current_locale_key] = locale
 
     @classmethod
-    def get_current_locale(cls):
-        """
-        :rtype: babel.Locale
-
-        """
+    def get_current_locale(cls) -> Locale:
         locale = cls._session().get(cls._current_locale_key)
         return Locale.parse(locale) if locale else AppConfig.DEFAULT_LOCALE
