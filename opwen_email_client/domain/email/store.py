@@ -1,4 +1,7 @@
+from abc import ABCMeta
+from abc import abstractmethod
 from datetime import datetime
+from uuid import uuid4
 
 from sqlalchemy import Binary
 from sqlalchemy import Boolean
@@ -13,8 +16,6 @@ from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
-
-from opwen_domain.email import EmailStore
 
 from opwen_email_client.util.sqlalchemy import create_database
 from opwen_email_client.util.sqlalchemy import get_or_create
@@ -119,6 +120,133 @@ class _Email(_Base):
         return (cls.to.any(_To.address.ilike(email_address)) |
                 cls.cc.any(_Cc.address.ilike(email_address)) |
                 cls.bcc.any(_Bcc.address.ilike(email_address)))
+
+
+class EmailStore(metaclass=ABCMeta):
+    def create(self, emails):
+        """
+        :type emails: collections.Iterable[dict]
+
+        """
+        self._create(map(self._add_uid, emails))
+
+    @abstractmethod
+    def _create(self, emails):
+        """
+        :type emails: collections.Iterable[dict]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def get(self, uid):
+        """
+        :type uid: str
+        :rtype dict | None
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def inbox(self, email_address):
+        """
+        :type email_address: str
+        :rtype: collections.Iterable[dict]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def outbox(self, email_address):
+        """
+        :type email_address: str
+        :rtype: collections.Iterable[dict]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def sent(self, email_address):
+        """
+        :type email_address: str
+        :rtype: collections.Iterable[dict]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def search(self, email_address, query):
+        """
+        :type email_address: str
+        :type query: str | None
+        :rtype: collections.Iterable[dict]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def pending(self):
+        """
+        :rtype: collections.Iterable[dict]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    def mark_sent(self, emails_or_uids):
+        """
+        :type emails_or_uids: collections.Iterable[dict] | collections.Iterable[str]
+
+        """
+        uids = map(self._get_uid, emails_or_uids)
+        return self._mark_sent(uids)
+
+    def mark_read(self, email_address, emails_or_uids):
+        """
+        :type email_address: str
+        :type emails_or_uids: collections.Iterable[dict] | collections.Iterable[str]
+
+        """
+        uids = map(self._get_uid, emails_or_uids)
+        return self._mark_read(email_address, uids)
+
+    @abstractmethod
+    def _mark_sent(self, uids):
+        """
+        :type uids: collections.Iterable[str]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def _mark_read(self, email_address, uids):
+        """
+        :type email_address: str
+        :type uids: collections.Iterable[str]
+
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @classmethod
+    def _get_uid(cls, email_or_uid):
+        """
+        :type email_or_uid: dict | str
+        :rtype: str
+
+        """
+        try:
+            return email_or_uid['_uid']
+        except TypeError:
+            return email_or_uid
+
+    @classmethod
+    def _add_uid(cls, email):
+        """
+        :type email: dict
+        :rtype: dict
+
+        """
+        email.setdefault('_uid', str(uuid4()))
+        return email
 
 
 class _SqlalchemyEmailStore(EmailStore):

@@ -15,7 +15,7 @@ class TestConfig(AppConfig):
 
     def __init__(self):
         with NamedTemporaryFile(delete=False) as fobj:
-            self.LOCAL_EMAIL_STORE = fobj.name
+            self.LOCAL_EMAIL_STORE = fobj.queue_name
 
     def close(self):
         remove(self.LOCAL_EMAIL_STORE)

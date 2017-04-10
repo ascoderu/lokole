@@ -4,12 +4,11 @@ from logging import StreamHandler
 from flask import Flask
 from flask_babel import Babel
 
-from opwen_domain.sync.azure import AzureAuth
-from opwen_domain.sync.azure import AzureSync
-from opwen_infrastructure.serialization.json import JsonSerializer
-
 from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder
 from opwen_email_client.domain.email.store import SqliteEmailStore
+from opwen_email_client.domain.email.sync import AzureAuth
+from opwen_email_client.domain.email.sync import AzureSync
+from opwen_email_client.util.serialization import JsonSerializer
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.session import AttachmentsStore
 

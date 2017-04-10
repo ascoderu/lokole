@@ -5,9 +5,7 @@ from tempfile import gettempdir
 from babel import Locale
 from flask_babel import gettext as _
 
-from opwen_domain.config import OpwenConfig
-from opwen_infrastructure.env import getenv
-
+from opwen_email_client.util.os import getenv
 from opwen_email_client.util.os import subdirectories
 
 
@@ -36,6 +34,16 @@ class i8n(object):
     USER_DOES_NOT_EXIST = _('This user does not exist.')
     USER_SUSPENDED = _('The user was suspended.')
     USER_UNSUSPENDED = _('The user was un-suspended.')
+
+
+class OpwenConfig(object):
+    EMAIL_HOST_FORMAT = '{}.lokole.ca'
+    STORAGE_UPLOAD_FORMAT = '{}/from_opwen/new.gz'
+    STORAGE_DOWNLOAD_FORMAT = '{}/to_opwen/new.gz'
+    STORAGE_CONTAINER = 'opwen'
+
+    STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
+    STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
 
 
 class AppConfig(OpwenConfig):
