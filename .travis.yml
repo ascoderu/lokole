@@ -6,11 +6,8 @@ python:
   - "3.5"
   - "3.6"
 
-install:
-  - pip install flake8
-  - pip install coverage
-  - pip install -r requirements.txt
+env:
+  - TARGET=lint
+  - TARGET=unit-tests
 
-script:
-  - flake8 opwen_email_client
-  - nosetests $(find tests -name '*.py') --with-coverage --cover-branches --cover-erase --cover-package=opwen_email_client
+script: make $TARGET -e py_env=~/virtualenv/python$TRAVIS_PYTHON_VERSION
