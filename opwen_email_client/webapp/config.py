@@ -43,8 +43,8 @@ class AppConfig(object):
     STORAGE_DOWNLOAD_FORMAT = '{}/to_opwen/new.gz'
     STORAGE_CONTAINER = 'opwen'
 
-    STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
-    STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
+    STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME', 'account')
+    STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY', 'key')
 
     SQLITE_PATH = path.join(state_basedir, 'app.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH

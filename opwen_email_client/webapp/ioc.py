@@ -1,12 +1,12 @@
 from logging import Formatter
 from logging import StreamHandler
 
+from azure.storage.blob import BlockBlobService
 from flask import Flask
 from flask_babel import Babel
 
 from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder
 from opwen_email_client.domain.email.sql_store import SqliteEmailStore
-from opwen_email_client.domain.email.sync import AzureAuth
 from opwen_email_client.domain.email.sync import AzureSync
 from opwen_email_client.util.serialization import JsonSerializer
 from opwen_email_client.webapp.config import AppConfig
@@ -16,15 +16,17 @@ from opwen_email_client.webapp.session import AttachmentsStore
 class Ioc(object):
     serializer = JsonSerializer()
 
+    azure_client = BlockBlobService(
+        account_name=AppConfig.STORAGE_ACCOUNT_NAME,
+        account_key=AppConfig.STORAGE_ACCOUNT_KEY)
+
     email_store = SqliteEmailStore(
         database_path=AppConfig.LOCAL_EMAIL_STORE,
         serializer=serializer)
 
     email_sync = AzureSync(
-        auth=AzureAuth(
-            account=AppConfig.STORAGE_ACCOUNT_NAME,
-            key=AppConfig.STORAGE_ACCOUNT_KEY,
-            container=AppConfig.STORAGE_CONTAINER),
+        azure_client=azure_client,
+        container=AppConfig.STORAGE_CONTAINER,
         download_locations=[AppConfig.STORAGE_DOWNLOAD_PATH],
         upload_locations=[AppConfig.STORAGE_UPLOAD_PATH],
         serializer=serializer)

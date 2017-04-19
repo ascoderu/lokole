@@ -5,7 +5,6 @@ from unittest.mock import Mock
 
 from azure.common import AzureMissingResourceHttpError
 
-from opwen_email_client.domain.email.sync import AzureAuth
 from opwen_email_client.domain.email.sync import AzureSync
 from opwen_email_client.util.serialization import JsonSerializer
 
@@ -15,10 +14,7 @@ class AzureSyncTests(TestCase):
     def setUp(self):
         self.azure_client_mock = Mock()
         self.sync = AzureSync(
-            auth=AzureAuth(
-                account='account_name',
-                key='account_key',
-                container='container'),
+            container='container',
             download_locations=['download_location'],
             upload_locations=['upload_location'],
             azure_client=self.azure_client_mock,
