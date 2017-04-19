@@ -1,6 +1,8 @@
 from typing import Tuple
 from typing import Union
 
+from connexion import request
+
 from opwen_email_server import config
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import EnvironmentAuth
@@ -15,7 +17,8 @@ STORAGE = AzureObjectStorage(
 CLIENTS = EnvironmentAuth()
 
 
-def download(client_id: str) -> Union[dict, Tuple[str, int]]:
+def download() -> Union[dict, Tuple[str, int]]:
+    client_id = request.headers['X-LOKOLE-ClientId']
     if client_id not in CLIENTS:
         return 'client is not registered', 403
 
