@@ -66,10 +66,10 @@ to address this problem by tackling it from three perspectives:
    hundreds of people via the Lokole. Spreading the cost in this way makes
    email access sustainable for local communities.
 
-Technical overview
-------------------
+System overview & Data exchange format
+--------------------------------------
 
-Can be found in the `opwen-shared readme <https://github.com/ascoderu/opwen-shared/blob/master/README.rst>`_.
+Can be found in the `opwen-cloudserver readme <https://github.com/ascoderu/opwen-cloudserver/blob/master/README.rst>`_.
 
 Development setup
 -----------------
