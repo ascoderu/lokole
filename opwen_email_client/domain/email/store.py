@@ -39,12 +39,12 @@ class EmailStore(metaclass=ABCMeta):
     def pending(self) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
-    def mark_sent(self, emails_or_uids: Union[Iterable[dict], Iterable[str]]):
+    def mark_sent(self, emails_or_uids: Iterable[Union[dict, str]]):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_sent(uids)
 
     def mark_read(self, email_address: str,
-                  emails_or_uids: Union[Iterable[dict], Iterable[str]]):
+                  emails_or_uids: Iterable[Union[dict, str]]):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_read(email_address, uids)
 
