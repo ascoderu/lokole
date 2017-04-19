@@ -9,7 +9,8 @@ from typing import TypeVar
 
 from azure.common import AzureException
 from azure.common import AzureMissingResourceHttpError
-from azure.storage.blob import BlockBlobService, Blob
+from azure.storage.blob import Blob
+from azure.storage.blob import BlockBlobService
 
 from opwen_email_client.util.serialization import Serializer
 
@@ -35,14 +36,21 @@ class Sync(metaclass=ABCMeta):
 
 class AzureSync(Sync):
     def __init__(self, auth: AzureAuth, download_locations: Iterable[str],
-                 upload_locations: Iterable[str], serializer: Serializer):
+                 upload_locations: Iterable[str], serializer: Serializer,
+                 azure_client: BlockBlobService=None):
         self._auth = auth
         self._download_locations = list(download_locations)
         self._upload_locations = list(upload_locations)
         self._serializer = serializer
+        self.__azure_client = azure_client
 
-    def _create_client(self) -> BlockBlobService:
-        return BlockBlobService(self._auth.account, self._auth.key)
+    @property
+    def _azure_client(self) -> BlockBlobService:
+        if self.__azure_client is not None:
+            return self.__azure_client
+        client = BlockBlobService(self._auth.account, self._auth.key)
+        self.__azure_client = client
+        return client
 
     @classmethod
     def _workspace(cls) -> TextIOBase:
@@ -53,28 +61,26 @@ class AzureSync(Sync):
         return GzipFile(fileobj=fileobj, mode=mode)
 
     def _download_to_stream(self, blobname: str, stream: TextIOBase) -> bool:
-        client = self._create_client()
         try:
-            client.get_blob_to_stream(self._auth.container, blobname, stream)
+            self._azure_client.get_blob_to_stream(self._auth.container,
+                                                  blobname, stream)
         except AzureMissingResourceHttpError:
             return False
         else:
             return True
 
     def _upload_from_stream(self, blobname: str, stream: TextIOBase):
-        client = self._create_client()
-        client.create_blob_from_stream(self._auth.container, blobname, stream)
+        self._azure_client.create_blob_from_stream(self._auth.container,
+                                                   blobname, stream)
 
     def _delete(self, blobname: str):
-        client = self._create_client()
         try:
-            client.delete_blob(self._auth.container, blobname)
+            self._azure_client.delete_blob(self._auth.container, blobname)
         except AzureException:
             pass
 
     def list_roots(self) -> Iterable[str]:
-        client = self._create_client()
-        blobs = client.list_blobs(self._auth.container)
+        blobs = self._azure_client.list_blobs(self._auth.container)
         return frozenset(map(_extract_root, blobs))
 
     def download(self):
