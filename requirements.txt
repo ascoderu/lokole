@@ -11,5 +11,6 @@ WTForms==2.1
 azure-storage==0.32.0
 bcrypt==3.1.0
 gunicorn==19.6.0
+requests==2.13.0
 typing==3.6.1
 tzlocal==1.2.2

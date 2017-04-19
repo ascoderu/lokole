@@ -38,20 +38,11 @@ class i8n(object):
 
 
 class AppConfig(object):
-    EMAIL_HOST_FORMAT = '{}.lokole.ca'
-    STORAGE_UPLOAD_FORMAT = '{}/from_opwen/new.gz'
-    STORAGE_DOWNLOAD_FORMAT = '{}/to_opwen/new.gz'
-    STORAGE_CONTAINER = 'opwen'
-
-    STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME', 'account')
-    STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY', 'key')
-
     SQLITE_PATH = path.join(state_basedir, 'app.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
     SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    PRESHARED_SECRET = getenv('OPWEN_PRESHARED_SECRET')
     SECRET_KEY = getenv('OPWEN_SECRET_KEY')
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'
@@ -85,7 +76,12 @@ class AppConfig(object):
         [DEFAULT_LOCALE] +
         [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)])
 
+    EMAIL_SERVER_READ_API_HOSTNAME = 'api.mailserver.read.lokole.ca'
+    EMAIL_SERVER_WRITE_API_HOSTNAME = 'api.mailserver.write.lokole.ca'
+    EMAIL_HOST_FORMAT = '{}.lokole.ca'
+    STORAGE_CONTAINER = 'compressedpackages'
+    STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME', 'azure-name')
+    STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY', 'azure-key')
     CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
+    CLIENT_ID = getenv('OPWEN_CLIENT_ID')
     CLIENT_EMAIL_HOST = EMAIL_HOST_FORMAT.format(CLIENT_NAME)
-    STORAGE_UPLOAD_PATH = STORAGE_UPLOAD_FORMAT.format(CLIENT_NAME)
-    STORAGE_DOWNLOAD_PATH = STORAGE_DOWNLOAD_FORMAT.format(CLIENT_NAME)

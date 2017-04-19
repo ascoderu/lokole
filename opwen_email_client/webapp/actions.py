@@ -12,7 +12,7 @@ class SyncEmails(object):
 
     def _upload(self):
         pending = self._email_store.pending()
-        uploaded = self._email_sync.upload([pending])
+        uploaded = self._email_sync.upload(pending)
         self._email_store.mark_sent(uploaded)
 
     def _download(self):

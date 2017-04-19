@@ -6,6 +6,7 @@ from flask import Flask
 from flask_babel import Babel
 
 from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder
+from opwen_email_client.domain.email.client import HttpEmailServerClient
 from opwen_email_client.domain.email.sql_store import SqliteEmailStore
 from opwen_email_client.domain.email.sync import AzureSync
 from opwen_email_client.util.serialization import JsonSerializer
@@ -20,15 +21,19 @@ class Ioc(object):
         account_name=AppConfig.STORAGE_ACCOUNT_NAME,
         account_key=AppConfig.STORAGE_ACCOUNT_KEY)
 
+    email_server_client = HttpEmailServerClient(
+        read_api=AppConfig.EMAIL_SERVER_READ_API_HOSTNAME,
+        write_api=AppConfig.EMAIL_SERVER_WRITE_API_HOSTNAME,
+        client_id=AppConfig.CLIENT_ID)
+
     email_store = SqliteEmailStore(
         database_path=AppConfig.LOCAL_EMAIL_STORE,
         serializer=serializer)
 
     email_sync = AzureSync(
         azure_client=azure_client,
+        email_server_client=email_server_client,
         container=AppConfig.STORAGE_CONTAINER,
-        download_locations=[AppConfig.STORAGE_DOWNLOAD_PATH],
-        upload_locations=[AppConfig.STORAGE_UPLOAD_PATH],
         serializer=serializer)
 
     attachment_encoder = Base64AttachmentEncoder()
