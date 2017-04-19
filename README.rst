@@ -32,6 +32,27 @@ System overview
   :alt: Overview of the Lokole system
   :target: https://raw.githubusercontent.com/ascoderu/opwen-cloudserver/master/docs/system-overview.png
 
+Data exchange format
+--------------------
+
+In order to communicate between the Opwen cloud server and the Opwen
+web-application (aka Lokole), a protocol based on gzipped jsonl files uploaded
+to Azure Blob Storage is used. The files contains a JSON object per line.
+Each JSON object describes an email, using the following schema:
+
+.. sourcecode :: json
+
+  {
+    "sent_at": "yyyy-mm-dd HH:MM",
+    "to": ["email"],
+    "cc": ["email"],
+    "bcc": ["email"],
+    "from": "email",
+    "subject": "string",
+    "body": "html",
+    "attachments": [{"filename": "string", "content": "base64"}]
+  }
+
 Development setup
 -----------------
 
