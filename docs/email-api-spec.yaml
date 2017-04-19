@@ -74,7 +74,7 @@ definitions:
   EmailPackage:
     properties:
       resource_id:
-        description: Id of the resource containing the emails to send from the Lokole client.
+        description: Id of the resource containing the emails (gzip jsonl file).
         type: string
       resource_container:
         description: Container where the resource containing emails can be found.
