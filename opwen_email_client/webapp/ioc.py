@@ -38,11 +38,7 @@ class Ioc(object):
         attachment_encoder=attachment_encoder)
 
 
-def create_app():
-    """
-    :rtype: flask.Flask
-
-    """
+def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     app.ioc = Ioc()
