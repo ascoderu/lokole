@@ -73,7 +73,6 @@ class AzureSync(Sync):
     def upload(self, items):
         uploaded_ids = []
         upload_location = str(uuid4())
-        upload_required = False
 
         with self._workspace() as workspace:
             with self._open(workspace, 'wb') as uploaded:
@@ -83,10 +82,9 @@ class AzureSync(Sync):
                     serialized = self._serializer.serialize(item)
                     uploaded.write(serialized)
                     uploaded.write(b'\n')
-                    upload_required = True
                     uploaded_ids.append(item.get('_uid'))
 
-            if upload_required:
+            if uploaded_ids:
                 workspace.seek(0)
                 self._upload_from_stream(upload_location, workspace)
                 self._email_server_client.upload(upload_location,
