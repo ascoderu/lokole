@@ -33,11 +33,7 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: X-LOKOLE-ClientId
-          in: header
-          required: true
-          description: Id of the Lokole client that wishes to send some emails.
-          type: string
+        - $ref: '#/parameters/ClientId'
         - name: upload_info
           in: body
           required: true
@@ -55,11 +51,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: X-LOKOLE-ClientId
-          description: Id of the Lokole client that wishes to recieve some emails.
-          type: string
-          in: header
-          required: true
+        - $ref: '#/parameters/ClientId'
       responses:
         200:
           description: The emails for the Lokole are ready to be downloaded.
@@ -67,6 +59,15 @@ paths:
             $ref: '#/definitions/EmailPackage'
         403:
           description: Request from unregistered client.
+
+parameters:
+
+  ClientId:
+    name: X-LOKOLE-ClientId
+    in: header
+    required: true
+    description: Id of the Lokole client.
+    type: string
 
 definitions:
 
