@@ -42,18 +42,7 @@ paths:
           in: body
           required: true
           schema:
-            type: object
-            properties:
-              resource_id:
-                description: Id of the resource containing the emails to send from the Lokole client.
-                type: string
-              resource_container:
-                description: Container where the resource containing emails can be found.
-                type: string
-              resource_type:
-                description: The provider where the resource containing emails can be found.
-                type: string
-                enum: [ 'azure-blob' ]
+            $ref: '#/definitions/EmailPackage'
       responses:
         200:
           description: The emails were successfully uploaded from the Lokole.
@@ -75,17 +64,21 @@ paths:
         200:
           description: The emails for the Lokole are ready to be downloaded.
           schema:
-            type: object
-            properties:
-              resource_id:
-                description: Id of the resource containing the emails to download to the Lokole client.
-                type: string
-              resource_container:
-                description: Container where the resource containing emails can be found.
-                type: string
-              resource_type:
-                description: The provider where the resource containing emails can be found.
-                type: string
-                enum: [ 'azure-blob' ]
+            $ref: '#/definitions/EmailPackage'
         403:
           description: Request from unregistered client.
+
+definitions:
+
+  EmailPackage:
+    properties:
+      resource_id:
+        description: Id of the resource containing the emails to send from the Lokole client.
+        type: string
+      resource_container:
+        description: Container where the resource containing emails can be found.
+        type: string
+      resource_type:
+        description: The provider where the resource containing emails can be found.
+        type: string
+        enum: [ 'azure-blob' ]
