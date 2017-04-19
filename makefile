@@ -2,7 +2,6 @@
 # System configuration
 #
 PYTHON=/usr/bin/python3
-VIRTUALENV=/usr/local/bin/virtualenv
 
 #
 # You shouldn't need to touch anything below this line.
@@ -15,7 +14,7 @@ app_runner=$(py_env)/bin/python ./manage.py runserver
 default: server
 
 $(py_env)/bin/activate: requirements.txt
-	test -d $(py_env) || $(VIRTUALENV) --python=$(PYTHON) --no-site-packages $(py_env)
+	test -d $(py_env) || $(PYTHON) -m venv $(py_env)
 	$(py_env)/bin/pip install -r requirements.txt
 	test -f requirements-dev.txt && $(py_env)/bin/pip install -r requirements-dev.txt
 
