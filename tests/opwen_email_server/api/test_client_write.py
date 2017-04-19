@@ -25,7 +25,7 @@ class UploadTests(TestCase):
         def restore_request():
             client_write.request = self._original_request
         request_type = namedtuple('Request', 'headers')
-        request_mock = request_type({'client_id': client})
+        request_mock = request_type({'X-LOKOLE-ClientId': client})
         self._original_request = client_write.request
         client_write.request = request_mock
         self.addCleanup(restore_request)

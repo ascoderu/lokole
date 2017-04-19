@@ -33,7 +33,7 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: client_id
+        - name: X-LOKOLE-ClientId
           in: header
           required: true
           description: Id of the Lokole client that wishes to send some emails.
@@ -55,7 +55,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: client_id
+        - name: X-LOKOLE-ClientId
           description: Id of the Lokole client that wishes to recieve some emails.
           type: string
           in: header

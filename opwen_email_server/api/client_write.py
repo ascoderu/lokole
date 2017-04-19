@@ -13,7 +13,7 @@ CLIENTS = EnvironmentAuth()
 
 
 def upload(upload_info: dict) -> Tuple[str, int]:
-    client_id = request.headers['client_id']
+    client_id = request.headers['X-LOKOLE-ClientId']
     if client_id not in CLIENTS:
         return 'client is not registered', 403
 
