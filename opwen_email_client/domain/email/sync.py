@@ -61,6 +61,8 @@ class AzureSync(Sync):
 
     def download(self):
         resource_id, container = self._email_server_client.download()
+        if not resource_id or not container:
+            return
 
         with self._workspace() as workspace:
             if self._download_to_stream(resource_id, container, workspace):
