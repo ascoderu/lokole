@@ -16,6 +16,8 @@ class EmailServerClient(metaclass=ABCMeta):
 
 
 class HttpEmailServerClient(EmailServerClient):
+    _supported_resource_type = 'azure-blob'
+
     def __init__(self, read_api: str, write_api: str, client_id: str):
         self._read_api = read_api
         self._write_api = write_api
@@ -41,7 +43,7 @@ class HttpEmailServerClient(EmailServerClient):
         payload = {
             'resource_id': resource_id,
             'container_name': container,
-            'resource_type': 'azure-blob',
+            'resource_type': self._supported_resource_type,
         }
 
         response = requests.post(self._upload_url, json=payload,
