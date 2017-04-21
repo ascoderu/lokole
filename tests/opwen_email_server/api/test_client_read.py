@@ -1,4 +1,3 @@
-from collections import namedtuple
 from contextlib import contextmanager
 from unittest import TestCase
 from unittest.mock import patch
@@ -9,9 +8,8 @@ from opwen_email_server.services.auth import EnvironmentAuth
 
 class DownloadTests(TestCase):
     def test_denies_unknown_client(self):
-        self.given_requester('unknown')
         with self.given_clients({'client1': 'bar.com'}):
-            message, status = client_read.download()
+            message, status = client_read.download('unknown')
             self.assertEqual(status, 403)
 
     @patch.object(client_read, 'server_datastore')
@@ -19,14 +17,13 @@ class DownloadTests(TestCase):
     def test_uploads_emails_and_marks_as_delivered(
             self, storage_mock, datastore_mock):
 
-        self.given_requester('client1')
         with self.given_clients({'client1': 'bar.com'}):
             resource_id = '1234'
             emails = [{'to': 'foo@bar.com', '_uid': '1'},
                        {'to': 'bar@bar.com', '_uid': '2'}]
             self.given_index(datastore_mock, storage_mock, emails, resource_id)
 
-            response = client_read.download()
+            response = client_read.download('client1')
 
             self.assertEqual(resource_id, response.get('resource_id'))
             self.assertEqual(self.stored_ids, emails)
@@ -47,12 +44,3 @@ class DownloadTests(TestCase):
         client_read.CLIENTS = EnvironmentAuth(clients)
         yield
         client_read.CLIENTS = original_clients
-
-    def given_requester(self, client):
-        def restore_request():
-            client_read.request = self._original_request
-        request_type = namedtuple('Request', 'headers')
-        request_mock = request_type({'X-LOKOLE-ClientId': client})
-        self._original_request = client_read.request
-        client_read.request = request_mock
-        self.addCleanup(restore_request)

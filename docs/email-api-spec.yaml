@@ -25,7 +25,7 @@ paths:
         200:
           description: The email was successfully received. No need to retry it.
 
-  /lokole:
+  '/lokole/{client_id}':
 
     post:
       operationId: opwen_email_server.api.client_write.upload
@@ -63,8 +63,8 @@ paths:
 parameters:
 
   ClientId:
-    name: X-LOKOLE-ClientId
-    in: header
+    name: client_id
+    in: path
     required: true
     description: Id of the Lokole client.
     type: string
