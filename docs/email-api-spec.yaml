@@ -8,7 +8,7 @@ basePath: '/api/email'
 
 paths:
 
-  '/sendgrid':
+  '/sendgrid/{client_id}':
 
     post:
       operationId: opwen_email_server.api.email_receive.receive
@@ -16,6 +16,7 @@ paths:
       consumes:
         - multipart/form-data
       parameters:
+        - $ref: '#/parameters/ClientId'
         - name: email
           description: Email represented as a MIME string.
           type: string
@@ -24,6 +25,8 @@ paths:
       responses:
         200:
           description: The email was successfully received. No need to retry it.
+        403:
+          description: Request from unregistered client.
 
   '/lokole/{client_id}':
 
