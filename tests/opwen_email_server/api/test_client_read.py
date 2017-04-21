@@ -1,14 +1,13 @@
-from contextlib import contextmanager
 from unittest import TestCase
 from unittest.mock import patch
 
 from opwen_email_server.api import client_read
-from opwen_email_server.services.auth import EnvironmentAuth
+from tests.opwen_email_server.api.api_test_base import AuthTestMixin
 
 
-class DownloadTests(TestCase):
+class DownloadTests(TestCase, AuthTestMixin):
     def test_denies_unknown_client(self):
-        with self.given_clients({'client1': 'bar.com'}):
+        with self.given_clients(client_read, {'client1': 'bar.com'}):
             message, status = client_read.download('unknown')
             self.assertEqual(status, 403)
 
@@ -17,7 +16,7 @@ class DownloadTests(TestCase):
     def test_uploads_emails_and_marks_as_delivered(
             self, storage_mock, datastore_mock):
 
-        with self.given_clients({'client1': 'bar.com'}):
+        with self.given_clients(client_read, {'client1': 'bar.com'}):
             resource_id = '1234'
             emails = [{'to': 'foo@bar.com', '_uid': '1'},
                        {'to': 'bar@bar.com', '_uid': '2'}]
@@ -37,10 +36,3 @@ class DownloadTests(TestCase):
         self.stored_ids = []
         datastore_mock.fetch_pending_emails.return_value = emails
         storage_mock.store_objects.side_effect = store_objects
-
-    @contextmanager
-    def given_clients(self, clients):
-        original_clients = client_read.CLIENTS
-        client_read.CLIENTS = EnvironmentAuth(clients)
-        yield
-        client_read.CLIENTS = original_clients
