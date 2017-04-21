@@ -27,19 +27,15 @@ class HttpEmailServerClient(EmailServerClient):
 
     @property
     def _upload_url(self) -> str:
-        return 'http://{host}/api/email/lokole'.format(
+        return 'http://{host}/api/email/lokole/{client_id}'.format(
+            client_id=self._client_id,
             host=self._write_api)
 
     @property
     def _download_url(self) -> str:
-        return 'http://{host}/api/email/lokole'.format(
+        return 'http://{host}/api/email/lokole/{client_id}'.format(
+            client_id=self._client_id,
             host=self._read_api)
-
-    @property
-    def _auth_headers(self) -> dict:
-        return {
-            'X-LOKOLE-ClientId': self._client_id,
-        }
 
     def upload(self, resource_id, container):
         payload = {
@@ -48,12 +44,11 @@ class HttpEmailServerClient(EmailServerClient):
             'resource_type': self._supported_resource_type,
         }
 
-        response = http_post(self._upload_url, json=payload,
-                             headers=self._auth_headers)
+        response = http_post(self._upload_url, json=payload)
         response.raise_for_status()
 
     def download(self):
-        response = http_get(self._download_url, headers=self._auth_headers)
+        response = http_get(self._download_url)
         response.raise_for_status()
 
         resource_id, resource_container = self._validate(response)
