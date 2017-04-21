@@ -9,7 +9,6 @@ from typing import TypeVar
 from uuid import uuid4
 
 from azure.common import AzureMissingResourceHttpError
-from azure.storage.blob import Blob
 from azure.storage.blob import BlockBlobService
 
 from opwen_email_client.domain.email.client import EmailServerClient
@@ -91,7 +90,3 @@ class AzureSync(Sync):
                                                  self._container)
 
         return uploaded_ids
-
-
-def _extract_root(blob: Blob) -> str:
-    return blob.name.split('/')[0]
