@@ -77,8 +77,8 @@ class AppConfig(object):
         [DEFAULT_LOCALE] +
         [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)])
 
-    EMAIL_SERVER_READ_API_HOSTNAME = 'api.mailserver.read.lokole.ca'
-    EMAIL_SERVER_WRITE_API_HOSTNAME = 'api.mailserver.write.lokole.ca'
+    EMAIL_SERVER_READ_API_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_READ_API')
+    EMAIL_SERVER_WRITE_API_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_WRITE_API')
     EMAIL_HOST_FORMAT = '{}.lokole.ca'
     STORAGE_CONTAINER = 'compressedpackages'
     STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME', 'azure-name')
