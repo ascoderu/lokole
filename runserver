@@ -8,15 +8,18 @@ from connexion import App
 from opwen_email_server.utils.imports import can_import
 
 servers = list(filter(can_import, ('tornado', 'gevent', 'flask')))
+hosts = ['127.0.0.1', '0.0.0.0']
 
 parser = ArgumentParser()
+parser.add_argument('--host', choices=hosts, default=hosts[0])
 parser.add_argument('--port', type=int, default=8080)
 parser.add_argument('--server', choices=servers, default=servers[0])
 parser.add_argument('--ui', action='store_true', default=False)
 parser.add_argument('apis', nargs='+', type=FileType('r'))
 args = parser.parse_args()
 
-app = App(__name__, port=args.port, server=args.server, swagger_ui=args.ui)
+app = App(__name__, host=args.host, port=args.port,
+          server=args.server, swagger_ui=args.ui)
 
 for api in args.apis:
     api.close()
