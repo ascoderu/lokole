@@ -2,7 +2,8 @@ from abc import ABCMeta
 from abc import abstractmethod
 from typing import Tuple
 
-import requests
+from requests import get as http_get
+from requests import post as http_post
 
 
 class EmailServerClient(metaclass=ABCMeta):
@@ -46,12 +47,12 @@ class HttpEmailServerClient(EmailServerClient):
             'resource_type': self._supported_resource_type,
         }
 
-        response = requests.post(self._upload_url, json=payload,
-                                 headers=self._auth_headers)
+        response = http_post(self._upload_url, json=payload,
+                             headers=self._auth_headers)
         response.raise_for_status()
 
     def download(self):
-        response = requests.get(self._download_url, headers=self._auth_headers)
+        response = http_get(self._download_url, headers=self._auth_headers)
         response.raise_for_status()
 
         payload = response.json()
