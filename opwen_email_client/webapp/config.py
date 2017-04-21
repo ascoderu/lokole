@@ -43,6 +43,7 @@ class AppConfig(object):
     SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    ADMIN_SECRET = getenv('OPWEN_ADMIN_SECRET')
     SECRET_KEY = getenv('OPWEN_SESSION_KEY')
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'

@@ -117,7 +117,7 @@ def admin_required(func):
     if app.config.get('TESTING'):
         return func
 
-    preshared_secret = app.config.get('PRESHARED_SECRET')
+    preshared_secret = app.config.get('ADMIN_SECRET')
     if preshared_secret:
         @wraps(func)
         def decorated_view(*args, **kwargs):
