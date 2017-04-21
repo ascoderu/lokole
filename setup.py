@@ -11,6 +11,7 @@ with open('README.rst') as fobj:
 
 
 packages = find_packages(exclude=['tests*'])
+scripts = ['manage.py']
 
 
 setup(
@@ -24,4 +25,5 @@ setup(
     description='Email client for the Opwen project',
     long_description=long_description,
     include_package_data=True,
+    scripts=scripts,
     install_requires=install_requires)
