@@ -33,7 +33,7 @@ lint: venv
 typecheck: venv
 	$(py_env)/bin/mypy --silent-imports $(py_packages)
 
-ci: tests lint typecheck
+ci: tests lint
 
 $(grunt): package.json bower.json
 	$(NPM) install
