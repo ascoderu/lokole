@@ -4,11 +4,11 @@ info:
   title: Opwen Cloudserver Email API.
   version: '0.1'
 
-basePath: /api/email
+basePath: '/api/email'
 
 paths:
 
-  /sendgrid:
+  '/sendgrid':
 
     post:
       operationId: opwen_email_server.api.email_receive.receive
