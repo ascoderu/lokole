@@ -2,12 +2,14 @@
 # System configuration
 #
 PYTHON=/usr/bin/python3
+NPM=/usr/bin/npm
 
 #
 # You shouldn't need to touch anything below this line.
 #
 py_env=venv
 py_packages=opwen_email_client
+grunt=./node_modules/grunt/bin/grunt
 app_runner=$(py_env)/bin/python ./manage.py runserver
 
 .PHONY: default
@@ -33,9 +35,11 @@ typecheck: venv
 
 ci: tests lint typecheck
 
-build-js: package.json bower.json Gruntfile.js
-	npm install
-	grunt
+$(grunt): package.json bower.json
+	$(NPM) install
+
+build-js: $(grunt) Gruntfile.js
+	$(grunt)
 
 server: venv
 	$(app_runner)
