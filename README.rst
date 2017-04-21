@@ -80,7 +80,13 @@ First, get the source code.
 
   git clone git@github.com:ascoderu/opwen-webapp.git
 
-Second, use the makefile to verify your installation by running the tests and
+Second, install the system-level dependencies using your package manager.
+
+.. sourcecode :: sh
+
+  sudo dnf install npm
+
+Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
 dependencies into a virtual environment.
 
