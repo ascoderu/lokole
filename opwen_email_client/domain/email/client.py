@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from typing import Tuple
 
+from requests import Response
 from requests import get as http_get
 from requests import post as http_post
 
@@ -55,5 +56,22 @@ class HttpEmailServerClient(EmailServerClient):
         response = http_get(self._download_url, headers=self._auth_headers)
         response.raise_for_status()
 
-        payload = response.json()
-        return payload['resource_id'], payload['resource_container']
+        resource_id, resource_container = self._validate(response)
+
+        return resource_id, resource_container
+
+    def _validate(self, response: Response):
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = {}
+
+        resource_id = payload.get('resource_id', '')
+        resource_container = payload.get('resource_container', '')
+        resource_type = payload.get('resource_type', '').lower()
+
+        if resource_type and resource_type != self._supported_resource_type:
+            raise ValueError('unsupported resource type: {}'
+                             .format(resource_type))
+
+        return resource_id, resource_container
