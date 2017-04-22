@@ -16,7 +16,7 @@ scripts = ['runserver']
 
 setup(
     name='opwen_email_server',
-    version='0.1.1',
+    version='0.1.2',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
