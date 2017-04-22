@@ -11,12 +11,12 @@ with open('README.rst') as fobj:
 
 
 packages = find_packages(exclude=['tests*'])
-scripts = ['runserver']
+scripts = ['runserver', 'docs/email-api-spec.yaml']
 
 
 setup(
     name='opwen_email_server',
-    version='0.1.2',
+    version='0.1.3',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
