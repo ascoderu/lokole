@@ -2,12 +2,13 @@ from time import sleep
 from typing import Callable
 from typing import Iterable
 
+from opwen_email_server.config import QUEUE_POLL_INTERVAL
 from opwen_email_server.utils.log import LogMixin
 
 
 class QueueConsumer(LogMixin):
     def __init__(self, dequeue: Callable[[], Iterable[dict]],
-                 poll_seconds: float=10) -> None:
+                 poll_seconds: float=QUEUE_POLL_INTERVAL) -> None:
 
         self._dequeue = dequeue
         self._poll_seconds = poll_seconds
