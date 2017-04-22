@@ -25,6 +25,24 @@ class AzureAuthTests(TestCase):
 
         self.assertIsNone(actual_domain)
 
+    def test_caches_values(self):
+        self.given_clients(('client', 'domain'))
+
+        self.auth.domain_for('client')
+        self.auth.domain_for('client')
+        self.auth.domain_for('client')
+
+        self.assertEqual(self.mock_client.query_entities.call_count, 1)
+
+    def test_does_not_cache_nulls(self):
+        self.given_clients()
+
+        self.auth.domain_for('client')
+        self.auth.domain_for('client')
+        self.auth.domain_for('client')
+
+        self.assertEqual(self.mock_client.query_entities.call_count, 3)
+
     def given_clients(self, *clients_and_domains):
         self.mock_client.query_entities.return_value = ({
             'RowKey': client_id,

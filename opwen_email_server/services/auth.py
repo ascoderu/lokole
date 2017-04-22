@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from functools import lru_cache
 from typing import Callable
 from typing import Optional
 
@@ -41,10 +42,17 @@ class AzureAuth(Auth):
         })
 
     def domain_for(self, client_id):
+        try:
+            return self._domain_for_cached(client_id)
+        except KeyError:
+            return None
+
+    @lru_cache(maxsize=128)
+    def _domain_for_cached(self, client_id: str) -> str:
         query = "PartitionKey eq '{0}' and RowKey eq '{0}'".format(client_id)
         entities = self._client.query_entities(self._table, query)
         for entity in entities:
             domain = entity.get('domain')
             if domain:
                 return domain
-        return None
+        raise KeyError

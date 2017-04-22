@@ -20,7 +20,7 @@ scripts = [
 
 setup(
     name='opwen_email_server',
-    version='0.1.4',
+    version='0.1.5',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
