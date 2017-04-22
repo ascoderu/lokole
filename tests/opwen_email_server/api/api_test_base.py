@@ -1,12 +1,22 @@
 from contextlib import contextmanager
+from typing import Mapping
+from typing import Optional
 
-from opwen_email_server.services.auth import EnvironmentAuth
+from opwen_email_server.services.auth import Auth
+
+
+class FakeAuth(Auth):
+    def __init__(self, clients: Mapping[str, str]):
+        self._clients = dict(clients.items())
+
+    def domain_for(self, client_id: str) -> Optional[str]:
+        return self._clients.get(client_id)
 
 
 class AuthTestMixin(object):
     @contextmanager
-    def given_clients(self, package, clients):
+    def given_clients(self, package, clients: Mapping[str, str]):
         original_clients = getattr(package, 'CLIENTS')
-        setattr(package, 'CLIENTS', EnvironmentAuth(clients))
+        setattr(package, 'CLIENTS', FakeAuth(clients))
         yield
         setattr(package, 'CLIENTS', original_clients)

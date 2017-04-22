@@ -2,7 +2,7 @@ from typing import Tuple
 from uuid import uuid4
 
 from opwen_email_server import config
-from opwen_email_server.services.auth import EnvironmentAuth
+from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.services.storage import AzureTextStorage
 
@@ -13,11 +13,12 @@ STORAGE = AzureTextStorage(account=config.STORAGE_ACCOUNT,
 QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                    name=config.QUEUE_SENDGRID_MIME)
 
-CLIENTS = EnvironmentAuth()
+CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+                    table=config.TABLE_AUTH)
 
 
 def receive(client_id: str, email: str) -> Tuple[str, int]:
-    if client_id not in CLIENTS:
+    if not CLIENTS.domain_for(client_id):
         return 'client is not registered', 403
 
     email_id = str(uuid4())

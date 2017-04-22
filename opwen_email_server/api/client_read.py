@@ -3,7 +3,7 @@ from typing import Union
 
 from opwen_email_server import config
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.services.auth import EnvironmentAuth
+from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 
@@ -12,14 +12,15 @@ STORAGE = AzureObjectStorage(
                      key=config.CLIENT_STORAGE_KEY,
                      container=config.CONTAINER_CLIENT_PACKAGES))
 
-CLIENTS = EnvironmentAuth()
+CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+                    table=config.TABLE_AUTH)
 
 
 def download(client_id) -> Union[dict, Tuple[str, int]]:
-    if client_id not in CLIENTS:
+    domain = CLIENTS.domain_for(client_id)
+    if not domain:
         return 'client is not registered', 403
 
-    domain = CLIENTS.domain_for(client_id)
     delivered = set()
 
     def mark_delivered(email: dict) -> dict:

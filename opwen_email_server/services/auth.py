@@ -1,36 +1,50 @@
-from ast import literal_eval
-
-from os import environ
+from abc import ABCMeta
+from abc import abstractmethod
 from typing import Callable
-from typing import Mapping
+from typing import Optional
 
-from opwen_email_server.utils.log import LogMixin
+from azure.storage.table import TableService
 
 
-class EnvironmentAuth(LogMixin):
-    def __init__(self, client_to_domain: Mapping[str, str]=None,
-                 envgetter: Callable[[str, str], str]=environ.get,
-                 envkey: str='LOKOLE_CLIENTS') -> None:
+class Auth(metaclass=ABCMeta):
+    @abstractmethod
+    def domain_for(self, client_id: str) -> Optional[str]:
+        raise NotImplementedError  # pramga: no cover
 
-        self.__client_to_domain = dict(client_to_domain or {})
-        self._envgetter = envgetter
-        self._envkey = envkey
+
+class AzureAuth(Auth):
+    def __init__(self, account: str, key: str, table: str,
+                 client: TableService=None,
+                 client_factory: Callable[..., TableService]=TableService
+                 ) -> None:
+
+        self._account = account
+        self._key = key
+        self._table = table
+        self.__client = client
+        self._client_factory = client_factory
 
     @property
-    def _client_to_domain(self):
-        if not self.__client_to_domain:
-            self.__client_to_domain = self._create_client_to_domain()
-            self.log_debug('initialized auth to %r', self.__client_to_domain)
-        return self.__client_to_domain
+    def _client(self) -> TableService:
+        if self.__client is not None:
+            return self.__client
+        client = self._client_factory(self._account, self._key)
+        client.create_table(self._table)
+        self.__client = client
+        return client
 
-    def _create_client_to_domain(self) -> Mapping[str, str]:
-        client_to_domain = literal_eval(self._envgetter(self._envkey, '{}'))
-        if not client_to_domain:
-            raise ValueError('environment key {} not set'.format(self._envkey))
-        return client_to_domain
+    def insert(self, client_id: str, domain: str):
+        self._client.insert_entity(self._table, {
+            'RowKey': client_id,
+            'PartitionKey': client_id,
+            'domain': domain,
+        })
 
-    def __contains__(self, client: str) -> bool:
-        return client in self._client_to_domain
-
-    def domain_for(self, client: str) -> str:
-        return self._client_to_domain[client]
+    def domain_for(self, client_id):
+        query = "PartitionKey eq '{0}' and RowKey eq '{0}'".format(client_id)
+        entities = self._client.query_entities(self._table, query)
+        for entity in entities:
+            domain = entity.get('domain')
+            if domain:
+                return domain
+        return None

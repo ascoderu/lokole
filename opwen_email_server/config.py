@@ -28,6 +28,7 @@ TABLE_CC = 'emailcc'
 TABLE_BCC = 'emailbcc'
 TABLE_FROM = 'emailfrom'
 TABLE_DOMAIN_X_DELIVERED = 'emaildomainxdelivered'
+TABLE_AUTH = 'clientsauth'
 
 QUEUE_CLIENT_PACKAGE = 'lokoleinboundemails'
 QUEUE_EMAIL_SEND = 'sengridoutboundemails'

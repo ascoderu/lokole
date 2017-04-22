@@ -14,12 +14,13 @@ packages = find_packages(exclude=['tests*'])
 scripts = [
     'runserver',
     'docs/email-api-spec.yaml',
+    'registerclient',
 ]
 
 
 setup(
     name='opwen_email_server',
-    version='0.1.3',
+    version='0.1.4',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
