@@ -6,9 +6,10 @@ from opwen_email_server import config
 
 class ConfigTests(TestCase):
     def test_azure_names_are_valid(self):
+        skip_names = {'LOG_LEVEL'}
+        skip_values = {None}
         acceptable_config_value = '^[a-z]{3,63}$'
-        constants = _get_constants(
-            config, skip_names={'LOG_LEVEL'}, skip_values={None})
+        constants = _get_constants(config, skip_names, skip_values)
 
         for constant, value in constants:
             if not match(acceptable_config_value, value):
