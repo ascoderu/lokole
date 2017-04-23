@@ -13,7 +13,6 @@ with open('README.rst') as fobj:
 packages = find_packages(exclude=['tests*'])
 scripts = [
     'runserver',
-    'docs/email-api-spec.yaml',
     'registerclient',
 ]
 

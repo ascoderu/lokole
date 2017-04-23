@@ -8,7 +8,7 @@ PYTHON=/usr/bin/python3
 #
 api_port=8080
 api_server=tornado
-api_specs=docs/email-api-spec.yaml
+api_specs=opwen_email_server/static/email-api-spec.yaml
 
 #
 # You shouldn't need to touch anything below this line.
