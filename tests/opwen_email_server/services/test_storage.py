@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 from opwen_email_server.services.storage import _AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.utils.serialization import gzip_string
 
 
 class AzureTextStorageTests(TestCase):
@@ -27,7 +28,7 @@ class AzureTextStorageTests(TestCase):
 
         content = storage.fetch_text('id1')
 
-        self.assertEqual(client_mock.get_blob_to_text.call_count, 1)
+        self.assertEqual(client_mock.get_blob_to_bytes.call_count, 1)
         self.assertEqual(content, expected_content)
 
     def test_stores_text(self):
@@ -35,18 +36,20 @@ class AzureTextStorageTests(TestCase):
 
         storage.store_text('id1', 'content')
 
-        self.assertEqual(client_mock.create_blob_from_text.call_count, 1)
+        self.assertEqual(client_mock.create_blob_from_bytes.call_count, 1)
 
     # noinspection PyTypeChecker
     @classmethod
     def given_storage(cls, content=None):
         client_mock = MagicMock()
-        storage = AzureTextStorage(account='account', key='key', container='name',
-                                   factory=lambda *args, **kwargs: client_mock)
+        storage = AzureTextStorage(
+            account='account', key='key', container='name',
+            factory=lambda *args, **kwargs: client_mock)
 
         if content:
             build_blob = namedtuple('Blob', 'content')
-            client_mock.get_blob_to_text.return_value = build_blob(content)
+            data = gzip_string(content)
+            client_mock.get_blob_to_bytes.return_value = build_blob(data)
 
         return storage, client_mock
 
