@@ -24,7 +24,6 @@ class EmailField(StringField):
 class HtmlTextAreaField(TextAreaField):
     _script_tags_re = re_compile(r'<script[\s\S]+?/script>', IGNORECASE)
 
-    # pylint:disable=attribute-defined-outside-init
     # noinspection PyAttributeOutsideInit
     def process_formdata(self, valuelist):
         super().process_formdata(valuelist)
@@ -60,7 +59,6 @@ class SuffixedStringField(StringField):
         super().__init__(*args, **kwargs)
         self._suffix = suffix
 
-    # pylint:disable=attribute-defined-outside-init
     # noinspection PyAttributeOutsideInit
     def process_formdata(self, valuelist):
         super().process_formdata(valuelist)

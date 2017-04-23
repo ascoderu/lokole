@@ -1,4 +1,3 @@
-# pylint:disable=no-member
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
@@ -227,7 +226,6 @@ def unsuspend(userid):
 
 
 # noinspection PyUnusedLocal
-# pylint:disable=unused-argument
 @app.errorhandler(404)
 def _on_404(code_or_exception):
     app.logger.warning('404: %s', request.path)

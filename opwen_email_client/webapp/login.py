@@ -1,4 +1,3 @@
-# pylint: disable=no-member
 from functools import wraps
 
 from flask import request
@@ -28,12 +27,14 @@ from opwen_email_client.webapp.config import i8n
 
 _db = SQLAlchemy(app)
 
+# noinspection PyUnresolvedReferences
 _roles_users = _db.Table(
     'roles_users',
     _db.Column('user_id', _db.Integer(), _db.ForeignKey('user.id')),
     _db.Column('role_id', _db.Integer(), _db.ForeignKey('role.id')))
 
 
+# noinspection PyUnresolvedReferences
 class User(_db.Model, UserMixin):
     id = _db.Column(_db.Integer(), primary_key=True)
     email = _db.Column(_db.String(255), unique=True, index=True)
@@ -63,20 +64,19 @@ class User(_db.Model, UserMixin):
         return self.email in actors
 
 
+# noinspection PyUnresolvedReferences
 class Role(_db.Model, RoleMixin):
     id = _db.Column(_db.Integer(), primary_key=True)
     name = _db.Column(_db.String(32), unique=True)
     description = _db.Column(_db.String(255))
 
 
-# pylint: disable=too-many-ancestors
 # noinspection PyClassHasNoInit
 class LoginForm(_LoginForm):
     email = SuffixedStringField(
         suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST))
 
 
-# pylint: disable=too-many-ancestors
 # noinspection PyClassHasNoInit
 class RegisterForm(_RegisterForm):
     email = SuffixedStringField(
