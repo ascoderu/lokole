@@ -13,7 +13,6 @@ class InboundEmailQueueConsumer(QueueConsumer):
     def _process_message(self, message: dict):
         email_id, mime_email = self._load_email_content(message)
         email = parse_mime_email(mime_email)
-        email['_delivered'] = False
         server_datastore.store_email(email_id, email)
 
     @classmethod
