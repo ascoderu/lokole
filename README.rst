@@ -20,7 +20,7 @@ The server has two main responsibilities:
    forward them to the appropriate Lokole device.
 2. Send new emails created by Lokole users to the rest of the internet.
 
-This package is intended to run on an Ubuntu server. There is a `script <https://github.com/ascoderu/opwen-setup>`_
+This package is intended to run on an Ubuntu server. There is a `script <https://github.com/ascoderu/opwen-setup/blob/master/setup-cloudserver.sh>`_
 to set up a server with all the bits and pieces necessary for deployment.
 
 System overview
