@@ -7,18 +7,21 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureObjectStorage
 
 parser = ArgumentParser()
-parser.add_argument('--account', default=config.STORAGE_ACCOUNT)
-parser.add_argument('--key', default=config.STORAGE_KEY)
+parser.add_argument('--server_account', default=config.STORAGE_ACCOUNT)
+parser.add_argument('--server_key', default=config.STORAGE_KEY)
+parser.add_argument('--client_account', default=config.CLIENT_STORAGE_ACCOUNT)
+parser.add_argument('--client_key', default=config.CLIENT_STORAGE_KEY)
 parser.add_argument('--table', default=config.TABLE_AUTH)
 parser.add_argument('--container', default=config.CONTAINER_CLIENT_PACKAGES)
 parser.add_argument('--client', required=True)
 parser.add_argument('--domain', required=True)
 args = parser.parse_args()
 
-auth = AzureAuth(account=args.account, key=args.key, table=args.table)
+auth = AzureAuth(account=args.server_account, key=args.server_key,
+                 table=args.table)
 auth.insert(client_id=args.client, domain=args.domain)
 
 # noinspection PyStatementEffect,PyProtectedMember
 # hack to ensure that the container gets created before the client accesses it
-storage = AzureObjectStorage(account=args.account, key=args.key,
+storage = AzureObjectStorage(account=args.client_account, key=args.client_key,
                              container=args.container)._file_storage._client
