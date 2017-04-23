@@ -42,18 +42,6 @@ class _BaseAzureStorage(LogMixin):
         yield 'container %s', self._container
 
 
-class AzureTextStorage(_BaseAzureStorage):
-    def store_text(self, resource_id: str, text: str):
-        self.log_debug('storing %d characters at %s', len(text), resource_id)
-        self._client.create_blob_from_text(self._container, resource_id, text)
-
-    def fetch_text(self, resource_id: str) -> str:
-        blob = self._client.get_blob_to_text(self._container, resource_id)
-        text = blob.content
-        self.log_debug('fetched %d characters from %s', len(text), resource_id)
-        return text
-
-
 class _AzureFileStorage(_BaseAzureStorage):
     def store_file(self, resource_id: str, path: str):
         self.log_debug('storing file %s at %s', path, resource_id)
@@ -64,6 +52,18 @@ class _AzureFileStorage(_BaseAzureStorage):
         self._client.get_blob_to_path(self._container, resource_id, path)
         self.log_debug('fetched file %s from %s', path, resource_id)
         return path
+
+
+class AzureTextStorage(_BaseAzureStorage):
+    def store_text(self, resource_id: str, text: str):
+        self.log_debug('storing %d characters at %s', len(text), resource_id)
+        self._client.create_blob_from_text(self._container, resource_id, text)
+
+    def fetch_text(self, resource_id: str) -> str:
+        blob = self._client.get_blob_to_text(self._container, resource_id)
+        text = blob.content
+        self.log_debug('fetched %d characters from %s', len(text), resource_id)
+        return text
 
 
 class AzureObjectStorage(LogMixin):
