@@ -5,7 +5,8 @@ from tempfile import NamedTemporaryFile
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from opwen_email_server.services.storage import AzureFileStorage
+# noinspection PyProtectedMember
+from opwen_email_server.services.storage import _AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 
@@ -62,7 +63,7 @@ class AzureFileStorageTests(TestCase):
     @classmethod
     def given_storage(cls):
         client_mock = MagicMock()
-        storage = AzureFileStorage(
+        storage = _AzureFileStorage(
             account='account', key='key', container='name',
             factory=lambda *args, **kwargs: client_mock)
 
@@ -114,7 +115,9 @@ class AzureObjectStorageTests(TestCase):
     @classmethod
     def given_storage(cls, lines=None):
         client_mock = MagicMock()
-        storage = AzureObjectStorage(client_mock)
+        storage = AzureObjectStorage(
+            account='account', key='key', container='container',
+            file_storage=client_mock)
 
         if lines:
             # noinspection PyUnusedLocal

@@ -4,13 +4,11 @@ from typing import Union
 from opwen_email_server import config
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 
-STORAGE = AzureObjectStorage(
-    AzureFileStorage(account=config.CLIENT_STORAGE_ACCOUNT,
-                     key=config.CLIENT_STORAGE_KEY,
-                     container=config.CONTAINER_CLIENT_PACKAGES))
+STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
+                             key=config.CLIENT_STORAGE_KEY,
+                             container=config.CONTAINER_CLIENT_PACKAGES)
 
 CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                     table=config.TABLE_AUTH)

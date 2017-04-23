@@ -54,7 +54,7 @@ class AzureTextStorage(_BaseAzureStorage):
         return text
 
 
-class AzureFileStorage(_BaseAzureStorage):
+class _AzureFileStorage(_BaseAzureStorage):
     def store_file(self, resource_id: str, path: str):
         self.log_debug('storing file %s at %s', path, resource_id)
         self._client.create_blob_from_path(self._container, resource_id, path)
@@ -69,8 +69,13 @@ class AzureFileStorage(_BaseAzureStorage):
 class AzureObjectStorage(LogMixin):
     _encoding = 'utf-8'
 
-    def __init__(self, file_storage: AzureFileStorage) -> None:
-        self._file_storage = file_storage
+    def __init__(self, account: str, key: str, container: str,
+                 client: BlockBlobService=None,
+                 factory: Callable[..., BlockBlobService]=BlockBlobService,
+                 file_storage: _AzureFileStorage=None) -> None:
+        self._file_storage = file_storage or _AzureFileStorage(
+            account=account, key=key, container=container,
+            client=client, factory=factory)
 
     @property
     def container(self) -> str:

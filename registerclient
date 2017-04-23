@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 from opwen_email_server import config
 from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.storage import AzureFileStorage
+from opwen_email_server.services.storage import AzureObjectStorage
 
 parser = ArgumentParser()
 parser.add_argument('--account', default=config.STORAGE_ACCOUNT)
@@ -20,5 +20,5 @@ auth.insert(client_id=args.client, domain=args.domain)
 
 # noinspection PyStatementEffect,PyProtectedMember
 # hack to ensure that the container gets created before the client accesses it
-storage = AzureFileStorage(account=args.account, key=args.key,
-                           container=args.container)._client
+storage = AzureObjectStorage(account=args.account, key=args.key,
+                             container=args.container)._file_storage._client
