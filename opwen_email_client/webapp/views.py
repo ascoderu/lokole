@@ -177,7 +177,6 @@ def sync():
 
 
 @app.route('/user/language/<locale>')
-@login_required
 def language(locale):
     Session.store_current_locale(locale)
     return redirect(Session.get_last_visited_url() or url_for('home'))
