@@ -41,5 +41,14 @@ $(grunt): package.json bower.json
 build-js: $(grunt) Gruntfile.js
 	$(grunt)
 
+babel.pot: babel.cfg venv
+	$(py_env)/bin/pybabel extract -F babel.cfg -k lazy_gettext -o babel.pot opwen_email_client/webapp
+
+prepare-translations: babel.pot venv
+	$(py_env)/bin/pybabel init -i babel.pot -d opwen_email_client/webapp/translations -l $(LANG)
+
+compile-translations: venv
+	$(py_env)/bin/pybabel compile -d opwen_email_client/webapp/translations
+
 server: venv
 	$(app_runner)

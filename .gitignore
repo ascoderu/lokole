@@ -14,4 +14,5 @@ opwen_email_client/webapp/static/flags
 
 .coverage
 *.mo
+*.pot
 /state/

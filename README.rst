@@ -100,3 +100,13 @@ dependencies into a virtual environment.
 
 The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
 so take a look there for an overview of the entrypoints into the code.
+
+Adding a new language
+---------------------
+
+.. sourcecode :: sh
+
+  export LANG=ln
+  make prepare-translations
+  poedit "opwen_email_client/webapp/translations/$LANG/LC_MESSAGES/messages.po"
+  make compile-translations
