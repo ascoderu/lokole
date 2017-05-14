@@ -1,0 +1,18 @@
+swagger: '2.0'
+
+info:
+  title: Opwen Cloudserver health-check endpoints.
+  version: '0.1'
+
+basePath: '/healthcheck'
+
+paths:
+
+  '/ping':
+
+    get:
+      operationId: opwen_email_server.api.healthcheck.ping
+      summary: Endpoint that the load-balancer hits to check if the server is healthy.
+      responses:
+        200:
+          description: The server is healthy.
