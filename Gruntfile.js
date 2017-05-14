@@ -46,6 +46,7 @@ module.exports = function(grunt) {
             flatten: true,
             src: [
               'bower_components/flag-icon-css/flags/4x3/ca.svg',
+              'bower_components/flag-icon-css/flags/4x3/cd.svg',
               'bower_components/flag-icon-css/flags/4x3/fr.svg',
             ],
             dest:'opwen_email_client/webapp/static/flags/4x3/',
