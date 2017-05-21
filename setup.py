@@ -16,7 +16,7 @@ scripts = ['manage.py']
 
 setup(
     name='opwen_email_client',
-    version='0.1.0',
+    version='0.1.1',
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
