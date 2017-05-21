@@ -70,7 +70,7 @@ class Session(object):
 
     @classmethod
     def _session(cls) -> Dict[str, str]:
-        return session or {}
+        return session
 
     @classmethod
     def store_last_visited_url(cls):
