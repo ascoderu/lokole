@@ -5,6 +5,7 @@ from os import path
 from typing import Iterable
 
 from babel import Locale
+from flask import Response
 from flask import abort
 from flask import flash
 from flask import redirect
@@ -30,7 +31,7 @@ from opwen_email_client.webapp.session import Session
 
 
 @app.route('/favicon.ico')
-def favicon():
+def favicon() -> Response:
     return send_from_directory(
         directory=path.join(app.root_path, 'static'),
         filename='favicon.ico',
@@ -39,12 +40,12 @@ def favicon():
 
 @app.route('/')
 @app.route('/home')
-def home():
+def home() -> Response:
     return _view('home.html')
 
 
 @app.route('/about')
-def about():
+def about() -> Response:
     return _view('about.html')
 
 
@@ -52,7 +53,7 @@ def about():
 @app.route('/email/inbox', defaults={'page': 1})
 @app.route('/email/inbox/<int:page>')
 @login_required
-def email_inbox(page):
+def email_inbox(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
 
@@ -62,7 +63,7 @@ def email_inbox(page):
 @app.route('/email/outbox', defaults={'page': 1})
 @app.route('/email/outbox/<int:page>')
 @login_required
-def email_outbox(page):
+def email_outbox(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
 
@@ -72,7 +73,7 @@ def email_outbox(page):
 @app.route('/email/sent', defaults={'page': 1})
 @app.route('/email/sent/<int:page>')
 @login_required
-def email_sent(page):
+def email_sent(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
 
@@ -82,7 +83,7 @@ def email_sent(page):
 @app.route('/email/search', defaults={'page': 1})
 @app.route('/email/search/<int:page>')
 @login_required
-def email_search(page):
+def email_search(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
     query = request.args.get('query')
@@ -93,18 +94,18 @@ def email_search(page):
 
 @app.route('/email/read/<email_uid>')
 @login_required
-def email_read(email_uid):
+def email_read(email_uid: str) -> Response:
     email_store = app.ioc.email_store
     user = current_user
 
     email_store.mark_read(user.email, [email_uid])
 
-    return 'OK'
+    return Response('OK', status=200, mimetype='text/plain')
 
 
 @app.route('/email/new', methods=['GET', 'POST'])
 @login_required
-def email_new():
+def email_new() -> Response:
     email_store = app.ioc.email_store
     attachment_encoder = app.ioc.attachment_encoder
 
@@ -119,7 +120,7 @@ def email_new():
 
 @app.route('/attachment/<attachment_id>', methods=['GET'])
 @login_required
-def download_attachment(attachment_id):
+def download_attachment(attachment_id: str) -> Response:
     attachments_session = app.ioc.attachments_session
 
     attachment = attachments_session.lookup(attachment_id)
@@ -133,7 +134,7 @@ def download_attachment(attachment_id):
 
 @app.route('/register_complete')
 @login_required
-def register_complete():
+def register_complete() -> Response:
     send_welcome_email = SendWelcomeEmail(
         time=datetime.utcnow(),
         to=current_user.email,
@@ -151,7 +152,7 @@ def register_complete():
 
 @app.route('/login_complete')
 @login_required
-def login_complete():
+def login_complete() -> Response:
     current_user.last_login = datetime.now()
     current_user.save()
 
@@ -164,14 +165,14 @@ def login_complete():
 
 
 @app.route('/logout_complete')
-def logout_complete():
+def logout_complete() -> Response:
     flash(i8n.LOGGED_OUT, category='success')
     return redirect(url_for('home'))
 
 
 @app.route('/sync')
 @admin_required
-def sync():
+def sync() -> Response:
     sync_emails = SyncEmails(
         email_sync=app.ioc.email_sync,
         email_store=app.ioc.email_store)
@@ -183,7 +184,7 @@ def sync():
 
 
 @app.route('/user/language/<locale>')
-def language(locale):
+def language(locale: str) -> Response:
     if current_user.is_authenticated:
         current_user.language = locale
         current_user.save()
@@ -193,7 +194,7 @@ def language(locale):
 
 @app.route('/admin')
 @admin_required
-def admin():
+def admin() -> Response:
     email_store = app.ioc.email_store
 
     return _view('admin.html',
@@ -203,7 +204,7 @@ def admin():
 
 @app.route('/admin/suspend/<userid>')
 @admin_required
-def suspend(userid):
+def suspend(userid: str) -> Response:
     user = User.query.filter_by(id=userid).first()
 
     if user is None:
@@ -219,7 +220,7 @@ def suspend(userid):
 
 @app.route('/admin/unsuspend/<userid>')
 @admin_required
-def unsuspend(userid):
+def unsuspend(userid: str) -> Response:
     user = User.query.filter_by(id=userid).first()
 
     if user is None:
@@ -235,29 +236,28 @@ def unsuspend(userid):
 
 # noinspection PyUnusedLocal
 @app.errorhandler(404)
-def _on_404(code_or_exception):
+def _on_404(status_code: int) -> Response:
     app.logger.warning('404: %s', request.path)
     flash(i8n.PAGE_DOES_NOT_EXIST, category='error')
     return redirect(url_for('home'))
 
 
 @app.errorhandler(Exception)
-def _on_exception(code_or_exception):
-    app.logger.error('%s: %s', code_or_exception.__class__.__name__,
-                     code_or_exception)
+def _on_exception(exception: Exception) -> Response:
+    app.logger.error('%s: %s', exception.__class__.__name__, exception)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
 
 
 @app.errorhandler(500)
-def _on_500(code_or_exception):
-    app.logger.error(code_or_exception)
+def _on_500(status_code: int) -> Response:
+    app.logger.error(status_code)
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
 
 
 @app.context_processor
-def _inject_locales():
+def _inject_locales() -> dict:
     return {
         'locales': AppConfig.LOCALES,
         'current_locale': Locale.parse(_localeselector()),
@@ -265,7 +265,7 @@ def _inject_locales():
 
 
 @app.after_request
-def _store_last_visited_url(response):
+def _store_last_visited_url(response: Response) -> Response:
     Session.store_last_visited_url()
     return response
 
@@ -281,7 +281,7 @@ def _localeselector() -> str:
 
 
 def _emails_view(emails: Iterable[dict], page: int,
-                 template: str='email.html'):
+                 template: str='email.html') -> Response:
     attachments_session = app.ioc.attachments_session
     timezone_offset = timedelta(minutes=current_user.timezone_offset_minutes)
 
@@ -301,5 +301,5 @@ def _emails_view(emails: Iterable[dict], page: int,
     return _view(template, emails=emails, page=page)
 
 
-def _view(template, **kwargs):
+def _view(template: str, **kwargs) -> Response:
     return render_template(template, **kwargs)
