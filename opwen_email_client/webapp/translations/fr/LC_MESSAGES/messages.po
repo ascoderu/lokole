@@ -1,12 +1,12 @@
 # French translations for PROJECT.
 # Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# Nzola Swasisa <nzola@ascoderu.ca>, 2017.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Project-Id-Version: 0.1.1\n"
+"Report-Msgid-Bugs-To: nzola@ascoderu.ca\n"
 "POT-Creation-Date: 2017-05-14 12:34-0700\n"
 "PO-Revision-Date: 2017-05-17 22:01-0700\n"
 "Language: fr\n"
