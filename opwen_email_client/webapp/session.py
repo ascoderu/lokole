@@ -3,13 +3,11 @@ from typing import Dict
 from typing import Iterable
 from typing import Optional
 
-from babel import Locale
 from flask import request
 from flask import session
 
 from opwen_email_client.domain.email.attachment import AttachmentEncoder
 from opwen_email_client.domain.email.store import EmailStore
-from opwen_email_client.webapp.config import AppConfig
 
 
 # noinspection PyClassHasNoInit
@@ -65,7 +63,7 @@ class AttachmentsStore(object):
 
 
 class Session(object):
-    _current_locale_key = 'current_locale'
+    _current_language_key = 'current_language'
     _last_visited_url_key = 'last_visited_url'
 
     @classmethod
@@ -82,10 +80,9 @@ class Session(object):
         return cls._session().get(cls._last_visited_url_key)
 
     @classmethod
-    def store_current_locale(cls, locale: str):
-        cls._session()[cls._current_locale_key] = locale
+    def store_current_language(cls, language: str):
+        cls._session()[cls._current_language_key] = language
 
     @classmethod
-    def get_current_locale(cls) -> Locale:
-        locale = cls._session().get(cls._current_locale_key)
-        return Locale.parse(locale) if locale else AppConfig.DEFAULT_LOCALE
+    def get_current_language(cls) -> str:
+        return cls._session().get(cls._current_language_key)

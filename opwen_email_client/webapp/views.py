@@ -4,6 +4,7 @@ from io import BytesIO
 from os import path
 from typing import Iterable
 
+from babel import Locale
 from flask import abort
 from flask import flash
 from flask import redirect
@@ -141,6 +142,7 @@ def register_complete():
     send_welcome_email()
 
     current_user.last_login = datetime.now()
+    current_user.language = Session.get_current_language()
     current_user.save()
 
     flash(i8n.ACCOUNT_CREATED, category='success')
@@ -152,6 +154,10 @@ def register_complete():
 def login_complete():
     current_user.last_login = datetime.now()
     current_user.save()
+
+    current_language = current_user.language
+    if current_language:
+        Session.store_current_language(current_language)
 
     flash(i8n.LOGGED_IN, category='success')
     return redirect(url_for('home'))
@@ -178,7 +184,10 @@ def sync():
 
 @app.route('/user/language/<locale>')
 def language(locale):
-    Session.store_current_locale(locale)
+    if current_user.is_authenticated:
+        current_user.language = locale
+        current_user.save()
+    Session.store_current_language(locale)
     return redirect(Session.get_last_visited_url() or url_for('home'))
 
 
@@ -251,7 +260,7 @@ def _on_500(code_or_exception):
 def _inject_locales():
     return {
         'locales': AppConfig.LOCALES,
-        'current_locale': Session.get_current_locale(),
+        'current_locale': Locale.parse(_localeselector()),
     }
 
 
@@ -262,8 +271,13 @@ def _store_last_visited_url(response):
 
 
 @app.babel.localeselector
-def _localeselector():
-    return Session.get_current_locale().language
+def _localeselector() -> str:
+    current_language = Session.get_current_language()
+    if not current_language and current_user.is_authenticated:
+        current_language = current_user.language
+    if not current_language:
+        current_language = AppConfig.DEFAULT_LOCALE.language
+    return current_language
 
 
 def _emails_view(emails: Iterable[dict], page: int,

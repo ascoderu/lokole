@@ -43,6 +43,7 @@ class User(_db.Model, UserMixin):
     last_login = _db.Column(_db.DateTime())
     timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False,
                                          default=0)
+    language = _db.Column(_db.String(8))
     roles = _db.relationship('Role', secondary=_roles_users,
                              backref=_db.backref('users', lazy='dynamic'))
 
