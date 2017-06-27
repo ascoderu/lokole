@@ -11,14 +11,17 @@ class ClientWriteQueueConsumer(QueueConsumer):
 
     def _process_message(self, message: dict):
         for email in client_datastore.unpack_emails(message['resource_id']):
-            server_datastore.store_email(email['_uid'], email)
+            email_id = email['_uid']
+            server_datastore.store_email(email_id, email)
 
             email_sender.QUEUE.enqueue({
                 '_version': '0.1',
                 '_type': 'email_to_send',
-                'resource_id': email['_uid'],
+                'resource_id': email_id,
                 'container_name': server_datastore.STORAGE.container,
             })
+
+            self.log_debug('done enqueuing email %s for sending', email_id)
 
 
 if __name__ == '__main__':

@@ -10,6 +10,7 @@ class OutboundEmailQueueConsumer(QueueConsumer):
     def _process_message(self, message: dict):
         email = server_datastore.fetch_email(message['resource_id'])
         email_sender.send(email)
+        self.log_debug('done sending email %s', email.get('_uid'))
 
 
 if __name__ == '__main__':

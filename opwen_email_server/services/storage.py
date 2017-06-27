@@ -96,6 +96,7 @@ class AzureObjectStorage(LogMixin):
                     fobj.write(encoded)
                     fobj.write(b'\n')
                     num_stored += 1
+                    self.log_debug('stored email %s', obj.get('_uid'))
 
             if num_stored > 0:
                 self._file_storage.store_file(resource_id, path)
@@ -111,5 +112,6 @@ class AzureObjectStorage(LogMixin):
                     serialized = encoded.decode(self._encoding)
                     obj = loads(serialized)
                     num_fetched += 1
+                    self.log_debug('fetched email %s', obj.get('_uid'))
                     yield obj
         self.log_debug('fetched %d objects from %s', num_fetched, resource_id)

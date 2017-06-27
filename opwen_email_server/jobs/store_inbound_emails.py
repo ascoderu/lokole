@@ -14,6 +14,7 @@ class InboundEmailQueueConsumer(QueueConsumer):
         email_id, mime_email = self._load_email_content(message)
         email = parse_mime_email(mime_email)
         server_datastore.store_email(email_id, email)
+        self.log_debug('done storing inbound email %s', email_id)
 
     @classmethod
     def _load_email_content(cls, message: dict) -> Tuple[str, str]:

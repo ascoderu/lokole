@@ -49,7 +49,7 @@ class AzureIndex(LogMixin):
                     'PartitionKey': value,
                     'RowKey': item_id,
                 })
-                self.log_debug('inserted %s into %s/%s', item_id, table, value)
+                self.log_debug('inserted %s/%s/%s', table, value, item_id)
 
     def query(self, table: str, partition: str) -> Iterable[str]:
         search_query = "PartitionKey eq '{}'".format(partition)
@@ -68,6 +68,7 @@ class AzureIndex(LogMixin):
             for item_id in chunk:
                 batch.delete_entity(partition, item_id)
                 num_deleted += 1
+                self.log_debug('deleted %s/%s/%s', table, partition, item_id)
             self._client.commit_batch(table, batch)
         self.log_debug('deleted %d from %s/%s', num_deleted, table, partition)
 
