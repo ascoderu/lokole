@@ -17,3 +17,15 @@ class ToIterableTests(TestCase):
         collection = collections.to_iterable(obj)
 
         self.assertSequenceEqual(list(collection), [])
+
+
+class ChunksTests(TestCase):
+    def test_creates_fullsize_chunks(self):
+        chunks = collections.chunks([1, 2, 3, 4], 2)
+
+        self.assertEqual(list(chunks), [(1, 2), (3, 4)])
+
+    def test_creates_nonfull_chunks(self):
+        chunks = collections.chunks([1, 2, 3, 4], 3)
+
+        self.assertEqual(list(chunks), [(1, 2, 3), (4, )])

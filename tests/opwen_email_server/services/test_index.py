@@ -44,6 +44,15 @@ class AzureIndexTests(TestCase):
         self.assertEqual(batch_mock.delete_entity.call_count, 1)
         self.assertEqual(client_mock.commit_batch.call_count, 1)
 
+    def test_delete_many(self):
+        index, client_mock, batch_mock = self._given_index(
+            {'table1': lambda _: [_['col1']]})
+
+        index.delete('table1', 'col1', ['id{}'.format(i) for i in range(213)])
+
+        self.assertEqual(batch_mock.delete_entity.call_count, 213)
+        self.assertEqual(client_mock.commit_batch.call_count, 3)
+
     def test_query(self):
         items = [{'PartitionKey': 'col1', 'RowKey': 'id1234'}]
         index, client_mock, batch_mock = self._given_index(

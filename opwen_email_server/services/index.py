@@ -7,12 +7,14 @@ from typing import TypeVar
 from azure.storage.table import TableBatch
 from azure.storage.table import TableService
 
+from opwen_email_server.utils.collections import chunks
 from opwen_email_server.utils.log import LogMixin
 
 T = TypeVar('T')
 
 
 class AzureIndex(LogMixin):
+    _BATCH_MAX_SIZE = 100
     _PARTITIONKEY_MAX_LENGTH = 1000
     _PARTITIONKEY_INVALID = re_compile('[\\\\/#?\u0000-\u001f\u007f-\u009f]')
 
@@ -60,12 +62,13 @@ class AzureIndex(LogMixin):
         self.log_debug('fetched %d from %s/%s', num_fetched, table, partition)
 
     def delete(self, table: str, partition: str, item_ids: Iterable[str]):
-        batch = self._batch_factory()
         num_deleted = 0
-        for item_id in item_ids:
-            batch.delete_entity(partition, item_id)
-            num_deleted += 1
-        self._client.commit_batch(table, batch)
+        for chunk in chunks(item_ids, self._BATCH_MAX_SIZE):
+            batch = self._batch_factory()
+            for item_id in chunk:
+                batch.delete_entity(partition, item_id)
+                num_deleted += 1
+            self._client.commit_batch(table, batch)
         self.log_debug('deleted %d from %s/%s', num_deleted, table, partition)
 
     @classmethod
