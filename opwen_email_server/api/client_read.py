@@ -5,6 +5,7 @@ from opwen_email_server import config
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.utils.log import LogMixin
 
 STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                              key=config.CLIENT_STORAGE_KEY,
@@ -14,7 +15,7 @@ CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                     table=config.TABLE_AUTH)
 
 
-class _Downloader(object):
+class _Downloader(LogMixin):
     def __call__(self, client_id) -> Union[dict, Tuple[str, int]]:
         domain = CLIENTS.domain_for(client_id)
         if not domain:
@@ -28,9 +29,13 @@ class _Downloader(object):
 
         pending = server_datastore.fetch_pending_emails(domain)
         pending = map(mark_delivered, pending)
+        self.log_info('%s:Got %d pending emails', domain, len(delivered))
 
         resource_id = STORAGE.store_objects(pending)
+        self.log_info('%s:Stored pending emails at %s', domain, resource_id)
+
         server_datastore.mark_emails_as_delivered(domain, delivered)
+        self.log_info('%s:Marked pending emails as delivered', domain)
 
         return {
             'resource_id': resource_id,

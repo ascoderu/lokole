@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from opwen_email_server.api import email_receive
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.queue_consumer import QueueConsumer
@@ -11,16 +9,13 @@ class InboundEmailQueueConsumer(QueueConsumer):
         super().__init__(email_receive.QUEUE.dequeue)
 
     def _process_message(self, message: dict):
-        email_id, mime_email = self._load_email_content(message)
-        email = parse_mime_email(mime_email)
-        server_datastore.store_email(email_id, email)
-        self.log_debug('done storing inbound email %s', email_id)
+        resource_id = message['resource_id']
+        mime_email = email_receive.STORAGE.fetch_text(resource_id)
+        self.log_info('Fetched inbound client email %s', resource_id)
 
-    @classmethod
-    def _load_email_content(cls, message: dict) -> Tuple[str, str]:
-        email_id = message['resource_id']
-        mime_email = email_receive.STORAGE.fetch_text(email_id)
-        return email_id, mime_email
+        email = parse_mime_email(mime_email)
+        server_datastore.store_email(resource_id, email)
+        self.log_info('Stored inbound client email %s', resource_id)
 
 
 if __name__ == '__main__':

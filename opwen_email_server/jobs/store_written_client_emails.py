@@ -10,9 +10,14 @@ class ClientWriteQueueConsumer(QueueConsumer):
         super().__init__(client_write.QUEUE.dequeue)
 
     def _process_message(self, message: dict):
-        for email in client_datastore.unpack_emails(message['resource_id']):
+        resource_id = message['resource_id']
+        emails = client_datastore.unpack_emails(resource_id)
+        self.log_info('Fetched packaged client emails from %s', resource_id)
+
+        for email in emails:
             email_id = email['_uid']
             server_datastore.store_email(email_id, email)
+            self.log_info('Stored packaged client email %s', email_id)
 
             email_sender.QUEUE.enqueue({
                 '_version': '0.1',
@@ -20,8 +25,7 @@ class ClientWriteQueueConsumer(QueueConsumer):
                 'resource_id': email_id,
                 'container_name': server_datastore.STORAGE.container,
             })
-
-            self.log_debug('done enqueuing email %s for sending', email_id)
+            self.log_info('Ingesting packaged client email %s', email_id)
 
 
 if __name__ == '__main__':

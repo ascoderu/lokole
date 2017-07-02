@@ -3,6 +3,7 @@ from typing import Tuple
 from opwen_email_server import config
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.queue import AzureQueue
+from opwen_email_server.utils.log import LogMixin
 
 QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                    name=config.QUEUE_CLIENT_PACKAGE)
@@ -11,9 +12,10 @@ CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                     table=config.TABLE_AUTH)
 
 
-class _Uploader(object):
+class _Uploader(LogMixin):
     def __call__(self, client_id: str, upload_info: dict) -> Tuple[str, int]:
-        if not CLIENTS.domain_for(client_id):
+        domain = CLIENTS.domain_for(client_id)
+        if not domain:
             return 'client is not registered', 403
 
         resource_type = upload_info.get('resource_type')
@@ -27,6 +29,7 @@ class _Uploader(object):
             'resource_id': resource_id,
             'container_name': resource_container,
         })
+        self.log_info('%s:Receiving client emails at %s', domain, resource_id)
 
         return 'uploaded', 200
 
