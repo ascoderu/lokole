@@ -14,25 +14,29 @@ CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                     table=config.TABLE_AUTH)
 
 
-def download(client_id) -> Union[dict, Tuple[str, int]]:
-    domain = CLIENTS.domain_for(client_id)
-    if not domain:
-        return 'client is not registered', 403
+class _Downloader(object):
+    def __call__(self, client_id) -> Union[dict, Tuple[str, int]]:
+        domain = CLIENTS.domain_for(client_id)
+        if not domain:
+            return 'client is not registered', 403
 
-    delivered = set()
+        delivered = set()
 
-    def mark_delivered(email: dict) -> dict:
-        delivered.add(email['_uid'])
-        return email
+        def mark_delivered(email: dict) -> dict:
+            delivered.add(email['_uid'])
+            return email
 
-    pending = server_datastore.fetch_pending_emails(domain)
-    pending = map(mark_delivered, pending)
+        pending = server_datastore.fetch_pending_emails(domain)
+        pending = map(mark_delivered, pending)
 
-    resource_id = STORAGE.store_objects(pending)
-    server_datastore.mark_emails_as_delivered(domain, delivered)
+        resource_id = STORAGE.store_objects(pending)
+        server_datastore.mark_emails_as_delivered(domain, delivered)
 
-    return {
-        'resource_id': resource_id,
-        'resource_container': STORAGE.container,
-        'resource_type': 'azure-blob',
-    }
+        return {
+            'resource_id': resource_id,
+            'resource_container': STORAGE.container,
+            'resource_type': 'azure-blob',
+        }
+
+
+download = _Downloader()

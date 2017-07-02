@@ -1,5 +1,9 @@
 from typing import Tuple
 
 
-def ping() -> Tuple[str, int]:
-    return 'OK', 200
+class _Pinger(object):
+    def __call__(self) -> Tuple[str, int]:
+        return 'OK', 200
+
+
+ping = _Pinger()

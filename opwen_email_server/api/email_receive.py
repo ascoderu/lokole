@@ -17,19 +17,23 @@ CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
                     table=config.TABLE_AUTH)
 
 
-def receive(client_id: str, email: str) -> Tuple[str, int]:
-    if not CLIENTS.domain_for(client_id):
-        return 'client is not registered', 403
+class _Receiver(object):
+    def __call__(self, client_id: str, email: str) -> Tuple[str, int]:
+        if not CLIENTS.domain_for(client_id):
+            return 'client is not registered', 403
 
-    email_id = str(uuid4())
+        email_id = str(uuid4())
 
-    STORAGE.store_text(email_id, email)
+        STORAGE.store_text(email_id, email)
 
-    QUEUE.enqueue({
-        '_version': '0.1',
-        '_type': 'mime_email_received',
-        'resource_id': email_id,
-        'container_name': STORAGE.container,
-    })
+        QUEUE.enqueue({
+            '_version': '0.1',
+            '_type': 'mime_email_received',
+            'resource_id': email_id,
+            'container_name': STORAGE.container,
+        })
 
-    return 'received', 200
+        return 'received', 200
+
+
+receive = _Receiver()
