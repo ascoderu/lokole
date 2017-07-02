@@ -57,7 +57,7 @@ class AzureAuth(Auth, LogMixin):
         for entity in entities:
             domain = entity.get('domain')
             if domain:
-                self.log_debug('Got domain %s for client %s', domain, client_id)
+                self.log_debug('Client %s has domain %s', client_id, domain)
                 return domain
         self.log_debug('Unrecognized client %s', client_id)
         raise KeyError
