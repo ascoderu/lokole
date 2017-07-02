@@ -6,6 +6,8 @@ from typing import Optional
 
 from azure.storage.table import TableService
 
+from opwen_email_server.utils.log import LogMixin
+
 
 class Auth(metaclass=ABCMeta):
     @abstractmethod
@@ -13,7 +15,7 @@ class Auth(metaclass=ABCMeta):
         raise NotImplementedError  # pramga: no cover
 
 
-class AzureAuth(Auth):
+class AzureAuth(Auth, LogMixin):
     def __init__(self, account: str, key: str, table: str,
                  client: TableService=None,
                  client_factory: Callable[..., TableService]=TableService
@@ -40,6 +42,7 @@ class AzureAuth(Auth):
             'PartitionKey': client_id,
             'domain': domain,
         })
+        self.log_debug('Registered client %s at domain %s', client_id, domain)
 
     def domain_for(self, client_id):
         try:
@@ -54,5 +57,7 @@ class AzureAuth(Auth):
         for entity in entities:
             domain = entity.get('domain')
             if domain:
+                self.log_debug('Got domain %s for client %s', domain, client_id)
                 return domain
+        self.log_debug('Unrecognized client %s', client_id)
         raise KeyError
