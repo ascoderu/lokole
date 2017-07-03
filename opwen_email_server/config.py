@@ -14,6 +14,8 @@ EMAIL_SENDER_KEY = environ.get('LOKOLE_SENDGRID_KEY')
 
 LOG_LEVEL = environ.get('LOKOLE_LOG_LEVEL', 'DEBUG')
 
+APPINSIGHTS_KEY = environ.get('LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY')
+
 #
 # Azure configuration values
 #

@@ -5,6 +5,9 @@ from typing import Any
 from typing import Iterable
 from typing import Tuple
 
+from applicationinsights.logging import LoggingHandler as AppInsightsHandler
+
+from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
 
 _STDERR_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
@@ -14,6 +17,12 @@ _STDERR.setFormatter(Formatter(_STDERR_FORMAT))
 _LOG = getLogger()
 _LOG.addHandler(_STDERR)
 _LOG.setLevel(LOG_LEVEL)
+
+if APPINSIGHTS_KEY:
+    _APPINSIGHTS_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
+    _APPINSIGHTS = AppInsightsHandler(APPINSIGHTS_KEY)
+    _APPINSIGHTS.setFormatter(Formatter(_APPINSIGHTS_FORMAT))
+    _LOG.addHandler(_APPINSIGHTS)
 
 
 class LogMixin(object):
