@@ -11,29 +11,31 @@ from wtforms import FileField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
-from wtforms.validators import Email
 from wtforms.validators import Optional as DataOptional
 
 from opwen_email_client.domain.email.attachment import AttachmentEncoder
 from opwen_email_client.domain.email.store import EmailStore
-from opwen_email_client.util.wtforms import EmailField
+from opwen_email_client.util.wtforms import Emails
 from opwen_email_client.util.wtforms import HtmlTextAreaField
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 
 
 class NewEmailForm(Form):
-    to = EmailField(
+    to = StringField(
         validators=[DataRequired(i8n.EMAIL_TO_REQUIRED),
-                    Email(i8n.EMAIL_ADDRESS_INVALID)])
+                    Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,
+                           i8n.EMAIL_ADDRESS_INVALID)])
 
-    cc = EmailField(
+    cc = StringField(
         validators=[DataOptional(),
-                    Email(i8n.EMAIL_ADDRESS_INVALID)])
+                    Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,
+                           i8n.EMAIL_ADDRESS_INVALID)])
 
-    bcc = EmailField(
+    bcc = StringField(
         validators=[DataOptional(),
-                    Email(i8n.EMAIL_ADDRESS_INVALID)])
+                    Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,
+                           i8n.EMAIL_ADDRESS_INVALID)])
 
     subject = StringField(
         validators=[DataOptional()])

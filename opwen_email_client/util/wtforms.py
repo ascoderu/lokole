@@ -10,15 +10,28 @@ from typing import Optional
 
 from wtforms import StringField
 from wtforms import TextAreaField
-from wtforms.widgets import Input
+from wtforms.validators import HostnameValidation
+from wtforms.validators import Regexp
+from wtforms.validators import ValidationError
 
 
-class EmailInput(Input):
-    input_type = 'email'
+class Emails(Regexp):
+    def __init__(self, email_address_delimiter, message=None):
+        self.validate_hostname = HostnameValidation(require_tld=True)
+        self.email_address_delimiter = email_address_delimiter
+        super().__init__(r'^.+@([^.@][^@]+)$', IGNORECASE, message)
 
+    # noinspection PyMethodOverriding
+    def __call__(self, form, field):
+        message = self.message
+        if message is None:
+            message = field.gettext('Invalid email address.')
 
-class EmailField(StringField):
-    widget = EmailInput()
+        messages = message.split(self.email_address_delimiter)
+        for message in messages:
+            match = super().__call__(form, field, message.strip())
+            if not self.validate_hostname(match.group(1)):
+                raise ValidationError(message)
 
 
 class HtmlTextAreaField(TextAreaField):

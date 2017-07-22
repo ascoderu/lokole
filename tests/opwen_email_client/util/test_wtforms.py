@@ -4,7 +4,9 @@ from html import escape
 from unittest import TestCase
 
 from wtforms import Form
+from wtforms import ValidationError
 
+from opwen_email_client.util.wtforms import Emails
 from opwen_email_client.util.wtforms import HtmlTextAreaField
 from opwen_email_client.util.wtforms import SuffixedStringField
 
@@ -88,6 +90,35 @@ class EscapedHtmlTextAreaFieldTests(HtmlTextAreaFieldTests):
     def dangerous_markup(self):
         for markup, expected in super().dangerous_markup:
             yield escape(markup), expected
+
+
+class EmailsTests(TestCase):
+    def test_verifies_single_email(self):
+        self.verify(',', 'foo@bar.com')
+
+    def test_verifies_multiple_emails(self):
+        self.verify(';', 'foo@bar.com;bar@foo.com')
+        self.verify(';', 'foo@bar.com; bar@foo.com')
+
+    def test_fails_on_bad_emails(self):
+        with self.assertRaises(ValidationError):
+            self.verify('|', 'foo.com')
+        with self.assertRaises(ValidationError):
+            self.verify('|', 'foo@bar.com|foo.com')
+
+    @classmethod
+    def verify(cls, delimiter, field_value):
+        validator = Emails(delimiter)
+        validator(form=None, field=DummyField(field_value))
+
+
+class DummyField(object):
+    def __init__(self, data):
+        self.data = data
+
+    # noinspection PyMethodMayBeStatic
+    def gettext(self, message):
+        return message
 
 
 class DummyPostData(dict):
