@@ -46,35 +46,6 @@ class NewEmailForm(Form):
 
     submit = SubmitField()
 
-    def _handle_reply(self, email: dict):
-        self.to.data = email.get('from', '')
-        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
-
-    def _handle_reply_all(self, email: dict):
-        self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
-        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
-
-    def _handle_forward(self, email: dict):
-        self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
-        self.body.data = render_template('emails/forward.html', email=email)
-
-    def handle_action(self, email_store: EmailStore):
-        uid = request.args.get('uid')
-        action = request.args.get('action')
-        if not uid or not action:
-            return
-
-        reference = email_store.get(uid)
-        if not reference or not current_user.can_access(reference):
-            return
-
-        if action == 'reply':
-            self._handle_reply(reference)
-        elif action == 'reply_all':
-            self._handle_reply_all(reference)
-        elif action == 'forward':
-            self._handle_forward(reference)
-
     def as_dict(self, attachment_encoder: AttachmentEncoder) -> dict:
         attachments = request.files.getlist(self.attachments.name)
         form = {key: value for (key, value) in self.data.items() if value}
@@ -90,11 +61,48 @@ class NewEmailForm(Form):
                                                         attachment_encoder))
         return form
 
+    def _populate(self, email: dict):
+        pass
+
     @classmethod
     def from_request(cls, email_store: EmailStore):
-        form = cls(request.form)
-        form.handle_action(email_store)
+        action = request.args.get('action')
+        clazz = next((clazz for clazz in cls.__subclasses__()
+                      if getattr(clazz, 'action_name', None) == action), cls)
+
+        form = clazz(request.form)
+
+        uid = request.args.get('uid')
+        if uid:
+            reference_email = email_store.get(uid)
+            if current_user.can_access(reference_email):
+                form._populate(reference_email)
+
         return form
+
+
+class ReplyEmailForm(NewEmailForm):
+    action_name = 'reply'
+
+    def _populate(self, email: dict):
+        self.to.data = email.get('from', '')
+        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+
+
+class ReplyAllEmailForm(NewEmailForm):
+    action_name = 'reply_all'
+
+    def _populate(self, email: dict):
+        self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
+        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+
+
+class ForwardEmailForm(NewEmailForm):
+    action_name = 'forward'
+
+    def _populate(self, email: dict):
+        self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
+        self.body.data = render_template('emails/forward.html', email=email)
 
 
 def _attachments_as_dict(
