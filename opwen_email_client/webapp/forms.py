@@ -1,6 +1,6 @@
 from typing import Iterable
 from typing import List
-from typing import Optional as Maybe
+from typing import Optional
 
 from flask import render_template
 from flask import request
@@ -12,7 +12,7 @@ from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
-from wtforms.validators import Optional
+from wtforms.validators import Optional as DataOptional
 
 from opwen_email_client.domain.email.attachment import AttachmentEncoder
 from opwen_email_client.domain.email.store import EmailStore
@@ -28,21 +28,21 @@ class NewEmailForm(Form):
                     Email(i8n.EMAIL_ADDRESS_INVALID)])
 
     cc = EmailField(
-        validators=[Optional(),
+        validators=[DataOptional(),
                     Email(i8n.EMAIL_ADDRESS_INVALID)])
 
     bcc = EmailField(
-        validators=[Optional(),
+        validators=[DataOptional(),
                     Email(i8n.EMAIL_ADDRESS_INVALID)])
 
     subject = StringField(
-        validators=[Optional()])
+        validators=[DataOptional()])
 
     body = HtmlTextAreaField(
-        validators=[Optional()])
+        validators=[DataOptional()])
 
     attachments = FileField(
-        validators=[Optional()],
+        validators=[DataOptional()],
         render_kw={'multiple': True})
 
     submit = SubmitField()
@@ -66,7 +66,7 @@ class NewEmailForm(Form):
         pass
 
     @classmethod
-    def _new_instance_for(cls, action_name: Maybe[str]):
+    def _new_instance_for(cls, action_name: Optional[str]):
         if not action_name:
             return cls(request.form)
 
@@ -135,7 +135,7 @@ def _join_emails(*emails: str) -> str:
     return delimiter.join(email for email in emails if email)
 
 
-def _split_emails(emails: Maybe[str]) -> List[str]:
+def _split_emails(emails: Optional[str]) -> List[str]:
     if not emails:
         return []
 
