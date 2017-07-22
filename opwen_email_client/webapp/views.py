@@ -111,7 +111,7 @@ def email_new() -> Response:
 
     form = NewEmailForm.from_request(email_store)
     if form is None:
-        abort(404)
+        return abort(404)
 
     if form.validate_on_submit():
         email_store.create([form.as_dict(attachment_encoder)])
@@ -127,7 +127,7 @@ def download_attachment(attachment_id: str) -> Response:
 
     attachment = attachments_session.lookup(attachment_id)
     if attachment is None:
-        abort(404)
+        return abort(404)
 
     return send_file(BytesIO(attachment.content),
                      attachment_filename=attachment.name,
@@ -288,7 +288,7 @@ def _emails_view(emails: Iterable[dict], page: int,
     timezone_offset = timedelta(minutes=current_user.timezone_offset_minutes)
 
     if page < 1:
-        abort(404)
+        return abort(404)
 
     emails = Pagination(emails, page, AppConfig.EMAILS_PER_PAGE)
 
