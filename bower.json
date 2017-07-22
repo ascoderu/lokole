@@ -8,6 +8,7 @@
     "respond": "^1.4.2",
     "jquery": "^3.1.0",
     "flag-icon-css": "^2.4.0",
-    "bootstrap3-wysihtml5-bower": "^0.3.3"
+    "bootstrap3-wysihtml5-bower": "^0.3.3",
+    "printThis": "^1.9.0"
   }
 }

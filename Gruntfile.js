@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -54,9 +55,24 @@ module.exports = function(grunt) {
       }
     },
 
+    uglify: {
+      bower: {
+        options: {
+          mangle: true,
+          compress: true,
+        },
+        files: {
+          'opwen_email_client/webapp/static/js/printThis.min.js': [
+            'bower_components/printThis/printThis.js',
+          ]
+        }
+      }
+    }
+
   });
 
   grunt.registerTask('default', [
     'copy:bower',
+    'uglify:bower',
   ])
 };

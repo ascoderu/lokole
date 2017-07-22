@@ -22,6 +22,10 @@
 {% block email_style %}{% endblock %}
 {% endblock %}
 
+{% block libs %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/printThis.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 {% block email_content %}{% endblock %}
 {% endblock %}
@@ -42,6 +46,11 @@ $(".panel-info").click(function() {
       });
     }
   }
+});
+
+$(".print-trigger").click(function() {
+  var $printRoot = $(this).closest(".print-root");
+  $printRoot.printThis();
 });
 })(window.jQuery);
 </script>

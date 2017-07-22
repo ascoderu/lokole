@@ -17,7 +17,7 @@
 <div class="email-display">
   <div class="panel-group" id="accordion">
     {% for email in emails %}
-    <div class="panel panel-{{ 'default' if email['read'] else 'info' }}" data-email_id="{{ email['_uid'] }}">
+    <div class="panel panel-{{ 'default' if email['read'] else 'info' }} print-root" data-email_id="{{ email['_uid'] }}">
       <div class="panel-heading">
         <h4 class="panel-title">
           <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" class="email-row">
@@ -25,24 +25,25 @@
               <div class="col-sm-3">
                 <span class="email-sent-to">
                   {% if email['from'] == current_user.email %}
-                    {{ email['to'] | join(', ') }}
+                    <span class="visible-print">{{ _('To: %(emails)s', emails=', '.join(email['to'])) }}</span>
+                    <span class="hidden-print">{{ email['to'] | join(', ') }}</span>
                   {% else %}
-                    {{ email['from'] }}
+                    <span class="visible-print">{{ _('From: %(email)s', email=email['from']) }}</span>
+                    <span class="hidden-print">{{ email['from'] }}</span>
                   {% endif %}
                 </span>
               </div>
               <div class="col-sm-3">
-                <span class="email-sent-by">{{ email['sender'] }}</span>
-              </div>
-              <div class="col-sm-3">
-                <span class="email-subject">{{ email['subject'] }}</span>
+                <span class="visible-print">{{ _('Subject: %(subject)s', subject=email['subject']) }}</span>
+                <span class="email-subject hidden-print">{{ email['subject'] }}</span>
               </div>
               <div class="col-sm-2">
-                <span class="email-sent-at">{{ email['sent_at'] or '' }}</span>
+                <span class="visible-print">{{ _('Sent at: %(date)s', date=email['sent_at']) }}</span>
+                <span class="email-sent-at hidden-print">{{ email['sent_at'] or '' }}</span>
               </div>
               <div class="col-sm-1 text-right">
                 {% if email['attachments'] %}
-                <span class="fa fa-paperclip"></span>
+                <span class="fa fa-paperclip hidden-print"></span>
                 {% endif %}
               </div>
             </div>
@@ -57,7 +58,7 @@
             </div>
           </div>
           {% if email['attachments'] %}
-          <div class="row">
+          <div class="row hidden-print">
             <div class="col-sm-12">
               <ul class="list-inline">
                 {% for attachment in email['attachments'] %}
@@ -71,7 +72,7 @@
           {% endif %}
           <div class="row">
             <div class="col-sm-12">
-              <div class="btn-group email-actions">
+              <div class="btn-group email-actions hidden-print">
                 <a class="btn btn-default" title="{{ _('Reply') }}"
                    href="{{ url_for('email_new', uid=email['_uid'], action='reply') }}">
                   <span class="fa fa-reply"></span>
@@ -84,6 +85,9 @@
                    href="{{ url_for('email_new', uid=email['_uid'], action='forward') }}">
                   <span class="fa fa-share"></span>
                 </a>
+                <button class="btn btn-default print-trigger" title="{{ _('Print') }}">
+                  <span class="fa fa-print"></span>
+                </button>
               </div>
             </div>
           </div>
