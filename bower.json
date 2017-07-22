@@ -4,11 +4,11 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "bootstrap-fileinput": "^4.3.3",
-    "html5shiv": "^3.7.3",
-    "respond": "^1.4.2",
-    "jquery": "^3.1.0",
-    "flag-icon-css": "^2.4.0",
     "bootstrap3-wysihtml5-bower": "^0.3.3",
-    "printThis": "^1.9.0"
+    "flag-icon-css": "^2.4.0",
+    "html5shiv": "^3.7.3",
+    "jquery": "^3.1.0",
+    "printThis": "^1.9.0",
+    "respond": "^1.4.2"
   }
 }
