@@ -67,8 +67,14 @@ class NewEmailForm(Form):
     @classmethod
     def from_request(cls, email_store: EmailStore):
         action = request.args.get('action')
-        clazz = next((clazz for clazz in cls.__subclasses__()
-                      if getattr(clazz, 'action_name', None) == action), cls)
+        if action:
+            try:
+                clazz = next(clazz for clazz in cls.__subclasses__()
+                             if getattr(clazz, 'action_name', None) == action)
+            except StopIteration:
+                return None
+        else:
+            clazz = cls
 
         form = clazz(request.form)
 

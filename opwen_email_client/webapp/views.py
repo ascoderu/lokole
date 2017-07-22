@@ -110,6 +110,8 @@ def email_new() -> Response:
     attachment_encoder = app.ioc.attachment_encoder
 
     form = NewEmailForm.from_request(email_store)
+    if form is None:
+        abort(404)
 
     if form.validate_on_submit():
         email_store.create([form.as_dict(attachment_encoder)])
