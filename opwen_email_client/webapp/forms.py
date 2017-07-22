@@ -1,5 +1,6 @@
-from typing import Optional as Maybe, Iterable
+from typing import Iterable
 from typing import List
+from typing import Optional as Maybe
 
 from flask import render_template
 from flask import request
