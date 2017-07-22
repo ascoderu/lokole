@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.min.css') }}">
 {% endblock %}
 
 {% block libs %}
@@ -9,5 +9,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/_base_email.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/_base_email.min.js') }}"></script>
 {% endblock %}

@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.initConfig({
@@ -55,6 +56,26 @@ module.exports = function(grunt) {
       }
     },
 
+    cssmin: {
+      options: {
+        shorthandCompacting: false,
+        roundingPrecision: -1
+      },
+      target: {
+        files: {
+          'opwen_email_client/webapp/static/css/_base_email.min.css': [
+            'opwen_email_client/webapp/static/css/_base_email.css',
+          ],
+          'opwen_email_client/webapp/static/css/about.min.css': [
+            'opwen_email_client/webapp/static/css/about.css',
+          ],
+          'opwen_email_client/webapp/static/css/home.min.css': [
+            'opwen_email_client/webapp/static/css/home.css',
+          ]
+        }
+      }
+    },
+
     uglify: {
       bower: {
         options: {
@@ -66,6 +87,23 @@ module.exports = function(grunt) {
             'bower_components/printThis/printThis.js',
           ]
         }
+      },
+      app: {
+        options: {
+          mangle: true,
+          compress: true,
+        },
+        files: {
+          'opwen_email_client/webapp/static/js/_base_email.min.js': [
+            'opwen_email_client/webapp/static/js/_base_email.js',
+          ],
+          'opwen_email_client/webapp/static/js/email_new.min.js': [
+            'opwen_email_client/webapp/static/js/email_new.js',
+          ],
+          'opwen_email_client/webapp/static/js/register.min.js': [
+            'opwen_email_client/webapp/static/js/register.js',
+          ]
+        }
       }
     }
 
@@ -73,6 +111,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'copy:bower',
+    'cssmin',
     'uglify:bower',
+    'uglify:app'
   ])
 };
