@@ -1,59 +1,13 @@
 {% extends "_base.html" %}
 
 {% block style %}
-<style>
-#email-subnav {
-  padding-bottom: 1em;
-}
-
-#email-search-form {
-   padding-bottom: 1em;
-}
-
-.btn-group.email-actions {
-  margin-top: 1em;
-}
-
-.panel-title .email-row {
-  text-decoration: none;
-}
-</style>
-
-{% block email_style %}{% endblock %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.css') }}">
 {% endblock %}
 
 {% block libs %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/printThis.min.js') }}"></script>
 {% endblock %}
 
-{% block content %}
-{% block email_content %}{% endblock %}
-{% endblock %}
-
 {% block scripts %}
-<script>
-(function($) {
-$(".panel-info").click(function() {
-  var $el = $(this);
-  if ($el.hasClass("panel-info")) {
-    var email_id = $el.data("email_id");
-    if (email_id != null) {
-      $.ajax({
-        url: "/email/read/" + email_id,
-        success: function() {
-          $el.removeClass("panel-info").addClass("panel-default");
-        }
-      });
-    }
-  }
-});
-
-$(".print-trigger").click(function() {
-  var $printRoot = $(this).closest(".print-root");
-  $printRoot.printThis();
-});
-})(window.jQuery);
-</script>
-
-{% block email_scripts %}{% endblock %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/_base_email.js') }}"></script>
 {% endblock %}

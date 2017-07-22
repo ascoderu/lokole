@@ -1,13 +1,7 @@
 {% extends "_base.html" %}
 
 {% block style %}
-<style>
-#lokole-logo {
-  padding-top: 1em;
-  padding-bottom: 1em;
-  max-height: 150px;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock %}
 
 {% block content %}

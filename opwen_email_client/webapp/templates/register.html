@@ -18,10 +18,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-(function() {
-var timezoneOffsetMinutes = (new Date()).getTimezoneOffset();
-document.getElementById(register_user_form.timezone_offset_minutes.id).value = timezoneOffsetMinutes;
-})()
-</script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/register.js') }}"></script>
 {% endblock %}

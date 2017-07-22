@@ -5,13 +5,14 @@
 {% from 'macros/nav.html' import email_subnav with context %}
 
 {% block libs %}
+{{ super() }}
 <script type="text/javascript" src="{{ url_for('static', filename='js/fileinput.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap3-wysihtml5.all.min.js') }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/fileinput.min.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap3-wysihtml5.min.css') }}">
 {% endblock %}
 
-{% block email_content %}
+{% block content %}
 {{ email_subnav() }}
 
 <form action="{{ url_for('email_new') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
@@ -29,63 +30,25 @@
 </form>
 {% endblock %}
 
-{% block email_scripts %}
+{% block scripts %}
+{{ super() }}
 <script>
-(function($) {
-  $(document).ready(function() {
-
-    (function styleEmailAttachmentsField() {
-      $("#{{ form.attachments.id }}").fileinput({
-        showPreview: false,
-        showUpload: false,
-        msgSelected: "{n} {{ _('files selected') }}",
-        layoutTemplates: {
-          fileIcon: '<span class="fa fa-file-o"></span>&nbsp;',
-        },
-        removeTitle: "",
-        removeIcon: '<span class="fa fa-trash-o"></span>',
-        removeLabel: "{{ _('Remove') }}",
-        browseLabel: "{{ _('Choose files') }}",
-        browseIcon: '<span class="fa fa-paperclip"></span>',
-        browseClass: 'btn btn-default'
-      });
-    }());
-
-    (function turnEmailBodyFieldIntoRichEditor() {
-      $("#{{ form.body.id }}").wysihtml5({
-        toolbar: {
-          "font-styles": false,
-          "link": false,
-          "image": false,
-          "outdent": false,
-          "indent": false,
-          "blockquote": false,
-          "fa": true,
-        },
-        customTemplates: {
-          emphasis: function(context) {
-            return '<li><div class="btn-group">'
-                    + '<a title="{{ _('Bold') }}" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-bold"></span></a>'
-                    + '<a title="{{ _('Italic') }}"class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-italic"></span></a>'
-                    + '<a title="{{ _('Underline') }}"class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-underline"></span></a>'
-                    + '</div></li>';
-          },
-          lists: function(context) {
-            return '<li><div class="btn-group">'
-                    + '<a title="{{ _('Un-ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'
-                    + '<a title="{{ _('Ordered list') }}"class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">'
-                    + '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>'
-                    + '</div></li>';
-          }
-        }
-       });
-     }());
-
-  });
- })(window.jQuery);
+window.flask_jinja_context__email_new = {
+  selectors: {
+    attachments: "#{{ form.attachments.id }}",
+    formBody: "#{{ form.body.id }}"
+  },
+  i8n: {
+    filesSelected: "{{ _('files selected') }}",
+    remove: "{{ _('Remove') }}",
+    chooseFiles: "{{ _('Choose files') }}",
+    bold: "{{ _('Bold') }}",
+    italic: "{{ _('Italic') }}",
+    underline: "{{ _('Underline') }}",
+    unorderedList: "{{ _('Un-ordered list') }}",
+    orderedList: "{{ _('Ordered list') }}"
+  }
+};
 </script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/email_new.js') }}"></script>
 {% endblock %}

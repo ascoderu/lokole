@@ -1,0 +1,10 @@
+@media screen and (max-width: 768px) {
+  .row .about-content.text-left {
+    text-align: center;
+  }
+}
+
+#team-row {
+  padding-left: 5em;
+  padding-right: 5em;
+}

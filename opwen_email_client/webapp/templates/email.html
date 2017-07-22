@@ -3,7 +3,7 @@
 {% from 'macros/email.html' import email_display with context %}
 {% from 'macros/nav.html' import email_subnav with context %}
 
-{% block email_content %}
+{% block content %}
 {{ email_subnav() }}
 {{ email_display(emails, _('No emails.')) }}
 {% endblock %}
