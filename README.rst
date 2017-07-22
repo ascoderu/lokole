@@ -121,3 +121,5 @@ Adding a new language
   make prepare-translations
   poedit "opwen_email_client/webapp/translations/$LANG/LC_MESSAGES/messages.po"
   make compile-translations
+
+Or via `Transifex <https://www.transifex.com/ascoderu/opwen-webapp/dashboard/>`_.
