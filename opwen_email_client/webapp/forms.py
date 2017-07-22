@@ -65,24 +65,31 @@ class NewEmailForm(Form):
         pass
 
     @classmethod
-    def from_request(cls, email_store: EmailStore):
-        action = request.args.get('action')
-        if action:
-            try:
-                clazz = next(clazz for clazz in cls.__subclasses__()
-                             if getattr(clazz, 'action_name', None) == action)
-            except StopIteration:
-                return None
-        else:
-            clazz = cls
+    def _new_instance_for(cls, action_name: Maybe[str]):
+        if not action_name:
+            return cls(request.form)
 
-        form = clazz(request.form)
+        try:
+            clazz = next(clazz for clazz in NewEmailForm.__subclasses__()
+                         if getattr(clazz, 'action_name', None) == action_name)
+        except StopIteration:
+            return None
+        else:
+            return clazz(request.form)
+
+    @classmethod
+    def from_request(cls, email_store: EmailStore):
+        action_name = request.args.get('action')
+        form = cls._new_instance_for(action_name)
+        if not form:
+            return None
 
         uid = request.args.get('uid')
         if uid:
-            reference_email = email_store.get(uid)
-            if current_user.can_access(reference_email):
-                form._populate(reference_email)
+            reference = email_store.get(uid)
+            if not reference or not current_user.can_access(reference):
+                return None
+            form._populate(reference)
 
         return form
 
