@@ -17,6 +17,8 @@ class AzureSyncTests(TestCase):
         self.sync = AzureSync(
             container='container',
             email_server_client=self.email_server_client_mock,
+            account_key='mock',
+            account_name='mock',
             azure_client=self.azure_client_mock,
             serializer=JsonSerializer())
 

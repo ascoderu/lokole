@@ -29,13 +29,23 @@ class Sync(metaclass=ABCMeta):
 
 class AzureSync(Sync):
     def __init__(self, container: str, serializer: Serializer,
-                 azure_client: BlockBlobService,
-                 email_server_client: EmailServerClient):
+                 account_name: str, account_key: str,
+                 email_server_client: EmailServerClient,
+                 azure_client: BlockBlobService=None):
 
         self._container = container
         self._serializer = serializer
-        self._azure_client = azure_client
+        self._account_name = account_name
+        self._account_key = account_key
         self._email_server_client = email_server_client
+        self.__azure_client = azure_client
+
+    @property
+    def _azure_client(self) -> BlockBlobService:
+        if not self.__azure_client:
+            self.__azure_client = BlockBlobService(self._account_name,
+                                                   self._account_key)
+        return self.__azure_client
 
     @classmethod
     def _workspace(cls) -> TextIOBase:

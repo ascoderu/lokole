@@ -1,7 +1,6 @@
 from logging import Formatter
 from logging import StreamHandler
 
-from azure.storage.blob import BlockBlobService
 from flask import Flask
 from flask_babel import Babel
 
@@ -17,10 +16,6 @@ from opwen_email_client.webapp.session import AttachmentsStore
 class Ioc(object):
     serializer = JsonSerializer()
 
-    azure_client = BlockBlobService(
-        account_name=AppConfig.STORAGE_ACCOUNT_NAME,
-        account_key=AppConfig.STORAGE_ACCOUNT_KEY)
-
     email_server_client = HttpEmailServerClient(
         read_api=AppConfig.EMAIL_SERVER_READ_API_HOSTNAME,
         write_api=AppConfig.EMAIL_SERVER_WRITE_API_HOSTNAME,
@@ -31,7 +26,8 @@ class Ioc(object):
         serializer=serializer)
 
     email_sync = AzureSync(
-        azure_client=azure_client,
+        account_name=AppConfig.STORAGE_ACCOUNT_NAME,
+        account_key=AppConfig.STORAGE_ACCOUNT_KEY,
         email_server_client=email_server_client,
         container=AppConfig.STORAGE_CONTAINER,
         serializer=serializer)
