@@ -80,11 +80,22 @@ First, get the source code.
 
   git clone git@github.com:ascoderu/opwen-webapp.git
 
-Second, install the system-level dependencies using your package manager.
+Second, install the system-level dependencies using your package manager and set
+all the required environment variables to dummy values.
 
 .. sourcecode :: sh
 
   sudo dnf install npm
+
+  export OPWEN_EMAIL_SERVER_WRITE_API='localhost:8080'
+  export OPWEN_EMAIL_SERVER_READ_API='localhost:8080'
+  export OPWEN_SESSION_KEY='session-secret'
+  export OPWEN_CLIENT_ID='dev-client-id'
+  export OPWEN_CLIENT_NAME='dev-client-name'
+  export OPWEN_ADMIN_SECRET='admin-secret'
+  export OPWEN_PASSWORD_SALT='password-salt'
+  export OPWEN_REMOTE_ACCOUNT_NAME='azure-storage-account-name'
+  export OPWEN_REMOTE_ACCOUNT_KEY='azure-storage-account-key'
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
