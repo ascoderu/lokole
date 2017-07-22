@@ -1,15 +1,13 @@
 from unittest import TestCase
 
+from typing import Iterable
+
 from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder
 
 
 class AttachmentEncoderTests(TestCase):
     @property
-    def encodable_objects(self):
-        """
-        :rtype: collections.Iterable
-
-        """
+    def encodable_objects(self) -> Iterable:
         yield b'some bytes'
         yield u'some unicode bytes: \u2603'.encode('utf-8')
 

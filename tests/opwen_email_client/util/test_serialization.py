@@ -2,25 +2,20 @@ from abc import ABCMeta
 from abc import abstractmethod
 from unittest import TestCase
 
+from typing import Iterable
+
 from opwen_email_client.util.serialization import JsonSerializer
+from opwen_email_client.util.serialization import Serializer
 
 
 class Base(object):
     class SerializerTests(TestCase, metaclass=ABCMeta):
         @abstractmethod
-        def create_serializer(self):
-            """
-            :rtype: opwen_infrastructure.serialization.Serializer
-
-            """
+        def create_serializer(self) -> Serializer:
             raise NotImplementedError
 
         @property
-        def serializable_objects(self):
-            """
-            :rtype: collections.Iterable
-
-            """
+        def serializable_objects(self) -> Iterable:
             yield 'some string'
             yield 123.4
             yield [1, "two"]

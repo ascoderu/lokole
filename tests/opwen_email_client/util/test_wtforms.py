@@ -1,8 +1,11 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from html import escape
+from typing import Iterable
+from typing import Tuple
 from unittest import TestCase
 
+from wtforms import Field
 from wtforms import Form
 from wtforms import ValidationError
 
@@ -14,11 +17,7 @@ from opwen_email_client.util.wtforms import SuffixedStringField
 class Base(object):
     class FieldTests(TestCase, metaclass=ABCMeta):
         @abstractmethod
-        def create_field(self):
-            """
-            :rtype: wtforms.Field
-
-            """
+        def create_field(self) -> Field:
             raise NotImplementedError
 
         def verify_field(self, given, expected):
@@ -46,21 +45,13 @@ class HtmlTextAreaFieldTests(Base.FieldTests):
         return HtmlTextAreaField()
 
     @property
-    def dangerous_markup(self):
-        """
-        :rtype: collections.Iterable[(str, str)]
-
-        """
+    def dangerous_markup(self) -> Iterable[Tuple[str, str]]:
         yield 'foo<script>alert();</script>bar', 'foobar'
         yield 'foo<script type="text/javascript">alert();</script>bar', 'foobar'
         yield 'foo<scr<script>Ha!</script>ipt> alert(document.cookie);</script>bar', 'foobar'
 
     @property
-    def safe_markup(self):
-        """
-        :rtype: collections.Iterable[(str, str)]
-
-        """
+    def safe_markup(self) -> Iterable[Tuple[str, str]]:
         yield '<h1>Title</h1>', '<h1>Title</h1>'
         yield '<b>bold</b>', '<b>bold</b>'
         yield '<u>underline</u>', '<u>underline</u>'
