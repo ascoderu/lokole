@@ -16,9 +16,13 @@
     {% endblock %}
   </title>
 
-  <script type="text/javascript" src="{{ url_for('static', filename='js/app.min.js') }}"></script>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.min.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flag-icon.min.css') }}">
 
+  {% block libs %}{% endblock %}
   {% block style %}{% endblock %}
 </head>
 <body>
