@@ -88,6 +88,10 @@
                 <button class="btn btn-default print-trigger" title="{{ _('Print') }}">
                   <span class="fa fa-print"></span>
                 </button>
+                <a class="btn btn-default" title="{{ _('Delete') }}"
+                   href="{{ url_for('email_delete', email_uid=email['_uid']) }}">
+                  <span class="fa fa-trash-o"></span>
+                </a>
               </div>
             </div>
           </div>

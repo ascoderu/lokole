@@ -48,6 +48,15 @@ class EmailStore(metaclass=ABCMeta):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_read(email_address, uids)
 
+    def delete(self, email_address: str,
+               emails_or_uids: Iterable[Union[dict, str]]):
+        uids = map(_get_uid, emails_or_uids)
+        return self._delete(email_address, uids)
+
+    @abstractmethod
+    def _delete(self, email_address: str, uids: Iterable[str]):
+        raise NotImplementedError  # pragma: no cover
+
     @abstractmethod
     def _mark_sent(self, uids: Iterable[str]):
         raise NotImplementedError  # pragma: no cover

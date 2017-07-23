@@ -103,6 +103,17 @@ def email_read(email_uid: str) -> Response:
     return Response('OK', status=200, mimetype='text/plain')
 
 
+@app.route('/email/delete/<email_uid>')
+@login_required
+def email_delete(email_uid: str) -> Response:
+    email_store = app.ioc.email_store
+    user = current_user
+
+    email_store.delete(user.email, [email_uid])
+
+    return redirect(Session.get_last_visited_url() or url_for('home'))
+
+
 @app.route('/email/new', methods=['GET', 'POST'])
 @login_required
 def email_new() -> Response:

@@ -188,6 +188,24 @@ class Base(object):
             self.assertTrue(all(email.get('read') for email in read_emails))
             self.assertTrue(not any(email.get('read') for email in unchanged_emails))
 
+        def test_delete(self):
+            emails = self.given_emails(
+                {'to': ['foo@bar.com'], 'subject': 'deleted1'},
+                {'to': ['foo@bar.com'], 'subject': 'deleted2'},
+                {'to': ['foo@bar.com'], 'subject': 'not-deleted1'},
+                {'to': ['foo@bar.com'], 'subject': 'not-deleted2'},
+                {'to': ['baz@bar.com'], 'subject': 'bar'})
+
+            self.email_store.delete('foo@bar.com', emails[:2])
+            deleted_emails = list(self.email_store.inbox('foo@bar.com'))
+            unchanged_emails = list(self.email_store.inbox('baz@bar.com'))
+
+            self.assertEqual(len(deleted_emails), 2)
+            self.assertEqual(deleted_emails[0]['_uid'], emails[2]['_uid'])
+            self.assertEqual(deleted_emails[1]['_uid'], emails[3]['_uid'])
+            self.assertEqual(len(unchanged_emails), 1)
+            self.assertEqual(unchanged_emails[0]['_uid'], emails[4]['_uid'])
+
         def test_get(self):
             given = self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo',

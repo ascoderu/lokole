@@ -165,6 +165,15 @@ class _SqlalchemyEmailStore(EmailStore):
             db.query(_Email).filter(match_email_uid & can_access)\
                 .update(set_read, synchronize_session='fetch')
 
+    def _delete(self, email_address, uids):
+        match_email_uid = or_(*(_Email.uid == uid for uid in uids))
+        can_access = (_Email.is_sent_by(email_address)
+                      | _Email.is_received_by(email_address))
+
+        with self._dbwrite() as db:
+            db.query(_Email).filter(match_email_uid & can_access)\
+                .delete(synchronize_session='fetch')
+
     def _find(self, query):
         with self._dbread() as db:
             results = db.query(_Email).filter(query)
