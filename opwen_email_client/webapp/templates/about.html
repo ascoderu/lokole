@@ -1,10 +1,10 @@
 {% extends "_base.html" %}
 
-{% block style %}
+{% block style %}{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/about.min.css') }}">
 {% endblock %}
 
-{% block content %}
+{% block content %}{{ super() }}
 <div class="container-fluid">
 
   <div class="row">

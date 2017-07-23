@@ -4,15 +4,14 @@
 {% from 'macros/form.html' import render_button %}
 {% from 'macros/nav.html' import email_subnav with context %}
 
-{% block libs %}
-{{ super() }}
+{% block libs %}{{ super() }}
 <script type="text/javascript" src="{{ url_for('static', filename='js/fileinput.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap3-wysihtml5.all.min.js') }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/fileinput.min.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap3-wysihtml5.min.css') }}">
 {% endblock %}
 
-{% block content %}
+{% block content %}{{ super() }}
 {{ email_subnav() }}
 
 <form action="{{ url_for('email_new') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
@@ -30,8 +29,7 @@
 </form>
 {% endblock %}
 
-{% block scripts %}
-{{ super() }}
+{% block scripts %}{{ super() }}
 <script>
 window.flask_jinja_context__email_new = {
   selectors: {

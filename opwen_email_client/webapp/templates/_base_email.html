@@ -1,13 +1,13 @@
 {% extends "_base.html" %}
 
-{% block style %}
+{% block style %}{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.min.css') }}">
 {% endblock %}
 
-{% block libs %}
+{% block libs %}{{ super() }}
 <script type="text/javascript" src="{{ url_for('static', filename='js/printThis.min.js') }}"></script>
 {% endblock %}
 
-{% block scripts %}
+{% block scripts %}{{ super() }}
 <script type="text/javascript" src="{{ url_for('static', filename='js/_base_email.min.js') }}"></script>
 {% endblock %}
