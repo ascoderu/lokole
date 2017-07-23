@@ -22,7 +22,12 @@ class Base(object):
 
         def assertContainsEmail(self, expected: dict, collection: Iterable[dict]):
             def cleanup(email):
-                return {key: value for (key, value) in email.items() if value}
+                email = {key: value for (key, value) in email.items() if value}
+                email['from'] = email.get('from', '').lower() or None
+                email['to'] = [_.lower() for _ in email.get('to', [])] or None
+                email['cc'] = [_.lower() for _ in email.get('cc', [])] or None
+                email['bcc'] = [_.lower() for _ in email.get('bcc', [])] or None
+                return email
 
             self.assertIn(cleanup(expected), [cleanup(actual) for actual in collection])
 

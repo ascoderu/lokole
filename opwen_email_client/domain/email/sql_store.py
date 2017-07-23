@@ -112,11 +112,11 @@ class _Email(_Base):
     def from_dict(cls, db, email):
         return _Email(
             uid=email['_uid'],
-            to=[get_or_create(db, _To, address=_)
+            to=[get_or_create(db, _To, address=_.lower())
                 for _ in email.get('to', [])],
-            cc=[get_or_create(db, _Cc, address=_)
+            cc=[get_or_create(db, _Cc, address=_.lower())
                 for _ in email.get('cc', [])],
-            bcc=[get_or_create(db, _Bcc, address=_)
+            bcc=[get_or_create(db, _Bcc, address=_.lower())
                  for _ in email.get('bcc', [])],
             attachments=[get_or_create(db, _Attachment, **_)
                          for _ in email.get('attachments', [])],
@@ -124,17 +124,19 @@ class _Email(_Base):
             body=email.get('body'),
             sent_at=email.get('sent_at'),
             read=email.get('read', False),
-            sender=email.get('from'))
+            sender=email.get('from', '').lower() or None)
 
     @classmethod
     def is_sent_by(cls, email_address):
-        return cls.sender.ilike(email_address)
+        email_address = email_address.lower()
+        return cls.sender == email_address
 
     @classmethod
     def is_received_by(cls, email_address):
-        return (cls.to.any(_To.address.ilike(email_address)) |
-                cls.cc.any(_Cc.address.ilike(email_address)) |
-                cls.bcc.any(_Bcc.address.ilike(email_address)))
+        email_address = email_address.lower()
+        return (cls.to.any(_To.address == email_address) |
+                cls.cc.any(_Cc.address == email_address) |
+                cls.bcc.any(_Bcc.address == email_address))
 
 
 class _SqlalchemyEmailStore(EmailStore):
@@ -206,8 +208,10 @@ class _SqlalchemyEmailStore(EmailStore):
         textquery = '%{}%'.format(query)
         contains_query = or_(*(_Email.subject.ilike(textquery),
                                _Email.body.ilike(textquery),
-                               _Email.is_received_by(textquery),
-                               _Email.is_sent_by(textquery)))
+                               _Email.sender.ilike(textquery),
+                               _Email.to.any(_To.address.ilike(textquery)),
+                               _Email.cc.any(_Cc.address.ilike(textquery)),
+                               _Email.bcc.any(_Bcc.address.ilike(textquery))))
         return self._query(_can_access(email_address) & contains_query)
 
     def pending(self):
