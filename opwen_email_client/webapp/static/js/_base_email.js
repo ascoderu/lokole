@@ -6,7 +6,7 @@ $(document).ready(function() {
     var $el = $(this);
     if ($el.hasClass("panel-info")) {
       var email_id = $el.data("email_id");
-      if (email_id != null) {
+      if (email_id) {
         $.ajax({
           url: "/email/read/" + email_id,
           success: function() {
