@@ -127,6 +127,7 @@ def email_new() -> Response:
     if form.validate_on_submit():
         email_store.create([form.as_dict(attachment_encoder)])
         flash(i8n.EMAIL_SENT, category='success')
+        return redirect(url_for('email_inbox'))
 
     return _view('email_new.html', form=form)
 
