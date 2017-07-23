@@ -149,29 +149,24 @@ class _SqlalchemyEmailStore(EmailStore):
     def _mark_sent(self, uids):
         now = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
         set_sent_at = {_Email.sent_at: now}
-        match_email_uid = or_(*(_Email.uid == uid for uid in uids))
 
         with self._dbwrite() as db:
-            db.query(_Email).filter(match_email_uid)\
+            db.query(_Email)\
+                .filter(_match_email_uid(uids))\
                 .update(set_sent_at)
 
     def _mark_read(self, email_address, uids):
         set_read = {_Email.read: True}
-        match_email_uid = or_(*(_Email.uid == uid for uid in uids))
-        can_access = (_Email.is_sent_by(email_address)
-                      | _Email.is_received_by(email_address))
 
         with self._dbwrite() as db:
-            db.query(_Email).filter(match_email_uid & can_access)\
+            db.query(_Email)\
+                .filter(_match_email_uid(uids) & _can_access(email_address))\
                 .update(set_read, synchronize_session='fetch')
 
     def _delete(self, email_address, uids):
-        match_email_uid = or_(*(_Email.uid == uid for uid in uids))
-        can_access = (_Email.is_sent_by(email_address)
-                      | _Email.is_received_by(email_address))
-
         with self._dbwrite() as db:
-            db.query(_Email).filter(match_email_uid & can_access)\
+            db.query(_Email)\
+                .filter(_match_email_uid(uids) & _can_access(email_address))\
                 .delete(synchronize_session='fetch')
 
     def _find(self, query):
@@ -199,9 +194,7 @@ class _SqlalchemyEmailStore(EmailStore):
                                _Email.body.ilike(textquery),
                                _Email.is_received_by(textquery),
                                _Email.is_sent_by(textquery)))
-        can_access = (_Email.is_received_by(email_address)
-                      | _Email.is_sent_by(email_address))
-        return self._query(can_access & contains_query)
+        return self._query(_can_access(email_address) & contains_query)
 
     def pending(self):
         return self._query(_Email.sent_at.is_(None))
@@ -217,3 +210,12 @@ class _SqlalchemyEmailStore(EmailStore):
 class SqliteEmailStore(_SqlalchemyEmailStore):
     def __init__(self, database_path: str, serializer: Serializer):
         super().__init__('sqlite:///{}'.format(database_path), serializer)
+
+
+def _can_access(email_address):
+    return (_Email.is_sent_by(email_address)
+            | _Email.is_received_by(email_address))
+
+
+def _match_email_uid(uids):
+    return or_(*(_Email.uid == uid for uid in uids))
