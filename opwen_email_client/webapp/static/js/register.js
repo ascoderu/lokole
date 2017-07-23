@@ -1,10 +1,10 @@
-(function($) {
+(function($, ctx) {
 $(document).ready(function() {
 
 (function setUserTimezone() {
   var timezoneOffsetMinutes = (new Date()).getTimezoneOffset();
-  document.getElementById(register_user_form.timezone_offset_minutes.id).value = timezoneOffsetMinutes;
+  $(ctx.selectors.timezoneOffsetMinutesField).val(timezoneOffsetMinutes);
 }());
 
 });
-})(window.jQuery);
+})(window.jQuery, window.flask_jinja_context__register);

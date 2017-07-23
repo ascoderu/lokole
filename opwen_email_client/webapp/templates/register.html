@@ -18,5 +18,12 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+window.flask_jinja_context__register = {
+  selectors: {
+    timezoneOffsetMinutesField: "#{{ register_user_form.timezone_offset_minutes.id }}"
+  }
+};
+</script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/register.min.js') }}"></script>
 {% endblock %}
