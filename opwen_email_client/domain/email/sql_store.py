@@ -38,6 +38,12 @@ _EmailBcc = Table('emailbcc',
                   Column('email_id', Integer, ForeignKey('email.id')),
                   Column('bcc_id', Integer, ForeignKey('bcc.id')))
 
+_EmailAttachment = Table(
+    'emailattachment',
+    _Base.metadata,
+    Column('email_id', Integer, ForeignKey('email.id')),
+    Column('attachment_id', Integer, ForeignKey('attachment.id')))
+
 
 class _To(_Base):
     __tablename__ = 'to'
@@ -60,6 +66,13 @@ class _Bcc(_Base):
     address = Column(String(length=128), index=True, unique=True)
 
 
+class _Attachment(_Base):
+    __tablename__ = 'attachment'
+    id = Column(Integer, primary_key=True)
+
+    body = Column(Binary)
+
+
 class _Email(_Base):
     __tablename__ = 'email'
     id = Column(Integer, primary_key=True)
@@ -70,14 +83,16 @@ class _Email(_Base):
     sent_at = Column(String(length=64))
     read = Column(Boolean, default=False, nullable=False)
     sender = Column(String(length=128), index=True)
-    attachments = Column(Binary)
+    attachments = relationship(_Attachment, secondary=_EmailAttachment,
+                               backref='emails')
     to = relationship(_To, secondary=_EmailTo)
     cc = relationship(_Cc, secondary=_EmailCc)
     bcc = relationship(_Bcc, secondary=_EmailBcc)
 
     def to_dict(self, serializer):
         attachments = self.attachments
-        attachments = (serializer.deserialize(attachments)
+        attachments = ([serializer.deserialize(attachment.body)
+                        for attachment in attachments]
                        if attachments else None)
 
         return {k: v for (k, v) in (
@@ -95,10 +110,6 @@ class _Email(_Base):
 
     @classmethod
     def from_dict(cls, db, serializer, email):
-        attachments = email.get('attachments')
-        attachments = (serializer.serialize(attachments)
-                       if attachments else None)
-
         return _Email(
             uid=email['_uid'],
             to=[get_or_create(db, _To, address=_)
@@ -107,11 +118,13 @@ class _Email(_Base):
                 for _ in email.get('cc', [])],
             bcc=[get_or_create(db, _Bcc, address=_)
                  for _ in email.get('bcc', [])],
+            attachments=[get_or_create(db, _Attachment, body=_)
+                         for _ in map(serializer.serialize,
+                                      email.get('attachments', []))],
             subject=email.get('subject'),
             body=email.get('body'),
             sent_at=email.get('sent_at'),
             read=email.get('read', False),
-            attachments=attachments,
             sender=email.get('from'))
 
     @classmethod
@@ -167,6 +180,9 @@ class _SqlalchemyEmailStore(EmailStore):
         with self._dbwrite() as db:
             db.query(_Email)\
                 .filter(_match_email_uid(uids) & _can_access(email_address))\
+                .delete(synchronize_session='fetch')
+            db.query(_Attachment)\
+                .filter(~_Attachment.emails.any())\
                 .delete(synchronize_session='fetch')
 
     def _find(self, query):
