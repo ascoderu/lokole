@@ -22,8 +22,7 @@ class Ioc(object):
         client_id=AppConfig.CLIENT_ID)
 
     email_store = SqliteEmailStore(
-        database_path=AppConfig.LOCAL_EMAIL_STORE,
-        serializer=serializer)
+        database_path=AppConfig.LOCAL_EMAIL_STORE)
 
     email_sync = AzureSync(
         account_name=AppConfig.STORAGE_ACCOUNT_NAME,

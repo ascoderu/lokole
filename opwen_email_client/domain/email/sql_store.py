@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from sqlalchemy import Binary
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -15,7 +14,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 
 from opwen_email_client.domain.email.store import EmailStore
-from opwen_email_client.util.serialization import Serializer
 from opwen_email_client.util.sqlalchemy import create_database
 from opwen_email_client.util.sqlalchemy import get_or_create
 from opwen_email_client.util.sqlalchemy import session
@@ -70,7 +68,8 @@ class _Attachment(_Base):
     __tablename__ = 'attachment'
     id = Column(Integer, primary_key=True)
 
-    body = Column(Binary)
+    filename = Column(Text)
+    content = Column(Text)
 
 
 class _Email(_Base):
@@ -89,9 +88,10 @@ class _Email(_Base):
     cc = relationship(_Cc, secondary=_EmailCc)
     bcc = relationship(_Bcc, secondary=_EmailBcc)
 
-    def to_dict(self, serializer):
+    def to_dict(self):
         attachments = self.attachments
-        attachments = ([serializer.deserialize(attachment.body)
+        attachments = ([{'filename': attachment.filename,
+                         'content': attachment.content}
                         for attachment in attachments]
                        if attachments else None)
 
@@ -109,7 +109,7 @@ class _Email(_Base):
         ) if v}
 
     @classmethod
-    def from_dict(cls, db, serializer, email):
+    def from_dict(cls, db, email):
         return _Email(
             uid=email['_uid'],
             to=[get_or_create(db, _To, address=_)
@@ -118,9 +118,8 @@ class _Email(_Base):
                 for _ in email.get('cc', [])],
             bcc=[get_or_create(db, _Bcc, address=_)
                  for _ in email.get('bcc', [])],
-            attachments=[get_or_create(db, _Attachment, body=_)
-                         for _ in map(serializer.serialize,
-                                      email.get('attachments', []))],
+            attachments=[get_or_create(db, _Attachment, **_)
+                         for _ in email.get('attachments', [])],
             subject=email.get('subject'),
             body=email.get('body'),
             sent_at=email.get('sent_at'),
@@ -139,8 +138,7 @@ class _Email(_Base):
 
 
 class _SqlalchemyEmailStore(EmailStore):
-    def __init__(self, database_uri: str, serializer: Serializer):
-        self._serializer = serializer
+    def __init__(self, database_uri: str):
         self._base = _Base
         self._engine = create_database(database_uri, self._base)
         self._sesion_maker = sessionmaker(autocommit=False, autoflush=False,
@@ -157,7 +155,7 @@ class _SqlalchemyEmailStore(EmailStore):
             for email in emails:
                 uid_exists = exists().where(_Email.uid == email['_uid'])
                 if not db.query(uid_exists).scalar():
-                    db.add(_Email.from_dict(db, self._serializer, email))
+                    db.add(_Email.from_dict(db, email))
 
     def _mark_sent(self, uids):
         now = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
@@ -189,13 +187,13 @@ class _SqlalchemyEmailStore(EmailStore):
         with self._dbread() as db:
             results = db.query(_Email).filter(query)
             email = results.first()
-            return email.to_dict(self._serializer) if email else None
+            return email.to_dict() if email else None
 
     def _query(self, query):
         with self._dbread() as db:
             results = db.query(_Email).filter(query)
             for email in results.all():
-                yield email.to_dict(self._serializer)
+                yield email.to_dict()
 
     def inbox(self, email_address):
         return self._query(_Email.is_received_by(email_address))
@@ -224,8 +222,8 @@ class _SqlalchemyEmailStore(EmailStore):
 
 
 class SqliteEmailStore(_SqlalchemyEmailStore):
-    def __init__(self, database_path: str, serializer: Serializer):
-        super().__init__('sqlite:///{}'.format(database_path), serializer)
+    def __init__(self, database_path: str):
+        super().__init__('sqlite:///{}'.format(database_path))
 
 
 def _can_access(email_address):

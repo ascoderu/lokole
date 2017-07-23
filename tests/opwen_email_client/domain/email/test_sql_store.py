@@ -2,7 +2,6 @@ from os import remove
 from tempfile import NamedTemporaryFile
 
 from opwen_email_client.domain.email.sql_store import SqliteEmailStore
-from opwen_email_client.util.serialization import JsonSerializer
 from tests.opwen_email_client.domain.email.test_store import Base
 
 
@@ -10,7 +9,7 @@ class SqliteEmailStoreTests(Base.EmailStoreTests):
     store_location = None
 
     def create_email_store(self):
-        return SqliteEmailStore(self.store_location, JsonSerializer())
+        return SqliteEmailStore(self.store_location)
 
     @classmethod
     def setUpClass(cls):
