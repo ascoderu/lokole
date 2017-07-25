@@ -81,13 +81,7 @@ First, get the source code.
   git clone git@github.com:ascoderu/opwen-webapp.git
 
 Second, install the system-level dependencies using your package manager,
-e.g. on Fedora:
-
-.. sourcecode :: sh
-
-  sudo dnf install -y python3-virtualenv npm
-
-Or on Ubuntu:
+e.g. on Ubuntu:
 
 .. sourcecode :: sh
 
