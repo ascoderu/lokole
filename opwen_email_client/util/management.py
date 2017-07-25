@@ -2,7 +2,6 @@ from glob import glob
 from os.path import join
 from typing import List
 
-# noinspection PyPackageRequirements
 from dotenv import load_dotenv
 from flask import Flask
 from flask_script import Command
