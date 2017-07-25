@@ -80,12 +80,18 @@ First, get the source code.
 
   git clone git@github.com:ascoderu/opwen-webapp.git
 
-Second, install the system-level dependencies using your package manager.
+Second, install the system-level dependencies using your package manager,
+e.g. on Fedora:
 
 .. sourcecode :: sh
 
-  sudo dnf install python3-virtualenv
-  sudo dnf install npm
+  sudo dnf install -y python3-virtualenv npm
+
+Or on Ubuntu:
+
+.. sourcecode :: sh
+
+  sudo apt-get install -y python3-venv npm
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
