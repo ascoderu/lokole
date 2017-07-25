@@ -92,6 +92,7 @@ Or on Ubuntu:
 .. sourcecode :: sh
 
   sudo apt-get install -y python3-venv npm
+  sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
