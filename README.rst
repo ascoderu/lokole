@@ -105,8 +105,6 @@ any of the Flask code or Jinja templates are changed.
   cd opwen-webapp
 
   make tests
-  make build-js
-  make compile-translations
   make server
 
 The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
