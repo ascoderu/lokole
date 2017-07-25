@@ -7,7 +7,7 @@ from flask_script import Command
 
 # noinspection PyAbstractClass,PyMethodOverriding
 class DevServerCommand(Command):
-    def __call__(self, app):
+    def __call__(self, app: Flask):
         extra_files = _templates_paths_for(app)
         app.run(debug=True, extra_files=extra_files)
 
