@@ -7,14 +7,14 @@ from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
-STORAGE = AzureTextStorage(account=config.STORAGE_ACCOUNT,
-                           key=config.STORAGE_KEY,
+STORAGE = AzureTextStorage(account=config.BLOBS_ACCOUNT,
+                           key=config.BLOBS_KEY,
                            container=config.CONTAINER_SENDGRID_MIME)
 
-QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+QUEUE = AzureQueue(account=config.QUEUES_ACCOUNT, key=config.QUEUES_KEY,
                    name=config.QUEUE_SENDGRID_MIME)
 
-CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
                     table=config.TABLE_AUTH)
 
 

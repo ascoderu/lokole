@@ -4,7 +4,7 @@ from opwen_email_server import config
 from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.services.sendgrid import SendgridEmailSender
 
-QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+QUEUE = AzureQueue(account=config.QUEUES_ACCOUNT, key=config.QUEUES_KEY,
                    name=config.QUEUE_EMAIL_SEND)
 
 EMAIL = SendgridEmailSender(key=config.EMAIL_SENDER_KEY)

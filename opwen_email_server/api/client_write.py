@@ -5,10 +5,10 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.utils.log import LogMixin
 
-QUEUE = AzureQueue(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+QUEUE = AzureQueue(account=config.QUEUES_ACCOUNT, key=config.QUEUES_KEY,
                    name=config.QUEUE_CLIENT_PACKAGE)
 
-CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
                     table=config.TABLE_AUTH)
 
 

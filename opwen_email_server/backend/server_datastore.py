@@ -8,12 +8,12 @@ from opwen_email_server.utils.collections import to_iterable
 from opwen_email_server.utils.email_parser import get_domains
 from opwen_email_server.utils.serialization import to_json
 
-STORAGE = AzureTextStorage(account=config.STORAGE_ACCOUNT,
-                           key=config.STORAGE_KEY,
+STORAGE = AzureTextStorage(account=config.BLOBS_ACCOUNT,
+                           key=config.BLOBS_KEY,
                            container=config.CONTAINER_EMAILS)
 
 INDEX = AzureIndex(
-    account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+    account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
     tables={
         config.TABLE_DOMAIN: get_domains,
         config.TABLE_TO: lambda _: _.get('to') or [],

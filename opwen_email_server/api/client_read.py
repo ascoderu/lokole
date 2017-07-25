@@ -11,7 +11,7 @@ STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                              key=config.CLIENT_STORAGE_KEY,
                              container=config.CONTAINER_CLIENT_PACKAGES)
 
-CLIENTS = AzureAuth(account=config.STORAGE_ACCOUNT, key=config.STORAGE_KEY,
+CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
                     table=config.TABLE_AUTH)
 
 

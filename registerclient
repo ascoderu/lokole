@@ -7,8 +7,8 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureObjectStorage
 
 parser = ArgumentParser()
-parser.add_argument('--server_account', default=config.STORAGE_ACCOUNT)
-parser.add_argument('--server_key', default=config.STORAGE_KEY)
+parser.add_argument('--tables_account', default=config.TABLES_ACCOUNT)
+parser.add_argument('--tables_key', default=config.TABLES_KEY)
 parser.add_argument('--client_account', default=config.CLIENT_STORAGE_ACCOUNT)
 parser.add_argument('--client_key', default=config.CLIENT_STORAGE_KEY)
 parser.add_argument('--table', default=config.TABLE_AUTH)
@@ -17,7 +17,7 @@ parser.add_argument('--client', required=True)
 parser.add_argument('--domain', required=True)
 args = parser.parse_args()
 
-auth = AzureAuth(account=args.server_account, key=args.server_key,
+auth = AzureAuth(account=args.tables_account, key=args.tables_key,
                  table=args.table)
 auth.insert(client_id=args.client, domain=args.domain)
 
