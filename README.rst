@@ -84,6 +84,7 @@ Second, install the system-level dependencies using your package manager.
 
 .. sourcecode :: sh
 
+  sudo dnf install python3-virtualenv
   sudo dnf install npm
 
 Third, use the makefile to verify your installation by running the tests and
