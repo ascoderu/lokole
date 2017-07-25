@@ -99,7 +99,8 @@ all the required environment variables to dummy values.
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
-dependencies into a virtual environment.
+dependencies into a virtual environment. The server will automatically reload
+whenever any of the Flask code or Jinja templates are changed.
 
 .. sourcecode :: sh
 
