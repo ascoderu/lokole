@@ -79,6 +79,7 @@ First, get the source code.
 .. sourcecode :: sh
 
   git clone git@github.com:ascoderu/opwen-webapp.git
+  cd opwen-webapp
 
 Second, install the system-level dependencies using your package manager,
 e.g. on Ubuntu:
@@ -95,8 +96,6 @@ variables for local development. The server will automatically reload whenever
 any of the Flask code or Jinja templates are changed.
 
 .. sourcecode :: sh
-
-  cd opwen-webapp
 
   make tests
   make server
