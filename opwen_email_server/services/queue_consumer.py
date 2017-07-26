@@ -2,7 +2,7 @@ from time import sleep
 from typing import Callable
 from typing import Iterable
 
-from opwen_email_server.config import QUEUE_POLL_INTERVAL
+from opwen_email_server.azure_constants import QUEUE_POLL_INTERVAL
 from opwen_email_server.utils.log import LogMixin
 
 

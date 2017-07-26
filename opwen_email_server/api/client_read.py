@@ -1,6 +1,7 @@
 from typing import Tuple
 from typing import Union
 
+from opwen_email_server import azure_constants as constants
 from opwen_email_server import config
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import AzureAuth
@@ -9,10 +10,10 @@ from opwen_email_server.utils.log import LogMixin
 
 STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                              key=config.CLIENT_STORAGE_KEY,
-                             container=config.CONTAINER_CLIENT_PACKAGES)
+                             container=constants.CONTAINER_CLIENT_PACKAGES)
 
 CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
-                    table=config.TABLE_AUTH)
+                    table=constants.TABLE_AUTH)
 
 
 class _Downloader(LogMixin):
