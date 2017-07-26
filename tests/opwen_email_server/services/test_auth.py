@@ -11,6 +11,10 @@ class AzureAuthTests(TestCase):
         self.auth = AzureAuth(account='account', key='key', table='table',
                               client=self.mock_client)
 
+    def test_insert(self):
+        self.auth.insert('client', 'domain')
+        self.assertEqual(self.mock_client.insert_or_replace_entity.call_count, 1)
+
     def test_retrieves_inserted(self):
         self.given_clients(('client', 'domain'))
 

@@ -42,7 +42,7 @@ class AzureAuth(Auth, LogMixin):
         return client
 
     def insert(self, client_id: str, domain: str):
-        self._client.insert_entity(self._table, {
+        self._client.insert_or_replace_entity(self._table, {
             'RowKey': client_id,
             'PartitionKey': client_id,
             'domain': domain,
