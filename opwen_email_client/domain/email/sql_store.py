@@ -177,10 +177,17 @@ class _SqlalchemyEmailStore(EmailStore):
                 .update(set_read, synchronize_session='fetch')
 
     def _delete(self, email_address, uids):
+        should_delete = _match_email_uid(uids) & _can_access(email_address)
+
         with self._dbwrite() as db:
-            db.query(_Email)\
-                .filter(_match_email_uid(uids) & _can_access(email_address))\
-                .delete(synchronize_session='fetch')
+            for email in db.query(_Email).filter(should_delete).all():
+                email.attachments = []
+                db.delete(email)
+
+        self._delete_orphaned_attachments()
+
+    def _delete_orphaned_attachments(self):
+        with self._dbwrite() as db:
             db.query(_Attachment)\
                 .filter(~_Attachment.emails.any())\
                 .delete(synchronize_session='fetch')
