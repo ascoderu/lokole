@@ -1,6 +1,8 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from functools import lru_cache
+from json import loads
+from os import getenv
 from typing import Callable
 from typing import Optional
 
@@ -26,6 +28,9 @@ class AzureAuth(Auth, LogMixin):
         self._table = table
         self.__client = client
         self._client_factory = client_factory
+
+        for client in loads(getenv('LOKOLE_DEFAULT_CLIENTS', '[]')):
+            self.insert(client['id'], client['domain'])
 
     @property
     def _client(self) -> TableService:

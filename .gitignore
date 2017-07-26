@@ -1,5 +1,7 @@
 .idea/
 
+.env
+
 *.pyc
 /build/
 /dist/
