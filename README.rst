@@ -61,6 +61,7 @@ First, get the source code.
 .. sourcecode :: sh
 
   git clone git@github.com:ascoderu/opwen-cloudserver.git
+  cd opwen-cloudserver
 
 Second, install the system-level dependencies using your package manager.
 
@@ -105,8 +106,6 @@ starting up the server. The makefile will automatically install all required
 dependencies into a virtual environment.
 
 .. sourcecode :: sh
-
-  cd opwen-cloudserver
 
   make tests
   make server
