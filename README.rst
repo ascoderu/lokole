@@ -75,6 +75,7 @@ Next, set up the required Azure resources and environment variables:
 .. sourcecode :: sh
 
   az login
+  az account set --subscription "YOUR_SUBSCRIPTION_ID_HERE"
 
   client="$(whoami | tr -dC 'a-zA-Z0-9')"
   resource_group="testopwen${client}"
