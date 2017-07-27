@@ -29,5 +29,5 @@ class ClientWriteQueueConsumer(QueueConsumer):
 
 
 if __name__ == '__main__':
-    consumer = ClientWriteQueueConsumer()
-    consumer.run_forever()
+    from opwen_email_server.jobs.job import main
+    main(ClientWriteQueueConsumer)

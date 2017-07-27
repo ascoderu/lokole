@@ -17,5 +17,5 @@ class OutboundEmailQueueConsumer(QueueConsumer):
 
 
 if __name__ == '__main__':
-    consumer = OutboundEmailQueueConsumer()
-    consumer.run_forever()
+    from opwen_email_server.jobs.job import main
+    main(OutboundEmailQueueConsumer)
