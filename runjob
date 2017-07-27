@@ -13,7 +13,7 @@ def _load_environment():
         pass
 
 
-def _package_for(job_name: str) -> str:
+def _module_for(job_name: str) -> str:
     return 'opwen_email_server.jobs.{}'.format(job_name)
 
 
@@ -21,7 +21,7 @@ def main(job_name: str):
     _load_environment()
 
     try:
-        job_module = import_module(_package_for(job_name))
+        job_module = import_module(_module_for(job_name))
         job_factory = getattr(job_module, 'Job')
     except AttributeError:
         raise ValueError('The job {} does not exist'.format(job_name))
