@@ -74,21 +74,23 @@ Next, set up the required Azure resources and environment variables:
 
 .. sourcecode :: sh
 
+  # connect to Azure account
   az login
   az account set --subscription "YOUR_SUBSCRIPTION_ID_HERE"
 
-  client="$(whoami | tr -dC 'a-zA-Z0-9')"
-  resource_group="testopwen${client}"
-  storage_name="teststorage${client}"
-  location="westus"
-
+  # define client properties
+  client_name="$(whoami | tr -dC 'a-zA-Z0-9')"
   client_id="123456789"
-  client_domain="${client}.lokole.ca"
 
+  # create development Azure resources
+  location="westus"
+  resource_group="opwentest${client_name}"
+  storage_name="opwenteststorage${client_name}"
   az group create -n ${resource_group} -l ${location} > /dev/null
   az storage account create -n ${storage_name} -g ${resource_group} -l ${location} --sku Standard_RAGRS > /dev/null
-  storage_key="$(az storage account keys list -n ${storage_name} -g ${resource_group} | jq -r '.[0].value')"
 
+  # setup environment variables
+  storage_key="$(az storage account keys list -n ${storage_name} -g ${resource_group} | jq -r '.[0].value')"
   cat > .env << EOF
   export LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME='${storage_name}'
   export LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME='${storage_name}'
@@ -98,7 +100,7 @@ Next, set up the required Azure resources and environment variables:
   export LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY='${storage_key}'
   export LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY='${storage_key}'
   export LOKOLE_CLIENT_AZURE_STORAGE_KEY='${storage_key}'
-  export LOKOLE_DEFAULT_CLIENTS='[{"id":"${client_id}","domain":"${client_domain}"}]'
+  export LOKOLE_DEFAULT_CLIENTS='[{"id":"${client_id}","domain":"${client_name}.lokole.ca"}]'
   EOF
 
 Third, use the makefile to verify your installation by running the tests and
@@ -113,4 +115,6 @@ dependencies into a virtual environment.
 
 There is an `OpenAPI specification <https://github.com/ascoderu/opwen-cloudserver/blob/master/opwen_email_server/static/email-api-spec.yaml>`_
 that documents the functionality of the application and provides pointers to the
-entry points into the code. You can experiment with the endpoints in the `API test console <http://localhost:8080/api/email/ui>`_.
+entry points into the code. You can experiment with the endpoints in the `API test console <http://localhost:8080/api/email/ui>`_
+(for any endpoints that require `client_id` to be specified, fill in the value
+described in the script above, i.e., 123456789).
