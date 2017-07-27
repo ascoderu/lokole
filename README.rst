@@ -118,3 +118,66 @@ that documents the functionality of the application and provides pointers to the
 entry points into the code. You can experiment with the endpoints in the `API test console <http://localhost:8080/api/email/ui>`_
 (for any endpoints that require `client_id` to be specified, fill in the value
 described in the script above, i.e., 123456789).
+
+How do I...
+-----------
+
+... test the receiving of an email from an external entity like Outlook?
+````````````````````````````````````````````````````````````````````````
+
+.. sourcecode :: sh
+
+  # start the server and the worker that processes inbound emails
+  make server &
+  make inbound-store-worker &
+
+  # simulate the Sendgrid service forwarding an email received at the Lokole MX
+  # records to this service
+  # the server will receive the request from Sendgrid and enqueue a message to
+  # process and ingest the newly received raw MIME email
+  # the inbound-store-worker then wakes up, parses the MIME email into a domain
+  # object and stores it in the email datastore
+  curl localhost:8080/api/email/sendgrid/YOUR_CLIENT_ID_HERE -F "email=YOUR_MIME_EMAIL_HERE"
+
+... test the Lokole devices uploading emails to be sent into the world?
+```````````````````````````````````````````````````````````````````````
+
+.. sourcecode :: sh
+
+  # start the server and the workers that process outbound emails
+  make server &
+  make outbound-store-worker &
+  make outbound-send-worker &
+
+  # create and upload a compressed emails package to Azure just like the Lokole
+  cat "YOUR_EMAIL_DATA_HERE" > emailsFromLokole.pack
+  az storage blob upload -f emailsFromLokole.pack -c compressedpackages -n test-resource-id --account-name "YOUR_ACCOUNT_NAME_HERE" --account-key "YOUR_KEY_HERE"
+
+  # simulate the Lokole device's upload phase of the sync cycle calling out to
+  # the service
+  # the server will receive the Lokole's upload request and enqueue a message to
+  # process and ingest the uploaded emails
+  # the outbound-store-worker then wakes up, retrieves the uploaded emails from
+  # Azure, stores them in the email datastore and enqueues another message to
+  # send the emails to their recipients
+  # the outbound-send-worker then wakes up, retrieves each email to be sent,
+  # formats it into a MIME email and shoots it off to Sendgrid for delivery
+  curl localhost:8080/api/email/lokole/YOUR_CLIENT_ID_HERE -X POST -d '{"resource_container":"compressedpackages","resource_id":"test-resource-id","resource_type":"azure-blob"}' -H "Content-Type: application/json"
+
+... test the Lokole devices downloading emails sent to it?
+``````````````````````````````````````````````````````````
+
+.. sourcecode :: sh
+
+  # start the server
+  make server &
+
+  # simulate the Lokole device's download phase of the sync cycle calling out to
+  # the service
+  # the server will receive the Lokole's download request, fetch all the new
+  # messages sent to the Lokole device since the last request, package them and
+  # upload them to Azure
+  resource_id=$(curl localhost:8080/api/email/lokole/YOUR_CLIENT_ID_HERE -X GET | jq -r '.resource_id')
+
+  # download the compressed emails package that the Lokole device would ingest
+  az storage blob download -f emailsToLokole.pack -c compressedpackages -n ${resource_id} --account-name "YOUR_ACCOUNT_NAME_HERE" --account-key "YOUR_KEY_HERE"
