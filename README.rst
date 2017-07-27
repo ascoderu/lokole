@@ -99,8 +99,6 @@ Next, set up the required Azure resources and environment variables:
   export LOKOLE_DEFAULT_CLIENTS='[{"id":"${client_id}","domain":"${client_domain}"}]'
   EOF
 
-  . .env
-
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
 dependencies into a virtual environment.

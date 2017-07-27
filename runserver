@@ -2,10 +2,19 @@
 
 from argparse import ArgumentParser
 from argparse import FileType
+from os.path import dirname
+from os.path import join
 
 from connexion import App
 
 from opwen_email_server.utils.imports import can_import
+
+try:
+    # noinspection PyUnresolvedReferences
+    from dotenv import load_dotenv
+    load_dotenv(join(dirname(__file__), '.env'))
+except ImportError:
+    pass
 
 servers = list(filter(can_import, ('tornado', 'gevent', 'flask')))
 hosts = ['127.0.0.1', '0.0.0.0']
