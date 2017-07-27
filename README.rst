@@ -79,11 +79,12 @@ Next, set up the required Azure resources and environment variables:
   client="$(whoami | tr -dC 'a-zA-Z0-9')"
   resource_group="testopwen${client}"
   storage_name="teststorage${client}"
+  location="westus"
 
   client_id="123456789"
   client_domain="${client}.lokole.ca"
 
-  location="$(az group create -n ${resource_group} | jq -r '.location')"
+  az group create -n ${resource_group} -l ${location} > /dev/null
   az storage account create -n ${storage_name} -g ${resource_group} -l ${location} --sku Standard_RAGRS > /dev/null
   storage_key="$(az storage account keys list -n ${storage_name} -g ${resource_group} | jq -r '.[0].value')"
 
