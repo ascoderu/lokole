@@ -12,6 +12,7 @@ with open('README.rst') as fobj:
 
 packages = find_packages(exclude=['tests*'])
 scripts = [
+    'runjob',
     'runserver',
     'registerclient',
 ]

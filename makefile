@@ -45,12 +45,12 @@ server: venv
 	$(api_runner)
 
 inbound-store-worker: venv
-	$(py_env)/bin/python -m opwen_email_server.jobs.store_inbound_emails
+	$(py_env)/bin/python runjob store_inbound_emails
 
 outbound-send-worker: venv
-	$(py_env)/bin/python -m opwen_email_server.jobs.send_outbound_emails
+	$(py_env)/bin/python runjob send_outbound_emails
 
 outbound-store-worker: venv
-	$(py_env)/bin/python -m opwen_email_server.jobs.store_written_client_emails
+	$(py_env)/bin/python runjob store_written_client_emails
 
 workers: inbound-store-worker outbound-store-worker outbound-send-worker

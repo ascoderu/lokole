@@ -4,7 +4,7 @@ from opwen_email_server.services.queue_consumer import QueueConsumer
 from opwen_email_server.utils.email_parser import parse_mime_email
 
 
-class InboundEmailQueueConsumer(QueueConsumer):
+class Job(QueueConsumer):
     def __init__(self):
         super().__init__(email_receive.QUEUE.dequeue)
 
@@ -16,8 +16,3 @@ class InboundEmailQueueConsumer(QueueConsumer):
         email = parse_mime_email(mime_email)
         server_datastore.store_email(resource_id, email)
         self.log_info('Stored inbound client email %s', resource_id)
-
-
-if __name__ == '__main__':
-    from opwen_email_server.jobs.job import main
-    main(InboundEmailQueueConsumer)

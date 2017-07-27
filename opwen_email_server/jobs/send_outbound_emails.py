@@ -3,7 +3,7 @@ from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.queue_consumer import QueueConsumer
 
 
-class OutboundEmailQueueConsumer(QueueConsumer):
+class Job(QueueConsumer):
     def __init__(self):
         super().__init__(email_sender.QUEUE.dequeue)
 
@@ -14,8 +14,3 @@ class OutboundEmailQueueConsumer(QueueConsumer):
 
         email_sender.send(email)
         self.log_info('Done sending outbound email %s', resource_id)
-
-
-if __name__ == '__main__':
-    from opwen_email_server.jobs.job import main
-    main(OutboundEmailQueueConsumer)

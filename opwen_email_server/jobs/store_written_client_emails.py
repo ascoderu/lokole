@@ -5,7 +5,7 @@ from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.queue_consumer import QueueConsumer
 
 
-class ClientWriteQueueConsumer(QueueConsumer):
+class Job(QueueConsumer):
     def __init__(self):
         super().__init__(client_write.QUEUE.dequeue)
 
@@ -26,8 +26,3 @@ class ClientWriteQueueConsumer(QueueConsumer):
                 'container_name': server_datastore.STORAGE.container,
             })
             self.log_info('Ingesting packaged client email %s', email_id)
-
-
-if __name__ == '__main__':
-    from opwen_email_server.jobs.job import main
-    main(ClientWriteQueueConsumer)

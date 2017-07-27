@@ -16,7 +16,7 @@ class SendOutboundEmailsTests(TestCase):
         email_id = '7ad33d8a-c1ee-44c7-a655-fb0d167dc380'
         email = {'to': ['foo@bar.com'], '_uid': email_id}
         self._given_message(email, email_id, fetch_mock, queue_mock)
-        consumer = send_outbound_emails.OutboundEmailQueueConsumer()
+        consumer = send_outbound_emails.Job()
 
         consumer._run_once()
 

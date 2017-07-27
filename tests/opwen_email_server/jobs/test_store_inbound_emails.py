@@ -16,7 +16,7 @@ class StoreInboundEmailsTests(TestCase):
         email_id = '7ad33d8a-c1ee-44c7-a655-fb0d167dc380'
         email = {'to': ['foo@bar.com']}
         self._given_message(email, email_id, parser_mock, queue_mock)
-        consumer = store_inbound_emails.InboundEmailQueueConsumer()
+        consumer = store_inbound_emails.Job()
 
         consumer._run_once()
 

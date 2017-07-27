@@ -22,7 +22,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         email2 = {'to': ['bar@test.com'], '_uid': email2_id}
         emails = [email1, email2]
         self._given_message(emails, resource_id, unpack_mock, write_queue_mock)
-        consumer = store_written_client_emails.ClientWriteQueueConsumer()
+        consumer = store_written_client_emails.Job()
 
         consumer._run_once()
 
