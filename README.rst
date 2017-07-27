@@ -111,7 +111,6 @@ dependencies into a virtual environment.
 
   make tests
   make server
-  make workers
 
 There is an `OpenAPI specification <https://github.com/ascoderu/opwen-cloudserver/blob/master/opwen_email_server/static/email-api-spec.yaml>`_
 that documents the functionality of the application and provides pointers to the

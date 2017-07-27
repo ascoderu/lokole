@@ -52,5 +52,3 @@ outbound-send-worker: venv
 
 outbound-store-worker: venv
 	$(py_env)/bin/python runjob store_written_client_emails
-
-workers: inbound-store-worker outbound-store-worker outbound-send-worker
