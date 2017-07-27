@@ -138,8 +138,8 @@ How do I...
   # object and stores it in the email datastore
   curl localhost:8080/api/email/sendgrid/YOUR_CLIENT_ID_HERE -F "email=YOUR_MIME_EMAIL_HERE"
 
-... test the Lokole devices uploading emails to be sent into the world?
-```````````````````````````````````````````````````````````````````````
+... test the Lokole devices uploading emails written on them?
+`````````````````````````````````````````````````````````````
 
 .. sourcecode :: sh
 
@@ -163,8 +163,8 @@ How do I...
   # formats it into a MIME email and shoots it off to Sendgrid for delivery
   curl localhost:8080/api/email/lokole/YOUR_CLIENT_ID_HERE -X POST -d '{"resource_container":"compressedpackages","resource_id":"test-resource-id","resource_type":"azure-blob"}' -H "Content-Type: application/json"
 
-... test the Lokole devices downloading emails sent to it?
-``````````````````````````````````````````````````````````
+... test the Lokole devices downloading emails sent to them?
+````````````````````````````````````````````````````````````
 
 .. sourcecode :: sh
 
