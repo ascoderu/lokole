@@ -17,7 +17,7 @@ def _module_for(job_name: str) -> str:
     return 'opwen_email_server.jobs.{}'.format(job_name)
 
 
-def main(job_name: str):
+def _main(job_name: str):
     _load_environment()
 
     try:
@@ -36,4 +36,4 @@ if __name__ == '__main__':
     parser.add_argument('job_name')
     args = parser.parse_args()
 
-    main(args.job_name)
+    _main(args.job_name)
