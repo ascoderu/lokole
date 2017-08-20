@@ -9,7 +9,7 @@ NPM=/usr/bin/npm
 #
 py_env=venv
 py_packages=opwen_email_client
-grunt=./node_modules/grunt/bin/grunt
+grunt=./node_modules/.bin/grunt
 env=./.env
 app_runner=$(py_env)/bin/python ./manage.py devserver
 
