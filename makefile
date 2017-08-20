@@ -40,7 +40,7 @@ ci: tests lint
 $(grunt): package.json bower.json
 	$(NPM) install
 
-build-js: $(grunt) Gruntfile.js
+build-frontend: $(grunt) Gruntfile.js
 	$(grunt)
 
 babel.pot: babel.cfg venv
@@ -52,5 +52,5 @@ prepare-translations: babel.pot venv
 compile-translations: venv
 	$(py_env)/bin/pybabel compile -d opwen_email_client/webapp/translations
 
-server: venv compile-translations build-js
+server: venv compile-translations build-frontend
 	$(app_runner)
