@@ -7,6 +7,7 @@ opwen_email_client/webapp/static/js/*.min.js
 opwen_email_client/webapp/static/fonts
 opwen_email_client/webapp/static/flags
 
+venv/
 *.pyc
 /build/
 /dist/
