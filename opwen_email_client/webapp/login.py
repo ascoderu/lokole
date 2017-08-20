@@ -85,7 +85,7 @@ class RegisterForm(_RegisterForm):
         validators=[Regexp('^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS),
                     email_required, email_validator, unique_user_email])
 
-    timezone_offset_minutes = IntegerField()
+    timezone_offset_minutes = IntegerField(default=0)
 
 
 user_datastore = SQLAlchemyUserDatastore(_db, User, Role)
