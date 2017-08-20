@@ -1,5 +1,7 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from os import getenv
+from os import path
 from typing import Tuple
 
 from requests import Response
@@ -70,3 +72,19 @@ class HttpEmailServerClient(EmailServerClient):
                              .format(resource_type))
 
         return resource_id, resource_container
+
+
+class LocalEmailServerClient(EmailServerClient):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def download(self) -> Tuple[str, str]:
+        container, resource_id = 'to-lokole', 'emails.pack'
+        local_file = path.join(getenv('AZURE_ROOT'), container, resource_id)
+        if not path.isfile(local_file):
+            return '', ''
+        return resource_id, container
+
+    def upload(self, resource_id: str, container: str):
+        upload_directory = path.join(getenv('AZURE_ROOT'), container)
+        print('Uploaded to {}'.format(upload_directory))

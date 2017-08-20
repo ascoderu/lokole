@@ -103,6 +103,21 @@ any of the Flask code or Jinja templates are changed.
 The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
 so take a look there for an overview of the entrypoints into the code.
 
+For local development, you can set the following additional environment variables:
+
+.. sourcecode :: sh
+
+  OPWEN_ENABLE_DEBUG='True'
+  AZURE_ROOT='/tmp/azure'
+
+With these environment variables set, when the Lokole exchanges data with the server,
+it will not make any calls to Azure and instead depend on the files in the `AZURE_ROOT`
+directory. Any files uploaded to the server will be written to a subdirectory of
+`AZURE_ROOT` so that they can be inspected. To test sending emails from the server to
+the Lokole, simply create a file at `$AZURE_ROOT/to-lokole/emails.pack` and the Lokole
+device will ingest the emails in that file during the data exchange.
+
+
 Adding a new language
 ---------------------
 

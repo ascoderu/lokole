@@ -3,6 +3,10 @@ from abc import abstractmethod
 from gzip import GzipFile
 from io import BytesIO
 from io import TextIOBase
+from os import getenv
+from os import makedirs
+from os import path
+from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
 from typing import Iterable
 from typing import TypeVar
@@ -102,3 +106,26 @@ class AzureSync(Sync):
                                                  self._container)
 
         return uploaded_ids
+
+
+class LocalAzureSync(AzureSync):
+    def _upload_from_stream(self, blobname: str, stream: TextIOBase):
+        upload_directory = path.join(getenv('AZURE_ROOT'), self._container)
+        makedirs(upload_directory, exist_ok=True)
+        local_filename = path.join(upload_directory, blobname)
+
+        with open(local_filename, 'wb') as fobj:
+            copyfileobj(stream, fobj)
+
+    def _download_to_stream(self, blobname: str, container: str,
+                            stream: TextIOBase):
+        download_directory = path.join(getenv('AZURE_ROOT'), container)
+        local_filename = path.join(download_directory, blobname)
+
+        try:
+            with open(local_filename, 'rb') as fobj:
+                copyfileobj(fobj, stream)
+        except FileNotFoundError:
+            return False
+        else:
+            return True
