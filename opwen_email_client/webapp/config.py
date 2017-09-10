@@ -66,6 +66,10 @@ class AppConfig(object):
     SECURITY_MSG_DISABLED_ACCOUNT = i8n.ACCOUNT_SUSPENDED, 'error'
     SECURITY_MSG_PASSWORD_INVALID_LENGTH = i8n.SHORT_PASSWORD, 'error'
     SECURITY_MSG_PASSWORD_IS_THE_SAME = i8n.SAME_PASSWORD, 'error'
+    SECURITY_LOGIN_URL = '/user/login'
+    SECURITY_LOGOUT_URL = '/user/logout'
+    SECURITY_REGISTER_URL = '/user/register'
+    SECURITY_CHANGE_URL = '/user/password/change'
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
