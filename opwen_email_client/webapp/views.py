@@ -156,7 +156,7 @@ def download_attachment(attachment_id: str) -> Response:
                      as_attachment=True)
 
 
-@app.route('/register_complete')
+@app.route('/user/register/complete')
 @login_required
 def register_complete() -> Response:
     send_welcome_email = SendWelcomeEmail(
@@ -173,7 +173,7 @@ def register_complete() -> Response:
     return redirect(url_for('email_inbox'))
 
 
-@app.route('/login_complete')
+@app.route('/user/login/complete')
 @login_required
 def login_complete() -> Response:
     current_language = current_user.language
@@ -184,7 +184,7 @@ def login_complete() -> Response:
     return redirect(url_for('home'))
 
 
-@app.route('/logout_complete')
+@app.route('/user/logout/complete')
 def logout_complete() -> Response:
     flash(i8n.LOGGED_OUT, category='success')
     return redirect(url_for('home'))
@@ -259,7 +259,7 @@ def unsuspend(userid: str) -> Response:
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/reset_password/<userid>')
+@app.route('/admin/password/reset/<userid>')
 @admin_required
 def reset_password(userid: str) -> Response:
     user = User.query.filter_by(id=userid).first()
