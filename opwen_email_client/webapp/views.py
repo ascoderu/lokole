@@ -28,6 +28,7 @@ from opwen_email_client.webapp.login import User
 from opwen_email_client.webapp.login import admin_required
 from opwen_email_client.webapp.login import login_required
 from opwen_email_client.webapp.session import Session
+from opwen_email_client.webapp.session import track_history
 
 
 @app.route('/favicon.ico')
@@ -40,11 +41,13 @@ def favicon() -> Response:
 
 @app.route('/')
 @app.route('/home')
+@track_history
 def home() -> Response:
     return _view('home.html')
 
 
 @app.route('/about')
+@track_history
 def about() -> Response:
     return _view('about.html')
 
@@ -53,6 +56,7 @@ def about() -> Response:
 @app.route('/email/inbox', defaults={'page': 1})
 @app.route('/email/inbox/<int:page>')
 @login_required
+@track_history
 def email_inbox(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
@@ -63,6 +67,7 @@ def email_inbox(page: int) -> Response:
 @app.route('/email/outbox', defaults={'page': 1})
 @app.route('/email/outbox/<int:page>')
 @login_required
+@track_history
 def email_outbox(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
@@ -73,6 +78,7 @@ def email_outbox(page: int) -> Response:
 @app.route('/email/sent', defaults={'page': 1})
 @app.route('/email/sent/<int:page>')
 @login_required
+@track_history
 def email_sent(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
@@ -83,6 +89,7 @@ def email_sent(page: int) -> Response:
 @app.route('/email/search', defaults={'page': 1})
 @app.route('/email/search/<int:page>')
 @login_required
+@track_history
 def email_search(page: int) -> Response:
     email_store = app.ioc.email_store
     user = current_user
@@ -116,6 +123,7 @@ def email_delete(email_uid: str) -> Response:
 
 @app.route('/email/new', methods=['GET', 'POST'])
 @login_required
+@track_history
 def email_new() -> Response:
     email_store = app.ioc.email_store
     attachment_encoder = app.ioc.attachment_encoder
@@ -208,6 +216,7 @@ def language(locale: str) -> Response:
 
 @app.route('/admin')
 @admin_required
+@track_history
 def admin() -> Response:
     email_store = app.ioc.email_store
 
@@ -276,12 +285,6 @@ def _inject_locales() -> dict:
         'locales': AppConfig.LOCALES,
         'current_locale': Locale.parse(_localeselector()),
     }
-
-
-@app.after_request
-def _store_last_visited_url(response: Response) -> Response:
-    Session.store_last_visited_url()
-    return response
 
 
 @app.babel.localeselector

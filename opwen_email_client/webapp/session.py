@@ -1,4 +1,5 @@
 from collections import namedtuple
+from functools import wraps
 from typing import Dict
 from typing import Iterable
 from typing import Optional
@@ -72,8 +73,7 @@ class Session(object):
 
     @classmethod
     def store_last_visited_url(cls):
-        if request.endpoint not in ('favicon', 'static'):
-            cls._session()[cls._last_visited_url_key] = request.url
+        cls._session()[cls._last_visited_url_key] = request.url
 
     @classmethod
     def get_last_visited_url(cls) -> Optional[str]:
@@ -86,3 +86,12 @@ class Session(object):
     @classmethod
     def get_current_language(cls) -> str:
         return cls._session().get(cls._current_language_key)
+
+
+def track_history(func):
+    @wraps(func)
+    def history_tracker(*args, **kwargs):
+        Session.store_last_visited_url()
+        return func(*args, **kwargs)
+
+    return history_tracker
