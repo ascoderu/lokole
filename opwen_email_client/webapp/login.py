@@ -1,3 +1,4 @@
+from datetime import timedelta
 from functools import wraps
 
 from flask import request
@@ -40,7 +41,11 @@ class User(_db.Model, UserMixin):
     email = _db.Column(_db.String(255), unique=True, index=True)
     password = _db.Column(_db.String(255), nullable=False)
     active = _db.Column(_db.Boolean(), default=True)
-    last_login = _db.Column(_db.DateTime())
+    last_login_at = _db.Column(_db.DateTime())
+    current_login_at = _db.Column(_db.DateTime())
+    last_login_ip = _db.Column(_db.String(128))
+    current_login_ip = _db.Column(_db.String(128))
+    login_count = _db.Column(_db.Integer())
     timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False,
                                          default=0)
     language = _db.Column(_db.String(8))
@@ -50,6 +55,13 @@ class User(_db.Model, UserMixin):
     @property
     def is_admin(self) -> bool:
         return self.has_role('admin')
+
+    def format_last_login(self, timezone_offset_minutes) -> str:
+        if not self.last_login_at:
+            return ''
+
+        date = self.last_login_at - timedelta(minutes=timezone_offset_minutes)
+        return date.strftime('%Y-%m-%d %H:%M')
 
     def save(self):
         _db.session.add(self)

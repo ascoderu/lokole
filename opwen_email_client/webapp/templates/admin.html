@@ -17,7 +17,7 @@
       {{ user.email }}
     </td>
     <td>
-      {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
+      {{ user.format_last_login(current_user.timezone_offset_minutes) }}
     </td>
     <td>
       <div class="btn-group">

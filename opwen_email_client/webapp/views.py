@@ -166,7 +166,6 @@ def register_complete() -> Response:
 
     send_welcome_email()
 
-    current_user.last_login = datetime.now()
     current_user.language = Session.get_current_language()
     current_user.save()
 
@@ -177,9 +176,6 @@ def register_complete() -> Response:
 @app.route('/login_complete')
 @login_required
 def login_complete() -> Response:
-    current_user.last_login = datetime.now()
-    current_user.save()
-
     current_language = current_user.language
     if current_language:
         Session.store_current_language(current_language)
