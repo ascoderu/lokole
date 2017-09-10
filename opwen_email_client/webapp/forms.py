@@ -103,6 +103,7 @@ class ReplyEmailForm(NewEmailForm):
     def _populate(self, email: dict):
         self.to.data = email.get('from', '')
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+        self.body.data = render_template('emails/reply.html', email=email)
 
 
 class ReplyAllEmailForm(NewEmailForm):
@@ -111,6 +112,7 @@ class ReplyAllEmailForm(NewEmailForm):
     def _populate(self, email: dict):
         self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+        self.body.data = render_template('emails/reply.html', email=email)
 
 
 class ForwardEmailForm(NewEmailForm):
