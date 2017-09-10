@@ -22,11 +22,17 @@
     <td>
       <div class="btn-group">
         {% if not user.is_admin and user.is_active %}
-        <a class="btn btn-default" href="{{ url_for('suspend', userid=user.get_id()) }}">{{ _('Suspend') }}</a>
+        <a class="btn btn-default" href="{{ url_for('suspend', userid=user.get_id()) }}">
+          <span class="fa fa-lock" /> {{ _('Suspend') }}
+        </a>
         {% elif not user.is_admin %}
-        <a class="btn btn-danger" href="{{ url_for('unsuspend', userid=user.get_id()) }}">{{ _('Activate') }}</a>
+        <a class="btn btn-danger" href="{{ url_for('unsuspend', userid=user.get_id()) }}">
+          <span class="fa fa-unlock-alt" /> {{ _('Activate') }}
+        </a>
         {% endif %}
-        <a class="btn btn-default" href="{{ url_for('reset_password', userid=user.get_id()) }}">{{ _('Reset password') }}</a>
+        <a class="btn btn-default" href="{{ url_for('reset_password', userid=user.get_id()) }}">
+          <span class="fa fa-key" /> {{ _('Reset password') }}
+        </a>
       </div>
     </td>
   </tr>
