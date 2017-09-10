@@ -26,6 +26,7 @@
         {% elif not user.is_admin %}
         <a class="btn btn-danger" href="{{ url_for('unsuspend', userid=user.get_id()) }}">{{ _('Activate') }}</a>
         {% endif %}
+        <a class="btn btn-default" href="{{ url_for('reset_password', userid=user.get_id()) }}">{{ _('Reset password') }}</a>
       </div>
     </td>
   </tr>

@@ -15,6 +15,8 @@ from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
+from flask_security.utils import encrypt_password
+from passlib.pwd import genword
 
 from opwen_email_client.util.generator import length
 from opwen_email_client.util.pagination import Pagination
@@ -258,6 +260,23 @@ def unsuspend(userid: str) -> Response:
     user.save()
 
     flash(i8n.USER_UNSUSPENDED, category='success')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/reset_password/<userid>')
+@admin_required
+def reset_password(userid: str) -> Response:
+    user = User.query.filter_by(id=userid).first()
+
+    if user is None:
+        flash(i8n.USER_DOES_NOT_EXIST, category='error')
+        return redirect(url_for('admin'))
+
+    new_password = genword()
+    user.password = encrypt_password(new_password)
+    user.save()
+
+    flash(i8n.PASSWORD_CHANGED_BY_ADMIN + new_password, category='success')
     return redirect(url_for('admin'))
 
 

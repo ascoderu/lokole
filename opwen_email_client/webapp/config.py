@@ -36,6 +36,7 @@ class i8n(object):
     USER_SUSPENDED = _('The user was suspended.')
     USER_UNSUSPENDED = _('The user was un-suspended.')
     ADMIN_CANNOT_BE_SUSPENDED = _("Administrators can't be suspended.")
+    PASSWORD_CHANGED_BY_ADMIN = _('Password was reset by administrator to: ')
 
 
 class AppConfig(object):
