@@ -42,7 +42,7 @@ class i8n(object):
 
 
 class AppConfig(object):
-    SQLITE_PATH = path.join(state_basedir, 'app.sqlite3')
+    SQLITE_PATH = path.join(state_basedir, 'users.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
     SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -73,7 +73,7 @@ class AppConfig(object):
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
-    LOCAL_EMAIL_STORE = path.join(state_basedir, 'email.store')
+    LOCAL_EMAIL_STORE = path.join(state_basedir, 'emails.sqlite3')
 
     EMAIL_ADDRESS_DELIMITER = ','
     EMAILS_PER_PAGE = 30
