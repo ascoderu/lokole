@@ -37,6 +37,8 @@ class i8n(object):
     USER_UNSUSPENDED = _('The user was un-suspended.')
     ADMIN_CANNOT_BE_SUSPENDED = _("Administrators can't be suspended.")
     PASSWORD_CHANGED_BY_ADMIN = _('Password was reset by administrator to: ')
+    SAME_PASSWORD = _(' Your new password must be different than your '
+                      'previous password.')
 
 
 class AppConfig(object):
@@ -51,6 +53,8 @@ class AppConfig(object):
     SECURITY_PASSWORD_HASH = 'bcrypt'
     SECURITY_PASSWORD_SALT = getenv('OPWEN_PASSWORD_SALT')
     SECURITY_REGISTERABLE = True
+    SECURITY_CHANGEABLE = True
+    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_POST_REGISTER_VIEW = 'register_complete'
     SECURITY_POST_LOGIN_VIEW = 'login_complete'
     SECURITY_POST_LOGOUT_VIEW = 'logout_complete'
@@ -60,6 +64,7 @@ class AppConfig(object):
     SECURITY_MSG_INVALID_PASSWORD = i8n.INVALID_PASSWORD, 'error'
     SECURITY_MSG_DISABLED_ACCOUNT = i8n.ACCOUNT_SUSPENDED, 'error'
     SECURITY_MSG_PASSWORD_INVALID_LENGTH = i8n.SHORT_PASSWORD, 'error'
+    SECURITY_MSG_PASSWORD_IS_THE_SAME = i8n.SAME_PASSWORD, 'error'
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
