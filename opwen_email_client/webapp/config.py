@@ -35,6 +35,7 @@ class i8n(object):
     USER_DOES_NOT_EXIST = _('This user does not exist.')
     USER_SUSPENDED = _('The user was suspended.')
     USER_UNSUSPENDED = _('The user was un-suspended.')
+    ADMIN_CANNOT_BE_SUSPENDED = _("Administrators can't be suspended.")
 
 
 class AppConfig(object):

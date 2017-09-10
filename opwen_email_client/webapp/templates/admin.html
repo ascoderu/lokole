@@ -20,9 +20,9 @@
       {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
     </td>
     <td>
-      {% if user.is_active %}
+      {% if not user.is_admin and user.is_active %}
       <a class="btn btn-default" href="{{ url_for('suspend', userid=user.get_id()) }}">{{ _('Suspend') }}</a>
-      {% else %}
+      {% elif not user.is_admin %}
       <a class="btn btn-danger" href="{{ url_for('unsuspend', userid=user.get_id()) }}">{{ _('Activate') }}</a>
       {% endif %}
     </td>

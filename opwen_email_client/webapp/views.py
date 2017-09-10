@@ -234,6 +234,10 @@ def suspend(userid: str) -> Response:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
         return redirect(url_for('admin'))
 
+    if user.is_admin:
+        flash(i8n.ADMIN_CANNOT_BE_SUSPENDED, category='error')
+        return redirect(url_for('admin'))
+
     user.active = False
     user.save()
 
