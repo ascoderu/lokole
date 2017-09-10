@@ -1,14 +1,15 @@
 <br>
 <br>
----------- {{ _('Forwarded message') }} ----------<br>
-{{ _('From') }}: {{ email.get('from', '') }}<br>
+<div>---------- {{ _('Forwarded message') }} ----------</div>
+<div>{{ _('From') }}: {{ email.get('from', '') }}</div>
 {% if email.get('sent_at') %}
-{{ _('Date') }}: {{ email.get('sent_at') }}<br>
+<div>{{ _('Date') }}: {{ email.get('sent_at') }}</div>
 {% endif %}
-{{ _('Subject') }}: {{ email.get('subject', '') }}<br>
-{{ _('To') }}: {{ email.get('to') | join(', ') }}<br>
+<div>{{ _('Subject') }}: {{ email.get('subject', '') }}</div>
+<div>{{ _('To') }}: {{ email.get('to') | join(', ') }}</div>
 {% if email.get('cc') %}
-{{ _('Cc') }}: {{ email.get('cc') | join(', ') }}<br>
+<div>{{ _('Cc') }}: {{ email.get('cc') | join(', ') }}</div>
 {% endif %}
-<br>
+<blockquote>
 {{ email.get('body', '') | replace('\n', '<br>') }}
+</blockquote>
