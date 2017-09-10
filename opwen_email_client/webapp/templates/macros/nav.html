@@ -1,14 +1,20 @@
 {% from 'macros/flag.html' import render_flag %}
 
-{% macro nav_link_security(endpoint, text) %}
+{% macro nav_link_security(endpoint, text, icon=None) %}
 <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
-  <a href="{{ url_for_security(endpoint) }}">{{ text }}</a>
+  <a href="{{ url_for_security(endpoint) }}">
+    {% if icon %}<span class="fa fa-{{ icon }}"></span> {% endif %}
+    {{ text }}
+  </a>
 </li>
 {% endmacro %}
 
-{% macro nav_link(endpoint, text, level) %}
+{% macro nav_link(endpoint, text, level, icon=None) %}
 <li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
-  <a href="{{ url_for(endpoint) }}">{{ text }}</a>
+  <a href="{{ url_for(endpoint) }}">
+    {% if icon %}<span class="fa fa-{{ icon }}"></span> {% endif %}
+    {{ text }}
+  </a>
 </li>
 {% endmacro %}
 
@@ -55,9 +61,9 @@
           </a>
           <ul class="dropdown-menu">
             {% if current_user.is_admin %}
-            <li>{{ nav_link('admin', _('Admin panel'), level=0) }}</li>
+            <li>{{ nav_link('admin', _('Admin panel'), level=0, icon='users') }}</li>
             {% endif %}
-            <li>{{ nav_link_security('logout', _('Logout')) }}</li>
+            <li>{{ nav_link_security('logout', _('Logout'), icon='sign-out') }}</li>
           </ul>
         </li>
         {% else %}
