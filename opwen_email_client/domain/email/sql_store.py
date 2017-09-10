@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
@@ -79,7 +80,7 @@ class _Email(_Base):
     uid = Column(String(length=64), unique=True, index=True)
     subject = Column(Text)
     body = Column(Text)
-    sent_at = Column(String(length=64))
+    sent_at = Column(DateTime())
     read = Column(Boolean, default=False, nullable=False)
     sender = Column(String(length=128), index=True)
     attachments = relationship(_Attachment, secondary=_EmailAttachment,
@@ -95,6 +96,10 @@ class _Email(_Base):
                         for attachment in attachments]
                        if attachments else None)
 
+        sent_at = self.sent_at
+        sent_at = (sent_at.stftime('%Y-%m-%d %H:%M')
+                   if sent_at else None)
+
         return {k: v for (k, v) in (
             ('from', self.sender),
             ('to', [_.address for _ in self.to]),
@@ -103,13 +108,17 @@ class _Email(_Base):
             ('subject', self.subject),
             ('body', self.body),
             ('_uid', self.uid),
-            ('sent_at', self.sent_at),
+            ('sent_at', sent_at),
             ('read', self.read),
             ('attachments', attachments),
         ) if v}
 
     @classmethod
     def from_dict(cls, db, email):
+        sent_at = email.get('sent_at')
+        sent_at = (sent_at.strptime('%Y-%m-%d %H:%M')
+                   if sent_at else None)
+
         return _Email(
             uid=email['_uid'],
             to=[get_or_create(db, _To, address=_.lower())
@@ -122,7 +131,7 @@ class _Email(_Base):
                          for _ in email.get('attachments', [])],
             subject=email.get('subject'),
             body=email.get('body'),
-            sent_at=email.get('sent_at'),
+            sent_at=sent_at,
             read=email.get('read', False),
             sender=email.get('from', '').lower() or None)
 
