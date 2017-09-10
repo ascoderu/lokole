@@ -201,7 +201,7 @@ class _SqlalchemyEmailStore(EmailStore):
     def _query(self, query):
         with self._dbread() as db:
             results = db.query(_Email).filter(query)
-            for email in results.all():
+            for email in results.order_by(_Email.sent_at.desc()).all():
                 yield email.to_dict()
 
     def inbox(self, email_address):
