@@ -97,7 +97,7 @@ class _Email(_Base):
                        if attachments else None)
 
         sent_at = self.sent_at
-        sent_at = (sent_at.stftime('%Y-%m-%d %H:%M')
+        sent_at = (sent_at.strftime('%Y-%m-%d %H:%M')
                    if sent_at else None)
 
         return {k: v for (k, v) in (
@@ -116,7 +116,7 @@ class _Email(_Base):
     @classmethod
     def from_dict(cls, db, email):
         sent_at = email.get('sent_at')
-        sent_at = (sent_at.strptime('%Y-%m-%d %H:%M')
+        sent_at = (datetime.strptime(sent_at, '%Y-%m-%d %H:%M')
                    if sent_at else None)
 
         return _Email(
@@ -169,7 +169,7 @@ class _SqlalchemyEmailStore(EmailStore):
                     db.add(_Email.from_dict(db, email))
 
     def _mark_sent(self, uids):
-        now = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+        now = datetime.utcnow()
         set_sent_at = {_Email.sent_at: now}
 
         with self._dbwrite() as db:

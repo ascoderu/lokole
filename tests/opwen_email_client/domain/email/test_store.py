@@ -54,12 +54,12 @@ class Base(object):
 
         def test_inbox(self):
             emails = self.given_emails(
-                {'to': ['Foo@bar.com'], 'sent_at': 'YYYY'},
-                {'to': ['foo@bar.com'], 'sent_at': 'YYYY'},
-                {'cc': ['foo@bar.com'], 'sent_at': 'YYYY'},
-                {'bcc': ['foo@bar.com'], 'sent_at': 'YYYY'},
-                {'from': 'foo@bar.com', 'sent_at': 'YYYY'},
-                {'from': 'baz@bar.com', 'sent_at': 'YYYY'})
+                {'to': ['Foo@bar.com'], 'sent_at': '2017-09-10 11:11'},
+                {'to': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11'},
+                {'cc': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11'},
+                {'bcc': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11'},
+                {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
             results = list(self.email_store.inbox('foo@bar.com'))
 
@@ -72,13 +72,13 @@ class Base(object):
         def test_outbox(self):
             emails = self.given_emails(
                 {'from': 'foo@bar.com'},
-                {'from': 'foo@bar.com', 'sent_at': 'YYYY'},
+                {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
                 {'from': 'foo@bar.com', 'sent_at': None},
                 {'from': 'Foo@bar.com', 'sent_at': None},
                 {'to': ['foo@bar.com']},
                 {'cc': ['foo@bar.com']},
                 {'bcc': ['foo@bar.com']},
-                {'from': 'baz@bar.com', 'sent_at': 'YYYY'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
             results = list(self.email_store.outbox('foo@bar.com'))
 
@@ -90,10 +90,10 @@ class Base(object):
         def test_pending(self):
             emails = self.given_emails(
                 {'from': 'foo@bar.com'},
-                {'from': 'foo@bar.com', 'sent_at': 'YYYY'},
+                {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
                 {'from': 'foo@bar.com', 'sent_at': None},
                 {'from': 'baz@bar.com'},
-                {'from': 'baz@bar.com', 'sent_at': 'YYYY'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
             results = list(self.email_store.pending())
 
@@ -105,12 +105,12 @@ class Base(object):
         def test_sent(self):
             emails = self.given_emails(
                 {'from': 'foo@bar.com'},
-                {'from': 'foo@bar.com', 'sent_at': 'YYYY'},
+                {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
                 {'from': 'foo@bar.com', 'sent_at': None},
                 {'to': ['foo@bar.com']},
                 {'cc': ['foo@bar.com']},
                 {'bcc': ['foo@bar.com']},
-                {'from': 'baz@bar.com', 'sent_at': 'YYYY'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
             results = list(self.email_store.sent('foo@bar.com'))
 
