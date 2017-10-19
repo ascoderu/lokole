@@ -12,4 +12,5 @@
 
 .panel-title .email-row {
   text-decoration: none;
+  word-wrap: break-word;
 }
