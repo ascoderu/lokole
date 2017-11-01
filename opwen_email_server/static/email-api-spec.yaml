@@ -28,7 +28,7 @@ paths:
         403:
           description: Request from unregistered client.
 
-  '/lokole/{client_id}':
+  '/upload/{client_id}':
 
     post:
       operationId: opwen_email_server.api.client_write.upload
@@ -47,6 +47,8 @@ paths:
           description: The emails were successfully uploaded from the Lokole.
         403:
           description: Request from unregistered client.
+
+  '/download/{client_id}':
 
     get:
       operationId: opwen_email_server.api.client_read.download
