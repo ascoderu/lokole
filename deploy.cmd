@@ -108,13 +108,13 @@ IF NOT EXIST "%DEPLOYMENT_TARGET%\env" (
   IF !ERRORLEVEL! NEQ 0 goto error
   env\scripts\python -m ensurepip --upgrade
   IF !ERRORLEVEL! NEQ 0 goto error
-  env\scripts\pip install --upgrade setuptools
+  env\scripts\python -m pip install --upgrade setuptools
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
 :: 4. Install packages
 echo Pip install requirements.
-env\scripts\pip install -r requirements.txt
+env\scripts\python -m pip install -r requirements.txt
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 5. Copy web.config
