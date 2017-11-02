@@ -124,11 +124,8 @@ First-time setup:
 
   location='eastus'
   name='opwenserver'
-  dockeruser='cwolff'
-
-  # create a new docker image
-  docker build -t "${dockeruser}/${name}" .
-  docker push "${dockeruser}/${name}"
+  deploy_password="FILL ME IN"
+  appinsights_key="SET ME"
 
   # create required resources
   az group create --location="${location}" --name="${name}"
@@ -139,15 +136,17 @@ First-time setup:
   az storage account create --sku=standard_lrs --name="opwenclientblobs"
 
   # fetch access keys
-  appinsights_key="FILL ME IN"
   queues_key=$(az storage account keys list --account-name="opwenserverqueues" | jq -r ".[0].value")
   tables_key=$(az storage account keys list --account-name="opwenservertables" | jq -r ".[0].value")
   blobs_key=$(az storage account keys list --account-name="opwenserverblobs" | jq -r ".[0].value")
   clients_key=$(az storage account keys list --account-name="opwenclientblobs" | jq -r ".[0].value")
 
-  # host the docker image in azure
-  az appservice plan create --name="${name}" --is-linx --sku=s1
-  az webapp create --name="${name}" --plan="${name}" --deployment-container-image-name="${dockeruser}/${name}"
+  # host the app in azure
+  az webapp deployment user set --user-name "${name}" --password "${deploy_password}"
+  az appservice plan create --name="${name}" --sku="s1"
+  az webapp create --name="${name}" --plan="${name}" --runtime="python|3.4" --deployment-local-git
+  git remote add azure "https://${name}@${name}.scm.azurewebsites.net:443/${name}.git
+  git push azure master
 
   # set environment variables
   az webapp config appsettings set --name="${name}" --settings \
@@ -160,9 +159,6 @@ First-time setup:
     LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY="${blobs_key}" \
     LOKOLE_CLIENT_AZURE_STORAGE_NAME="opwenclientblobs" \
     LOKOLE_CLIENT_AZURE_STORAGE_KEY="${clients_key}"
-
-The production deployment of this repository is also hooked up to continuous delivery which means that when
-a commit gets pushed to master, a new Docker image will automatically be created and published.
 
 How do I...
 -----------
