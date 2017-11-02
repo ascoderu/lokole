@@ -115,8 +115,11 @@ IF !ERRORLEVEL! NEQ 0 goto error
 env\scripts\python -m pip install --upgrade pip setuptools
 IF !ERRORLEVEL! NEQ 0 goto error
 
+echo Got pip version:
+env\scripts\python -m pip --version
+
 :: 4. Install packages
-echo Pip install requirements.
+echo Installing requirements.
 env\scripts\python -m pip install -r requirements.txt
 IF !ERRORLEVEL! NEQ 0 goto error
 
