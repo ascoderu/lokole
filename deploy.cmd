@@ -71,18 +71,15 @@ SET PYTHON_EXE="D:\python34\python.exe"
 pushd "%DEPLOYMENT_TARGET%"
 
 :: 3. Create virtual environment
-IF EXIST "%DEPLOYMENT_TARGET%\env" (
-  echo Deleting old virtual environment
-  rmdir /q /s "%DEPLOYMENT_TARGET%\env"
+IF NOT EXIST "%DEPLOYMENT_TARGET%\env" (
+  echo Creating virtual environment.
+  %PYTHON_EXE% -m venv --without-pip env
+  IF !ERRORLEVEL! NEQ 0 goto error
+  env\scripts\python -m ensurepip
+  IF !ERRORLEVEL! NEQ 0 goto error
+  env\scripts\python -m pip install --upgrade pip setuptools
   IF !ERRORLEVEL! NEQ 0 goto error
 )
-echo Creating virtual environment.
-%PYTHON_EXE% -m venv --without-pip env
-IF !ERRORLEVEL! NEQ 0 goto error
-env\scripts\python -m ensurepip
-IF !ERRORLEVEL! NEQ 0 goto error
-env\scripts\python -m pip install --upgrade pip setuptools
-IF !ERRORLEVEL! NEQ 0 goto error
 
 echo Got pip version:
 env\scripts\python -m pip --version
