@@ -7,7 +7,6 @@ PYTHON=/usr/bin/python3
 # Server configuration
 #
 api_port=8080
-api_server=tornado
 api_specs=opwen_email_server/static/email-api-spec.yaml opwen_email_server/static/healthcheck-spec.yaml
 
 #
@@ -15,7 +14,7 @@ api_specs=opwen_email_server/static/email-api-spec.yaml opwen_email_server/stati
 #
 py_env=venv
 py_packages=opwen_email_server
-api_runner=$(py_env)/bin/python runserver.py --port=$(api_port) --server=$(api_server) --ui $(api_specs)
+api_runner=$(py_env)/bin/python runserver.py --port=$(api_port) --ui $(api_specs)
 
 .PHONY: default
 default: server
