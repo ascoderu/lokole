@@ -115,6 +115,55 @@ entry points into the code. You can experiment with the endpoints in the `API te
 (for any endpoints that require `client_id` to be specified, fill in the value
 described in the script above, i.e., 123456789).
 
+Production setup
+----------------
+
+First-time setup:
+
+.. sourcecode :: sh
+
+  location='eastus'
+  name='opwenserver'
+  dockeruser='cwolff'
+
+  # create a new docker image
+  docker build -t "${dockeruser}/${name}" .
+  docker push "${dockeruser}/${name}"
+
+  # create required resources
+  az group create --location="${location}" --name="${name}"
+  az configure --defaults group="${name}" location="${location}"
+  az storage account create --sku=standard_lrs --name="opwenserverqueues"
+  az storage account create --sku=standard_lrs --name="opwenservertables"
+  az storage account create --sku=standard_lrs --name="opwenserverblobs"
+  az storage account create --sku=standard_lrs --name="opwenclientblobs"
+
+  # fetch access keys
+  appinsights_key="FILL ME IN"
+  queues_key=$(az storage account keys list --account-name="opwenserverqueues" | jq -r ".[0].value")
+  tables_key=$(az storage account keys list --account-name="opwenservertables" | jq -r ".[0].value")
+  blobs_key=$(az storage account keys list --account-name="opwenserverblobs" | jq -r ".[0].value")
+  clients_key=$(az storage account keys list --account-name="opwenclientblobs" | jq -r ".[0].value")
+
+  # host the docker image in azure
+  az appservice plan create --name="${name}" --is-linx --sku=s1
+  az webapp create --name="${name}" --plan="${name}" --deployment-container-image-name="${dockeruser}/${name}"
+
+  # set environment variables
+  az webapp config appsettings set --name="${name}" --settings \
+    LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY="${appinsights_key}" \
+    LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME="opwenserverqueues" \
+    LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY="${queues_key}" \
+    LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME="opwenservertables" \
+    LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY="${tables_key}" \
+    LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME="opwenserverblobs" \
+    LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY="${blobs_key}" \
+    LOKOLE_CLIENT_AZURE_STORAGE_NAME="opwenclientblobs" \
+    LOKOLE_CLIENT_AZURE_STORAGE_KEY="${clients_key}"
+
+The production deployment of this repository is also hooked up to continuous delivery which means that when
+a commit gets pushed to master, a new Docker image will automatically be created and published.
+
 How do I...
 -----------
 
