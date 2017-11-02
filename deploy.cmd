@@ -117,28 +117,10 @@ echo Pip install requirements.
 env\scripts\pip install -r requirements.txt
 IF !ERRORLEVEL! NEQ 0 goto error
 
-REM Add additional package installation here
-REM -- Example --
-REM env\scripts\easy_install pytz
-REM IF !ERRORLEVEL! NEQ 0 goto error
-
 :: 5. Copy web.config
 IF EXIST "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" (
   echo Overwriting web.config with web.%PYTHON_VER%.config
   copy /y "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" "%DEPLOYMENT_TARGET%\web.config"
-)
-
-:: 6. Django collectstatic
-IF EXIST "%DEPLOYMENT_TARGET%\manage.py" (
-  IF EXIST "%DEPLOYMENT_TARGET%\env\lib\site-packages\django" (
-    IF NOT EXIST "%DEPLOYMENT_TARGET%\.skipDjango" (
-      echo Collecting Django static files. You can skip Django specific steps with a .skipDjango file.
-      IF NOT EXIST "%DEPLOYMENT_TARGET%\static" (
-        MKDIR "%DEPLOYMENT_TARGET%\static"
-      )
-      env\scripts\python manage.py collectstatic --noinput --clear
-    )
-  )
 )
 
 popd
