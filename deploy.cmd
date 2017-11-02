@@ -68,25 +68,23 @@ IF EXIST "%DEPLOYMENT_TARGET%\.skipPythonDeployment" goto postPython
 :: 2. Select Python version
 SET PYTHON_EXE="D:\python34\python.exe"
 
-pushd "%DEPLOYMENT_TARGET%"
-
 :: 3. Create virtual environment
 IF NOT EXIST "%DEPLOYMENT_TARGET%\env" (
   echo Creating virtual environment.
-  %PYTHON_EXE% -m venv --without-pip env
+  %PYTHON_EXE% -m venv --without-pip "%DEPLOYMENT_TARGET%\env"
   IF !ERRORLEVEL! NEQ 0 goto error
-  env\scripts\python -m ensurepip
+  "%DEPLOYMENT_TARGET%\env\scripts\python" -m ensurepip
   IF !ERRORLEVEL! NEQ 0 goto error
-  env\scripts\python -m pip install --upgrade pip setuptools
+  "%DEPLOYMENT_TARGET%\env\scripts\python" -m pip install --upgrade pip setuptools
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
 echo Got pip version:
-env\scripts\python -m pip --version
+"%DEPLOYMENT_TARGET%\env\scripts\python" -m pip --version
 
 :: 4. Install packages
 echo Installing requirements.
-env\scripts\python -m pip install -r requirements.txt
+"%DEPLOYMENT_TARGET%\env\scripts\python" -m pip install -r requirements.txt
 IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 5. Copy web.config
@@ -94,8 +92,6 @@ IF EXIST "%DEPLOYMENT_SOURCE%\web.config" (
   echo Overwriting web.config
   copy /y "%DEPLOYMENT_SOURCE%\web.config" "%DEPLOYMENT_TARGET%\web.config"
 )
-
-popd
 
 :postPython
 
