@@ -29,13 +29,13 @@ class HttpEmailServerClient(EmailServerClient):
 
     @property
     def _upload_url(self) -> str:
-        return 'http://{host}/api/email/lokole/{client_id}'.format(
+        return 'http://{host}/api/email/upload/{client_id}'.format(
             client_id=self._client_id,
             host=self._write_api)
 
     @property
     def _download_url(self) -> str:
-        return 'http://{host}/api/email/lokole/{client_id}'.format(
+        return 'http://{host}/api/email/download/{client_id}'.format(
             client_id=self._client_id,
             host=self._read_api)
 
