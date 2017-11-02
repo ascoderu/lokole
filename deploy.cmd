@@ -102,20 +102,14 @@ call :SelectPythonVersion
 pushd "%DEPLOYMENT_TARGET%"
 
 :: 3. Create virtual environment
-IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
-  IF EXIST "%DEPLOYMENT_TARGET%\env" (
-    echo Deleting incompatible virtual environment.
-    rmdir /q /s "%DEPLOYMENT_TARGET%\env"
-    IF !ERRORLEVEL! NEQ 0 goto error
-  )
-
+IF NOT EXIST "%DEPLOYMENT_TARGET%\env" (
   echo Creating %PYTHON_RUNTIME% virtual environment.
-  %PYTHON_EXE% -m %PYTHON_ENV_MODULE% env
+  %PYTHON_EXE% -m %PYTHON_ENV_MODULE% --without-pip env
   IF !ERRORLEVEL! NEQ 0 goto error
-
-  copy /y NUL "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" >NUL
-) ELSE (
-  echo Found compatible virtual environment.
+  env\scripts\python -m ensurepip --upgrade
+  IF !ERRORLEVEL! NEQ 0 goto error
+  env\scripts\pip install --upgrade setuptools
+  IF !ERRORLEVEL! NEQ 0 goto error
 )
 
 :: 4. Install packages
