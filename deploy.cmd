@@ -119,8 +119,12 @@ IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 5. Copy web.config
 IF EXIST "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" (
-  echo Overwriting web.config with web.%PYTHON_VER%.config
+  echo Overwriting web.config
   copy /y "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" "%DEPLOYMENT_TARGET%\web.config"
+)
+IF EXIST "%DEPLOYMENT_SOURCE%\web.config" (
+  echo Overwriting web.config
+  copy /y "%DEPLOYMENT_SOURCE%\web.config" "%DEPLOYMENT_TARGET%\web.config"
 )
 
 popd
