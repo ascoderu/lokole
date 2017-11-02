@@ -102,15 +102,18 @@ call :SelectPythonVersion
 pushd "%DEPLOYMENT_TARGET%"
 
 :: 3. Create virtual environment
-IF NOT EXIST "%DEPLOYMENT_TARGET%\env" (
-  echo Creating %PYTHON_RUNTIME% virtual environment.
-  %PYTHON_EXE% -m %PYTHON_ENV_MODULE% --without-pip env
-  IF !ERRORLEVEL! NEQ 0 goto error
-  env\scripts\python -m ensurepip --upgrade
-  IF !ERRORLEVEL! NEQ 0 goto error
-  env\scripts\python -m pip install --upgrade setuptools
+IF EXIST "%DEPLOYMENT_TARGET%\env" (
+  echo Deleting old virtual environment
+  rmdir /q /s "%DEPLOYMENT_TARGET%\env"
   IF !ERRORLEVEL! NEQ 0 goto error
 )
+echo Creating %PYTHON_RUNTIME% virtual environment.
+%PYTHON_EXE% -m %PYTHON_ENV_MODULE% --without-pip env
+IF !ERRORLEVEL! NEQ 0 goto error
+env\scripts\python -m ensurepip --upgrade
+IF !ERRORLEVEL! NEQ 0 goto error
+env\scripts\python -m pip install --upgrade setuptools
+IF !ERRORLEVEL! NEQ 0 goto error
 
 :: 4. Install packages
 echo Pip install requirements.
