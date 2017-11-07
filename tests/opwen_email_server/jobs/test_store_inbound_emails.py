@@ -18,7 +18,7 @@ class StoreInboundEmailsTests(TestCase):
         self._given_message(email, email_id, parser_mock, queue_mock)
         consumer = store_inbound_emails.Job()
 
-        consumer._run_once()
+        consumer.run_once()
 
         self.assertEqual(storage_mock.fetch_text.call_count, 1)
         self.assertEqual(queue_mock.dequeue.call_count, 1)

@@ -24,7 +24,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         self._given_message(emails, resource_id, unpack_mock, write_queue_mock)
         consumer = store_written_client_emails.Job()
 
-        consumer._run_once()
+        consumer.run_once()
 
         self.assertEqual(unpack_mock.call_count, 1)
         self.assertEqual(send_queue_mock.enqueue.call_count, 2)

@@ -18,7 +18,7 @@ class SendOutboundEmailsTests(TestCase):
         self._given_message(email, email_id, fetch_mock, queue_mock)
         consumer = send_outbound_emails.Job()
 
-        consumer._run_once()
+        consumer.run_once()
 
         self.assertEqual(queue_mock.dequeue.call_count, 1)
         fetch_mock.assert_called_once_with(email_id)
