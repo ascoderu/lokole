@@ -2,12 +2,21 @@ version: '3'
 
 services:
 
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "8080:80"
+    links:
+      - api:frontend
+    depends_on:
+      - api
+
   api:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
-    ports:
-     - "8080:80"
     env_file:
       - .env
 
