@@ -41,14 +41,15 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=_port)
     parser.add_argument('--server', choices=_servers, default=_server)
     parser.add_argument('--ui', action='store_true', default=_ui)
-    parser.add_argument('--waitress', action='store_true', default=_waitress)
+    if can_import('waitress'):
+        parser.add_argument('--waitress', action='store_true', default=_waitress)
     parser.add_argument('apis', nargs='+', type=FileType('r'))
     args = parser.parse_args()
 
     app = build_app([api.name for api in args.apis], args.host,
                     args.port, args.server, args.ui)
 
-    if args.waitress:
+    if can_import('waitress') and args.waitress:
         from waitress import serve
         serve(app.app, host=args.host, port=args.port)
     else:

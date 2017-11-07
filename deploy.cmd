@@ -80,6 +80,9 @@ echo Got pip version:
 "%DEPLOYMENT_TARGET%\env\scripts\python" -m pip --version
 
 :: 4. Install packages
+echo Installing webserver.
+"%DEPLOYMENT_TARGET%\env\scripts\python" -m pip install waitress==1.1.0
+IF !ERRORLEVEL! NEQ 0 goto error
 echo Installing requirements.
 "%DEPLOYMENT_TARGET%\env\scripts\python" -m pip install -r requirements.txt
 IF !ERRORLEVEL! NEQ 0 goto error
