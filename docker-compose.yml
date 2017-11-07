@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    ports:
+     - "8080:80"
+    env_file:
+      - .env
+
+  send_outbound_emails:
+    build:
+      context: .
+      dockerfile: docker/job/Dockerfile
+    environment:
+      - JOB_NAME=send_outbound_emails
+    env_file:
+      - .env
+
+  store_inbound_emails:
+    build:
+      context: .
+      dockerfile: docker/job/Dockerfile
+    environment:
+      - JOB_NAME=store_inbound_emails
+    env_file:
+      - .env
+
+  store_writte_client_emails:
+    build:
+      context: .
+      dockerfile: docker/job/Dockerfile
+    environment:
+      - JOB_NAME=store_written_client_emails
+    env_file:
+      - .env
