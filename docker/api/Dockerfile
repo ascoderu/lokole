@@ -16,7 +16,8 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
   && pip3 --no-cache-dir -q install gunicorn==19.7.1 tornado==4.5.2 \
   && apk del ${BUILD_DEPENDENCIES}
 
+ENV GUNICORN_WORKERS="1"
+
 EXPOSE 80
 WORKDIR /app
-CMD ["gunicorn", "-w", "8", "-b", "0.0.0.0:80", \
-     "server:build_app(apis=['/app/swagger1.yaml', '/app/swagger2.yaml'], server='tornado')"]
+CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/swagger1.yaml', '/app/swagger2.yaml'], server='tornado')"]

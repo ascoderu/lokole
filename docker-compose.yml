@@ -17,6 +17,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+    environment:
+      - GUNICORN_WORKERS=3
     env_file:
       - .env
 
