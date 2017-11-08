@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: docker/nginx/Dockerfile
     ports:
-      - "8080:80"
+      - "${APP_PORT}:80"
     links:
       - api:frontend
     depends_on:
