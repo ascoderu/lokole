@@ -16,4 +16,4 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
 ENV JOB_NAME="SET_ME"
 
 WORKDIR /app
-CMD "/app/job.py" "$JOB_NAME"
+CMD "python3" "/app/job.py" "$JOB_NAME"
