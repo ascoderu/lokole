@@ -10,14 +10,21 @@ fi
 
 set -euo pipefail
 
-export APP_PORT="80"
-export BUILD_TAG="$TRAVIS_TAG"
-touch .env
+compose_file="$(mktemp)"
+env_file="$PWD/.env"
 
-docker-compose build
+cleanup() {
+  rm -f "$compose_file" "$env_file"
+}
+trap cleanup EXIT
+
+APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" docker-compose config > "$compose_file"
+touch "$env_file"
+
+docker-compose -f "$compose_file" build
 
 docker login --username="$DOCKERIO_USERNAME" --password="$DOCKERIO_PASSWORD"
 
-docker-compose config | grep -Po '(?<=image: ).*$' | sort -u | while read image; do
+< "$compose_file" grep -Po '(?<=image: ).*$' | sort -u | while read image; do
   docker push "$image"
 done
