@@ -11,4 +11,4 @@ env:
   - TARGET=typecheck
   - TARGET=unit-tests
 
-script: make $TARGET -e py_env=~/virtualenv/python$TRAVIS_PYTHON_VERSION
+script: travis/ci.sh
