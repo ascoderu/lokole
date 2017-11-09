@@ -113,9 +113,9 @@ Alternatively, you can also run the entire application stack via Docker:
 
 .. sourcecode :: sh
 
-  ENV_FILE=.env
-  BUILD_TAG=development
-  APP_PORT=8080
+  export ENV_FILE=.env
+  export BUILD_TAG=development
+  export APP_PORT=8080
   docker-compose up
 
 There is an `OpenAPI specification <https://github.com/ascoderu/opwen-cloudserver/blob/master/opwen_email_server/static/email-api-spec.yaml>`_
