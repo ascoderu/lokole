@@ -12,6 +12,7 @@ fi
 
 export APP_PORT="80"
 export BUILD_TAG="$TRAVIS_TAG"
+touch .env
 
 docker-compose build
 
