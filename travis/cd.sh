@@ -11,15 +11,14 @@ fi
 set -euo pipefail
 
 compose_file="$(mktemp)"
-env_file="$PWD/.env"
+env_file="$(mktemp)"
 
 cleanup() {
   rm -f "$compose_file" "$env_file"
 }
 trap cleanup EXIT
 
-APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" docker-compose config > "$compose_file"
-touch "$env_file"
+APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" ENV_FILE="$env_file" docker-compose config > "$compose_file"
 
 docker-compose -f "$compose_file" build
 

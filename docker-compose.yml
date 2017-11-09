@@ -22,7 +22,7 @@ services:
     environment:
       - GUNICORN_WORKERS=3
     env_file:
-      - .env
+      - ${ENV_FILE}
 
   send_outbound_emails:
     image: cwolff/opwenserver_send_outbound_emails:${BUILD_TAG}
@@ -32,7 +32,7 @@ services:
     environment:
       - JOB_NAME=send_outbound_emails
     env_file:
-      - .env
+      - ${ENV_FILE}
 
   store_inbound_emails:
     image: cwolff/opwenserver_store_inbound_emails:${BUILD_TAG}
@@ -42,7 +42,7 @@ services:
     environment:
       - JOB_NAME=store_inbound_emails
     env_file:
-      - .env
+      - ${ENV_FILE}
 
   store_written_client_emails:
     image: cwolff/opwenserver_store_written_client_emails:${BUILD_TAG}
@@ -52,4 +52,4 @@ services:
     environment:
       - JOB_NAME=store_written_client_emails
     env_file:
-      - .env
+      - ${ENV_FILE}
