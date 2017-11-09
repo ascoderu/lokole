@@ -20,4 +20,4 @@ ENV GUNICORN_WORKERS="1"
 
 EXPOSE 80
 WORKDIR /app
-CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/swagger1.yaml', '/app/swagger2.yaml'], server='tornado')"]
+CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/swagger1.yaml', '/app/swagger2.yaml'], server='tornado')"
