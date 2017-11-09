@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 if [ -z "$TRAVIS_TAG" ]; then
   echo "Build is not a release, skipping CD" >&2; exit 0
 fi
