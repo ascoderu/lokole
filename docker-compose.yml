@@ -40,7 +40,7 @@ services:
     env_file:
       - .env
 
-  store_writte_client_emails:
+  store_written_client_emails:
     build:
       context: .
       dockerfile: docker/job/Dockerfile
