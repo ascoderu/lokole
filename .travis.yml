@@ -6,11 +6,6 @@ python:
   - "3.5"
   - "3.6"
 
-env:
-  - TARGET=lint
-  - TARGET=typecheck
-  - TARGET=unit-tests
-
 script: travis/ci.sh
 
 after_success: travis/cd.sh
