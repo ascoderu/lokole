@@ -113,6 +113,7 @@ Alternatively, you can also run the entire application stack via Docker:
 
 .. sourcecode :: sh
 
+  BUILD_TAG=development
   APP_PORT=8080
   docker-compose up
 

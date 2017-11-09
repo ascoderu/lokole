@@ -12,3 +12,5 @@ env:
   - TARGET=unit-tests
 
 script: travis/ci.sh
+
+after_success: travis/cd.sh

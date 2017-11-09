@@ -3,6 +3,7 @@ version: '3'
 services:
 
   nginx:
+    image: cwolff/opwenserver_nginx:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
@@ -14,6 +15,7 @@ services:
       - api
 
   api:
+    image: cwolff/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
@@ -23,6 +25,7 @@ services:
       - .env
 
   send_outbound_emails:
+    image: cwolff/opwenserver_send_outbound_emails:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
@@ -32,6 +35,7 @@ services:
       - .env
 
   store_inbound_emails:
+    image: cwolff/opwenserver_store_inbound_emails:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
@@ -41,6 +45,7 @@ services:
       - .env
 
   store_written_client_emails:
+    image: cwolff/opwenserver_store_written_client_emails:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
