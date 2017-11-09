@@ -3,6 +3,11 @@ language: python
 python:
   - "3.6"
 
+sudo: required
+
+services:
+  - docker
+
 script: travis/ci.sh
 
 after_success: travis/cd.sh
