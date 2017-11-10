@@ -25,7 +25,7 @@ services:
     env_file:
       - ${ENV_FILE}
 
-  send_outbound_emails:
+  job_send_outbound_emails:
     image: cwolff/opwenserver_send_outbound_emails:${BUILD_TAG}
     build:
       context: .
@@ -35,7 +35,7 @@ services:
     env_file:
       - ${ENV_FILE}
 
-  store_inbound_emails:
+  job_store_inbound_emails:
     image: cwolff/opwenserver_store_inbound_emails:${BUILD_TAG}
     build:
       context: .
@@ -45,7 +45,7 @@ services:
     env_file:
       - ${ENV_FILE}
 
-  store_written_client_emails:
+  job_store_written_client_emails:
     image: cwolff/opwenserver_store_written_client_emails:${BUILD_TAG}
     build:
       context: .
