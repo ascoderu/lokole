@@ -1,7 +1,7 @@
 FROM alpine:3.6
 
 ENV GUNICORN_WORKERS="1"
-ENV API_NAME="SET_ME"
+ARG API_NAME
 
 ADD opwen_email_server /app/opwen_email_server
 ADD runserver.py /app/server.py

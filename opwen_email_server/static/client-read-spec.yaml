@@ -1,0 +1,50 @@
+swagger: '2.0'
+
+info:
+  title: Opwen Cloudserver Email API.
+  version: '0.1'
+
+basePath: '/api/email'
+
+paths:
+
+  '/download/{client_id}':
+
+    get:
+      operationId: opwen_email_server.api.client_read.download
+      summary: Endpoint that the Lokole clients call to get their new emails from the server.
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/ClientId'
+      responses:
+        200:
+          description: The emails for the Lokole are ready to be downloaded.
+          schema:
+            $ref: '#/definitions/EmailPackage'
+        403:
+          description: Request from unregistered client.
+
+parameters:
+
+  ClientId:
+    name: client_id
+    in: path
+    required: true
+    description: Id of the Lokole client.
+    type: string
+
+definitions:
+
+  EmailPackage:
+    properties:
+      resource_id:
+        description: Id of the resource containing the emails (gzip jsonl file).
+        type: string
+      resource_container:
+        description: Container where the resource containing emails can be found.
+        type: string
+      resource_type:
+        description: The provider where the resource containing emails can be found.
+        type: string
+        enum: [ 'azure-blob' ]

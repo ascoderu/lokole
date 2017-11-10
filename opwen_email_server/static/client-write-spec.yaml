@@ -8,26 +8,6 @@ basePath: '/api/email'
 
 paths:
 
-  '/sendgrid/{client_id}':
-
-    post:
-      operationId: opwen_email_server.api.email_receive.receive
-      summary: Webhook listening to emails received via Sendgrid.
-      consumes:
-        - multipart/form-data
-      parameters:
-        - $ref: '#/parameters/ClientId'
-        - name: email
-          description: Email represented as a MIME string.
-          type: string
-          in: formData
-          required: true
-      responses:
-        200:
-          description: The email was successfully received. No need to retry it.
-        403:
-          description: Request from unregistered client.
-
   '/upload/{client_id}':
 
     post:
@@ -45,23 +25,6 @@ paths:
       responses:
         200:
           description: The emails were successfully uploaded from the Lokole.
-        403:
-          description: Request from unregistered client.
-
-  '/download/{client_id}':
-
-    get:
-      operationId: opwen_email_server.api.client_read.download
-      summary: Endpoint that the Lokole clients call to get their new emails from the server.
-      produces:
-        - application/json
-      parameters:
-        - $ref: '#/parameters/ClientId'
-      responses:
-        200:
-          description: The emails for the Lokole are ready to be downloaded.
-          schema:
-            $ref: '#/definitions/EmailPackage'
         403:
           description: Request from unregistered client.
 

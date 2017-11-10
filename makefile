@@ -7,7 +7,7 @@ PYTHON=/usr/bin/python3
 # Server configuration
 #
 api_port=8080
-api_specs=opwen_email_server/static/email-api-spec.yaml opwen_email_server/static/healthcheck-spec.yaml
+api_specs=opwen_email_server/static/email-receive-spec.yaml opwen_email_server/static/client-write-spec.yaml opwen_email_server/static/client-read-spec.yaml opwen_email_server/static/healthcheck-spec.yaml
 
 #
 # You shouldn't need to touch anything below this line.

@@ -2,26 +2,45 @@ version: '3'
 
 services:
 
-  nginx:
-    image: cwolff/opwenserver_nginx:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/nginx/Dockerfile
-    ports:
-      - "${APP_PORT}:80"
-    links:
-      - api:frontend
-    depends_on:
-      - api
-
-  api:
-    image: cwolff/opwenserver_api:${BUILD_TAG}
+  api_email_receive:
+    image: cwolff/opwenserver_api_email_receive:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+      args:
+        - API_NAME=opwen_email_server/static/email-receive-spec.yaml
+    ports:
+      - ${API_RECEIVE_PORT}:80
+    environment:
+      - GUNICORN_WORKERS=5
+    env_file:
+      - ${ENV_FILE}
+
+  api_client_write:
+    image: cwolff/opwenserver_api_client_write:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+      args:
+        - API_NAME=opwen_email_server/static/client-write-spec.yaml
+    ports:
+      - ${API_WRITE_PORT}:80
     environment:
       - GUNICORN_WORKERS=3
-      - API_NAME=opwen_email_server/static/email-api-spec.yaml
+    env_file:
+      - ${ENV_FILE}
+
+  api_client_read:
+    image: cwolff/opwenserver_api_client_read:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+      args:
+        - API_NAME=opwen_email_server/static/client-read-spec.yaml
+    ports:
+      - ${API_READ_PORT}:80
+    environment:
+      - GUNICORN_WORKERS=3
     env_file:
       - ${ENV_FILE}
 
