@@ -44,10 +44,10 @@ server: venv
 	$(api_runner)
 
 inbound-store-worker: venv
-	$(py_env)/bin/python runjob store_inbound_emails
+	$(py_env)/bin/python runjob.py store_inbound_emails
 
 outbound-send-worker: venv
-	$(py_env)/bin/python runjob send_outbound_emails
+	$(py_env)/bin/python runjob.py send_outbound_emails
 
 outbound-store-worker: venv
-	$(py_env)/bin/python runjob store_written_client_emails
+	$(py_env)/bin/python runjob.py store_written_client_emails
