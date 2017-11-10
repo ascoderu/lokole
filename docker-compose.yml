@@ -21,6 +21,7 @@ services:
       dockerfile: docker/api/Dockerfile
     environment:
       - GUNICORN_WORKERS=3
+      - API_NAME=opwen_email_server/static/email-api-spec.yaml
     env_file:
       - ${ENV_FILE}
 

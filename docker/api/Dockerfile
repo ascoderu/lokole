@@ -1,10 +1,13 @@
 FROM alpine:3.6
 
+ENV GUNICORN_WORKERS="1"
+ENV API_NAME="SET_ME"
+
 ADD opwen_email_server /app/opwen_email_server
 ADD runserver.py /app/server.py
 ADD requirements.txt /app/requirements.txt
-ADD opwen_email_server/static/email-api-spec.yaml /app/swagger1.yaml
-ADD opwen_email_server/static/healthcheck-spec.yaml /app/swagger2.yaml
+ADD ${API_NAME} /app/api.yaml
+ADD opwen_email_server/static/healthcheck-spec.yaml /app/healthcheck.yaml
 
 ARG BUILD_DEPENDENCIES="build-base python3-dev"
 RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev \
@@ -17,9 +20,7 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
   && apk del ${BUILD_DEPENDENCIES} \
   && apk add --no-cache curl
 
-ENV GUNICORN_WORKERS="1"
-
 EXPOSE 80
 WORKDIR /app
 HEALTHCHECK --interval=1m --timeout=5s CMD curl --fail --silent http://localhost/healthcheck/ping || exit 1
-CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/swagger1.yaml', '/app/swagger2.yaml'], server='tornado')"
+CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/api.yaml', '/app/healthcheck.yaml'], server='tornado')"
