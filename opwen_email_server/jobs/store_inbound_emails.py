@@ -16,3 +16,8 @@ class Job(QueueConsumer):
         email = parse_mime_email(mime_email)
         server_datastore.store_email(resource_id, email)
         self.log_info('Stored inbound client email %s', resource_id)
+
+
+if __name__ == '__main__':
+    from opwen_email_server.services.queue_consumer import cli
+    cli(Job)

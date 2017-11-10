@@ -14,3 +14,8 @@ class Job(QueueConsumer):
 
         email_sender.send(email)
         self.log_info('Done sending outbound email %s', resource_id)
+
+
+if __name__ == '__main__':
+    from opwen_email_server.services.queue_consumer import cli
+    cli(Job)

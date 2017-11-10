@@ -49,8 +49,8 @@ services:
     build:
       context: .
       dockerfile: docker/job/Dockerfile
-    environment:
-      - JOB_NAME=send_outbound_emails
+      args:
+        - JOB_NAME=opwen_email_server/jobs/send_outbound_emails.py
     env_file:
       - ${ENV_FILE}
 
@@ -59,8 +59,8 @@ services:
     build:
       context: .
       dockerfile: docker/job/Dockerfile
-    environment:
-      - JOB_NAME=store_inbound_emails
+      args:
+        - JOB_NAME=opwen_email_server/jobs/store_inbound_emails.py
     env_file:
       - ${ENV_FILE}
 
@@ -69,7 +69,7 @@ services:
     build:
       context: .
       dockerfile: docker/job/Dockerfile
-    environment:
-      - JOB_NAME=store_written_client_emails
+      args:
+        - JOB_NAME=opwen_email_server/jobs/store_written_client_emails.py
     env_file:
       - ${ENV_FILE}

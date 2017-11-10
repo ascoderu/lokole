@@ -49,3 +49,26 @@ class QueueConsumer(LogMixin):
         if QUEUE_ERROR_FILE:
             with open(QUEUE_ERROR_FILE, 'a') as fobj:
                 fobj.write('{}\n'.format(ex))
+
+
+def cli(job_class):
+    from argparse import ArgumentParser
+    from os.path import dirname
+    from os.path import join
+
+    parser = ArgumentParser()
+    parser.add_argument('--once', action='store_true', default=False)
+    args = parser.parse_args()
+
+    try:
+        # noinspection PyUnresolvedReferences
+        from dotenv import load_dotenv
+        load_dotenv(join(dirname(__file__), '.env'))
+    except ImportError:
+        pass
+
+    job = job_class()
+    if args.once:
+        job.run_once()
+    else:
+        job.run_forever()

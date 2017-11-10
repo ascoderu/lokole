@@ -26,3 +26,8 @@ class Job(QueueConsumer):
                 'container_name': server_datastore.STORAGE.container,
             })
             self.log_info('Ingesting packaged client email %s', email_id)
+
+
+if __name__ == '__main__':
+    from opwen_email_server.services.queue_consumer import cli
+    cli(Job)
