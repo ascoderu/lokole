@@ -4,6 +4,9 @@ ADD opwen_email_server /app/opwen_email_server
 ADD runjob.py /app/job.py
 ADD requirements.txt /app/requirements.txt
 
+ENV LOKOLE_QUEUE_ERROR_FILE="/app/queue_health.txt"
+ENV JOB_NAME="SET_ME"
+
 ARG BUILD_DEPENDENCIES="build-base python3-dev"
 RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev \
   && python3 -m ensurepip \
@@ -11,9 +14,9 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
   && pip3 install -U --no-cache-dir -q pip setuptools \
   && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip; fi \
   && pip3 --no-cache-dir -q install -r /app/requirements.txt \
+  && touch ${LOKOLE_QUEUE_ERROR_FILE} \
   && apk del ${BUILD_DEPENDENCIES}
 
-ENV JOB_NAME="SET_ME"
-
 WORKDIR /app
+HEALTHCHECK CMD test -s "$LOKOLE_QUEUE_ERROR_FILE" && cat "$LOKOLE_QUEUE_ERROR_FILE" && exit 1
 CMD "python3" "/app/job.py" "$JOB_NAME"
