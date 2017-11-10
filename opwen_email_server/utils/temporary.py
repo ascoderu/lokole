@@ -17,9 +17,9 @@ def removing(path: str) -> Generator[str, None, None]:
     try:
         yield path
     finally:
-        _remove_if_exists(path)
+        remove_if_exists(path)
 
 
-def _remove_if_exists(path: str):
+def remove_if_exists(path: str):
     with suppress(FileNotFoundError):
         remove(path)
