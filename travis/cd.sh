@@ -18,7 +18,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-API_READ_PORT="80" API_WRITE_PORT="80" API_RECEIVE_PORT="80" BUILD_TAG="$TRAVIS_TAG" ENV_FILE="$env_file" \
+APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" ENV_FILE="$env_file" \
   docker-compose config > "$compose_file"
 
 make docker-build-base
