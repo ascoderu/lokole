@@ -51,3 +51,10 @@ outbound-send-worker: venv
 
 outbound-store-worker: venv
 	$(py_env)/bin/python opwen_email_server/jobs/store_outbound_emails.py
+
+docker-build-base:
+	docker build -f docker\api_base\Dockerfile -t cwolff/opwenserver_api_base .
+	docker build -f docker\job_base\Dockerfile -t cwolff/opwenserver_job_base .
+
+docker-build: docker-build-base
+	docker-compose build
