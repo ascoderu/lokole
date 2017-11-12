@@ -25,6 +25,7 @@ services:
       dockerfile: docker/api/Dockerfile
       args:
         - API_NAME=opwen_email_server/static/email-receive-spec.yaml
+        - BASE_TAG=${BUILD_TAG}
     environment:
       - GUNICORN_WORKERS=5
     env_file:
@@ -37,6 +38,7 @@ services:
       dockerfile: docker/api/Dockerfile
       args:
         - API_NAME=opwen_email_server/static/client-write-spec.yaml
+        - BASE_TAG=${BUILD_TAG}
     environment:
       - GUNICORN_WORKERS=3
     env_file:
@@ -49,6 +51,7 @@ services:
       dockerfile: docker/api/Dockerfile
       args:
         - API_NAME=opwen_email_server/static/client-read-spec.yaml
+        - BASE_TAG=${BUILD_TAG}
     environment:
       - GUNICORN_WORKERS=3
     env_file:
@@ -61,6 +64,7 @@ services:
       dockerfile: docker/job/Dockerfile
       args:
         - JOB_NAME=opwen_email_server/jobs/send_outbound_emails.py
+        - BASE_TAG=${BUILD_TAG}
     env_file:
       - ${ENV_FILE}
 
@@ -71,6 +75,7 @@ services:
       dockerfile: docker/job/Dockerfile
       args:
         - JOB_NAME=opwen_email_server/jobs/store_inbound_emails.py
+        - BASE_TAG=${BUILD_TAG}
     env_file:
       - ${ENV_FILE}
 
@@ -81,5 +86,6 @@ services:
       dockerfile: docker/job/Dockerfile
       args:
         - JOB_NAME=opwen_email_server/jobs/store_written_client_emails.py
+        - BASE_TAG=${BUILD_TAG}
     env_file:
       - ${ENV_FILE}

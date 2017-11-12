@@ -60,7 +60,7 @@ docker-build-base:
 	docker build -f docker/job_base/Dockerfile -t cwolff/opwenserver_job_base:$(build_tag) .
 
 docker-build: docker-build-base
-	sed -i "s/:latest/:$(build_tag)/g" docker/{api,job}/Dockerfile && BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) build && sed -i "s/:$(build_tag)/:latest/g" docker/{api,job}/Dockerfile
+	BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) build
 
 docker-run: $(env_file)
 	BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) up
