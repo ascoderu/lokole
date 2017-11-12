@@ -4,11 +4,11 @@ info:
   title: Opwen Cloudserver Email API.
   version: '0.1'
 
-basePath: '/api/email'
+basePath: '/api/email/upload'
 
 paths:
 
-  '/upload/{client_id}':
+  '/{client_id}':
 
     post:
       operationId: opwen_email_server.api.client_write.upload
