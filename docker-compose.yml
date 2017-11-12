@@ -23,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+    ports:
+      - 8001:80
     environment:
       - GUNICORN_WORKERS=5
       - API_NAME=opwen_email_server/static/email-receive-spec.yaml
@@ -34,6 +36,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+    ports:
+      - 8002:80
     environment:
       - GUNICORN_WORKERS=3
       - API_NAME=opwen_email_server/static/client-write-spec.yaml
@@ -45,6 +49,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+    ports:
+      - 8003:80
     environment:
       - GUNICORN_WORKERS=3
       - API_NAME=opwen_email_server/static/client-read-spec.yaml
