@@ -12,7 +12,6 @@ api_specs=opwen_email_server/static/email-receive-spec.yaml opwen_email_server/s
 #
 # You shouldn't need to touch anything below this line.
 #
-compose_file=docker-compose.yml
 build_tag=latest
 env_file=.env
 py_env=venv
@@ -60,14 +59,17 @@ docker-build-base:
 	docker build -f docker/job_base/Dockerfile -t cwolff/opwenserver_job_base:$(build_tag) .
 
 docker-build: docker-build-base
-	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) build
+	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-compose build
 
 docker-run: $(env_file)
-	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) up
+	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-compose up
 
 docker-push-base:
 	docker push cwolff/opwenserver_api_base:$(build_tag)
 	docker push cwolff/opwenserver_job_base:$(build_tag)
 
 docker-push: docker-push-base
-	BUILD_TAG=$(build_tag) docker-compose -f $(compose_file) push
+	BUILD_TAG=$(build_tag) docker-compose push
+
+docker-config:
+	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-config
