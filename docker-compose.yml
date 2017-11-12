@@ -57,7 +57,7 @@ services:
       context: .
       dockerfile: docker/job/Dockerfile
     environment:
-      - JOB_NAME=opwen_email_server/jobs/send_outbound_emails.py
+      - JOB_NAME=opwen_email_server.jobs.send_outbound_emails
     env_file:
       - ${ENV_FILE}
 
@@ -67,7 +67,7 @@ services:
       context: .
       dockerfile: docker/job/Dockerfile
     environment:
-      - JOB_NAME=opwen_email_server/jobs/store_inbound_emails.py
+      - JOB_NAME=opwen_email_server.jobs.store_inbound_emails
     env_file:
       - ${ENV_FILE}
 
@@ -77,6 +77,6 @@ services:
       context: .
       dockerfile: docker/job/Dockerfile
     environment:
-      - JOB_NAME=opwen_email_server/jobs/store_written_client_emails.py
+      - JOB_NAME=opwen_email_server.jobs.store_written_client_emails
     env_file:
       - ${ENV_FILE}
