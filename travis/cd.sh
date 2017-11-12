@@ -21,10 +21,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
-make -e build_tag="$build_tag" -e env_file="$env_file" -e app_port="$app_port" \
-  docker-build
+APP_PORT="$app_port" BUILD_TAG="$build_tag" ENV_FILE="$env_file" \
+  docker-compose config > "$compose_file"
+
+docker-compose -f "$compose_file" build
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
+docker-compose -f "$compose_file" push
 
-make -e build_tag="$build_tag" -e env_file="$env_file" -e app_port="$app_port" \
-  docker-push

@@ -19,73 +19,64 @@ services:
       - api_client_read
 
   api_email_receive:
-    image: cwolff/opwenserver_api_email_receive:${BUILD_TAG}
+    image: cwolff/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
-      args:
-        - API_NAME=opwen_email_server/static/email-receive-spec.yaml
-        - BASE_TAG=${BUILD_TAG}
     environment:
       - GUNICORN_WORKERS=5
+      - API_NAME=opwen_email_server/static/email-receive-spec.yaml
     env_file:
       - ${ENV_FILE}
 
   api_client_write:
-    image: cwolff/opwenserver_api_client_write:${BUILD_TAG}
+    image: cwolff/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
-      args:
-        - API_NAME=opwen_email_server/static/client-write-spec.yaml
-        - BASE_TAG=${BUILD_TAG}
     environment:
       - GUNICORN_WORKERS=3
+      - API_NAME=opwen_email_server/static/client-write-spec.yaml
     env_file:
       - ${ENV_FILE}
 
   api_client_read:
-    image: cwolff/opwenserver_api_client_read:${BUILD_TAG}
+    image: cwolff/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
-      args:
-        - API_NAME=opwen_email_server/static/client-read-spec.yaml
-        - BASE_TAG=${BUILD_TAG}
     environment:
       - GUNICORN_WORKERS=3
+      - API_NAME=opwen_email_server/static/client-read-spec.yaml
     env_file:
       - ${ENV_FILE}
 
   job_send_outbound_emails:
-    image: cwolff/opwenserver_send_outbound_emails:${BUILD_TAG}
+    image: cwolff/opwenserver_job:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
-      args:
-        - JOB_NAME=opwen_email_server/jobs/send_outbound_emails.py
-        - BASE_TAG=${BUILD_TAG}
+    environment:
+      - JOB_NAME=opwen_email_server/jobs/send_outbound_emails.py
     env_file:
       - ${ENV_FILE}
 
   job_store_inbound_emails:
-    image: cwolff/opwenserver_store_inbound_emails:${BUILD_TAG}
+    image: cwolff/opwenserver_job:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
-      args:
-        - JOB_NAME=opwen_email_server/jobs/store_inbound_emails.py
-        - BASE_TAG=${BUILD_TAG}
+    environment:
+      - JOB_NAME=opwen_email_server/jobs/store_inbound_emails.py
     env_file:
       - ${ENV_FILE}
 
   job_store_written_client_emails:
-    image: cwolff/opwenserver_store_written_client_emails:${BUILD_TAG}
+    image: cwolff/opwenserver_job:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
-      args:
-        - JOB_NAME=opwen_email_server/jobs/store_written_client_emails.py
-        - BASE_TAG=${BUILD_TAG}
+    environment:
+      - JOB_NAME=opwen_email_server/jobs/store_written_client_emails.py
     env_file:
       - ${ENV_FILE}
