@@ -13,6 +13,8 @@ api_specs=opwen_email_server/static/email-receive-spec.yaml opwen_email_server/s
 # You shouldn't need to touch anything below this line.
 #
 compose_file=docker-compose.yml
+build_tag=latest
+env_file=.env
 py_env=venv
 py_packages=opwen_email_server
 api_runner=$(py_env)/bin/python runserver.py --port=$(api_port) --ui $(api_specs)
@@ -54,8 +56,18 @@ outbound-store-worker: venv
 	$(py_env)/bin/python opwen_email_server/jobs/store_outbound_emails.py
 
 docker-build-base:
-	docker build -f docker/api_base/Dockerfile -t cwolff/opwenserver_api_base .
-	docker build -f docker/job_base/Dockerfile -t cwolff/opwenserver_job_base .
+	docker build -f docker/api_base/Dockerfile -t cwolff/opwenserver_api_base:$(build_tag) .
+	docker build -f docker/job_base/Dockerfile -t cwolff/opwenserver_job_base:$(build_tag) .
 
 docker-build: docker-build-base
-	docker-compose -f $(compose_file) build
+	sed -i "s/:latest/:$(build_tag)/g" docker/{api,job}/Dockerfile && BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) build && sed -i "s/:$(build_tag)/:latest/g" docker/{api,job}/Dockerfile
+
+docker-run: $(env_file)
+	BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) up
+
+docker-push-base:
+	docker push cwolff/opwenserver_api_base:$(build_tag)
+	docker push cwolff/opwenserver_job_base:$(build_tag)
+
+docker-push: docker-push-base
+	BUILD_TAG=$(build_tag) docker-compose -f $(compose_file) config | grep -Po '(?<=image: ).*$' | sort -u | while read image; do docker push "$image"; done

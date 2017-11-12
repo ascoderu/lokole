@@ -21,12 +21,10 @@ trap cleanup EXIT
 APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" ENV_FILE="$env_file" \
   docker-compose config > "$compose_file"
 
-make -e compose_file="$compose_file" docker-build
+make -e compose_file="$compose_file" -e build_tag="$TRAVIS_TAG" -e env_file="$env_file" \
+  docker-build
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 
-docker push cwolff/opwenserver_api_base:latest
-docker push cwolff/opwenserver_job_base:latest
-< "$compose_file" grep -Po '(?<=image: ).*$' | sort -u | while read image; do
-  docker push "$image"
-done
+make -e compose_file="$compose_file" -e build_tag="$TRAVIS_TAG" -e env_file="$env_file" \
+  docker-push
