@@ -70,4 +70,4 @@ docker-push-base:
 	docker push cwolff/opwenserver_job_base:$(build_tag)
 
 docker-push: docker-push-base
-	BUILD_TAG=$(build_tag) docker-compose -f $(compose_file) config | grep -Po '(?<=image: ).*$' | sort -u | while read image; do docker push "$image"; done
+	BUILD_TAG=$(build_tag) docker-compose -f $(compose_file) push
