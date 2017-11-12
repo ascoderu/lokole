@@ -10,11 +10,16 @@ fi
 
 set -euo pipefail
 
+secrets_archive="$(mktemp)"
 compose_file="$(mktemp)"
-env_file="$(mktemp)"
+env_file='.env'
+
+openssl aes-256-cbc -K $encrypted_2ff31a343d6c_key -iv $encrypted_2ff31a343d6c_iv -in travis/secrets.tar.enc -out "$secrets_archive" -d
+tar xf "$secrets_archive" -C . "$cert_file" "$env_file"
+touch "$env_file"
 
 cleanup() {
-  rm -f "$compose_file" "$env_file"
+  rm -f "$compose_file" "$env_file" "$secrets_archive"
 }
 trap cleanup EXIT
 
