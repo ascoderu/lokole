@@ -12,6 +12,7 @@ api_specs=opwen_email_server/static/email-receive-spec.yaml opwen_email_server/s
 #
 # You shouldn't need to touch anything below this line.
 #
+compose_file=docker-compose.yml
 py_env=venv
 py_packages=opwen_email_server
 api_runner=$(py_env)/bin/python runserver.py --port=$(api_port) --ui $(api_specs)
@@ -53,8 +54,8 @@ outbound-store-worker: venv
 	$(py_env)/bin/python opwen_email_server/jobs/store_outbound_emails.py
 
 docker-build-base:
-	docker build -f docker\api_base\Dockerfile -t cwolff/opwenserver_api_base .
-	docker build -f docker\job_base\Dockerfile -t cwolff/opwenserver_job_base .
+	docker build -f docker/api_base/Dockerfile -t cwolff/opwenserver_api_base .
+	docker build -f docker/job_base/Dockerfile -t cwolff/opwenserver_job_base .
 
 docker-build: docker-build-base
-	docker-compose build
+	docker-compose -f $(compose_file) build
