@@ -63,6 +63,7 @@ Second, install the system-level dependencies using your package manager.
 
   sudo apt-get install -y python3-dev python3-venv openssl-dev jq
   curl -L https://aka.ms/InstallAzureCli | bash
+  python3 -m pip install sfctl
 
 Next, set up the required Azure resources and environment variables:
 
