@@ -6,7 +6,7 @@ PYTHON=/usr/bin/python3
 #
 # Server configuration
 #
-api_port=8080
+app_port=8080
 api_specs=opwen_email_server/static/email-receive-spec.yaml opwen_email_server/static/client-write-spec.yaml opwen_email_server/static/client-read-spec.yaml opwen_email_server/static/healthcheck-spec.yaml
 
 #
@@ -17,7 +17,7 @@ build_tag=latest
 env_file=.env
 py_env=venv
 py_packages=opwen_email_server
-api_runner=$(py_env)/bin/python runserver.py --port=$(api_port) --ui $(api_specs)
+api_runner=$(py_env)/bin/python runserver.py --port=$(app_port) --ui $(api_specs)
 
 .PHONY: default
 default: server
@@ -60,10 +60,10 @@ docker-build-base:
 	docker build -f docker/job_base/Dockerfile -t cwolff/opwenserver_job_base:$(build_tag) .
 
 docker-build: docker-build-base
-	BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) build
+	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) build
 
 docker-run: $(env_file)
-	BUILD_TAG=$(build_tag) APP_PORT=$(api_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) up
+	BUILD_TAG=$(build_tag) APP_PORT=$(app_port) ENV_FILE=$(env_file) docker-compose -f $(compose_file) up
 
 docker-push-base:
 	docker push cwolff/opwenserver_api_base:$(build_tag)
