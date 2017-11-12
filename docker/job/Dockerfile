@@ -17,5 +17,5 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
   && apk del ${BUILD_DEPENDENCIES}
 
 WORKDIR /app
-HEALTHCHECK CMD test -s "$LOKOLE_QUEUE_ERROR_FILE" && cat "$LOKOLE_QUEUE_ERROR_FILE" && exit 1
+HEALTHCHECK CMD test -s "$LOKOLE_QUEUE_ERROR_FILE" && cat "$LOKOLE_QUEUE_ERROR_FILE" && exit 1 || exit 0
 CMD "python3" "-m" "${JOB_NAME}"
