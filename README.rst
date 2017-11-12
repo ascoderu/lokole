@@ -134,6 +134,11 @@ First-time setup:
 
   location='eastus'
   name='opwenserver'
+  deploy_tag='latest'
+  cert_folder="$(mktemp -d)"
+  cluster_size=3
+  vm_size='Standard_D2_V2'
+
   deploy_password="FILL ME IN"
   appinsights_key="SET ME"
 
@@ -151,24 +156,45 @@ First-time setup:
   blobs_key=$(az storage account keys list --account-name="opwenserverblobs" | jq -r ".[0].value")
   clients_key=$(az storage account keys list --account-name="opwenclientblobs" | jq -r ".[0].value")
 
-  # host the app in azure
-  az webapp deployment user set --user-name "${name}" --password "${deploy_password}"
-  az appservice plan create --name="${name}" --sku="s1"
-  az webapp create --name="${name}" --plan="${name}" --runtime="python|3.4" --deployment-local-git
-  git remote add azure "https://${name}@${name}.scm.azurewebsites.net:443/${name}.git
-  git push azure master
-
-  # set environment variables
-  az webapp config appsettings set --name="${name}" --settings \
-    LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY="${appinsights_key}" \
-    LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME="opwenserverqueues" \
-    LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY="${queues_key}" \
-    LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME="opwenservertables" \
-    LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY="${tables_key}" \
-    LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME="opwenserverblobs" \
-    LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY="${blobs_key}" \
-    LOKOLE_CLIENT_AZURE_STORAGE_NAME="opwenclientblobs" \
+  # build the containers to be deployed
+  cat > .env << EOF
+    LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY="${appinsights_key}"
+    LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME="opwenserverqueues"
+    LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY="${queues_key}"
+    LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME="opwenservertables"
+    LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY="${tables_key}"
+    LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME="opwenserverblobs"
+    LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY="${blobs_key}"
+    LOKOLE_CLIENT_AZURE_STORAGE_NAME="opwenclientblobs"
     LOKOLE_CLIENT_AZURE_STORAGE_KEY="${clients_key}"
+  EOF
+  APP_PORT=80 ENV_FILE=.env BUILD_TAG="$deploy_tag" docker-compose config > compose.yml
+  docker-compose -f compose.yml push
+
+  # create a new cluster
+  cluster_host="$name.$location.cloudapp.azure.com"
+  az group create -n "$name" -l "$location"
+  az sf cluster create \
+    --resource-group "$name" --location "$location" --certificate-output-folder "$cert_folder" \
+    --certificate-password "$deploy_password" --certificate-subject-name "$cluster_host" \
+    --cluster-name "$name" --cluster-size "$cluster_size" --os UbuntuServer1604 \
+    --vault-name "$name" --vault-resource-group "$name" \
+    --vm-password "$deploy_password" --vm-user-name "$name" --vm-sku "$vm_size"
+
+  # wait for the cluster to come up
+  while [ "$(az sf cluster show -g $name -n $name | jq -r '.clusterState')" == 'Deploying' ]; do
+    sleep 15s
+  done
+
+  # deploy the containers for the application to the cluster
+  cert_file="$(ls $cert_folder/*.pem | head -1)"
+  sfctl cluster select --endpoint "https://$cluster_host:19080" --pem "$cert_file" --no-verify
+  sfctl compose create --deployment-name "$name" --file-path compose.yml
+
+  # log some information about the deployment
+  echo "All done. Keep the following for your records:"
+  echo "- Cluster URL: http://$cluster_host"
+  echo "- Certificate: $cert_file"
 
 How do I...
 -----------
