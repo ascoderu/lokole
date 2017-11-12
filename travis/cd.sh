@@ -13,15 +13,12 @@ set -euo pipefail
 compose_file="$(mktemp)"
 env_file="$(mktemp)"
 
-app_port="80"
-build_tag="$TRAVIS_TAG"
-
 cleanup() {
   rm -f "$compose_file" "$env_file"
 }
 trap cleanup EXIT
 
-APP_PORT="$app_port" BUILD_TAG="$build_tag" ENV_FILE="$env_file" \
+APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" ENV_FILE="$env_file" \
   docker-compose config > "$compose_file"
 
 docker-compose -f "$compose_file" build
