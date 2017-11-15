@@ -43,7 +43,7 @@ fi
 sudo apt-get install -y jq
 sudo python3 -m pip install sfctl
 
-sfctl cluster select --endpoint "$SERVICE_FABRIC_ENDPOINT" --pem "$cert_file" --no-verify
+REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "$SERVICE_FABRIC_ENDPOINT" --pem "$cert_file" --no-verify
 sfctl compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
 
 while [ "$(sfctl compose upgrade-status --deployment-name $SERVICE_FABRIC_DEPLOYMENT_NAME | jq -r '.upgradeState')" != 'RollingForwardCompleted' ]; do

@@ -185,7 +185,7 @@ First-time setup:
 
   # deploy the containers for the application to the cluster
   cert_file="$(ls $cert_folder/*.pem | head -1)"
-  sfctl cluster select --endpoint "https://$cluster_host:19080" --pem "$cert_file" --no-verify
+  REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "https://$cluster_host:19080" --pem "$cert_file" --no-verify
   sfctl compose create --deployment-name "$name" --file-path compose.yml
 
   # log some information about the deployment
