@@ -32,7 +32,7 @@ docker-compose -f "$compose_file" build
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 docker-compose -f "$compose_file" push
 
-if [ -z "$SERVICE_FABRIC_ENDPOINT" -o -z "$SERVICE_FABRIC_DEPLOYMENT_NAME" ]; then
+if [ -z "$SERVICE_FABRIC_HOST" -o -z "$SERVICE_FABRIC_DEPLOYMENT_NAME" ]; then
   echo "No service fabric credentials configured, skipping upgrade of cluster" >&2; exit 0
 fi
 
@@ -42,7 +42,7 @@ fi
 
 sudo python3 -m pip install sfctl
 
-REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "$SERVICE_FABRIC_ENDPOINT" --pem "$cert_file" --no-verify
+REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "https://$SERVICE_FABRIC_HOST:19080" --pem "$cert_file" --no-verify
 sfctl compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
 
 echo "All done with deployment" >&2; exit 0
