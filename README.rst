@@ -178,11 +178,6 @@ First-time setup:
     --vault-name "$name" --vault-resource-group "$name" \
     --vm-password "$deploy_password" --vm-user-name "$name" --vm-sku "$vm_size"
 
-  # wait for the cluster to come up
-  while [ "$(az sf cluster show -g $name -n $name | jq -r '.clusterState')" == 'Deploying' ]; do
-    sleep 15s
-  done
-
   # deploy the containers for the application to the cluster
   cert_file="$(ls $cert_folder/*.pem | head -1)"
   REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "https://$cluster_host:19080" --pem "$cert_file" --no-verify

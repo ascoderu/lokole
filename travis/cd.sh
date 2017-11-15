@@ -40,15 +40,9 @@ if [ ! -f "$cert_file" -o ! -s "$env_file" ]; then
   echo "No service fabric secrets found, unable to upgrade cluster" >&2; exit 2
 fi
 
-sudo apt-get install -y jq
 sudo python3 -m pip install sfctl
 
 REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "$SERVICE_FABRIC_ENDPOINT" --pem "$cert_file" --no-verify
 sfctl compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
-
-while [ "$(sfctl compose upgrade-status --deployment-name $SERVICE_FABRIC_DEPLOYMENT_NAME | jq -r '.upgradeState')" != 'RollingForwardCompleted' ]; do
-  echo "Waiting for service fabric deployment to complete..." >&2
-  sleep 15s
-done
 
 echo "All done with deployment" >&2; exit 0
