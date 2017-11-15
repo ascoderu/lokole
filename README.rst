@@ -194,6 +194,9 @@ First-time setup:
   echo "- Cluster URL: http://$cluster_host"
   echo "- Certificate: $cert_file"
 
+The production cluster is wired-up with continuous delivery via Travis so that whenever a new release gets created on
+Github, the containers are automatically re-built and deployed to the cluster.
+
 How do I...
 -----------
 
