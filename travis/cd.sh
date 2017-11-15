@@ -40,9 +40,13 @@ if [ ! -f "$cert_file" -o ! -s "$env_file" ]; then
   echo "No service fabric secrets found, unable to upgrade cluster" >&2; exit 2
 fi
 
-sudo pip install sfctl
+py_env=~/virtualenv/python$TRAVIS_PYTHON_VERSION
+pip="$py_env/bin/pip"
+sfctl="$py_env/bin/sfctl"
 
-REQUESTS_CA_BUNDLE="$cert_file" sfctl cluster select --endpoint "https://$SERVICE_FABRIC_HOST:19080" --pem "$cert_file" --no-verify
+${pip} install sfctl
+
+REQUESTS_CA_BUNDLE="$cert_file" ${sfctl} cluster select --endpoint "https://$SERVICE_FABRIC_HOST:19080" --pem "$cert_file" --no-verify
 sfctl compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
 
 echo "All done with deployment" >&2; exit 0
