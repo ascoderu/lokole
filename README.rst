@@ -141,8 +141,8 @@ First-time setup:
   appinsights_key="SET ME"
 
   # create required resources
-  az group create --location="${location}" --name="${name}"
   az configure --defaults group="${name}" location="${location}"
+  az group create --name="${name}"
   az storage account create --sku=standard_lrs --name="opwenserverqueues"
   az storage account create --sku=standard_lrs --name="opwenservertables"
   az storage account create --sku=standard_lrs --name="opwenserverblobs"
@@ -171,7 +171,6 @@ First-time setup:
 
   # create a new cluster
   cluster_host="$name.$location.cloudapp.azure.com"
-  az group create -n "$name" -l "$location"
   az sf cluster create \
     --resource-group "$name" --location "$location" --certificate-output-folder "$cert_folder" \
     --certificate-password "$deploy_password" --certificate-subject-name "$cluster_host" \

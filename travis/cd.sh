@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
 if [ -z "$TRAVIS_TAG" ]; then
   echo "Build is not a release, skipping CD" >&2; exit 0
 fi
@@ -7,8 +9,6 @@ fi
 if [ -z "$DOCKER_USERNAME" -o -z "$DOCKER_PASSWORD" ]; then
   echo "No docker credentials configured, unable to publish builds" >&2; exit 1
 fi
-
-set -euo pipefail
 
 secrets_archive="$(mktemp)"
 compose_file="$(mktemp)"
