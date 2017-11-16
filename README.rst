@@ -117,16 +117,21 @@ Alternatively, you can also run the entire application stack via Docker:
   docker-compose build
   docker-compose up
 
-There is an `OpenAPI specification <https://github.com/ascoderu/opwen-cloudserver/blob/master/opwen_email_server/static/email-api-spec.yaml>`_
-that documents the functionality of the application and provides pointers to the
-entry points into the code. You can experiment with the endpoints in the `API test console <http://localhost:8080/api/email/ui>`_
-(for any endpoints that require `client_id` to be specified, fill in the value
-described in the script above, i.e., 123456789).
+There are OpenAPI specifications that document the functionality of the
+application and provide references to the entry points into the code
+(look for "some-api-name-spec.yaml" files in the repository).
 
 Production setup
 ----------------
 
-First-time setup:
+For setting up a new deployment, run the steps below to create a new
+`ServiceFabric cluster <https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-docker-compose>`_
+via Docker-Compose and deploy the application across the cluster. This only
+needs to be done once. After that, the cluster is wired-up with continuous
+delivery via Travis so that whenever a
+`new release <https://github.com/ascoderu/opwen-cloudserver/releases/new>`_
+gets created on Github, the containers are automatically re-built and
+deployed to the cluster.
 
 .. sourcecode :: sh
 
@@ -188,8 +193,12 @@ First-time setup:
   echo "- Cluster URL: http://$cluster_host"
   echo "- Certificate: $cert_file"
 
-The production cluster is wired-up with continuous delivery via Travis so that whenever a new release gets created on
-Github, the containers are automatically re-built and deployed to the cluster.
+If you're setting up a new continuous delivery integration, make sure to
+update the secrets archive in Travis to include your cluster certificate
+and environment dotfile since the items included in this repository are
+specific to the Ascoderu deployment of this repository. For more information,
+take a look at how to
+`encrypt files with Travis <https://docs.travis-ci.com/user/encrypting-files/>`_.
 
 How do I...
 -----------
