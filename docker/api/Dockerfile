@@ -6,6 +6,7 @@ ENV GUNICORN_WORKERS="1"
 ADD opwen_email_server /app/opwen_email_server
 ADD runserver.py /app/server.py
 ADD requirements.txt /app/requirements.txt
+ADD docker/api/healthcheck.sh /app/healthcheck.sh
 
 ARG BUILD_DEPENDENCIES="build-base python3-dev"
 RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev \
@@ -20,5 +21,5 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
 
 EXPOSE 80
 WORKDIR /app
-HEALTHCHECK --interval=1m --timeout=5s CMD curl --fail --silent http://localhost/healthcheck/ping || exit 1
+HEALTHCHECK --interval=1m --timeout=5s CMD /app/healthcheck.sh
 CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/${API_NAME}', '/app/opwen_email_server/static/healthcheck-spec.yaml'], server='tornado')"

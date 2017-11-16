@@ -5,6 +5,7 @@ ENV LOKOLE_QUEUE_ERROR_FILE="/app/queue_health.txt"
 
 ADD opwen_email_server /app/opwen_email_server
 ADD requirements.txt /app/requirements.txt
+ADD docker/job/healthcheck.sh /app/healthcheck.sh
 
 ARG BUILD_DEPENDENCIES="build-base python3-dev"
 RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev \
@@ -17,5 +18,5 @@ RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openss
   && apk del ${BUILD_DEPENDENCIES}
 
 WORKDIR /app
-HEALTHCHECK CMD test -s "$LOKOLE_QUEUE_ERROR_FILE" && cat "$LOKOLE_QUEUE_ERROR_FILE" && exit 1 || exit 0
+HEALTHCHECK CMD /app/healthcheck.sh
 CMD "python3" "-m" "${JOB_NAME}"
