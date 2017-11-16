@@ -134,8 +134,8 @@ First-time setup:
   name='opwenserver'
   deploy_tag='latest'
   cert_folder="$(mktemp -d)"
-  cluster_size=3
-  vm_size='Standard_D2_V2'
+  cluster_size='5'
+  vm_size='Standard_B2S'
 
   deploy_password="FILL ME IN"
   appinsights_key="SET ME"
