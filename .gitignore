@@ -1,10 +1,10 @@
 .idea/
 
-.env
-
 *.pyc
 /build/
 /dist/
 /*.egg-info/
 
+.env
+cert.pem
 travis/secrets.tar
