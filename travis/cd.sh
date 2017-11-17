@@ -10,6 +10,10 @@ if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_PASSWORD" ]; then
   echo "No docker credentials configured, unable to publish builds" >&2; exit 1
 fi
 
+if [ -z "$PYPI_USERNAME" ] || [ -z "$PYPI_PASSWORD" ]; then
+  echo "No PyPI credentials configured, unable to publish builds" >&2; exit 1
+fi
+
 secrets_archive="$(mktemp)"
 compose_file="$(mktemp)"
 env_file='.env'
@@ -20,7 +24,7 @@ tar xf "$secrets_archive" -C . "$cert_file" "$env_file"
 touch "$env_file"
 
 cleanup() {
-  rm -f "$compose_file" "$env_file" "$secrets_archive" "$cert_file"
+  rm -f "$compose_file" "$env_file" "$secrets_archive" "$cert_file" "$HOME/.pypirc"
 }
 trap cleanup EXIT
 
@@ -32,6 +36,23 @@ docker-compose -f "$compose_file" build
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 docker-compose -f "$compose_file" push
 
+cat > ~/.pypirc << EOF
+[distutils]
+index-servers =
+    pypi
+
+[pypi]
+username: $PYPI_USERNAME
+password: $PYPI_PASSWORD
+EOF
+
+echo "$TRAVIS_TAG" > version.txt
+
+py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
+python="$py_env/bin/python"
+
+${python} setup.py sdist upload
+
 if [ -z "$SERVICE_FABRIC_HOST" ] || [ -z "$SERVICE_FABRIC_DEPLOYMENT_NAME" ]; then
   echo "No service fabric credentials configured, skipping upgrade of cluster" >&2; exit 0
 fi
@@ -40,7 +61,6 @@ if [ ! -f "$cert_file" ] || [ ! -s "$env_file" ]; then
   echo "No service fabric secrets found, unable to upgrade cluster" >&2; exit 2
 fi
 
-py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 pip="$py_env/bin/pip"
 sfctl="$py_env/bin/sfctl"
 
