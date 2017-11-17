@@ -18,13 +18,14 @@ secrets_archive="$(mktemp)"
 compose_file="$(mktemp)"
 env_file='.env'
 cert_file='cert.pem'
+pypirc_file="$HOME/.pypirc"
 
 openssl aes-256-cbc -K "$encrypted_2ff31a343d6c_key" -iv "$encrypted_2ff31a343d6c_iv" -in travis/secrets.tar.enc -out "$secrets_archive" -d
 tar xf "$secrets_archive" -C . "$cert_file" "$env_file"
 touch "$env_file"
 
 cleanup() {
-  rm -f "$compose_file" "$env_file" "$secrets_archive" "$cert_file" "$HOME/.pypirc"
+  rm -f "$compose_file" "$env_file" "$secrets_archive" "$cert_file" "$pypirc_file"
 }
 trap cleanup EXIT
 
@@ -36,7 +37,7 @@ docker-compose -f "$compose_file" build
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 docker-compose -f "$compose_file" push
 
-cat > ~/.pypirc << EOF
+cat > "$pypirc_file" << EOF
 [distutils]
 index-servers =
     pypi
