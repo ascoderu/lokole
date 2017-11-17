@@ -12,3 +12,5 @@ addons:
       - shellcheck
 
 script: travis/ci.sh
+
+after_success: travis/cd.sh
