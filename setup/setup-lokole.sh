@@ -202,7 +202,7 @@ update_python_package 'pip'
 update_python_package 'setuptools'
 install_python_package 'wheel'
 
-install_python_package "${opwen_webapp_service}"
+install_python_package "${opwen_webapp_service}"  # TODO: change to git clone
 "${opwen_webapp_virtualenv}/bin/pybabel" compile -d "${opwen_webapp_directory}/translations"
 
 delete "${HOME}/.cache/pip"
@@ -224,7 +224,7 @@ update_python_package 'pip'
 update_python_package 'setuptools'
 install_python_package 'wheel'
 
-install_python_package 'opwen_email_server'
+install_python_package 'opwen_email_server'  # TODO: change to git clone
 
 "${registration_virtualenv}/bin/registerclient.py" \
     --tables_account="${server_tables_account_name}" \
