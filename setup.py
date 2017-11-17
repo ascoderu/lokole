@@ -10,13 +10,17 @@ with open('README.rst') as fobj:
     long_description = fobj.read()
 
 
+with open('version.txt') as fobj:
+    version = fobj.read().strip()
+
+
 packages = find_packages(exclude=['tests*'])
 scripts = ['manage.py']
 
 
 setup(
     name='opwen_email_client',
-    version='0.1.3',
+    version=version,
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
