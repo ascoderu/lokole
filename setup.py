@@ -25,7 +25,7 @@ setup(
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
     url='https://github.com/ascoderu/opwen-webapp',
-    license='LICENSE.txt',
+    license='License :: OSI Approved :: Apache Software License',
     description='Email client for the Opwen project',
     long_description=long_description,
     include_package_data=True,
