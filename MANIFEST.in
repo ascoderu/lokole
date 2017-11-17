@@ -1,0 +1,4 @@
+include requirements.txt
+recursive-include opwen_email_client/webapp/static *
+recursive-include opwen_email_client/webapp/templates *.html
+recursive-include opwen_email_client/webapp/translations *.po
