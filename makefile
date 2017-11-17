@@ -3,6 +3,7 @@
 #
 PYTHON=/usr/bin/python3
 NPM=/usr/bin/npm
+SHELLCHECK=/usr/bin/shellcheck
 
 #
 # You shouldn't need to touch anything below this line.
@@ -29,8 +30,13 @@ unit-tests: venv
 
 tests: unit-tests
 
-lint: venv
+lint-python: venv
 	$(py_env)/bin/flake8 $(py_packages)
+
+lint-shell: $(SHELLCHECK)
+	$(SHELLCHECK) --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh')
+
+lint: lint-python lint-shell
 
 typecheck: venv
 	$(py_env)/bin/mypy --silent-imports $(py_packages)

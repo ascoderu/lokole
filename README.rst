@@ -27,9 +27,8 @@ files, manages the actual mailboxes for the users on the Lokole and sends new
 emails back to the Lokole by using the same compressed file exchange format.
 
 The Lokole web-application is intended to run on low-spec Raspberry Pi 3
-hardware. There is a `script <https://github.com/ascoderu/opwen-setup>`_ to set up
-the hardware with all the bits and pieces necessary to run the Lokole
-web-application: web server, wsgi server, etc.
+hardware (or similar). Read the "Production setup" section below for further
+information on how to set up the client devices.
 
 Why is this useful?
 -------------------
@@ -86,7 +85,7 @@ e.g. on Ubuntu:
 
 .. sourcecode :: sh
 
-  sudo apt-get install -y python3-venv npm
+  sudo apt-get install -y python3-venv npm shellcheck
   sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 Third, use the makefile to verify your installation by running the tests and
@@ -117,6 +116,38 @@ directory. Any files uploaded to the server will be written to a subdirectory of
 the Lokole, simply create a file at `$AZURE_ROOT/to-lokole/emails.pack` and the Lokole
 device will ingest the emails in that file during the data exchange.
 
+Production setup
+----------------
+
+There is a `script <https://github.com/ascoderu/opwen-webapp/setup/setup-lokole.sh>`_
+to set up a new Lokole device. The script will install the web app in this repository
+as well as standard web infrastructure like nginx and gunicorn. The script will also
+make ready peripherals like the USB modem used for data exchange, and set up any
+required background jobs such as the email synchronization cron job.
+
+The setup script assumes that you have already set up:
+
+* 3 Azure Storage Accounts, general purpose: for the cloudserver to manage its queues, tables and blobs
+* 1 Azure Storage Account, blob storage: for the cloudserver and webapp to exchange email packages
+* 1 Application Insights account: to collect logs from the cloudserver and monitor its operations
+* 1 SendGrid account: to send and receive emails in the cloudserver
+
+The setup script is tested with hardware:
+
+* `Raspberry Pi 3 <https://www.raspberrypi.org/products/raspberry-pi-3-model-b/>`_
+  running Raspbian Jessie lite
+  `v2016-05-27 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2016-05-31/2016-05-27-raspbian-jessie-lite.zip>`_,
+  `v2017-01-11 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-01-10/2017-01-11-raspbian-jessie-lite.zip>`_, and
+  `v2017-04-10 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-04-10/2017-04-10-raspbian-jessie-lite.zip>`_
+
+* `Orange Pi Zero <http://www.orangepi.org/orangepizero/>`_
+  running `Armbian Ubuntu Xenial <https://dl.armbian.com/orangepizero/Ubuntu_xenial_default.7z>`_
+
+The setup script is also tested with USB modems:
+
+* `Huawei E303s-65 <http://consumer.huawei.com/cl/mobile-broadband/dongles/tech-specs/e303-cl.htm>`_
+* `Huawei E3131 <http://consumer.huawei.com/lk/mobile-broadband/dongles/tech-specs/e3131-lk.htm>`_
+* `Huawei MS2131i-8 <http://consumer.huawei.com/en/solutions/m2m-solutions/products/tech-specs/ms2131-en.htm>`_
 
 Adding a new language
 ---------------------

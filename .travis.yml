@@ -6,6 +6,13 @@ python:
   - "3.5"
   - "3.6"
 
+addons:
+  apt:
+    sources:
+      - debian-sid
+    packages:
+      - shellcheck
+
 env:
   - TARGET=lint
   - TARGET=unit-tests
