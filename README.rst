@@ -149,6 +149,11 @@ The setup script is also tested with USB modems:
 * `Huawei E3131 <http://consumer.huawei.com/lk/mobile-broadband/dongles/tech-specs/e3131-lk.htm>`_
 * `Huawei MS2131i-8 <http://consumer.huawei.com/en/solutions/m2m-solutions/products/tech-specs/ms2131-en.htm>`_
 
+The setup script installs the latest version of the webapp published to PyPI.
+New versions get automatically published to PyPI (via Travis) whenever a new
+`release <https://github.com/ascoderu/opwen-webapp/releases/new>`_ is created
+on Github.
+
 Adding a new language
 ---------------------
 
