@@ -119,7 +119,7 @@ device will ingest the emails in that file during the data exchange.
 Production setup
 ----------------
 
-There is a `script <https://github.com/ascoderu/opwen-webapp/setup/setup-lokole.sh>`_
+There is a `script <https://github.com/ascoderu/opwen-webapp/blob/master/setup/setup-lokole.sh>`_
 to set up a new Lokole device. The script will install the web app in this repository
 as well as standard web infrastructure like nginx and gunicorn. The script will also
 make ready peripherals like the USB modem used for data exchange, and set up any
