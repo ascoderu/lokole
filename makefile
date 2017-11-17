@@ -41,7 +41,7 @@ lint: lint-python lint-shell
 typecheck: venv
 	$(py_env)/bin/mypy --silent-imports $(py_packages)
 
-ci: tests lint
+ci: lint tests
 
 $(grunt): package.json bower.json
 	$(NPM) install
