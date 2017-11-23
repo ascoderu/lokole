@@ -68,6 +68,6 @@ sfctl="$py_env/bin/sfctl"
 ${pip} install sfctl
 
 REQUESTS_CA_BUNDLE="$cert_file" ${sfctl} cluster select --endpoint "https://$SERVICE_FABRIC_HOST:19080" --pem "$cert_file" --no-verify
-sfctl compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
+${sfctl} compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
 
 echo "All done with deployment" >&2; exit 0
