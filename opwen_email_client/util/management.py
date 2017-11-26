@@ -19,11 +19,11 @@ class DevServerCommand(Command):
 
 def _load_environment(app: Flask) -> None:
     try:
+        # noinspection PyUnresolvedReferences
         from dotenv import load_dotenv
+        load_dotenv(join(app.root_path, '..', '..', '.env'))
     except ImportError:
-        return
-    dotenv_path = join(app.root_path, '..', '..', '.env')
-    load_dotenv(dotenv_path)
+        pass
 
 
 def _templates_paths_for(app: Flask, templates_matcher: str) -> List[str]:
