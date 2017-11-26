@@ -2,7 +2,6 @@ from glob import glob
 from os.path import join
 from typing import List
 
-from dotenv import load_dotenv
 from flask import Flask
 from flask_script import Command
 
@@ -19,6 +18,10 @@ class DevServerCommand(Command):
 
 
 def _load_environment(app: Flask) -> None:
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
     dotenv_path = join(app.root_path, '..', '..', '.env')
     load_dotenv(dotenv_path)
 
