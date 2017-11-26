@@ -154,6 +154,15 @@ New versions get automatically published to PyPI (via Travis) whenever a new
 `release <https://github.com/ascoderu/opwen-webapp/releases/new>`_ is created
 on Github.
 
+You can run the script on your client device like so:
+
+.. sourcecode :: sh
+
+  wget https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/{.shared,setup-lokole}.sh
+  chmod +x setup-lokole.sh
+  ./setup-lokole.sh <client-name> <storage-account-name> <storage-account-key> <sim-type> <email-key> <server-tables-name> <server-tables-key>
+
+
 Adding a new language
 ---------------------
 
