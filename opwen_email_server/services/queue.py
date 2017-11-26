@@ -45,24 +45,32 @@ class AzureQueue(LogMixin):
         self._client.put_message(self._name, message)
         self.log_debug('received message')
 
-    # noinspection PyBroadException
     def dequeue(self, batch: int=1, lock_seconds: int=10) -> Iterable[dict]:
         messages = self._client.get_messages(self._name, batch, lock_seconds)
         for message in messages:
+            delete_message = False
+
+            # noinspection PyBroadException
             try:
                 payload = self._unpack(message.content)
             except Exception:
-                self.log_exception('error unpacking message')
-                pass
+                self.log_exception('error unpacking message %r, purging',
+                                   message.id)
+                delete_message = True
             else:
+                # noinspection PyBroadException
                 try:
                     yield payload
                 except Exception:
-                    self.log_exception('error processing message payload')
-                    continue
-            self._client.delete_message(self._name, message.id,
-                                        message.pop_receipt)
-            self.log_debug('done with message %r, deleting', message.id)
+                    self.log_exception('error processing message, retrying')
+                else:
+                    self.log_debug('done with message %r, deleting',
+                                   message.id)
+                    delete_message = True
+
+            if delete_message:
+                self._client.delete_message(self._name, message.id,
+                                            message.pop_receipt)
 
     def extra_log_args(self):
         yield 'queue %s', self._name
