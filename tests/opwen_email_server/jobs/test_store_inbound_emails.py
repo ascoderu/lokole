@@ -21,6 +21,7 @@ class StoreInboundEmailsTests(TestCase):
         consumer.run_once()
 
         self.assertEqual(storage_mock.fetch_text.call_count, 1)
+        self.assertEqual(storage_mock.delete.call_count, 1)
         self.assertEqual(queue_mock.dequeue.call_count, 1)
         store_mock.assert_called_once_with(email_id, email)
 

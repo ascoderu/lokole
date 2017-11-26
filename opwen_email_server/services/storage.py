@@ -43,6 +43,9 @@ class _BaseAzureStorage(LogMixin):
     def extra_log_args(self):
         yield 'container %s', self._container
 
+    def delete(self, resource_id: str):
+        self._client.delete_blob(self._container, resource_id)
+
 
 class _AzureFileStorage(_BaseAzureStorage):
     def store_file(self, resource_id: str, path: str):
@@ -115,3 +118,6 @@ class AzureObjectStorage(LogMixin):
                     self.log_debug('fetched email %s', obj.get('_uid'))
                     yield obj
         self.log_debug('fetched %d objects from %s', num_fetched, resource_id)
+
+    def delete(self, resource_id: str):
+        self._file_storage.delete(resource_id)

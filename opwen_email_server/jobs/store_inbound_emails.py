@@ -11,11 +11,14 @@ class Job(QueueConsumer):
     def _process_message(self, message: dict):
         resource_id = message['resource_id']
         mime_email = email_receive.STORAGE.fetch_text(resource_id)
-        self.log_info('Fetched inbound client email %s', resource_id)
+        self.log_info('Fetched inbound MIME email %s', resource_id)
 
         email = parse_mime_email(mime_email)
         server_datastore.store_email(resource_id, email)
-        self.log_info('Stored inbound client email %s', resource_id)
+        self.log_info('Stored inbound email %s', resource_id)
+
+        email_receive.STORAGE.delete(resource_id)
+        self.log_info('Deleted inbound MIME email %s', resource_id)
 
 
 if __name__ == '__main__':

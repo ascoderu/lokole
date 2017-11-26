@@ -27,6 +27,9 @@ class Job(QueueConsumer):
             })
             self.log_info('Ingesting packaged client email %s', email_id)
 
+        client_datastore.delete(resource_id)
+        self.log_info('Deleted packaged client emails from %s', resource_id)
+
 
 if __name__ == '__main__':
     from opwen_email_server.services.queue_consumer import cli

@@ -11,3 +11,7 @@ STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
 
 def unpack_emails(resource_id: str) -> Iterable[dict]:
     return STORAGE.fetch_objects(resource_id)
+
+
+def delete(resource_id: str):
+    STORAGE.delete(resource_id)

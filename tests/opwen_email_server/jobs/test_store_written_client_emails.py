@@ -11,9 +11,11 @@ class StoreWrittenClientEmailsTests(TestCase):
     @patch.object(store_written_client_emails.client_write, 'QUEUE')
     @patch.object(email_sender, 'QUEUE')
     @patch.object(client_datastore, 'unpack_emails')
+    @patch.object(client_datastore, 'delete')
     @patch.object(server_datastore, 'store_email')
     def test_reads_message_and_stores_email(
-            self, store_mock, unpack_mock, send_queue_mock, write_queue_mock):
+            self, store_mock, delete_mock, unpack_mock, send_queue_mock,
+            write_queue_mock):
 
         resource_id = '7ad33d8a-c1ee-44c7-a655-fb0d167dc380'
         email1_id = '4efba428-143c-11e7-93ae-92361f002671'
@@ -27,6 +29,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         consumer.run_once()
 
         self.assertEqual(unpack_mock.call_count, 1)
+        self.assertEqual(delete_mock.call_count, 1)
         self.assertEqual(send_queue_mock.enqueue.call_count, 2)
         self.assertEqual(write_queue_mock.dequeue.call_count, 1)
         self.assertEqual(store_mock.call_count, 2)
