@@ -1,1 +1,4 @@
 recursive-include opwen_email_server/static *
+include version.txt
+include requirements.txt
+include README.rst
