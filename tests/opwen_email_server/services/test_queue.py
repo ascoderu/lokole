@@ -5,6 +5,11 @@ from unittest.mock import MagicMock
 from opwen_email_server.services.queue import AzureQueue
 
 
+AzureQueueMessage = namedtuple(
+    'Message',
+    'id pop_receipt content dequeue_count')
+
+
 class AzureQueueTests(TestCase):
     def test_enqueue_stores_message(self):
         queue, client_mock = self._given_queue()
@@ -60,15 +65,15 @@ class AzureQueueTests(TestCase):
 
     # noinspection PyTypeChecker
     @classmethod
-    def _given_queue(cls, messages=None):
+    def _given_queue(cls, messages=None, dequeue_count=0):
         client_mock = MagicMock()
         queue = AzureQueue(account='account', key='key', name='name',
                            factory=lambda *args, **kwargs: client_mock)
 
         if messages:
-            build_message = namedtuple('Message', 'id pop_receipt content')
             client_mock.get_messages.return_value = [
-                build_message(id=i, pop_receipt=i, content=message)
+                AzureQueueMessage(id=i, pop_receipt=i, content=message,
+                                  dequeue_count=dequeue_count)
                 for (i, message) in enumerate(messages)]
 
         return queue, client_mock
