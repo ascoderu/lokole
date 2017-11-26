@@ -58,5 +58,7 @@ prepare-translations: babel.pot venv
 compile-translations: venv
 	$(py_env)/bin/pybabel compile -d opwen_email_client/webapp/translations
 
-server: venv compile-translations build-frontend
+prepare-server: venv compile-translations build-frontend
+
+server: prepare-server
 	$(app_runner)

@@ -30,4 +30,6 @@ echo "$TRAVIS_TAG" > version.txt
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 python="$py_env/bin/python"
 
+make prepare-server -e py_env="$py_env"
+
 ${python} setup.py sdist upload
