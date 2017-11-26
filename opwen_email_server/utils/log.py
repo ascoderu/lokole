@@ -5,7 +5,7 @@ from typing import Any
 from typing import Iterable
 from typing import Tuple
 
-from applicationinsights.logging import LoggingHandler as AppInsightsHandler
+from applicationinsights import TelemetryClient
 
 from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
@@ -18,11 +18,12 @@ _LOG = getLogger()
 _LOG.addHandler(_STDERR)
 _LOG.setLevel(LOG_LEVEL)
 
+_APPINSIGHTS = None  # type: TelemetryClient
+
 if APPINSIGHTS_KEY:
-    _APPINSIGHTS_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
-    _APPINSIGHTS = AppInsightsHandler(APPINSIGHTS_KEY)
-    _APPINSIGHTS.setFormatter(Formatter(_APPINSIGHTS_FORMAT))
-    _LOG.addHandler(_APPINSIGHTS)
+    _APPINSIGHTS = TelemetryClient(APPINSIGHTS_KEY)
+    _APPINSIGHTS.channel.sender.send_interval_in_milliseconds = 30 * 1000
+    _APPINSIGHTS.channel.sender.max_queue_item_count = 10
 
 
 class LogMixin(object):
@@ -48,6 +49,9 @@ class LogMixin(object):
         message = self.info_separator.join(message_parts)
         log = getattr(_LOG, level)
         log(message, *args)
+
+        if _APPINSIGHTS:
+            _APPINSIGHTS.track_trace(message.format(args), {'level': level})
 
     # noinspection PyMethodMayBeStatic
     def extra_log_args(self) -> Iterable[Tuple[str, Any]]:
