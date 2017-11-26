@@ -10,6 +10,8 @@ from opwen_email_server.utils.serialization import to_json
 
 
 class AzureQueue(LogMixin):
+    _max_message_retries = 5
+
     def __init__(self, account: str, key: str, name: str,
                  client: QueueService=None,
                  factory: Callable[..., QueueService]=QueueService) -> None:
@@ -65,8 +67,14 @@ class AzureQueue(LogMixin):
             try:
                 yield [payload]  # type: ignore
             except Exception:
-                self.log_exception('error handling message %r, retrying',
-                                   message.id)
+                if message.dequeue_count > self._max_message_retries:
+                    self.log_exception(
+                        'too many retries for message %r, purging',
+                        message.id)
+                    delete_message = True
+                else:
+                    self.log_exception('error handling message %r, retrying',
+                                       message.id)
             else:
                 self.log_debug('done with message %r, deleting',
                                message.id)

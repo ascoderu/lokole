@@ -45,6 +45,16 @@ class AzureQueueTests(TestCase):
         self.assertEqual(client_mock.get_messages.call_count, 1)
         self.assertEqual(client_mock.delete_message.call_count, 0)
 
+    def test_dequeue_with_many_exceptions_removes_message(self):
+        queue, client_mock = self._given_queue(['{"foo":"bar"}'],
+                                               dequeue_count=999)
+
+        with queue.dequeue() as _:
+            raise ValueError
+
+        self.assertEqual(client_mock.get_messages.call_count, 1)
+        self.assertEqual(client_mock.delete_message.call_count, 1)
+
     def test_dequeue_rejects_unparsable_messages(self):
         queue, client_mock = self._given_queue(['{"corrupt'])
 
