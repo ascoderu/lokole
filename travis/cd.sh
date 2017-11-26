@@ -30,6 +30,9 @@ echo "$TRAVIS_TAG" > version.txt
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 python="$py_env/bin/python"
 
+sudo apt-get install -y npm
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+
 make prepare-server -e py_env="$py_env"
 
 ${python} setup.py sdist upload
