@@ -39,14 +39,17 @@ class ExceptionPreservingThread(Thread):
 
 class QueueConsumerTests(TestCase):
     def test_processes_messages(self):
-        consumer = TestQueueConsumer(lambda: None, lambda: [{"foo": "bar"}])
+        def _do_nothing(): pass
 
-        self._when_running(consumer, 0.05)
+        consumer = TestQueueConsumer(_do_nothing, lambda: [{"foo": "bar"}])
+
+        self._when_running(consumer, 0.06)
 
         self.assertGreaterEqual(consumer.messages_processed, 5)
 
     def test_ignores_exceptions_while_running(self):
         def _throw(): raise ValueError
+
         consumer = TestQueueConsumer(_throw, lambda: [{"foo": "bar"}])
 
         exception = self._when_running(consumer, 0.01)
