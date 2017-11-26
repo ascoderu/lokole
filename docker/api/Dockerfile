@@ -9,7 +9,7 @@ ADD requirements.txt /app/requirements.txt
 ADD docker/api/healthcheck.sh /app/healthcheck.sh
 
 ARG BUILD_DEPENDENCIES="build-base python3-dev"
-RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev \
+RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev ca-certificates \
   && python3 -m ensurepip \
   && rm -r /usr/lib/python*/ensurepip \
   && pip3 install -U --no-cache-dir pip setuptools \
