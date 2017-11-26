@@ -30,8 +30,8 @@ echo "$TRAVIS_TAG" > version.txt
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 python="$py_env/bin/python"
 
-sudo apt-get install -y npm
-sudo ln -s /usr/bin/nodejs /usr/bin/node
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 make prepare-server -e py_env="$py_env"
 
