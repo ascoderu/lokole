@@ -29,27 +29,18 @@ class AzureQueueTests(TestCase):
     def test_dequeue_removes_messages(self):
         queue, client_mock = self._given_queue(['{"foo":"bar"}'])
 
-        messages = list(queue.dequeue())
+        with queue.dequeue() as messages:
+            pass
 
         self.assertEqual(client_mock.get_messages.call_count, 1)
         self.assertEqual(client_mock.delete_message.call_count, 1)
         self.assertEqual(messages, [{'foo': 'bar'}])
 
-    def test_batch_dequeue_removes_many_messages(self):
-        queue, client_mock = self._given_queue(['{"foo":"bar"}', '{"baz":1}'])
-
-        messages = list(queue.dequeue(batch=2))
-
-        self.assertEqual(client_mock.get_messages.call_count, 1)
-        self.assertEqual(client_mock.delete_message.call_count, 2)
-        self.assertEqual(messages, [{'foo': 'bar'}, {'baz': 1}])
-
     def test_dequeue_with_exception_does_not_remove_message(self):
         queue, client_mock = self._given_queue(['{"foo":"bar"}'])
 
-        messages = queue.dequeue()
-        with self.assertRaises(Exception):
-            _consume_and_throw(messages)
+        with queue.dequeue() as _:
+            raise ValueError
 
         self.assertEqual(client_mock.get_messages.call_count, 1)
         self.assertEqual(client_mock.delete_message.call_count, 0)
@@ -57,7 +48,8 @@ class AzureQueueTests(TestCase):
     def test_dequeue_rejects_unparsable_messages(self):
         queue, client_mock = self._given_queue(['{"corrupt'])
 
-        messages = list(queue.dequeue())
+        with queue.dequeue() as messages:
+            pass
 
         self.assertEqual(client_mock.get_messages.call_count, 1)
         self.assertEqual(client_mock.delete_message.call_count, 1)
@@ -77,8 +69,3 @@ class AzureQueueTests(TestCase):
                 for (i, message) in enumerate(messages)]
 
         return queue, client_mock
-
-
-def _consume_and_throw(iterable):
-    for _ in iterable:
-        raise ValueError

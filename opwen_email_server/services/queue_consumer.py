@@ -1,6 +1,4 @@
 from time import sleep
-from typing import Callable
-from typing import Iterable
 
 from opwen_email_server.azure_constants import QUEUE_POLL_INTERVAL
 from opwen_email_server.utils.log import LogMixin
@@ -9,7 +7,7 @@ from opwen_email_server.utils.temporary import remove_if_exists
 
 
 class QueueConsumer(LogMixin):
-    def __init__(self, dequeue: Callable[[], Iterable[dict]],
+    def __init__(self, dequeue,
                  poll_seconds: float=QUEUE_POLL_INTERVAL) -> None:
 
         self._dequeue = dequeue
@@ -20,9 +18,9 @@ class QueueConsumer(LogMixin):
         raise NotImplementedError
 
     def run_once(self):
-        messages = self._dequeue()
-        for message in messages:
-            self._process_message(message)
+        with self._dequeue() as messages:
+            for message in messages:
+                self._process_message(message)
 
     def run_forever(self):
         self.log_debug('queue consumer listening')

@@ -27,5 +27,6 @@ class StoreInboundEmailsTests(TestCase):
 
     @classmethod
     def _given_message(cls, email, email_id, parser_mock, queue_mock):
-        queue_mock.dequeue.return_value = [{'resource_id': email_id}]
+        queue_mock.dequeue.return_value.__enter__.return_value = \
+            [{'resource_id': email_id}]
         parser_mock.return_value = email

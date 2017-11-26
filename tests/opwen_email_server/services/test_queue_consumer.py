@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from queue import Queue
 from sys import exc_info
 from threading import Thread
@@ -41,7 +42,10 @@ class QueueConsumerTests(TestCase):
     def test_processes_messages(self):
         def _do_nothing(): pass
 
-        consumer = TestQueueConsumer(_do_nothing, lambda: [{"foo": "bar"}])
+        @contextmanager
+        def _produce(): yield [{"foo": "bar"}]
+
+        consumer = TestQueueConsumer(_do_nothing, _produce)
 
         self._when_running(consumer, 0.06)
 
@@ -50,7 +54,10 @@ class QueueConsumerTests(TestCase):
     def test_ignores_exceptions_while_running(self):
         def _throw(): raise ValueError
 
-        consumer = TestQueueConsumer(_throw, lambda: [{"foo": "bar"}])
+        @contextmanager
+        def _produce(): yield [{"foo": "bar"}]
+
+        consumer = TestQueueConsumer(_throw, _produce)
 
         exception = self._when_running(consumer, 0.01)
 

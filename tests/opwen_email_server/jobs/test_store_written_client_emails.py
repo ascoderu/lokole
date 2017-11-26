@@ -38,5 +38,6 @@ class StoreWrittenClientEmailsTests(TestCase):
 
     @classmethod
     def _given_message(cls, emails, resource_id, unpack_mock, queue_mock):
-        queue_mock.dequeue.return_value = [{'resource_id': resource_id}]
+        queue_mock.dequeue.return_value.__enter__.return_value = \
+            [{'resource_id': resource_id}]
         unpack_mock.return_value = emails
