@@ -51,38 +51,45 @@ class AzureQueue(LogMixin):
     @contextmanager  # type: ignore
     def dequeue(self, lock_seconds: int=10) -> Iterable[dict]:
         messages = self._client.get_messages(self._name, 1, lock_seconds)
-        message = list(messages)[0]
-
-        delete_message = False
-        # noinspection PyBroadException
-        try:
-            payload = self._unpack(message.content)
-        except Exception:
-            self.log_exception('error unpacking message %r, purging',
-                               message.id)
-            delete_message = True
+        messages = list(messages)
+        if not messages:
             yield []  # type: ignore
         else:
+            message = messages[0]
+            delete_message = False
+
             # noinspection PyBroadException
             try:
-                yield [payload]  # type: ignore
+                payload = self._unpack(message.content)
             except Exception:
-                if message.dequeue_count > self._max_message_retries:
-                    self.log_exception(
-                        'too many retries for message %r, purging',
+                self.log_exception(
+                    'error unpacking message %r, purging',
+                    message.id)
+                delete_message = True
+                yield []  # type: ignore
+            else:
+                # noinspection PyBroadException
+                try:
+                    yield [payload]  # type: ignore
+                except Exception:
+                    if message.dequeue_count > self._max_message_retries:
+                        self.log_exception(
+                            'too many retries for message %r, purging',
+                            message.id)
+                        delete_message = True
+                    else:
+                        self.log_exception(
+                            'error processing message %r, retrying',
+                            message.id)
+                else:
+                    self.log_debug(
+                        'done with message %r, deleting',
                         message.id)
                     delete_message = True
-                else:
-                    self.log_exception('error handling message %r, retrying',
-                                       message.id)
-            else:
-                self.log_debug('done with message %r, deleting',
-                               message.id)
-                delete_message = True
 
-        if delete_message:
-            self._client.delete_message(self._name, message.id,
-                                        message.pop_receipt)
+            if delete_message:
+                self._client.delete_message(self._name, message.id,
+                                            message.pop_receipt)
 
     def extra_log_args(self):
         yield 'queue %s', self._name

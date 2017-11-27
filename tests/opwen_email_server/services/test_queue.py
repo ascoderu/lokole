@@ -26,6 +26,16 @@ class AzureQueueTests(TestCase):
 
         self.assertEqual(client_mock.create_queue.call_count, 1)
 
+    def test_dequeue_without_messages(self):
+        queue, client_mock = self._given_queue([])
+
+        with queue.dequeue() as messages:
+            pass
+
+        self.assertEqual(client_mock.get_messages.call_count, 1)
+        self.assertEqual(client_mock.delete_message.call_count, 0)
+        self.assertEqual(messages, [])
+
     def test_dequeue_removes_messages(self):
         queue, client_mock = self._given_queue(['{"foo":"bar"}'])
 
