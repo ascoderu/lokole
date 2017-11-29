@@ -15,10 +15,15 @@ addons:
     packages:
       - shellcheck
 
-before_install:
+script: travis/ci.sh
+
+before_deploy:
   - sudo apt-get update
   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
-script: travis/ci.sh
-
-after_success: travis/cd.sh
+deploy:
+  - provider: script
+    script: travis/cd.sh
+    on:
+      repo: ascoderu/opwen-cloudserver
+      tags: true
