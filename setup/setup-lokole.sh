@@ -354,6 +354,7 @@ internet_modem_config_e353='/etc/usb_modeswitch.d/12d1:1f01'
 internet_modem_config_e3131='/etc/usb_modeswitch.d/12d1:155b'
 internet_dialer_config='/etc/wvdial.conf'
 opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/email-sync.sh"
+opwen_webapp_email_sync_script_log="${opwen_webapp_run_directory}/email-sync.log"
 
 if [ "${sim_type}" = 'Hologram_World' ]; then
 write_file "${internet_dialer_config}" << EOF
@@ -413,6 +414,7 @@ dialer_config='${internet_dialer_config}'
 dialer_logfile="\$(mktemp dialer.log.XXXXXX)"
 dialer_pidfile="\$(mktemp dialer.pid.XXXXXX)"
 modem_target_mode='1506'
+logfile='${opwen_webapp_email_sync_script_log}'
 
 modem_is_e303() { lsusb | grep 'Huawei' | grep -q '12d1:14fe'; }
 modem_is_e353() { lsusb | grep 'Huawei' | grep -q '12d1:1f01'; }
@@ -432,22 +434,36 @@ setup_modem() {
   else exit 1;         fi
 }
 
-if ! modem_is_plugged; then
-  exit 1
-fi
+main() {
+  if ! modem_is_plugged; then
+    echo 'Modem not plugged in, exitting' >&2
+    exit 1
+  fi
 
-if ! modem_is_setup; then
-  setup_modem
-  while ! modem_is_setup; do sleep 1s; done
-fi
+  if ! modem_is_setup; then
+    echo 'Setting up modem...'
+    setup_modem
+    while ! modem_is_setup; do sleep 1s; done
+    echo '...done, modem is now set up'
+  fi
 
-if ! dialer_is_running; then
-  connect_to_internet
-  while ! dialer_is_connected; do sleep 1s; done
-fi
+  if ! dialer_is_running; then
+    echo 'Dialing up...'
+    connect_to_internet
+    while ! dialer_is_connected; do sleep 1s; done
+    echo '...done, connection to internet is established'
+  fi
 
-sync_emails
-kill_dialer
+  echo 'Syncing emails...'
+  sync_emails
+  echo '...done, emails are synced'
+
+  echo 'Killing dialer...'
+  kill_dialer
+  echo '...done, connection to internet is terminated'
+}
+
+main >> "$logfile" 2>&1
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 
