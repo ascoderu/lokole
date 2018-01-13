@@ -354,7 +354,6 @@ internet_modem_config_e353='/etc/usb_modeswitch.d/12d1:1f01'
 internet_modem_config_e3131='/etc/usb_modeswitch.d/12d1:155b'
 internet_dialer_config='/etc/wvdial.conf'
 opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/email-sync.sh"
-opwen_webapp_email_sync_script_log="${opwen_webapp_run_directory}/email-sync.log"
 
 if [ "${sim_type}" = 'Hologram_World' ]; then
 write_file "${internet_dialer_config}" << EOF
@@ -413,8 +412,8 @@ sync_secret='${opwen_webapp_admin_secret}'
 dialer_config='${internet_dialer_config}'
 dialer_logfile="\$(mktemp dialer.log.XXXXXX)"
 dialer_pidfile="\$(mktemp dialer.pid.XXXXXX)"
+sync_logfile="\$(mktemp email-sync.log.XXXXXX)"
 modem_target_mode='1506'
-logfile='${opwen_webapp_email_sync_script_log}'
 
 modem_is_e303() { lsusb | grep 'Huawei' | grep -q '12d1:14fe'; }
 modem_is_e353() { lsusb | grep 'Huawei' | grep -q '12d1:1f01'; }
@@ -463,7 +462,7 @@ main() {
   echo '...done, connection to internet is terminated'
 }
 
-main >> "$logfile" 2>&1
+main >> "\$sync_logfile" 2>&1
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 
