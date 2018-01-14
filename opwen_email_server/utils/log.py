@@ -51,7 +51,7 @@ class LogMixin(object):
         log(message, *args)
 
         if _APPINSIGHTS:
-            _APPINSIGHTS.track_trace(message % args, {'level': level})
+            _APPINSIGHTS.track_trace(message % tuple(args), {'level': level})
 
     # noinspection PyMethodMayBeStatic
     def extra_log_args(self) -> Iterable[Tuple[str, Any]]:
