@@ -29,7 +29,7 @@ class _Downloader(LogMixin):
             return email
 
         pending = server_datastore.fetch_pending_emails(domain)
-        pending = map(mark_delivered, pending)
+        pending = [mark_delivered(email) for email in pending]
         self.log_info('%s:Got %d pending emails', domain, len(delivered))
 
         resource_id = STORAGE.store_objects(pending)
