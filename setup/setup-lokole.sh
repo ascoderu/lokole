@@ -412,7 +412,6 @@ sync_secret='${opwen_webapp_admin_secret}'
 dialer_config='${internet_dialer_config}'
 dialer_logfile="\$(mktemp dialer.log.XXXXXX)"
 dialer_pidfile="\$(mktemp dialer.pid.XXXXXX)"
-sync_logfile="\$(mktemp email-sync.log.XXXXXX)"
 modem_target_mode='1506'
 
 modem_is_e303() { lsusb | grep 'Huawei' | grep -q '12d1:14fe'; }
@@ -462,7 +461,7 @@ main() {
   echo '...done, connection to internet is terminated'
 }
 
-main >> "\$sync_logfile" 2>&1
+main
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 
