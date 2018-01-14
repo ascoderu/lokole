@@ -52,6 +52,12 @@ class LogMixin(object):
 
         if _APPINSIGHTS:
             _APPINSIGHTS.track_trace(message % tuple(args), {'level': level})
+            if self.should_send_message_immediately(level):
+                _APPINSIGHTS.flush()
+
+    # noinspection PyMethodMayBeStatic
+    def should_send_message_immediately(self, level: str) -> bool:
+        return level != 'debug'
 
     # noinspection PyMethodMayBeStatic
     def extra_log_args(self) -> Iterable[Tuple[str, Any]]:

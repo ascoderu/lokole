@@ -25,10 +25,28 @@ class LogMixinTests(TestCase):
 
         self.assertDidLog('info', '%s:a %s:b %s:message %d', 'Bar', 1, 2, 3)
 
+    def test_important_messages_get_quickly_sent_by_appinsights(self):
+        class Foo(log.LogMixin):
+            def foo(self):
+                self.log_info('message %d', 123)
+        Foo().foo()
+        self.assertAppInsightsIsSent(True)
+
+    def test_not_important_messages_get_delayed_by_appinsights(self):
+        class Foo(log.LogMixin):
+            def foo(self):
+                self.log_debug('message %d', 123)
+        Foo().foo()
+        self.assertAppInsightsIsSent(False)
+
     def assertDidLog(self, log_level, *log_args):
         self.assertIsLogMessage(*log_args)
         self.assertDidCallLogger(log_level, *log_args)
         self.assertDidCallApplicationInsights(log_level, *log_args)
+
+    def assertAppInsightsIsSent(self, is_sent):
+        mock = self.appinsights_mock.flush
+        self.assertEqual(bool(mock.call_count), is_sent)
 
     def assertDidCallApplicationInsights(self, log_level, fmt, *args):
         mock = self.appinsights_mock.track_trace
