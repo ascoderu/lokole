@@ -38,11 +38,13 @@ class _Downloader(LogMixin):
         server_datastore.mark_emails_as_delivered(domain, delivered)
         self.log_info('%s:Marked pending emails as delivered', domain)
 
-        return {
+        response = {
             'resource_id': resource_id,
             'resource_container': STORAGE.container,
             'resource_type': 'azure-blob',
         }
+        self.log_info('%s:Returning %r', domain, response)
+        return response
 
 
 download = _Downloader()
