@@ -158,9 +158,7 @@ You can run the script on your client device like so:
 
 .. sourcecode :: sh
 
-  wget https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/{.shared,setup-lokole}.sh
-  chmod +x setup-lokole.sh
-  ./setup-lokole.sh <client-name> <storage-account-name> <storage-account-key> <sim-type> <email-key> <server-tables-name> <server-tables-key>
+  curl https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/setup-lokole.sh | sudo bash -s <client-name> <storage-account-name> <storage-account-key> <sim-type> <email-key> <server-tables-name> <server-tables-key>
 
 
 Adding a new language
