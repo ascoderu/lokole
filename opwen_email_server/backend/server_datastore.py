@@ -25,7 +25,8 @@ INDEX = AzureIndex(
             '{domain}_{delivered}'.format(
                 domain=domain,
                 delivered=_.get('_delivered') or False)
-            for domain in get_domains(_)),
+            for domain in get_domains(_)
+            if domain.endswith('lokole.ca')),
         })
 
 
