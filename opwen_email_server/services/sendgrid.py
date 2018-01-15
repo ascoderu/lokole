@@ -45,18 +45,18 @@ class SendgridEmailSender(LogMixin):
         return success
 
     def _send_email(self, email: Mail, email_id: str) -> Tuple[int, str]:
-        self.log_debug('about to send email %s', memoryview)
+        self.log_debug('about to send email %s', email_id)
         request = email.get()
         try:
             response = self._client.client.mail.send.post(request_body=request)
         except HTTPError as exception:
-            self.log_exception('error sending email %s', email_id)
             status = exception.code
             message = str(exception.read())
+            self.log_exception('error sending email %s:%s', email_id, message)
         except URLError as exception:
-            self.log_exception('error sending email %s', email_id)
             status = None
             message = str(exception.reason)
+            self.log_exception('error sending email %s:%s', email_id, message)
         else:
             self.log_debug('sent email %s', email_id)
             status = response.status_code

@@ -42,7 +42,7 @@ class QueueConsumer(LogMixin):
             remove_if_exists(QUEUE_ERROR_FILE)
 
     def _report_error(self, ex: Exception):
-        self.log_exception('error polling queue')
+        self.log_exception('error polling queue:%r', ex)
 
         if QUEUE_ERROR_FILE:
             with open(QUEUE_ERROR_FILE, 'a') as fobj:

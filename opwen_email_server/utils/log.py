@@ -6,6 +6,7 @@ from typing import Iterable
 from typing import Tuple
 
 from applicationinsights import TelemetryClient
+from applicationinsights import exceptions
 
 from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
@@ -24,6 +25,7 @@ if APPINSIGHTS_KEY:
     _APPINSIGHTS = TelemetryClient(APPINSIGHTS_KEY)
     _APPINSIGHTS.channel.sender.send_interval_in_milliseconds = 30 * 1000
     _APPINSIGHTS.channel.sender.max_queue_item_count = 10
+    exceptions.enable(APPINSIGHTS_KEY)
 
 
 class LogMixin(object):

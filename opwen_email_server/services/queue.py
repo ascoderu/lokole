@@ -71,16 +71,16 @@ class AzureQueue(LogMixin):
                 # noinspection PyBroadException
                 try:
                     yield [payload]  # type: ignore
-                except Exception:
+                except Exception as ex:
                     if message.dequeue_count > self._max_message_retries:
                         self.log_exception(
-                            'too many retries for message %r, purging',
-                            message.id)
+                            'too many retries for message %r, purging:%r',
+                            message.id, ex)
                         delete_message = True
                     else:
                         self.log_exception(
-                            'error processing message %r, retrying',
-                            message.id)
+                            'error processing message %r, retrying:%r',
+                            message.id, ex)
                 else:
                     self.log_debug(
                         'done with message %r, deleting',
