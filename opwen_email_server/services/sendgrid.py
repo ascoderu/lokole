@@ -79,7 +79,7 @@ class SendgridEmailSender(LogMixin):
 
         mail = Mail()
         mail.add_personalization(personalization)
-        mail.set_subject(email.get('subject'))
+        mail.set_subject(email.get('subject', '(no subject)'))
         mail.add_content(Content('text/html', email.get('body')))
         mail.set_from(Email(email.get('from')))
 
