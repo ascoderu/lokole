@@ -30,7 +30,7 @@ class LogMixinTests(TestCase):
             def foo(self):
                 self.log_info('message %d', 123)
         Foo().foo()
-        self.assertAppInsightsIsSent(True)
+        self.assertAppInsightsIsSent()
 
     def test_not_important_messages_get_delayed_by_appinsights(self):
         class Foo(log.LogMixin):
@@ -44,7 +44,7 @@ class LogMixinTests(TestCase):
         self.assertDidCallLogger(log_level, *log_args)
         self.assertDidCallApplicationInsights(log_level, *log_args)
 
-    def assertAppInsightsIsSent(self, is_sent):
+    def assertAppInsightsIsSent(self, is_sent=True):
         mock = self.appinsights_mock.flush
         self.assertEqual(bool(mock.call_count), is_sent)
 
