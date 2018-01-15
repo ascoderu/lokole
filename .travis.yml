@@ -15,4 +15,9 @@ addons:
 
 script: travis/ci.sh
 
-after_success: travis/cd.sh
+deploy:
+  - provider: script
+    script: travis/cd.sh
+    on:
+      repo: ascoderu/opwen-webapp
+      tags: true
