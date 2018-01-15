@@ -60,6 +60,7 @@ class NewEmailForm(Form):
         form['cc'] = _split_emails(form.get('cc'))
         form['bcc'] = _split_emails(form.get('bcc'))
         form['body'] = form.get('body')
+        form['subject'] = form.get('subject', i8n.EMAIL_NO_SUBJECT)
         form['attachments'] = list(_attachments_as_dict(attachments,
                                                         attachment_encoder))
         return form

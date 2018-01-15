@@ -22,6 +22,7 @@ class i8n(object):
     EMAIL_SENT = _('Email sent!')
     EMAIL_ADDRESS_INVALID = _('Invalid email address.')
     EMAIL_TO_REQUIRED = _('Please specify a recipient.')
+    EMAIL_NO_SUBJECT = _('(no subject)')
     LOGGED_IN = _('You are now logged in.')
     LOGGED_OUT = _('You have logged out successfully.')
     WELCOME = _('Welcome!')
