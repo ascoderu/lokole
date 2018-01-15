@@ -35,4 +35,7 @@ sudo apt-get install -y nodejs
 
 make prepare-server -e py_env="$py_env"
 
-${python} setup.py sdist upload
+while ! ${python} setup.py sdist upload; do
+  echo "Unable to upload to PyPI, retrying" >&2
+  sleep 1m
+done
