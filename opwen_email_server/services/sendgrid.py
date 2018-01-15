@@ -52,11 +52,13 @@ class SendgridEmailSender(LogMixin):
         except HTTPError as exception:
             status = exception.code
             message = str(exception.read())
-            self.log_exception('error sending email %s:%s', email_id, message)
+            self.log_exception('error sending email %s:%r:%r',
+                               email_id, exception, request)
         except URLError as exception:
             status = None
             message = str(exception.reason)
-            self.log_exception('error sending email %s:%s', email_id, message)
+            self.log_exception('error sending email %s:%r:%r',
+                               email_id, exception, request)
         else:
             self.log_debug('sent email %s', email_id)
             status = response.status_code
