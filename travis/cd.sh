@@ -52,7 +52,10 @@ echo "$TRAVIS_TAG" > version.txt
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 python="$py_env/bin/python"
 
-${python} setup.py sdist upload
+while ! ${python} setup.py sdist upload; do
+  echo "Unable to upload to PyPI, retrying" >&2
+  sleep 1m
+done
 
 if [ -z "$SERVICE_FABRIC_HOST" ] || [ -z "$SERVICE_FABRIC_DEPLOYMENT_NAME" ]; then
   echo "No service fabric credentials configured, skipping upgrade of cluster" >&2; exit 0
