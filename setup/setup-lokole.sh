@@ -37,7 +37,6 @@ server-tables-key:        The security key to access the account specified via
 info() { echo "$@"; }
 error() { echo "$@"; exit 1; }
 python_version() { python3 --version 2>&1 | cut -d' ' -f2- | cut -d'.' -f1,2; }
-set_locale() { sudo locale-gen "$1" && sudo update-locale; local cmd="export LANGUAGE='$1'; export LC_ALL='$1'; export LANG='$1'; export LC_TYPE='$1';"; echo "${cmd}" >> "/home/$2/.bashrc"; eval "${cmd}"; }
 set_timezone() { sudo timedatectl set-timezone "$1"; }
 update_system_packages() { sudo apt-get update; sudo apt-get upgrade -y; }
 install_system_package() { sudo apt-get install -y "$@"; }
@@ -63,6 +62,20 @@ create_root_cron() { (sudo crontab -l || true; echo "$1 $2") 2>&1 | grep -v 'no 
 http_delete() { /usr/bin/curl --request 'DELETE' "$@"; }
 http_post_json() { /usr/bin/curl --header 'Content-Type: application/json' --request 'POST' "$@"; }
 reload_daemons() { sudo service supervisor start; sudo supervisorctl reread; sudo supervisorctl update; }
+
+set_locale() {
+local locale="$1"
+
+local locale_script='/etc/profile.d/set-locale.sh'
+local locale_command="export LANGUAGE='${locale}'; export LC_ALL='${locale}'; export LANG='${locale}'; export LC_TYPE='${locale}';"
+
+sudo locale-gen "${locale}"
+sudo update-locale
+eval "${locale_command}"
+
+echo "${locale_command}" | write_file "${locale_script}"
+make_executable "${locale_script}"
+}
 
 create_daemon() {
 local daemon_name="$1"
@@ -124,7 +137,7 @@ opwen_user="${USER}"
 opwen_user_password="$(random_string 8)"
 info "Password of ${opwen_user} set to ${opwen_user_password}"
 
-set_locale 'en_GB.UTF-8' "${opwen_user}"
+set_locale 'en_GB.UTF-8'
 set_timezone 'Etc/UTC'
 update_system_packages
 change_password "${opwen_user}" "${opwen_user_password}"
