@@ -19,10 +19,6 @@
     </div>
   </div>
 
-  <div class="row">
-    {{ _meet_the_team() }}
-  </div>
-
 </div>
 {% endblock %}
 
@@ -73,80 +69,4 @@
     </div>
   </div>
 </div>
-{% endmacro %}
-
-{% macro _meet_the_team() %}
-<div>
-  <div class="text-center">
-    <div class="row">
-      <div class="col-sm-12">
-        <h2 id="team">{{ _('Meet the team') }}</h2>
-      </div>
-    </div>
-
-    <div class="row" id="team-row">
-      <div class="col-sm-4">{{ _meet_nzola() }}</div>
-      <div class="col-sm-4">{{ _meet_laura() }}</div>
-      <div class="col-sm-4">{{ _meet_clemens() }}</div>
-    </div>
-  </div>
-</div>
-{% endmacro %}
-
-{% macro _meet(who, roles, description) %}
-<div>
-  <img src="{{ url_for('static', filename='images/%s.png' % who.lower()) }}" class="img-responsive img-circle center-block" alt="{{ who }}">
-  <h4>{{ who }} <small>{{ roles | join(' & ') }}</small></h4>
-  <p class="text-left about-content">
-    {{ description }}
-  </p>
-</div>
-{% endmacro %}
-
-{% macro _meet_nzola() %}
-{{
-  _meet(
-    'Nzola',
-    [_('Founder'), _('CEO')],
-    _(
-    'Nzola is a native of the DRC in Africa who now lives in Victoria, '
-    'Canada. While being employed by the humanitarian organization '
-    'Mission Aviation Fellowship in the Congo, Angola, Namibia, South '
-    'Africa and Zambia for 19 years, Nzola developed expertise with '
-    'communications devices and an acute understanding of the '
-    'communication problems in rural sub-saharan Africa.'
-    ))
-}}
-{% endmacro %}
-
-{% macro _meet_laura() %}
-{{
-  _meet(
-    'Laura',
-    [_('Operations')],
-    _(
-    'Laura is a self-taught developer and passionate advocate for '
-    'positive change and justice with a MSc in International '
-    'Development. Laura has dedicated 10 years of her life supporting '
-    'local and international NGOs. Before supporting Ascoderu, she '
-    'worked at the British Columbia Council for International '
-    'Cooperation (BCCIC) and for Amnesty International.'
-    ))
-}}
-{% endmacro %}
-
-{% macro _meet_clemens() %}
-{{
-  _meet(
-    'Clemens',
-    [_('Development')],
-    _(
-    'Clemens is a full-stack software developer who spent much of his '
-    'life in Togo, Mali and Zambia and is now based in Vancouver, '
-    'Canada. He honed his software chops working on large-scale projects '
-    'at Amazon and Microsoft and on open-source projects such as the '
-    'sharing platform yunity. Clemens now drives the development of all '
-    "technical aspects of Ascoderu's projects."
-    ))
-}}
 {% endmacro %}
