@@ -30,7 +30,7 @@ echo "$TRAVIS_TAG" > version.txt
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 python="$py_env/bin/python"
 
-make prepare-server -e py_env="$py_env"
+make prepare-server -e py_env="$py_env" -e NPM="$(which npm)" -e SHELLCHECK="$(which shellcheck)"
 
 while ! ${python} setup.py sdist upload; do
   echo "Unable to upload to PyPI, retrying" >&2
