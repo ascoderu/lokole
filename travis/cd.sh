@@ -30,9 +30,6 @@ echo "$TRAVIS_TAG" > version.txt
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 python="$py_env/bin/python"
 
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
 make prepare-server -e py_env="$py_env"
 
 while ! ${python} setup.py sdist upload; do
