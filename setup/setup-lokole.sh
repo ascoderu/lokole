@@ -70,6 +70,7 @@ create_root_cron() { (sudo crontab -l || true; echo "$1 $2") 2>&1 | grep -v 'no 
 http_get() { /usr/bin/curl --request 'GET' --fail "$@"; }
 http_post_json() { /usr/bin/curl --header 'Content-Type: application/json' --request 'POST' --fail "$@"; }
 reload_daemons() { sudo service supervisor start; sudo supervisorctl reread; sudo supervisorctl update; }
+sleep_a_bit() { sleep "$(((RANDOM%10)+17))s"; }
 
 set_locale() {
 local locale="$1"
@@ -303,8 +304,8 @@ opwen_webapp_service='opwen_email_client'
 opwen_webapp_directory="${opwen_webapp_virtualenv}/lib/python$(python_version)/site-packages/${opwen_webapp_service}/webapp"
 
 create_virtualenv "${opwen_webapp_virtualenv}"
-"${opwen_webapp_virtualenv}/bin/pip" install --upgrade pip setuptools wheel
-"${opwen_webapp_virtualenv}/bin/pip" install "${opwen_webapp_service}"
+while ! "${opwen_webapp_virtualenv}/bin/pip" install --upgrade pip setuptools wheel; do sleep_a_bit; done
+while ! "${opwen_webapp_virtualenv}/bin/pip" install "${opwen_webapp_service}"; do sleep_a_bit; done
 "${opwen_webapp_virtualenv}/bin/pybabel" compile -d "${opwen_webapp_directory}/translations"
 
 
@@ -317,8 +318,8 @@ registration_virtualenv="$(create_temp_directory /tmp/opwen_email_server.XXXXXX)
 opwen_webapp_config_client_id="$(random_string 32)"
 
 create_virtualenv "${registration_virtualenv}"
-"${registration_virtualenv}/bin/pip" install --upgrade pip setuptools wheel
-"${registration_virtualenv}/bin/pip" install opwen_email_server
+while ! "${registration_virtualenv}/bin/pip" install --upgrade pip setuptools wheel; do sleep_a_bit; done
+while ! "${registration_virtualenv}/bin/pip" install opwen_email_server; do sleep_a_bit; done
 
 "${registration_virtualenv}/bin/registerclient.py" \
     --tables_account="${server_tables_account_name}" \
