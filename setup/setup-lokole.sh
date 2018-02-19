@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly usage="Usage: $0 <client-name> <storage-account-name> <storage-account-key> <sim-type> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <local-password>
+readonly usage="Usage: $0 <client-name> <storage-account-name> <storage-account-key> <sim-type> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <local-password> <sync-schedule>
 
 client-name:              The name that should be assigned to the Opwen device
                           that is being configured by this script. Usually this
@@ -39,6 +39,9 @@ cloudflare-zone:          The zone for the Cloudflare account associated with
                           the Lokole DNS.
 
 local-password:           The password for the Lokole user account.
+
+sync-schedule:            How often the Lokole should sync with the server. In
+                          cron syntax. Example: '34 * * * *' for once per hour.
 "
 
 ################################################################################
@@ -123,6 +126,7 @@ readonly cloudflare_user="$8"
 readonly cloudflare_key="$9"
 readonly cloudflare_zone="${10}"
 readonly local_password="${11}"
+readonly sync_schedule="${12}"
 
 readonly opwen_network_name='Lokole'
 readonly opwen_network_password='Ascoderu'
@@ -131,7 +135,6 @@ readonly opwen_server_write_host='api.mailserver.write.lokole.ca'
 readonly opwen_server_inbox_host='api.mailserver.inbox.lokole.ca'
 readonly opwen_server_locale='en_GB.UTF-8'
 readonly opwen_server_timezone='Etc/UTC'
-readonly opwen_webapp_sync_schedule='34 * * * *'
 readonly opwen_user="${USER}"
 readonly opwen_device="${HOSTNAME}"
 
@@ -146,6 +149,7 @@ required_param "${cloudflare_user}" 'cloudflare-user' "${usage}"
 required_param "${cloudflare_key}" 'cloudflare-key' "${usage}"
 required_param "${cloudflare_zone}" 'cloudflare-zone' "${usage}"
 required_param "${local_password}" 'local-password' "${usage}"
+required_param "${sync_schedule}" 'sync-schedule' "${usage}"
 
 set -o errexit
 set -o pipefail
@@ -566,7 +570,7 @@ main 2>&1 | tee --append "\${sync_logfile}"
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 
-create_root_cron "${opwen_webapp_sync_schedule}" "${opwen_webapp_email_sync_script}"
+create_root_cron "${sync_schedule}" "${opwen_webapp_email_sync_script}"
 
 
 info '

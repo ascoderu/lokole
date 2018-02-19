@@ -162,7 +162,7 @@ You can run the script on your client device like so:
   | bash -s \
       <client-name> <storage-account-name> <storage-account-key> <sim-type> \
       <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> \
-      <cloudflare-key> <cloudflare-zone> <local-password>
+      <cloudflare-key> <cloudflare-zone> <local-password> <sync-schedule>
 
 
 Adding a new language
