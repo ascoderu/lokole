@@ -8,6 +8,8 @@ sudo: required
 services:
   - docker
 
+cache: pip
+
 addons:
   apt:
     sources:
