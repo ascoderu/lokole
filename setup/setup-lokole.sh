@@ -160,7 +160,11 @@ info '
 #                                                               verifying inputs
 ################################################################################'
 
+update_system_packages
+install_system_package 'curl'
+
 opwen_webapp_config_client_domain="${opwen_webapp_config_client_name}.lokole.ca"
+opwen_webapp_config_client_id="$(random_string 32)"
 
 if http_get --header "Authorization: Bearer ${email_account_key}" \
   "https://api.sendgrid.com/v3/user/webhooks/parse/settings/${opwen_webapp_config_client_domain}"; then
@@ -188,25 +192,13 @@ set_locale "${opwen_server_locale}"
 set_timezone "${opwen_server_timezone}"
 change_password "${opwen_user}" "${local_password}"
 
-update_system_packages
-install_system_package \
-  'nginx' 'supervisor' 'libssl-dev' 'cron' 'curl' \
-  'python3' 'python3-pip' 'python3-venv' 'python3-dev' 'libffi-dev' 'bcrypt' \
-  'hostapd' 'dnsmasq' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
-
-opwen_webapp_run_directory="/home/${opwen_user}/state"
-opwen_webapp_virtualenv="/home/${opwen_user}/python"
-opwen_dialer_config_directory="/home/${opwen_user}/wvdial"
-
-create_directory "${opwen_webapp_run_directory}"
-create_directory "${opwen_webapp_virtualenv}"
-create_directory "${opwen_dialer_config_directory}"
-
 
 info '
 ################################################################################
 #                                                                installing wifi
 ################################################################################'
+
+install_system_package 'hostapd' 'dnsmasq'
 
 opwen_ip_base='10.0.0'
 opwen_ip="${opwen_ip_base}.1"
@@ -304,6 +296,11 @@ info '
 #                                                        installing email webapp
 ################################################################################'
 
+install_system_package 'python3' 'python3-pip' 'python3-venv' 'python3-dev' 'libffi-dev' 'libssl-dev' 'bcrypt'
+
+opwen_webapp_virtualenv="/home/${opwen_user}/python"
+create_directory "${opwen_webapp_virtualenv}"
+
 opwen_webapp_service='opwen_email_client'
 opwen_webapp_directory="${opwen_webapp_virtualenv}/lib/python$(python_version)/site-packages/${opwen_webapp_service}/webapp"
 
@@ -315,32 +312,11 @@ while ! "${opwen_webapp_virtualenv}/bin/pip" install "${opwen_webapp_service}"; 
 
 info '
 ################################################################################
-#                                                       registering email webapp
-################################################################################'
-
-registration_virtualenv="$(create_temp_directory /tmp/opwen_email_server.XXXXXX)"
-opwen_webapp_config_client_id="$(random_string 32)"
-
-create_virtualenv "${registration_virtualenv}"
-while ! "${registration_virtualenv}/bin/pip" install --upgrade pip setuptools wheel; do sleep_a_bit; done
-while ! "${registration_virtualenv}/bin/pip" install opwen_email_server; do sleep_a_bit; done
-
-"${registration_virtualenv}/bin/registerclient.py" \
-    --tables_account="${server_tables_account_name}" \
-    --tables_key="${server_tables_account_key}" \
-    --client_account="${opwen_webapp_config_remote_account_name}" \
-    --client_key="${opwen_webapp_config_remote_account_key}" \
-    --client="${opwen_webapp_config_client_id}" \
-    --domain="${opwen_webapp_config_client_domain}"
-
-delete "${HOME}/.cache/pip"
-delete "${registration_virtualenv}"
-
-
-info '
-################################################################################
 #                                                  setting up webapp environment
 ################################################################################'
+
+opwen_webapp_run_directory="/home/${opwen_user}/state"
+create_directory "${opwen_webapp_run_directory}"
 
 opwen_webapp_config_session_key="$(random_string 32)"
 opwen_webapp_config_password_salt="$(random_string 16)"
@@ -365,6 +341,8 @@ info '
 ################################################################################
 #                                             installing server for email webapp
 ################################################################################'
+
+install_system_package 'nginx' 'supervisor'
 
 memory_per_worker_kb=200000
 max_workers=4
@@ -448,10 +426,39 @@ http {
 }
 EOF
 
+
+info '
+################################################################################
+#                                                       registering email webapp
+################################################################################'
+
+registration_virtualenv="$(create_temp_directory /tmp/opwen_email_server.XXXXXX)"
+
+create_virtualenv "${registration_virtualenv}"
+while ! "${registration_virtualenv}/bin/pip" install --upgrade pip setuptools wheel; do sleep_a_bit; done
+while ! "${registration_virtualenv}/bin/pip" install opwen_email_server; do sleep_a_bit; done
+
+"${registration_virtualenv}/bin/registerclient.py" \
+    --tables_account="${server_tables_account_name}" \
+    --tables_key="${server_tables_account_key}" \
+    --client_account="${opwen_webapp_config_remote_account_name}" \
+    --client_key="${opwen_webapp_config_remote_account_key}" \
+    --client="${opwen_webapp_config_client_id}" \
+    --domain="${opwen_webapp_config_client_domain}"
+
+delete "${HOME}/.cache/pip"
+delete "${registration_virtualenv}"
+
+
 info '
 ################################################################################
 #                                                       installing network stick
 ################################################################################'
+
+install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
+
+opwen_dialer_config_directory="/home/${opwen_user}/wvdial"
+create_directory "${opwen_dialer_config_directory}"
 
 internet_modem_config_e303='/etc/usb_modeswitch.d/12d1:14fe'
 internet_modem_config_e353='/etc/usb_modeswitch.d/12d1:1f01'
