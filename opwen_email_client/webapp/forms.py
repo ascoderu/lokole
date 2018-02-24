@@ -1,3 +1,5 @@
+from datetime import datetime
+from itertools import chain
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -50,15 +52,24 @@ class NewEmailForm(Form):
     submit = SubmitField()
 
     def as_dict(self, attachment_encoder: AttachmentEncoder) -> dict:
-        attachments = request.files.getlist(self.attachments.name)
         form = {key: value for (key, value) in self.data.items() if value}
         form.pop('submit', None)
-        form['sent_at'] = None
+
+        attachments = request.files.getlist(self.attachments.name)
+        to = _split_emails(form.get('to'))
+        cc = _split_emails(form.get('cc'))
+        bcc = _split_emails(form.get('bcc'))
+
+        sent_at = None
+        if all(_is_local_message(address) for address in chain(to, cc, bcc)):
+            sent_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+
+        form['sent_at'] = sent_at
         form['read'] = True
         form['from'] = current_user.email
-        form['to'] = _split_emails(form.get('to'))
-        form['cc'] = _split_emails(form.get('cc'))
-        form['bcc'] = _split_emails(form.get('bcc'))
+        form['to'] = to
+        form['cc'] = cc
+        form['bcc'] = bcc
         form['body'] = form.get('body')
         form['subject'] = form.get('subject', i8n.EMAIL_NO_SUBJECT)
         form['attachments'] = list(_attachments_as_dict(attachments,
@@ -133,6 +144,11 @@ def _attachments_as_dict(
         content = attachment_encoder.encode(filestorage.stream.read())
         if filename and content:
             yield {'filename': filename, 'content': content}
+
+
+def _is_local_message(address: str) -> bool:
+    host = address.split('@')[-1]
+    return host.lower() == AppConfig.CLIENT_EMAIL_HOST.lower()
 
 
 def _join_emails(*emails: str) -> str:
