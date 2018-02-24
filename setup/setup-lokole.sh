@@ -535,11 +535,11 @@ dialer_pidfile="\$(mktemp /tmp/dialer.pid.XXXXXX)"
 
 modem_target_mode='1506'
 
-modem_is_e303() { lsusb | grep 'Huawei' | grep -q '12d1:14fe'; }
-modem_is_e353() { lsusb | grep 'Huawei' | grep -q '12d1:1f01'; }
-modem_is_e3131() { lsusb | grep 'Huawei' | grep -q '12d1:155b'; }
-modem_is_plugged() { lsusb | grep 'Huawei' | grep -q '12d1:'; }
-modem_is_setup() { lsusb | grep 'Huawei' | grep -q "12d1:\${modem_target_mode}"; }
+modem_is_e303() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:14fe'; }
+modem_is_e353() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:1f01'; }
+modem_is_e3131() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:155b'; }
+modem_is_plugged() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:'; }
+modem_is_setup() { /usr/bin/lsusb | grep 'Huawei' | grep -q "12d1:\${modem_target_mode}"; }
 dialer_is_running() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidfile}" && ps -p "\${pid}" > /dev/null; }
 connect_to_internet() { /usr/bin/wvdial --config="\${dialer_config}" 2> "\${dialer_logfile}" & echo \$! > "\${dialer_pidfile}"; }
 dialer_is_connected() { test -f "\${dialer_logfile}" && grep -q 'secondary DNS address' "\${dialer_logfile}"; }
