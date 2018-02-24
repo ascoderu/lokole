@@ -166,6 +166,7 @@ install_system_package 'curl'
 
 case "${sim_type}" in
   Hologram_World) ;;
+  Ethernet) ;;
   LocalOnly) ;;
   *) fail "Unsupported sim-type: ${sim_type}" ;;
 esac
@@ -552,7 +553,7 @@ setup_modem() {
   else exit 1;         fi
 }
 
-main() {
+main_modem() {
   if ! modem_is_plugged; then
     echo 'Modem not plugged in, exitting' >&2
     exit 1
@@ -579,6 +580,20 @@ main() {
   echo 'Killing dialer...'
   kill_dialer
   echo '...done, connection to internet is terminated'
+}
+
+main_ethernet() {
+  echo 'Syncing emails...'
+  sync_emails
+  echo '...done, emails are synced'
+}
+
+main() {
+  if [ "${sim_type}" == "Ethernet" ]; then
+    main_ethernet
+  else
+    main_modem
+  fi
 }
 
 main 2>&1 | tee --append "\${sync_logfile}"
