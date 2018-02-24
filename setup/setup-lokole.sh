@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-readonly usage="Usage: $0 <client-name> <storage-account-name> <storage-account-key> <sim-type> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <local-password> <sync-schedule>
+set -o errexit
+set -o pipefail
+
+readonly usage="Usage: $0 <client-name> <sim-type> <local-password> <storage-account-name> <storage-account-key> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <sync-schedule>
 
 client-name:              The name that should be assigned to the Opwen device
                           that is being configured by this script. Usually this
@@ -9,15 +12,17 @@ client-name:              The name that should be assigned to the Opwen device
                           should be globally unique as it is used as the key for
                           a bunch of things.
 
+sim-type:                 The mobile network to which to connect to upload data
+                          to the cloud, e.g. Hologram_World or Vodacom_DRC.
+
+local-password:           The password for the Lokole user account.
+
 storage-account-name:     The name of the account on the external storage
                           service (e.g. Azure Blob Storage, Amazon S3, etc.)
                           that the Opwen will use as its target data store.
 
 storage-account-key:      The security key to access the account specified via
                           the <storage-account-name> parameter above.
-
-sim-type:                 The mobile network to which to connect to upload data
-                          to the cloud, e.g. Hologram_World or Vodacom_DRC.
 
 email-key:                The security key to access the email sending service
                           (e.g. Sendgrid, Mailgun, etc.)
@@ -37,8 +42,6 @@ cloudflare-key:           The access key for the Cloudflare account associated
 
 cloudflare-zone:          The zone for the Cloudflare account associated with
                           the Lokole DNS.
-
-local-password:           The password for the Lokole user account.
 
 sync-schedule:            How often the Lokole should sync with the server. In
                           cron syntax. Example: '34 * * * *' for once per hour.
@@ -116,16 +119,16 @@ reload_daemons
 case $1 in -h|--help) fail "${usage}";; esac
 
 readonly opwen_webapp_config_client_name="$1"
-readonly opwen_webapp_config_remote_account_name="$2"
-readonly opwen_webapp_config_remote_account_key="$3"
-readonly sim_type="$4"
-readonly email_account_key="$5"
-readonly server_tables_account_name="$6"
-readonly server_tables_account_key="$7"
-readonly cloudflare_user="$8"
-readonly cloudflare_key="$9"
-readonly cloudflare_zone="${10}"
-readonly local_password="${11}"
+readonly sim_type="$2"
+readonly local_password="$3"
+readonly opwen_webapp_config_remote_account_name="$4"
+readonly opwen_webapp_config_remote_account_key="$5"
+readonly email_account_key="$6"
+readonly server_tables_account_name="$7"
+readonly server_tables_account_key="$8"
+readonly cloudflare_user="$9"
+readonly cloudflare_key="${10}"
+readonly cloudflare_zone="${11}"
 readonly sync_schedule="${12}"
 
 readonly opwen_network_name='Lokole'
@@ -138,38 +141,34 @@ readonly opwen_server_timezone='Etc/UTC'
 readonly opwen_user="${USER}"
 readonly opwen_device="${HOSTNAME}"
 
-required_param "${opwen_webapp_config_client_name}" 'client-name' "${usage}"
-required_param "${opwen_webapp_config_remote_account_name}" 'storage-account-name' "${usage}"
-required_param "${opwen_webapp_config_remote_account_key}" 'storage-account-key' "${usage}"
-required_param "${sim_type}" 'sim-type' "${usage}"
-required_param "${email_account_key}" 'email-key' "${usage}"
-required_param "${server_tables_account_name}" 'server-tables-name' "${usage}"
-required_param "${server_tables_account_key}" 'server-tables-key' "${usage}"
-required_param "${cloudflare_user}" 'cloudflare-user' "${usage}"
-required_param "${cloudflare_key}" 'cloudflare-key' "${usage}"
-required_param "${cloudflare_zone}" 'cloudflare-zone' "${usage}"
-required_param "${local_password}" 'local-password' "${usage}"
-required_param "${sync_schedule}" 'sync-schedule' "${usage}"
-
-set -o errexit
-set -o pipefail
-
-
 info '
 ################################################################################
 #                                                               verifying inputs
 ################################################################################'
 
+required_param "${opwen_webapp_config_client_name}" 'client-name' "${usage}"
+required_param "${sim_type}" 'sim-type' "${usage}"
+required_param "${local_password}" 'local-password' "${usage}"
+if [ "${sim_type}" != "LocalOnly" ]; then
+  required_param "${opwen_webapp_config_remote_account_name}" 'storage-account-name' "${usage}"
+  required_param "${opwen_webapp_config_remote_account_key}" 'storage-account-key' "${usage}"
+  required_param "${email_account_key}" 'email-key' "${usage}"
+  required_param "${server_tables_account_name}" 'server-tables-name' "${usage}"
+  required_param "${server_tables_account_key}" 'server-tables-key' "${usage}"
+  required_param "${cloudflare_user}" 'cloudflare-user' "${usage}"
+  required_param "${cloudflare_key}" 'cloudflare-key' "${usage}"
+  required_param "${cloudflare_zone}" 'cloudflare-zone' "${usage}"
+  required_param "${sync_schedule}" 'sync-schedule' "${usage}"
+fi
+
 update_system_packages
 install_system_package 'curl'
 
-opwen_webapp_config_client_domain="${opwen_webapp_config_client_name}.lokole.ca"
-opwen_webapp_config_client_id="$(random_string 32)"
-
-if http_get --header "Authorization: Bearer ${email_account_key}" \
-  "https://api.sendgrid.com/v3/user/webhooks/parse/settings/${opwen_webapp_config_client_domain}"; then
-  fail "Client ${opwen_webapp_config_client_name} already exists."
-fi
+case "${sim_type}" in
+  Hologram_World) ;;
+  LocalOnly) ;;
+  *) fail "Unsupported sim-type: ${sim_type}" ;;
+esac
 
 case "${opwen_device}" in
   OrangePI|orangepizero) ht_capab='[HT40][DSS_CCK-40]' ;;
@@ -177,10 +176,15 @@ case "${opwen_device}" in
   *) fail "Unsupported device: ${opwen_device}" ;;
 esac
 
-case "${sim_type}" in
-  Hologram_World) ;;
-  *) fail "Unsupported sim-type: ${sim_type}" ;;
-esac
+opwen_webapp_config_client_domain="${opwen_webapp_config_client_name}.lokole.ca"
+opwen_webapp_config_client_id="$(random_string 32)"
+
+if [ "${sim_type}" != "LocalOnly" ]; then
+  if http_get --header "Authorization: Bearer ${email_account_key}" \
+    "https://api.sendgrid.com/v3/user/webhooks/parse/settings/${opwen_webapp_config_client_domain}"; then
+    fail "Client ${opwen_webapp_config_client_name} already exists."
+  fi
+fi
 
 
 info '
@@ -425,6 +429,10 @@ http {
   fastcgi_read_timeout ${opwen_webapp_timeout_seconds};
 }
 EOF
+
+if [ "${sim_type}" == "LocalOnly" ]; then
+  exit 0
+fi
 
 
 info '
