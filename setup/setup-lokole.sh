@@ -73,7 +73,7 @@ create_root_cron() { (sudo crontab -l || true; echo "$1 $2") 2>&1 | grep -v 'no 
 http_get() { /usr/bin/curl --request 'GET' --fail "$@"; }
 http_post_json() { /usr/bin/curl --header 'Content-Type: application/json' --request 'POST' --fail "$@"; }
 reload_daemons() { sudo service supervisor start; sudo supervisorctl reread; sudo supervisorctl update; }
-sleep_a_bit() { sleep "$(((RANDOM%10)+17))s"; }
+sleep_a_bit() { sleep "$((RANDOM % 10 + 17))s"; }
 
 set_locale() {
 local locale="$1"
