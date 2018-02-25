@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-set -o errexit
-set -o pipefail
-
 readonly usage="Usage: $0 <client-name> <sim-type> <local-password> <storage-account-name> <storage-account-key> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <sync-schedule>
 
 client-name:              The name that should be assigned to the Opwen device
@@ -160,6 +157,9 @@ if [ "${sim_type}" != "LocalOnly" ]; then
   required_param "${cloudflare_zone}" 'cloudflare-zone' "${usage}"
   required_param "${sync_schedule}" 'sync-schedule' "${usage}"
 fi
+
+set -o errexit
+set -o pipefail
 
 update_system_packages
 install_system_package 'curl'
