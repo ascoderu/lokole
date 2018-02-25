@@ -109,6 +109,16 @@ EOF
 reload_daemons
 }
 
+finished() {
+info '
+################################################################################
+#                                         rebooting in 1 minute to start service
+################################################################################'
+
+sudo shutdown --reboot +1
+exit 0
+}
+
 ################################################################################
 #                                                         command line interface
 ################################################################################
@@ -432,7 +442,7 @@ http {
 EOF
 
 if [ "${sim_type}" == "LocalOnly" ]; then
-  exit 0
+  finished
 fi
 
 
@@ -622,9 +632,4 @@ http_post_json \
   "https://api.cloudflare.com/client/v4/zones/${cloudflare_zone}/dns_records"
 
 
-info '
-################################################################################
-#                                         rebooting in 1 minute to start service
-################################################################################'
-
-sudo shutdown --reboot +1
+finished
