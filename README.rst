@@ -161,9 +161,9 @@ You can run the script on your client device like so:
 
   curl https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/setup-lokole.sh \
   | bash -s \
-      <client-name> <storage-account-name> <storage-account-key> <sim-type> \
-      <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> \
-      <cloudflare-key> <cloudflare-zone> <local-password> <sync-schedule>
+      <client-name> <sim-type> <local-password> \
+      <storage-account-name> <storage-account-key> <email-key> <server-tables-name> <server-tables-key> \
+      <cloudflare-user> <cloudflare-key> <cloudflare-zone> <sync-schedule>
 
 
 Adding a new language
