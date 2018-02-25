@@ -18,7 +18,6 @@ from flask_login import current_user
 from flask_security.utils import encrypt_password
 from passlib.pwd import genword
 
-from opwen_email_client.util.generator import length
 from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.actions import SendWelcomeEmail
@@ -212,15 +211,12 @@ def language(locale: str) -> Response:
     return redirect(Session.get_last_visited_url() or url_for('home'))
 
 
-@app.route('/admin')
-@admin_required
+@app.route('/users')
+@login_required
 @track_history
-def admin() -> Response:
-    email_store = app.ioc.email_store
-
-    return _view('admin.html',
-                 users=User.query.all(),
-                 pending_emails=length(email_store.pending()))
+def users() -> Response:
+    return _view('users.html',
+                 users=User.query.all())
 
 
 @app.route('/admin/suspend/<userid>')

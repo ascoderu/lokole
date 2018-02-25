@@ -76,7 +76,7 @@ class NewEmailForm(Form):
                                                         attachment_encoder))
         return form
 
-    def _populate(self, email: dict):
+    def _populate(self, email: Optional[dict], to: Optional[str]):
         pass
 
     @classmethod
@@ -99,20 +99,32 @@ class NewEmailForm(Form):
         if not form:
             return None
 
+        to = request.args.get('to')
         uid = request.args.get('uid')
+        reference = None
         if uid:
             reference = email_store.get(uid)
-            if not reference or not current_user.can_access(reference):
-                return None
-            form._populate(reference)
+            if not current_user.can_access(reference):
+                reference = None
+        form._populate(reference, to)
 
         return form
+
+
+class ToEmailForm(NewEmailForm):
+    action_name = 'to'
+
+    def _populate(self, email: Optional[dict], to: Optional[str]):
+        self.to.data = to or ''
 
 
 class ReplyEmailForm(NewEmailForm):
     action_name = 'reply'
 
-    def _populate(self, email: dict):
+    def _populate(self, email: Optional[dict], to: Optional[str]):
+        if not email:
+            return
+
         self.to.data = email.get('from', '')
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
         self.body.data = render_template('emails/reply.html', email=email)
@@ -121,7 +133,10 @@ class ReplyEmailForm(NewEmailForm):
 class ReplyAllEmailForm(NewEmailForm):
     action_name = 'reply_all'
 
-    def _populate(self, email: dict):
+    def _populate(self, email: Optional[dict], to: Optional[str]):
+        if not email:
+            return
+
         self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
         self.subject.data = 'Re: {}'.format(email.get('subject', ''))
         self.body.data = render_template('emails/reply.html', email=email)
@@ -130,7 +145,10 @@ class ReplyAllEmailForm(NewEmailForm):
 class ForwardEmailForm(NewEmailForm):
     action_name = 'forward'
 
-    def _populate(self, email: dict):
+    def _populate(self, email: Optional[dict], to: Optional[str]):
+        if not email:
+            return
+
         self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
         self.body.data = render_template('emails/forward.html', email=email)
 

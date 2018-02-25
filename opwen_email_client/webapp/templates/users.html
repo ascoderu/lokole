@@ -5,22 +5,29 @@
 <table class="table table-hover">
   <thead>
     <tr>
-      <td>{{ _('Email') }}</td>
-      <td>{{ _('Last login') }}</td>
+      <td>{{ _('Name') }}</td>
       <td>{{ _('Action') }}</td>
+      {% if current_user.is_admin %}
+      <td>{{ _('Last login') }}</td>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
   {% for user in users %}
+  {% if user != current_user %}
   <tr>
     <td>
-      {{ user.email }}
-    </td>
-    <td>
-      {{ user.format_last_login(current_user.timezone_offset_minutes) }}
+      {{ user.email.split('@')[0] }}
+      {% if user.is_admin %}
+      <span class="fa fa-star" title="{{ _('Administrator') }}"></span>
+      {% endif %}
     </td>
     <td>
       <div class="btn-group">
+        <a class="btn btn-default" href="{{ url_for('email_new', to=user.email, action='to') }}">
+          <span class="fa fa-envelope-o"></span> {{ _('Send message') }}
+        </a>
+        {% if current_user.is_admin %}
         {% if not user.is_admin and user.is_active %}
         <a class="btn btn-default" href="{{ url_for('suspend', userid=user.get_id()) }}">
           <span class="fa fa-lock"></span> {{ _('Suspend') }}
@@ -33,16 +40,17 @@
         <a class="btn btn-default" href="{{ url_for('reset_password', userid=user.get_id()) }}">
           <span class="fa fa-key"></span> {{ _('Reset password') }}
         </a>
+        {% endif %}
       </div>
     </td>
+    {% if current_user.is_admin %}
+    <td>
+      {{ user.format_last_login(current_user.timezone_offset_minutes) }}
+    </td>
+    {% endif %}
   </tr>
+  {% endif %}
   {% endfor %}
   </tbody>
 </table>
-
-<h2>{{ _('Email status') }}</h2>
-<p>
-  {{ _('The next sync will upload %(num)d email(s).', num=pending_emails) }}
-</p>
-<a class="btn btn-default" href="{{ url_for('sync') }}">{{ _('Sync now') }}</a>
 {% endblock %}

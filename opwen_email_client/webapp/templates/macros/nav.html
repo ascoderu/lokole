@@ -51,6 +51,7 @@
         {{ nav_link('home', _('Home'), level=0) }}
         {{ nav_link('about', _('About'), level=0) }}
         {{ nav_link('email_inbox', _('Email'), level=0) }}
+        {{ nav_link('users', _('Users'), level=0) }}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {{ language_switcher() }}
@@ -60,9 +61,6 @@
             {{ current_user.email }} <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            {% if current_user.is_admin %}
-            <li>{{ nav_link('admin', _('Admin panel'), level=0, icon='users') }}</li>
-            {% endif %}
             <li>{{ nav_link_security('change_password', _('Change password'), icon='key') }}</li>
             <li>{{ nav_link_security('logout', _('Logout'), icon='sign-out') }}</li>
           </ul>
