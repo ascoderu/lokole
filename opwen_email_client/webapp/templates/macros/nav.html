@@ -48,10 +48,10 @@
     </div>
     <div class="collapse navbar-collapse" id="navbar">
       <ul class="nav navbar-nav">
-        {{ nav_link('home', _('Home'), level=0) }}
-        {{ nav_link('about', _('About'), level=0) }}
-        {{ nav_link('email_inbox', _('Email'), level=0) }}
-        {{ nav_link('users', _('Users'), level=0) }}
+        {{ nav_link('home', _('Home'), level=0, icon='home') }}
+        {{ nav_link('about', _('About'), level=0, icon='info-circle') }}
+        {{ nav_link('email_inbox', _('Email'), level=0, icon='envelope') }}
+        {{ nav_link('users', _('Users'), level=0, icon='users') }}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {{ language_switcher() }}
