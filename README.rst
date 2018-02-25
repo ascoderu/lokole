@@ -137,8 +137,9 @@ The setup script is tested with hardware:
 * `Raspberry Pi 3 <https://www.raspberrypi.org/products/raspberry-pi-3-model-b/>`_
   running Raspbian Jessie lite
   `v2016-05-27 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2016-05-31/2016-05-27-raspbian-jessie-lite.zip>`_,
-  `v2017-01-11 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-01-10/2017-01-11-raspbian-jessie-lite.zip>`_, and
-  `v2017-04-10 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-04-10/2017-04-10-raspbian-jessie-lite.zip>`_
+  `v2017-01-11 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-01-10/2017-01-11-raspbian-jessie-lite.zip>`_,
+  `v2017-04-10 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-04-10/2017-04-10-raspbian-jessie-lite.zip>`_, and
+  `v2017-11-29 <http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-12-01/2017-11-29-raspbian-stretch-lite.zip>`_.
 
 * `Orange Pi Zero <http://www.orangepi.org/orangepizero/>`_
   running `Armbian Ubuntu Xenial <https://dl.armbian.com/orangepizero/Ubuntu_xenial_default.7z>`_
