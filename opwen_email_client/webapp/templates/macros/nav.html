@@ -3,7 +3,7 @@
 {% macro nav_link_security(endpoint, text, icon=None) %}
 <li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
   <a href="{{ url_for_security(endpoint) }}">
-    {% if icon %}<span class="fa fa-{{ icon }}"></span> {% endif %}
+    {% if icon %}<span class="fa fa-{{ icon }}" aria-hidden="true"></span> {% endif %}
     {{ text }}
   </a>
 </li>
@@ -12,7 +12,7 @@
 {% macro nav_link(endpoint, text, level, icon=None) %}
 <li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
   <a href="{{ url_for(endpoint) }}">
-    {% if icon %}<span class="fa fa-{{ icon }}"></span> {% endif %}
+    {% if icon %}<span class="fa fa-{{ icon }}" aria-hidden="true"></span> {% endif %}
     {{ text }}
   </a>
 </li>

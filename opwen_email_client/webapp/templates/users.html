@@ -19,26 +19,27 @@
     <td>
       {{ user.email.split('@')[0] }}
       {% if user.is_admin %}
-      <span class="fa fa-star" title="{{ _('Administrator') }}"></span>
+      <span class="fa fa-star" title="{{ _('Administrator') }}" aria-hidden="true"></span>
+      <span class="sr-only">{{ _('Administrator') }}</span>
       {% endif %}
     </td>
     <td>
       <div class="btn-group">
         <a class="btn btn-default" href="{{ url_for('email_new', to=user.email, action='to') }}">
-          <span class="fa fa-envelope-o"></span> {{ _('Send message') }}
+          <span class="fa fa-envelope-o" aria-hidden="true"></span> {{ _('Send message') }}
         </a>
         {% if current_user.is_admin %}
         {% if not user.is_admin and user.is_active %}
         <a class="btn btn-default" href="{{ url_for('suspend', userid=user.get_id()) }}">
-          <span class="fa fa-lock"></span> {{ _('Suspend') }}
+          <span class="fa fa-lock" aria-hidden="true"></span> {{ _('Suspend') }}
         </a>
         {% elif not user.is_admin %}
         <a class="btn btn-danger" href="{{ url_for('unsuspend', userid=user.get_id()) }}">
-          <span class="fa fa-unlock-alt"></span> {{ _('Activate') }}
+          <span class="fa fa-unlock-alt" aria-hidden="true"></span> {{ _('Activate') }}
         </a>
         {% endif %}
         <a class="btn btn-default" href="{{ url_for('reset_password', userid=user.get_id()) }}">
-          <span class="fa fa-key"></span> {{ _('Reset password') }}
+          <span class="fa fa-key" aria-hidden="true"></span> {{ _('Reset password') }}
         </a>
         {% endif %}
       </div>

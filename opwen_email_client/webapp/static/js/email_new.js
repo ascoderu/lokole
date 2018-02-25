@@ -7,13 +7,13 @@ $(document).ready(function() {
     showUpload: false,
     msgSelected: "{n} " + ctx.i8n.filesSelected,
     layoutTemplates: {
-      fileIcon: '<span class="fa fa-file-o"></span>&nbsp;',
+      fileIcon: '<span class="fa fa-file-o" aria-hidden="true"></span>&nbsp;',
     },
     removeTitle: "",
-    removeIcon: '<span class="fa fa-trash-o"></span>',
+    removeIcon: '<span class="fa fa-trash-o" aria-hidden="true"></span>',
     removeLabel: ctx.i8n.remove,
     browseLabel: ctx.i8n.chooseFiles,
-    browseIcon: '<span class="fa fa-paperclip"></span>',
+    browseIcon: '<span class="fa fa-paperclip" aria-hidden="true"></span>',
     browseClass: 'btn btn-default'
   });
 }());
@@ -33,11 +33,11 @@ $(document).ready(function() {
       emphasis: function(context) {
         return '<li><div class="btn-group">'
                 + '<a title="' + ctx.i8n.bold + '" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
-                + '  <span class="fa fa-bold"></span></a>'
+                + '  <span class="fa fa-bold" aria-hidden="true"></span></a>'
                 + '<a title="' + ctx.i8n.italic + '" class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">'
-                + '  <span class="fa fa-italic"></span></a>'
+                + '  <span class="fa fa-italic" aria-hidden="true"></span></a>'
                 + '<a title="' + ctx.i8n.underline + '" class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">'
-                + '  <span class="fa fa-underline"></span></a>'
+                + '  <span class="fa fa-underline" aria-hidden="true"></span></a>'
                 + '</div></li>';
       },
       lists: function(context) {
