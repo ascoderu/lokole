@@ -110,6 +110,8 @@ reload_daemons
 }
 
 finished() {
+delete "${HOME}/.cache/pip"
+
 info '
 ################################################################################
 #                                         rebooting in 1 minute to start service
@@ -465,7 +467,6 @@ while ! "${registration_virtualenv}/bin/pip" install opwen_email_server; do slee
     --client="${opwen_webapp_config_client_id}" \
     --domain="${opwen_webapp_config_client_domain}"
 
-delete "${HOME}/.cache/pip"
 delete "${registration_virtualenv}"
 
 
