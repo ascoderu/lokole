@@ -600,7 +600,7 @@ main_ethernet() {
 }
 
 main() {
-  if [ "${sim_type}" == "Ethernet" ]; then
+  if [ "${sim_type}" = "Ethernet" ]; then
     main_ethernet
   else
     main_modem
