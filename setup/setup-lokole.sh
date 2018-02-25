@@ -59,7 +59,7 @@ replace_file() { sudo sed -i "$1" "$2"; }
 create_directory() { mkdir -p "$1"; }
 create_temp_directory() { mktemp -d "$1"; }
 create_link() { sudo ln -s "$1" "$2" || true; }
-copy_file() { sudo cp -f "$1" "$2"; }
+copy_file() { sudo cp -f "$1" "$2" || echo "$1 does not exist, skipping copy to $2"; }
 delete() { if [ ! -L "$1" ]; then sudo rm -rf "$1"; else sudo unlink "$1"; fi }
 make_executable() { sudo chmod a+x "$1"; }
 create_virtualenv() { python3 -m venv "$1"; }
