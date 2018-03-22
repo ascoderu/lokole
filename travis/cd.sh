@@ -32,6 +32,9 @@ cat > "$compose_env_file" << EOF
 APP_PORT=80
 BUILD_TAG=${TRAVIS_TAG}
 ENV_FILE=${secrets_env_file}
+CLIENT_READ_API_WORKERS=3
+CLIENT_WRITE_API_WORKERS=3
+EMAIL_RECEIVE_API_WORKERS=5
 EOF
 
 docker-compose build
