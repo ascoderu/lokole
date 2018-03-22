@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM python:3.6
 
 ENV API_NAME="SET_ME"
 ENV GUNICORN_WORKERS="1"
@@ -8,16 +8,12 @@ ADD runserver.py /app/server.py
 ADD requirements.txt /app/requirements.txt
 ADD docker/api/healthcheck.sh /app/healthcheck.sh
 
-ARG BUILD_DEPENDENCIES="build-base python3-dev"
-RUN apk add --no-cache ${BUILD_DEPENDENCIES} python3 libstdc++ libffi-dev openssl-dev ca-certificates \
-  && python3 -m ensurepip \
-  && rm -r /usr/lib/python*/ensurepip \
+RUN apt-get update \
+  && apt-get install -y libffi-dev libssl-dev ca-certificates curl \
   && pip3 install -U --no-cache-dir pip setuptools \
-  && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip; fi \
   && pip3 --no-cache-dir -q install -r /app/requirements.txt \
   && pip3 --no-cache-dir -q install gunicorn==19.7.1 tornado==4.5.2 \
-  && apk del ${BUILD_DEPENDENCIES} \
-  && apk add --no-cache curl
+  && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 80
 WORKDIR /app
