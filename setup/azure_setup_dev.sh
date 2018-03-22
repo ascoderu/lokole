@@ -25,13 +25,13 @@ client_id="123456789"
 location="eastus"
 resource_group="opwentest${client_name}"
 storage_name="opwenteststorage${client_name}"
-az group create -n ${resource_group} -l ${location} > /dev/null
-az storage account create -n ${storage_name} -g ${resource_group} -l ${location} --sku Standard_RAGRS > /dev/null
+az group create -n "${resource_group}" -l "${location}"
+az storage account create -n "${storage_name}" -g "${resource_group}" -l "${location}" --sku Standard_RAGRS
 
 #
 # setup environment variables
 #
-storage_key="$(az storage account keys list -n ${storage_name} -g ${resource_group} | jq -r '.[0].value')"
+storage_key="$(az storage account keys list -n "${storage_name}" -g "${resource_group}" | jq -r '.[0].value')"
 
 cat > "$(dirname "$0")/../secrets.env" << EOF
 LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME=${storage_name}
