@@ -67,7 +67,7 @@ if [ ! -f "$ssh_key_file" ] || [ ! -f "$secrets_env_file" ]; then
   echo "No deployment secrets found, unable to upgrade application" >&2; exit 2
 fi
 
-scp -i "$ssh_key_file" \
+scp -i "$ssh_key_file" -o "StrictHostKeyChecking no" \
   "$compose_env_file" \
   "$secrets_env_file" \
   'docker-compose.yml' \
@@ -75,7 +75,7 @@ scp -i "$ssh_key_file" \
   'setup/systemd_stop.sh' \
   "$VM_USER@$VM_HOST":~/opwen_cloudserver
 
-ssh -i "$ssh_key_file" \
+ssh -i "$ssh_key_file" -o "StrictHostKeyChecking no" \
   "$VM_USER@$VM_HOST" \
   'sudo systemctl restart opwen_cloudserver'
 
