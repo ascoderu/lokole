@@ -15,27 +15,29 @@ if [ -z "$PYPI_USERNAME" ] || [ -z "$PYPI_PASSWORD" ]; then
 fi
 
 secrets_archive="$(mktemp)"
-compose_file="$(mktemp)"
-env_file='.env'
-cert_file='cert.pem'
+compose_env_file='.env'
+secrets_env_file='secrets.env'
+ssh_key_file='id_rsa'
 pypirc_file="$HOME/.pypirc"
 
 openssl aes-256-cbc -K "$encrypted_2ff31a343d6c_key" -iv "$encrypted_2ff31a343d6c_iv" -in travis/secrets.tar.enc -out "$secrets_archive" -d
-tar xf "$secrets_archive" -C . "$cert_file" "$env_file"
-touch "$env_file"
+tar xf "$secrets_archive" -C . "$ssh_key_file" "$secrets_env_file"
 
 cleanup() {
-  rm -f "$compose_file" "$env_file" "$secrets_archive" "$cert_file" "$pypirc_file"
+  rm -f "$compose_env_file" "$secrets_archive" "$ssh_key_file" "$pypirc_file" "$secrets_env_file"
 }
 trap cleanup EXIT
 
-APP_PORT="80" BUILD_TAG="$TRAVIS_TAG" ENV_FILE="$env_file" \
-  docker-compose config > "$compose_file"
+cat > "$compose_env_file" << EOF
+APP_PORT=80
+BUILD_TAG=${TRAVIS_TAG}
+ENV_FILE=${secrets_env_file}
+EOF
 
-docker-compose -f "$compose_file" build
+docker-compose build
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
-docker-compose -f "$compose_file" push
+docker-compose push
 
 cat > "$pypirc_file" << EOF
 [distutils]
@@ -57,20 +59,24 @@ while ! ${python} setup.py sdist upload; do
   sleep 1m
 done
 
-if [ -z "$SERVICE_FABRIC_HOST" ] || [ -z "$SERVICE_FABRIC_DEPLOYMENT_NAME" ]; then
-  echo "No service fabric credentials configured, skipping upgrade of cluster" >&2; exit 0
+if [ -z "$VM_HOST" ] || [ -z "$VM_USER" ]; then
+  echo "No deployment target, skipping upgrade of application" >&2; exit 0
 fi
 
-if [ ! -f "$cert_file" ] || [ ! -s "$env_file" ]; then
-  echo "No service fabric secrets found, unable to upgrade cluster" >&2; exit 2
+if [ ! -f "$ssh_key_file" ] || [ ! -f "$secrets_env_file" ]; then
+  echo "No deployment secrets found, unable to upgrade application" >&2; exit 2
 fi
 
-pip="$py_env/bin/pip"
-sfctl="$py_env/bin/sfctl"
+scp -i "$ssh_key_file" \
+  "$compose_env_file" \
+  "$secrets_env_file" \
+  'docker-compose.yml' \
+  'setup/systemd_start.sh' \
+  'setup/systemd_stop.sh' \
+  "$VM_USER@$VM_HOST":~/opwen_cloudserver
 
-${pip} install sfctl
-
-REQUESTS_CA_BUNDLE="$cert_file" ${sfctl} cluster select --endpoint "https://$SERVICE_FABRIC_HOST:19080" --pem "$cert_file" --no-verify
-${sfctl} compose upgrade --deployment-name "$SERVICE_FABRIC_DEPLOYMENT_NAME" --file-path "$compose_file"
+ssh -i "$ssh_key_file" \
+  "$VM_USER@$VM_HOST" \
+  'sudo systemctl restart opwen_cloudserver'
 
 echo "All done with deployment" >&2; exit 0

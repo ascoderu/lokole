@@ -114,11 +114,7 @@ Alternatively, you can also run the entire application stack via Docker:
 
 .. sourcecode :: sh
 
-  export APP_PORT=8080
-  export ENV_FILE=.env
-  export BUILD_TAG=development
-  docker-compose build
-  docker-compose up
+  docker-compose up --build
 
 There are OpenAPI specifications that document the functionality of the
 application and provide references to the entry points into the code
