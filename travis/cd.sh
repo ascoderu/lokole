@@ -67,6 +67,8 @@ if [ ! -f "$ssh_key_file" ] || [ ! -f "$secrets_env_file" ]; then
   echo "No deployment secrets found, unable to upgrade application" >&2; exit 2
 fi
 
+chmod 600 "$ssh_key_file"
+
 scp -i "$ssh_key_file" -o "StrictHostKeyChecking no" \
   "$compose_env_file" \
   "$secrets_env_file" \
