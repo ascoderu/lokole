@@ -80,7 +80,7 @@ Next, set up the required Azure resources and environment variables:
   client_id="123456789"
 
   # create development Azure resources
-  location="westus"
+  location="eastus"
   resource_group="opwentest${client_name}"
   storage_name="opwenteststorage${client_name}"
   az group create -n ${resource_group} -l ${location} > /dev/null
@@ -89,15 +89,15 @@ Next, set up the required Azure resources and environment variables:
   # setup environment variables
   storage_key="$(az storage account keys list -n ${storage_name} -g ${resource_group} | jq -r '.[0].value')"
   cat > secrets.env << EOF
-  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME='${storage_name}'
-  LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME='${storage_name}'
-  LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME='${storage_name}'
-  LOKOLE_CLIENT_AZURE_STORAGE_NAME='${storage_name}'
-  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY='${storage_key}'
-  LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY='${storage_key}'
-  LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY='${storage_key}'
-  LOKOLE_CLIENT_AZURE_STORAGE_KEY='${storage_key}'
-  LOKOLE_DEFAULT_CLIENTS='[{"id":"${client_id}","domain":"${client_name}.lokole.ca"}]'
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME=${storage_name}
+  LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME=${storage_name}
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME=${storage_name}
+  LOKOLE_CLIENT_AZURE_STORAGE_NAME=${storage_name}
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY=${storage_key}
+  LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY=${storage_key}
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY=${storage_key}
+  LOKOLE_CLIENT_AZURE_STORAGE_KEY=${storage_key}
+  LOKOLE_DEFAULT_CLIENTS=[{"id":"${client_id}","domain":"${client_name}.lokole.ca"}]
   EOF
 
 Third, use the makefile to verify your installation by running the tests and
