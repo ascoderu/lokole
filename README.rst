@@ -71,7 +71,7 @@ Next, set up the required Azure resources and environment variables:
 
 .. sourcecode :: sh
 
-  ./setup/azure_setup_dev.sh YOUR_AZURE_SUBCRIPTION_ID_HERE
+  ./setup/azure_setup_dev.sh YOUR_AZURE_SUBSCRIPTION_ID_HERE
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
