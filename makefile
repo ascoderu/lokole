@@ -37,7 +37,7 @@ lint-python: venv
 	$(py_env)/bin/flake8 $(py_packages)
 
 lint-shell: $(SHELLCHECK)
-	$(SHELLCHECK) --exclude=SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh')
+	$(SHELLCHECK) --exclude=SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh' -not -path './venv/*')
 
 lint: lint-python lint-shell
 
