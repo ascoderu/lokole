@@ -17,23 +17,34 @@ class QueueConsumer(LogMixin):
     def _process_message(self, message: dict):
         raise NotImplementedError
 
-    def run_once(self):
+    def run_once(self) -> bool:
+        did_process = False
+
         with self._dequeue() as messages:
             for message in messages:
                 self._process_message(message)
+                did_process = True
+
+        return did_process
 
     def run_forever(self):
         self.log_debug('queue consumer listening')
         while self._is_running:
             self.log_debug('starting polling queue')
+
             # noinspection PyBroadException
             try:
-                self.run_once()
+                did_process = self.run_once()
             except Exception as ex:
                 self._report_error(ex)
             else:
-                self._report_success()
-            sleep(self._poll_seconds)
+                if did_process:
+                    self._report_success()
+                else:
+                    self._wait_for_next_message()
+
+    def _wait_for_next_message(self):
+        sleep(self._poll_seconds)
 
     def _report_success(self):
         self.log_debug('done polling queue')

@@ -1,55 +1,86 @@
 from contextlib import contextmanager
-from queue import Queue
-from sys import exc_info
-from threading import Thread
-from time import sleep
 from unittest import TestCase
 
 from opwen_email_server.services.queue_consumer import QueueConsumer
 
 
 class TestQueueConsumer(QueueConsumer):
-    def __init__(self, message_processor, message_generator):
+    def __init__(self, message_processor, message_generator, max_runs):
         super().__init__(message_generator, poll_seconds=0.01)
         self.messages_processed = 0
+        self.times_waited = 0
+        self.exceptions_encountered = 0
+        self._num_runs = 0
+        self._max_runs = max_runs
         self._message_processor = message_processor
 
     def _process_message(self, message: dict):
         self._message_processor()
+
+    def _track_run(self):
+        self._num_runs += 1
+        if self._num_runs >= self._max_runs:
+            self._is_running = False
+
+    def _report_success(self):
+        self._track_run()
         self.messages_processed += 1
 
+    def _report_error(self, ex: Exception):
+        self._track_run()
+        self.exceptions_encountered += 1
 
-class ExceptionPreservingThread(Thread):
-    def __init__(self, action):
-        super().__init__()
-        self._action = action
-        self._exceptions = Queue()
-
-    # noinspection PyBroadException
-    def run(self):
-        try:
-            self._action()
-        except Exception:
-            self._exceptions.put(exc_info())
-        self._exceptions.put(None)
-
-    def join_with_exceptions(self):
-        exception = self._exceptions.get()
-        return exception
+    def _wait_for_next_message(self):
+        self._track_run()
+        self.times_waited += 1
 
 
 class QueueConsumerTests(TestCase):
-    def test_processes_messages(self):
-        def _do_nothing(): pass
+    def test_processes_messages_immediately_if_there_is_more_work(self):
+        def _process(): pass
 
         @contextmanager
         def _produce(): yield [{"foo": "bar"}]
 
-        consumer = TestQueueConsumer(_do_nothing, _produce)
+        consumer = TestQueueConsumer(_process, _produce, max_runs=10)
 
-        self._when_running(consumer, 0.06)
+        consumer.run_forever()
 
-        self.assertGreaterEqual(consumer.messages_processed, 5)
+        self.assertEqual(consumer.messages_processed, 10)
+        self.assertEqual(consumer.times_waited, 0)
+
+    def test_waits_for_new_messages_if_there_is_no_work_to_do(self):
+        def _process(): pass
+
+        @contextmanager
+        def _produce(): yield []
+
+        consumer = TestQueueConsumer(_process, _produce, max_runs=10)
+
+        consumer.run_forever()
+
+        self.assertEqual(consumer.messages_processed, 0)
+        self.assertEqual(consumer.times_waited, 10)
+
+    def test_waits_or_processes_messages_if_available(self):
+        self.messages_produced = 0
+
+        def _process(): pass
+
+        @contextmanager
+        def _produce():
+            if self.messages_produced % 2 == 0:
+                yield []
+            else:
+                yield [{"foo": "bar"}]
+            self.messages_produced += 1
+
+        consumer = TestQueueConsumer(_process, _produce, max_runs=10)
+
+        consumer.run_forever()
+
+        self.assertEqual(consumer.messages_processed, 5)
+        self.assertEqual(consumer.times_waited, 5)
 
     def test_ignores_exceptions_while_running(self):
         def _throw(): raise ValueError
@@ -57,16 +88,8 @@ class QueueConsumerTests(TestCase):
         @contextmanager
         def _produce(): yield [{"foo": "bar"}]
 
-        consumer = TestQueueConsumer(_throw, _produce)
+        consumer = TestQueueConsumer(_throw, _produce, max_runs=10)
 
-        exception = self._when_running(consumer, 0.01)
+        consumer.run_forever()
 
-        self.assertIsNone(exception)
-
-    @classmethod
-    def _when_running(cls, consumer, time):
-        thread = ExceptionPreservingThread(action=consumer.run_forever)
-        thread.start()
-        sleep(time)
-        consumer._is_running = False
-        return thread.join_with_exceptions()
+        self.assertEqual(consumer.exceptions_encountered, 10)
