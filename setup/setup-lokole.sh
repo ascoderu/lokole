@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-readonly usage="Usage: $0 <client-name> <sim-type> <local-password> <storage-account-name> <storage-account-key> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <sync-schedule>
+readonly usage="Usage: $0 <client-name> <sim-type> <storage-account-name> <storage-account-key> <email-key> <server-tables-name> <server-tables-key> <cloudflare-user> <cloudflare-key> <cloudflare-zone> <sync-schedule>
+
+Parameters:
+--------------------------
 
 client-name:              The name that should be assigned to the Opwen device
                           that is being configured by this script. Usually this
@@ -11,8 +14,6 @@ client-name:              The name that should be assigned to the Opwen device
 
 sim-type:                 The mobile network to which to connect to upload data
                           to the cloud, e.g. Hologram_World or Vodacom_DRC.
-
-local-password:           The password for the Lokole user account.
 
 storage-account-name:     The name of the account on the external storage
                           service (e.g. Azure Blob Storage, Amazon S3, etc.)
@@ -42,6 +43,14 @@ cloudflare-zone:          The zone for the Cloudflare account associated with
 
 sync-schedule:            How often the Lokole should sync with the server. In
                           cron syntax. Example: '34 * * * *' for once per hour.
+
+Environment variables:
+--------------------------
+
+LOKOLE_PASSWORD:          If set to a non-empty string, updates the password of
+                          the current user to this value as part of the setup.
+                          Useful for fully automated setups of new devices that
+                          come with a default insecure password.
 "
 
 ################################################################################
@@ -129,16 +138,15 @@ case $1 in -h|--help) fail "${usage}";; esac
 
 readonly opwen_webapp_config_client_name="$1"
 readonly sim_type="$2"
-readonly local_password="$3"
-readonly opwen_webapp_config_remote_account_name="$4"
-readonly opwen_webapp_config_remote_account_key="$5"
-readonly email_account_key="$6"
-readonly server_tables_account_name="$7"
-readonly server_tables_account_key="$8"
-readonly cloudflare_user="$9"
-readonly cloudflare_key="${10}"
-readonly cloudflare_zone="${11}"
-readonly sync_schedule="${12}"
+readonly opwen_webapp_config_remote_account_name="$3"
+readonly opwen_webapp_config_remote_account_key="$4"
+readonly email_account_key="$5"
+readonly server_tables_account_name="$6"
+readonly server_tables_account_key="$7"
+readonly cloudflare_user="$8"
+readonly cloudflare_key="$9"
+readonly cloudflare_zone="${10}"
+readonly sync_schedule="${11}"
 
 readonly opwen_network_name='Lokole'
 readonly opwen_network_password='Ascoderu'
@@ -157,7 +165,7 @@ info '
 
 required_param "${opwen_webapp_config_client_name}" 'client-name' "${usage}"
 required_param "${sim_type}" 'sim-type' "${usage}"
-required_param "${local_password}" 'local-password' "${usage}"
+
 if [ "${sim_type}" != "LocalOnly" ]; then
   required_param "${opwen_webapp_config_remote_account_name}" 'storage-account-name' "${usage}"
   required_param "${opwen_webapp_config_remote_account_key}" 'storage-account-key' "${usage}"
@@ -207,7 +215,10 @@ info '
 
 set_locale "${opwen_server_locale}"
 set_timezone "${opwen_server_timezone}"
-change_password "${opwen_user}" "${local_password}"
+
+if [ -n "${LOKOLE_PASSWORD}" ]; then
+  change_password "${opwen_user}" "${LOKOLE_PASSWORD}"
+fi
 
 
 info '
