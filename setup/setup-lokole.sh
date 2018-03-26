@@ -51,6 +51,9 @@ LOKOLE_PASSWORD:          If set to a non-empty string, updates the password of
                           the current user to this value as part of the setup.
                           Useful for fully automated setups of new devices that
                           come with a default insecure password.
+
+LOKOLE_WIFI:              If set to 'no', skip setup of WiFi access point and
+                          local DNS server configuration.
 "
 
 ################################################################################
@@ -225,6 +228,7 @@ info '
 ################################################################################
 #                                                                installing wifi
 ################################################################################'
+if [ "${LOKOLE_WIFI}" != "no" ]; then
 
 install_system_package 'hostapd' 'dnsmasq'
 
@@ -319,6 +323,7 @@ replace_file 's@^DAEMON_CONF=$@DAEMON_CONF=/etc/hostapd/hostapd.conf@' '/etc/ini
 disable_system_power_management
 
 
+fi
 info '
 ################################################################################
 #                                                        installing email webapp
@@ -486,7 +491,12 @@ info '
 #                                                       installing network stick
 ################################################################################'
 
-install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
+install_system_package 'cron'
+
+opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/sync.sh"
+
+if [ "${sim_type}" != "Ethernet" ]; then
+install_system_package 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
 
 opwen_dialer_config_directory="/home/${opwen_user}/wvdial"
 create_directory "${opwen_dialer_config_directory}"
@@ -495,7 +505,6 @@ internet_modem_config_e303='/etc/usb_modeswitch.d/12d1:14fe'
 internet_modem_config_e353='/etc/usb_modeswitch.d/12d1:1f01'
 internet_modem_config_e3131='/etc/usb_modeswitch.d/12d1:155b'
 internet_dialer_config='/etc/wvdial.conf'
-opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/sync.sh"
 
 write_file "${opwen_dialer_config_directory}/Hologram_World" << EOF
 [Dialer Defaults]
@@ -544,6 +553,7 @@ usepeerdns
 defaultroute
 replacedefaultroute
 EOF
+fi
 
 write_file "${opwen_webapp_email_sync_script}" << EOF
 #!/usr/bin/env sh
