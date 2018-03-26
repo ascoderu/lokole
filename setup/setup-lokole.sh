@@ -163,6 +163,7 @@ readonly opwen_server_locale='en_GB.UTF-8'
 readonly opwen_server_timezone='Etc/UTC'
 readonly opwen_user="${USER}"
 readonly opwen_device="${HOSTNAME}"
+readonly opwen_port="${LOKOLE_PORT:-80}"
 
 info '
 ################################################################################
@@ -410,7 +411,7 @@ create_daemon \
 
 write_file "/etc/nginx/sites-available/${opwen_webapp_service}" << EOF
 server {
-  listen ${LOKOLE_PORT:-80};
+  listen ${opwen_port};
   server_name localhost;
 
   location = /favicon.ico {
@@ -579,7 +580,7 @@ dialer_is_running() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidf
 connect_to_internet() { /usr/bin/wvdial --config="\${dialer_config}" 2> "\${dialer_logfile}" & echo \$! > "\${dialer_pidfile}"; }
 dialer_is_connected() { test -f "\${dialer_logfile}" && grep -q 'secondary DNS address' "\${dialer_logfile}"; }
 kill_dialer() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidfile}" && kill "\${pid}" && rm "\${dialer_pidfile}" && rm "\${dialer_logfile}"; }
-sync_emails() { /usr/bin/curl "http://localhost/sync?secret=\${sync_secret}"; }
+sync_emails() { /usr/bin/curl "http://localhost:${opwen_port}/sync?secret=\${sync_secret}"; }
 
 setup_modem() {
   if   modem_is_e353;  then modem_target_mode='1001'; /usr/sbin/usb_modeswitch --config-file '${internet_modem_config_e353}'
