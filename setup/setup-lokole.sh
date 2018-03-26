@@ -54,6 +54,9 @@ LOKOLE_PASSWORD:          If set to a non-empty string, updates the password of
 
 LOKOLE_WIFI:              If set to 'no', skip setup of WiFi access point and
                           local DNS server configuration.
+
+LOKOLE_PORT:              If set to a non-empty string, use this value instead
+                          of the default port 80 to run the Lokole email app.
 "
 
 ################################################################################
@@ -407,7 +410,7 @@ create_daemon \
 
 write_file "/etc/nginx/sites-available/${opwen_webapp_service}" << EOF
 server {
-  listen 80;
+  listen ${LOKOLE_PORT:-80};
   server_name localhost;
 
   location = /favicon.ico {
