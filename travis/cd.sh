@@ -46,10 +46,12 @@ docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 touch secrets.env
 mkdir -p state
 
-APP_PORT="8080" \
-SECRETS_FILE="secrets.env" \
-STATE_DIR="./state" \
-BUILD_TAG="${TRAVIS_TAG}" \
-docker-compose build
+cat > .env << EOF
+APP_PORT=8080
+SECRETS_FILE=secrets.env
+STATE_DIR=./state
+BUILD_TAG=${TRAVIS_TAG}
+EOF
 
+docker-compose build
 docker-compose push
