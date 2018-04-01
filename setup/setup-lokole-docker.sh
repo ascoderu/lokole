@@ -60,7 +60,7 @@ case "$1" in -h|--help) echo "${usage}" && exit 1;; esac
 
 required_param() { [ -z "$1" ] && echo "Missing required parameter: $2" && (echo "$3" | head -1) && exit 1; }
 check_dependency() { if ! command -v "$1" >/dev/null; then echo "Missing dependency: $1" && exit 1; fi }
-random_string() { < /dev/urandom | tr -dc '_A-Z-a-z-0-9' | head -c"${1:-16}"; echo; }
+random_string() { head /dev/urandom | tr -dc '_A-Z-a-z-0-9' | head -c"${1:-16}"; echo; }
 
 readonly version="$1"
 readonly opwen_webapp_config_client_name="$2"

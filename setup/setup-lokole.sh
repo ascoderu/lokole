@@ -80,7 +80,7 @@ make_executable() { sudo chmod a+x "$1"; }
 create_virtualenv() { python3 -m venv "$1"; }
 change_password() { echo "$1:$2" | sudo chpasswd; }
 required_param() { [ -z "$1" ] && echo "Missing required parameter: $2" && (echo "$3" | head -1) && exit 1; }
-random_string() { < /dev/urandom | tr -dc '_A-Z-a-z-0-9' | head -c"${1:-16}"; echo; }
+random_string() { head /dev/urandom | tr -dc '_A-Z-a-z-0-9' | head -c"${1:-16}"; echo; }
 disable_system_power_management() { sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target; }
 get_system_ram_kb() { grep 'MemTotal' '/proc/meminfo' | cut -d':' -f2 | sed 's/^ *//g' | cut -d' ' -f1; }
 min() { if [ "$1" -lt "$2" ]; then echo "$1"; else echo "$2"; fi; }
