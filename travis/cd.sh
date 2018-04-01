@@ -43,15 +43,15 @@ done
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 
-touch secrets.env
-mkdir -p state
+docker build \
+  --build-arg "CLIENT_VERSION=$TRAVIS_TAG" \
+  --tag "$DOCKER_USERNAME/opwenclient_nginx:$TRAVIS_TAG"
+  docker/nginx
 
-cat > .env << EOF
-APP_PORT=8080
-SECRETS_FILE=secrets.env
-STATE_DIR=./state
-BUILD_TAG=${TRAVIS_TAG}
-EOF
+docker build \
+  --build-arg "CLIENT_VERSION=$TRAVIS_TAG" \
+  --tag "$DOCKER_USERNAME/opwenclient_app:$TRAVIS_TAG"
+  docker/app
 
-docker-compose build
-docker-compose push
+docker push "$DOCKER_USERNAME/opwenclient_nginx:$TRAVIS_TAG"
+docker push "$DOCKER_USERNAME/opwenclient_app:$TRAVIS_TAG"

@@ -54,6 +54,9 @@ LOKOLE_STATEDIR:          The Lokole state files will get stored in this
 
 LOKOLE_PORT:              The Lokole application will run on this port. Defaults
                           to 80.
+
+DOCKER_USERNAME:          The user from which the Lokole docker images will be
+                          pulled. Defaults to cwolff.
 "
 
 case "$1" in -h|--help) echo "${usage}" && exit 1;; esac
@@ -86,15 +89,15 @@ required_param "${cloudflare_key}" 'cloudflare-key' "${usage}"
 required_param "${cloudflare_zone}" 'cloudflare-zone' "${usage}"
 required_param "${sync_schedule}" 'sync-schedule' "${usage}"
 
-check_dependency "cron"
+check_dependency "crontab"
 check_dependency "curl"
 check_dependency "docker"
-check_dependency "docker-compose"
 check_dependency "systemctl"
 
 readonly basedir="$(readlink -f "${LOKOLE_BASEDIR:-~/opwen_config}")"
 readonly statedir="$(readlink -f "${LOKOLE_STATEDIR:-~/opwen_state}")"
 readonly port="${LOKOLE_PORT:-80}"
+readonly dockeruser="${DOCKER_USERNAME:-cwolff}"
 
 mkdir -p "${basedir}" "${statedir}"
 
@@ -103,13 +106,6 @@ mkdir -p "${basedir}" "${statedir}"
 #
 
 curl "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${version}/docker-compose.yml" > "${basedir}/docker-compose.yml"
-
-cat > "${basedir}/.env" << EOF
-APP_PORT=${port}
-BUILD_TAG=${version}
-SECRETS_FILE=${basedir}/secrets.env
-STATE_DIR=${statedir}
-EOF
 
 cat > "${basedir}/secrets.env" << EOF
 OPWEN_ADMIN_SECRET=$(random_string 32)
@@ -127,7 +123,35 @@ OPWEN_SERVER_TABLES_ACCOUNT_KEY=${server_tables_account_key}
 OPWEN_SERVER_TABLES_ACCOUNT_NAME=${server_tables_account_name}
 EOF
 
-(cd "${basedir}" && docker-compose pull)
+docker pull "${dockeruser}/opwenclient_nginx:${version}"
+docker pull "${dockeruser}/opwenclient_app:${version}"
+
+cat > "${basedir}/docker-start.sh" << EOF
+#!/usr/bin/env sh
+docker network create opwen_webapp
+
+docker run \
+  --detach \
+  --net "opwen_webapp" \
+  --publish "${port}:80" \
+  --name "opwenclient_nginx" \
+  "${dockeruser}/opwenclient_nginx:${version}"
+
+docker run \
+  --detach \
+  --net "opwen_webapp" \
+  --env-file "${basedir}/secrets.env" \
+  --volume "${statedir}:/state" \
+  --name "opwenclient_app" \
+  "${dockeruser}/opwenclient_app:${version}"
+EOF
+chmod a+x "${basedir}/docker-start.sh"
+
+cat > "${basedir}/docker-stop.sh" << EOF
+docker stop "opwenclient_app" "opwenclient_nginx"
+docker network remove opwen_webapp
+EOF
+chmod a+x "${basedir}/docker-stop.sh"
 
 #
 # set up autostart
@@ -143,8 +167,8 @@ After=docker.service
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=${basedir}
-ExecStart=$(which docker-compose) up -d
-ExecStop=$(which docker-compose) down
+ExecStart=${basedir}/docker-start.sh
+ExecStop=${basedir}/docker-stop.sh
 TimeoutStartSec=0
 
 [Install]
