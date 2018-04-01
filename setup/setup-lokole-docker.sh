@@ -106,8 +106,6 @@ mkdir -p "${basedir}" "${statedir}"
 # set up app
 #
 
-curl "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${version}/docker-compose.yml" > "${basedir}/docker-compose.yml"
-
 cat > "${basedir}/secrets.env" << EOF
 OPWEN_ADMIN_SECRET=$(random_string 32)
 OPWEN_CLIENT_ID=$(random_string 32)
