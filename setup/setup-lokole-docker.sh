@@ -64,6 +64,7 @@ case "$1" in -h|--help) echo "${usage}" && exit 1;; esac
 required_param() { [ -z "$1" ] && echo "Missing required parameter: $2" && (echo "$3" | head -1) && exit 1; }
 check_dependency() { if ! command -v "$1" >/dev/null; then echo "Missing dependency: $1" && exit 1; fi }
 random_string() { head /dev/urandom | tr -dc '_A-Z-a-z-0-9' | head -c"${1:-16}"; echo; }
+set_default() { if [ -z "$1" ]; then echo "$2"; else echo "$1"; fi }
 
 readonly version="$1"
 readonly opwen_webapp_config_client_name="$2"
@@ -94,17 +95,10 @@ check_dependency "curl"
 check_dependency "docker"
 check_dependency "systemctl"
 
-basedir="${LOKOLE_BASEDIR}"
-if [ -z "${basedir}" ]; then basedir="${HOME}/opwen_config"; fi
-
-statedir="${LOKOLE_STATEDIR}"
-if [ -z "${statedir}" ]; then statedir="${HOME}/opwen_state"; fi
-
-port="${LOKOLE_PORT}"
-if [ -z "${port}" ]; then port="80"; fi
-
-dockeruser="${DOCKER_USERNAME}"
-if [ -z "${dockeruser}" ]; then dockeruser="cwolff"; fi
+readonly basedir="$(set_default "${LOKOLE_BASEDIR}" "${HOME}/opwen_config")"
+readonly statedir="$(set_default "${LOKOLE_STATEDIR}" "${HOME}/opwen_state")"
+readonly port="$(set_default "${LOKOLE_PORT}" "80")"
+readonly dockeruser="$(set_default "${DOCKER_USERNAME}" "cwolff")"
 
 mkdir -p "${basedir}" "${statedir}"
 
