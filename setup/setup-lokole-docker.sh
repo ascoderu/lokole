@@ -148,6 +148,7 @@ chmod a+x "${basedir}/docker-start.sh"
 
 cat > "${basedir}/docker-stop.sh" << EOF
 docker stop "opwenclient_app" "opwenclient_nginx"
+docker rm "opwenclient_app" "opwenclient_nginx"
 docker network remove opwen_webapp
 EOF
 chmod a+x "${basedir}/docker-stop.sh"
@@ -158,7 +159,7 @@ chmod a+x "${basedir}/docker-stop.sh"
 
 cat > "${basedir}/opwen_webapp.service" << EOF
 [Unit]
-Description=Run opwen-webapp via docker-compose
+Description=Run opwen-webapp via docker
 Requires=docker.service
 After=docker.service
 
