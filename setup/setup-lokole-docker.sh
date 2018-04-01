@@ -109,12 +109,12 @@ mkdir -p "${basedir}" "${statedir}"
 cat > "${basedir}/secrets.env" << EOF
 OPWEN_ADMIN_SECRET=$(random_string 32)
 OPWEN_CLIENT_ID=$(random_string 32)
-OPWEN_CLOUDFLARE_KEY=${cloudflare_key}
-OPWEN_CLOUDFLARE_USER=${cloudflare_user}
-OPWEN_CLOUDFLARE_ZONE=${cloudflare_zone}
 OPWEN_PASSWORD_SALT=$(random_string 32)
 OPWEN_SESSION_KEY=$(random_string 32)
 OPWEN_CLIENT_NAME=${opwen_webapp_config_client_name}
+OPWEN_CLOUDFLARE_KEY=${cloudflare_key}
+OPWEN_CLOUDFLARE_USER=${cloudflare_user}
+OPWEN_CLOUDFLARE_ZONE=${cloudflare_zone}
 OPWEN_REMOTE_ACCOUNT_KEY=${opwen_webapp_config_remote_account_key}
 OPWEN_REMOTE_ACCOUNT_NAME=${opwen_webapp_config_remote_account_name}
 OPWEN_SENDGRID_KEY=${email_account_key}
