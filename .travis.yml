@@ -4,6 +4,11 @@ language:
 python:
   - "3.6"
 
+sudo: required
+
+services:
+  - docker
+
 addons:
   apt:
     sources:

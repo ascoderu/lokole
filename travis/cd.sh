@@ -10,6 +10,10 @@ if [ -z "$PYPI_USERNAME" ] || [ -z "$PYPI_PASSWORD" ]; then
   echo "No PyPI credentials configured, unable to publish builds" >&2; exit 1
 fi
 
+if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_PASSWORD" ]; then
+  echo "No docker credentials configured, unable to publish builds" >&2; exit 1
+fi
+
 cleanup() {
   rm -f ~/.pypirc
 }
@@ -36,3 +40,16 @@ while ! ${python} setup.py sdist upload; do
   echo "Unable to upload to PyPI, retrying" >&2
   sleep 1m
 done
+
+docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
+
+touch secrets.env
+mkdir -p state
+
+APP_PORT="8080" \
+SECRETS_FILE="secrets.env" \
+STATE_DIR="./state" \
+BUILD_TAG="${TRAVIS_TAG}" \
+docker-compose build
+
+docker-compose push
