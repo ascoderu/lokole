@@ -95,12 +95,10 @@ check_dependency "docker"
 check_dependency "systemctl"
 
 basedir="${LOKOLE_BASEDIR}"
-if [ -z "${basedir}"]; then basedir="~/opwen_config"; fi
-basedir="$(readlink -f "${basedir}")"
+if [ -z "${basedir}" ]; then basedir="${HOME}/opwen_config"; fi
 
 statedir="${LOKOLE_STATEDIR}"
-if [ -z "${statedir}"]; then statedir="~/opwen_state"; fi
-statedir="$(readlink -f "${statedir}")"
+if [ -z "${statedir}" ]; then statedir="${HOME}/opwen_state"; fi
 
 port="${LOKOLE_PORT}"
 if [ -z "${port}" ]; then port="80"; fi
