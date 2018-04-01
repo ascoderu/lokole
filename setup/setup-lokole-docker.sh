@@ -94,10 +94,19 @@ check_dependency "curl"
 check_dependency "docker"
 check_dependency "systemctl"
 
-readonly basedir="$(readlink -f "${LOKOLE_BASEDIR:-~/opwen_config}")"
-readonly statedir="$(readlink -f "${LOKOLE_STATEDIR:-~/opwen_state}")"
-readonly port="${LOKOLE_PORT:-80}"
-readonly dockeruser="${DOCKER_USERNAME:-cwolff}"
+basedir="${LOKOLE_BASEDIR}"
+if [ -z "${basedir}"]; then basedir="~/opwen_config"; fi
+basedir="$(readlink -f "${basedir}")"
+
+statedir="${LOKOLE_STATEDIR}"
+if [ -z "${statedir}"]; then statedir="~/opwen_state"; fi
+statedir="$(readlink -f "${statedir}")"
+
+port="${LOKOLE_PORT}"
+if [ -z "${port}" ]; then port="80"; fi
+
+dockeruser="${DOCKER_USERNAME}"
+if [ -z "${dockeruser}" ]; then dockeruser="cwolff"; fi
 
 mkdir -p "${basedir}" "${statedir}"
 
