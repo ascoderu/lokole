@@ -170,6 +170,7 @@ WorkingDirectory=${basedir}
 ExecStart=${basedir}/docker-start.sh
 ExecStop=${basedir}/docker-stop.sh
 TimeoutStartSec=0
+TimeoutStopSec=0
 
 [Install]
 WantedBy=multi-user.target
