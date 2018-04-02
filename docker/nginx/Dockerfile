@@ -10,7 +10,8 @@ RUN apt-get -qq update \
   && apt-get -qq install -y ${BUILD_DEPENDENCIES} \
   && while ! curl -fsLO ${CLIENT_DOWNLOAD_URL}; do sleep 20s; done \
   && tar xf ${CLIENT_DOWNLOAD_ARCHIVE} \
-  && mv ${CLIENT_DOWNLOAD_FOLDER}/opwen_email_client/webapp/static /static \
+  && mkdir /app \
+  && mv ${CLIENT_DOWNLOAD_FOLDER}/opwen_email_client/webapp/static /app \
   && rm -rf ${CLIENT_DOWNLOAD_FOLDER} ${CLIENT_DOWNLOAD_ARCHIVE} \
   && apt-get -qq remove -y ${BUILD_DEPENDENCIES} \
   && rm -rf /var/lib/apt/lists/*
