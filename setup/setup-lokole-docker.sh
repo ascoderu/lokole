@@ -129,20 +129,20 @@ cat > "${basedir}/docker-start.sh" << EOF
 #!/usr/bin/env sh
 docker network create opwen_webapp
 
-docker run \
-  --detach \
-  --net "opwen_webapp" \
-  --publish "${port}:80" \
-  --name "opwenclient_nginx" \
-  "${dockeruser}/opwenclient_nginx:${version}"
-
-docker run \
-  --detach \
-  --net "opwen_webapp" \
-  --env-file "${basedir}/secrets.env" \
-  --volume "${statedir}:/state" \
-  --name "opwenclient_app" \
+docker run \\
+  --detach \\
+  --net "opwen_webapp" \\
+  --env-file "${basedir}/secrets.env" \\
+  --volume "${statedir}:/state" \\
+  --name "opwenclient_app" \\
   "${dockeruser}/opwenclient_app:${version}"
+
+docker run \\
+  --detach \\
+  --net "opwen_webapp" \\
+  --publish "${port}:80" \\
+  --name "opwenclient_nginx" \\
+  "${dockeruser}/opwenclient_nginx:${version}"
 EOF
 chmod a+x "${basedir}/docker-start.sh"
 
