@@ -93,7 +93,6 @@ required_param "${sync_schedule}" 'sync-schedule' "${usage}"
 check_dependency "crontab"
 check_dependency "curl"
 check_dependency "docker"
-# check_dependency "systemctl"
 
 readonly basedir="$(set_default "${LOKOLE_BASEDIR}" "${HOME}/opwen_config")"
 readonly statedir="$(set_default "${LOKOLE_STATEDIR}" "${HOME}/opwen_state")"
@@ -125,58 +124,24 @@ EOF
 docker pull "${dockeruser}/opwenclient_nginx:${version}"
 docker pull "${dockeruser}/opwenclient_app:${version}"
 
-cat > "${basedir}/docker-start.sh" << EOF
-#!/usr/bin/env sh
-docker network create opwen_webapp
+docker network ls | grep -q opwen_webapp || docker network create opwen_webapp
 
-docker run \\
-  --detach \\
-  --net "opwen_webapp" \\
-  --env-file "${basedir}/secrets.env" \\
-  --volume "${statedir}:/state" \\
-  --name "opwenclient_app" \\
+docker run \
+  --net "opwen_webapp" \
+  --env-file "${basedir}/secrets.env" \
+  --volume "${statedir}:/state" \
+  --name "opwenclient_app" \
+  --detach \
+  --restart always \
   "${dockeruser}/opwenclient_app:${version}"
 
-docker run \\
-  --detach \\
-  --net "opwen_webapp" \\
-  --publish "${port}:80" \\
-  --name "opwenclient_nginx" \\
+docker run \
+  --net "opwen_webapp" \
+  --publish "${port}:80" \
+  --name "opwenclient_nginx" \
+  --detach \
+  --restart always \
   "${dockeruser}/opwenclient_nginx:${version}"
-EOF
-chmod a+x "${basedir}/docker-start.sh"
-
-cat > "${basedir}/docker-stop.sh" << EOF
-docker stop "opwenclient_app" "opwenclient_nginx"
-docker rm "opwenclient_app" "opwenclient_nginx"
-docker network remove opwen_webapp
-EOF
-chmod a+x "${basedir}/docker-stop.sh"
-
-#
-# set up autostart
-#
-
-cat > "${basedir}/opwen_webapp.service" << EOF
-[Unit]
-Description=Run opwen-webapp via docker
-Requires=docker.service
-After=docker.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=${basedir}
-ExecStart=${basedir}/docker-start.sh
-ExecStop=${basedir}/docker-stop.sh
-TimeoutStartSec=0
-TimeoutStopSec=0
-
-[Install]
-WantedBy=multi-user.target
-EOF
-# sudo mv "${basedir}/opwen_webapp.service" /etc/systemd/system
-# sudo systemctl enable opwen_webapp
 
 #
 # set up emails sync cronjob
