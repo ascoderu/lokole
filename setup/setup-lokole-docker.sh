@@ -93,7 +93,7 @@ required_param "${sync_schedule}" 'sync-schedule' "${usage}"
 check_dependency "crontab"
 check_dependency "curl"
 check_dependency "docker"
-check_dependency "systemctl"
+# check_dependency "systemctl"
 
 readonly basedir="$(set_default "${LOKOLE_BASEDIR}" "${HOME}/opwen_config")"
 readonly statedir="$(set_default "${LOKOLE_STATEDIR}" "${HOME}/opwen_state")"
@@ -175,8 +175,8 @@ TimeoutStopSec=0
 [Install]
 WantedBy=multi-user.target
 EOF
-sudo mv "${basedir}/opwen_webapp.service" /etc/systemd/system
-sudo systemctl enable opwen_webapp
+# sudo mv "${basedir}/opwen_webapp.service" /etc/systemd/system
+# sudo systemctl enable opwen_webapp
 
 #
 # set up emails sync cronjob
