@@ -45,13 +45,7 @@ docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 
 docker build \
   --build-arg "CLIENT_VERSION=$TRAVIS_TAG" \
-  --tag "$DOCKER_USERNAME/opwenclient_nginx:$TRAVIS_TAG" \
-  docker/nginx
-
-docker build \
-  --build-arg "CLIENT_VERSION=$TRAVIS_TAG" \
   --tag "$DOCKER_USERNAME/opwenclient_app:$TRAVIS_TAG" \
   docker/app
 
-docker push "$DOCKER_USERNAME/opwenclient_nginx:$TRAVIS_TAG"
 docker push "$DOCKER_USERNAME/opwenclient_app:$TRAVIS_TAG"

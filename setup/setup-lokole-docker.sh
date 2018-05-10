@@ -121,27 +121,16 @@ OPWEN_SERVER_TABLES_ACCOUNT_KEY=${server_tables_account_key}
 OPWEN_SERVER_TABLES_ACCOUNT_NAME=${server_tables_account_name}
 EOF
 
-docker pull "${dockeruser}/opwenclient_nginx:${version}"
 docker pull "${dockeruser}/opwenclient_app:${version}"
 
-docker network ls | grep -q opwen_webapp || docker network create opwen_webapp
-
 docker run \
-  --net "opwen_webapp" \
   --env-file "${basedir}/secrets.env" \
   --volume "${statedir}:/state" \
+  --publish "${port}:80" \
   --name "opwenclient_app" \
   --detach \
   --restart always \
   "${dockeruser}/opwenclient_app:${version}"
-
-docker run \
-  --net "opwen_webapp" \
-  --publish "${port}:80" \
-  --name "opwenclient_nginx" \
-  --detach \
-  --restart always \
-  "${dockeruser}/opwenclient_nginx:${version}"
 
 #
 # set up emails sync cronjob

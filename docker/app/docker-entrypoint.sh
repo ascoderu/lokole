@@ -69,5 +69,5 @@ fi
 /venv/bin/gunicorn \
   --timeout="${OPWEN_WEBAPP_TIMEOUT_SECONDS}" \
   --workers="${OPWEN_WEBAPP_WORKERS}" \
-  --bind="0.0.0.0:5000" \
+  --bind="unix:/tmp/gunicorn.sock" \
   opwen_email_client.webapp:app

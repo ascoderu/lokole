@@ -7,10 +7,12 @@ RUN python3 -m venv /venv \
   && /venv/bin/pip install --no-cache-dir opwen_email_client==${CLIENT_VERSION} \
   && /venv/bin/pybabel compile -d /venv/lib/python3.6/site-packages/opwen_email_client/webapp/translations \
   && apt-get -qq update \
-  && apt-get -qq install -y curl \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get -qq install -y curl nginx \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm /etc/nginx/sites-enabled/default
 
-ADD docker-entrypoint.sh /docker-entrypoint.sh
+ADD docker-entrypoint.sh /run-app.sh
+ADD nginx.conf /etc/nginx/conf.d/frontend.conf
 
 ENV OPWEN_STATE_DIRECTORY=/state
 ENV OPWEN_SESSION_KEY=
@@ -33,5 +35,5 @@ ENV OPWEN_EMAIL_SERVER_INBOX_API=api.mailserver.inbox.lokole.ca
 ENV OPWEN_WEBAPP_TIMEOUT_SECONDS=30
 ENV OPWEN_WEBAPP_WORKERS=2
 
-EXPOSE 5000
-CMD ["/docker-entrypoint.sh"]
+EXPOSE 80
+CMD nginx && /run-app.sh
