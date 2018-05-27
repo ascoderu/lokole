@@ -1,0 +1,8 @@
+apiVersion: "v1"
+name: opwen_cloudserver
+description: A Helm Chart for the OPWEN email server by Ascoderu
+version: 0.0.1
+keywords:
+  - ascoderu
+sources:
+  - https://github.com/ascoderu/opwen-cloudserver

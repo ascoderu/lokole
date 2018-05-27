@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file=compose.yml --chart
+    kompose.version: 1.13.0 (84fa826)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: nginx
+  name: nginx
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: {{.Values.version.imageRegistry}}/opwenserver_nginx:{{.Values.version.dockerTag}}
+        env:
+        - name: DNS_RESOLVER
+          value: 127.0.0.1:53 ipv6=off
+        ports:
+        - containerPort: 80
+        resources: {}
+      - name: dnsmasq
+        image: "janeczku/go-dnsmasq:release-1.0.7"
+        args:
+          - --listen=127.0.0.1:53
+          - --default-resolver
+          - --append-search-domains
+          - --hostsfile=/etc/hosts
+          - --verbose
+      restartPolicy: Always
+status: {}

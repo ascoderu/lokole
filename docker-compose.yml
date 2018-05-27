@@ -3,78 +3,93 @@ version: '3'
 services:
 
   nginx:
-    image: cwolff/opwenserver_nginx:${BUILD_TAG}
+    image: ${DOCKER_REPO}/opwenserver_nginx:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
     ports:
       - ${APP_PORT}:80
     environment:
-      - DNS_RESOLVER=127.0.0.11
+      DNS_RESOLVER: 127.0.0.11
     depends_on:
-      - api_email_receive
-      - api_client_write
-      - api_client_read
+      - apiemailreceive
+      - apiclientwrite
+      - apiclientread
 
-  api_email_receive:
-    image: cwolff/opwenserver_api:${BUILD_TAG}
+  apiemailreceive:
+    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      - GUNICORN_WORKERS=${EMAIL_RECEIVE_API_WORKERS}
-      - API_NAME=opwen_email_server/static/email-receive-spec.yaml
+      API_NAME: opwen_email_server/static/email-receive-spec.yaml
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
-      - ${ENV_FILE}
+      - ./secrets/azure.env
+      - ./secrets/sendgrid.env
 
-  api_client_write:
-    image: cwolff/opwenserver_api:${BUILD_TAG}
+  apiclientwrite:
+    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      - GUNICORN_WORKERS=${CLIENT_WRITE_API_WORKERS}
-      - API_NAME=opwen_email_server/static/client-write-spec.yaml
+      API_NAME: opwen_email_server/static/client-write-spec.yaml
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
-      - ${ENV_FILE}
+      - ./secrets/azure.env
+      - ./secrets/sendgrid.env
 
-  api_client_read:
-    image: cwolff/opwenserver_api:${BUILD_TAG}
+  apiclientread:
+    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      - GUNICORN_WORKERS=${CLIENT_READ_API_WORKERS}
-      - API_NAME=opwen_email_server/static/client-read-spec.yaml
+      API_NAME: opwen_email_server/static/client-read-spec.yaml
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
-      - ${ENV_FILE}
+      - ./secrets/azure.env
+      - ./secrets/sendgrid.env
 
-  job_send_outbound_emails:
-    image: cwolff/opwenserver_job:${BUILD_TAG}
+  jobsendoutboundemails:
+    image: ${DOCKER_REPO}/opwenserver_job:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
     environment:
-      - JOB_NAME=opwen_email_server.jobs.send_outbound_emails
+      JOB_NAME: opwen_email_server.jobs.send_outbound_emails
+      LOKOLE_QUEUE_POLL_SECONDS: ${LOKOLE_QUEUE_POLL_SECONDS}
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
-      - ${ENV_FILE}
+      - ./secrets/azure.env
+      - ./secrets/sendgrid.env
 
-  job_store_inbound_emails:
-    image: cwolff/opwenserver_job:${BUILD_TAG}
+  jobstoreinboundemails:
+    image: ${DOCKER_REPO}/opwenserver_job:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
     environment:
-      - JOB_NAME=opwen_email_server.jobs.store_inbound_emails
+      JOB_NAME: opwen_email_server.jobs.store_inbound_emails
+      LOKOLE_QUEUE_POLL_SECONDS: ${LOKOLE_QUEUE_POLL_SECONDS}
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
-      - ${ENV_FILE}
+      - ./secrets/azure.env
+      - ./secrets/sendgrid.env
 
-  job_store_written_client_emails:
-    image: cwolff/opwenserver_job:${BUILD_TAG}
+  jobstorewritteclientemails:
+    image: ${DOCKER_REPO}/opwenserver_job:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/job/Dockerfile
     environment:
-      - JOB_NAME=opwen_email_server.jobs.store_written_client_emails
+      JOB_NAME: opwen_email_server.jobs.store_written_client_emails
+      LOKOLE_QUEUE_POLL_SECONDS: ${LOKOLE_QUEUE_POLL_SECONDS}
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
-      - ${ENV_FILE}
+      - ./secrets/azure.env
+      - ./secrets/sendgrid.env

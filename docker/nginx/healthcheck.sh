@@ -1,17 +1,17 @@
 #!/usr/bin/env sh
 
-if ! curl --fail --silent "http://api_email_receive/healthcheck/ping"; then
-  echo "Unable to call api_email_receive" >&2
+if ! curl --fail --silent "http://apiemailreceive/healthcheck/ping"; then
+  echo "Unable to call apiemailreceive" >&2
   exit 1
 fi
 
-if ! curl --fail --silent "http://api_client_write/healthcheck/ping"; then
-  echo "Unable to call api_client_write" >&2
+if ! curl --fail --silent "http://apiclientwrite/healthcheck/ping"; then
+  echo "Unable to call apiclientwrite" >&2
   exit 2
 fi
 
-if ! curl --fail --silent "http://api_client_read/healthcheck/ping"; then
-  echo "Unable to call api_client_read" >&2
+if ! curl --fail --silent "http://apiclientread/healthcheck/ping"; then
+  echo "Unable to call apiclientread" >&2
   exit 3
 fi
 

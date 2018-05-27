@@ -1,9 +1,7 @@
 server {
   listen 80;
 
-  {{#DNS_RESOLVER}}
   resolver {{DNS_RESOLVER}};
-  {{/DNS_RESOLVER}}
 
   client_max_body_size 50M;
 
@@ -23,15 +21,15 @@ server {
     proxy_set_header X-Scheme \$scheme;
 
     location /api/email/sendgrid {
-      proxy_pass http://api_email_receive;
+      proxy_pass http://apiemailreceive;
     }
 
     location /api/email/upload {
-      proxy_pass http://api_client_write;
+      proxy_pass http://apiclientwrite;
     }
 
     location /api/email/download {
-      proxy_pass http://api_client_read;
+      proxy_pass http://apiclientread;
     }
   }
 }

@@ -6,8 +6,5 @@
 /*.egg-info/
 venv/
 
-id_rsa
-id_rsa.pub
-secrets.env
-cert.pem
 travis/secrets.tar
+serviceprincipal.json

@@ -60,29 +60,53 @@ First, get the source code.
   git clone git@github.com:ascoderu/opwen-cloudserver.git
   cd opwen-cloudserver
 
-Second, install the system-level dependencies using your package manager.
-
-.. sourcecode :: sh
-
-  sudo apt-get install -y python3-dev python3-venv python3-pip openssl-dev jq
-  curl -L https://aka.ms/InstallAzureCli | bash
-
-Next, set up the required Azure resources and environment variables:
-
-.. sourcecode :: sh
-
-  ./setup/azure_setup_dev.sh YOUR_AZURE_SUBSCRIPTION_ID_HERE
-
-Third, use the makefile to verify your installation by running the tests and
-starting up the server. The makefile will automatically install all required
-dependencies into a virtual environment.
+You can use the makefile to verify your checkout by running the tests and
+other CI steps such as linting. The makefile will automatically install all
+required dependencies into a virtual environment.
 
 .. sourcecode :: sh
 
   make tests
-  make server
+  make lint
 
-Alternatively, you can also run the entire application stack via Docker:
+This project consists of a number of microservices and background jobs. You
+can run all the pieces via the makefile, however, it's easiest to run and
+manage all of the moving pieces via Docker, so install Docker on your machine
+by following the `Docker setup instructions <https://docs.docker.com/install/>`_
+for your platform.
+
+The project uses Sendgrid, so to emulate a full production environment,
+follow these `Sendgrid setup instructions <https://sendgrid.com/free/>`_ to
+create a free account and take note of you API key for sending emails.
+
+The project also makes use of a number of Azure services such as Blobs,
+Tables, Queues, Application Insights, and so forth. To set up all the
+required cloud resources programmatically, you'll need to create a service
+principal by following these `Service Principal instructions <https://aka.ms/create-sp>`_.
+After you created the service principal, you can run the Docker setup script
+to initialize the required cloud resources.
+
+.. sourcecode :: sh
+
+  docker build -t opwenserversetup -f docker/setup/Dockerfile .
+
+  docker run \
+    -e SP_APPID={appId field of your service principal} \
+    -e SP_PASSWORD={password field of your service principal} \
+    -e SP_TENANT={tenant field of your service principal} \
+    -e SUBSCRIPTION_ID={subscription id of your service principal} \
+    -e LOCATION={an azure location like eastus} \
+    -e RESOURCE_GROUP_NAME={the name of the resource group to create or reuse} \
+    -e SENDGRID_KEY={the sendgrid key you created earlier} \
+    -v ${PWD}/secrets:/secrets \
+    opwenserversetup
+
+The secrets to access the Azure resources created by the setup script will be
+stored in files in the :code:`secrets` directory. Other parts of the
+project's tooling (e.g. docker-compose) depend on these files so make sure to
+not delete them.
+
+Finall, run the application stack via Docker:
 
 .. sourcecode :: sh
 
@@ -91,3 +115,24 @@ Alternatively, you can also run the entire application stack via Docker:
 There are OpenAPI specifications that document the functionality of the
 application and provide references to the entry points into the code
 (look for "some-api-name-spec.yaml" files in the repository).
+
+Production setup
+----------------
+
+To set up a production-ready deployment of the system, follow the development
+setup scripts described above, but additionally also pass the following
+environment variables to the Docker setup script:
+
+- :code:`KUBERNETES_RESOURCE_GROUP_NAME`: The resource group into which to
+  provision the Azure Kubernetes Service cluster.
+
+- :code:`KUBERNETES_NODE_COUNT`: The number of VMs to provision into the
+  cluster. This should be an odd number and can be dynamically changed later
+  via the Azure CLI.
+
+- :code:`KUBERNETES_NODE_SKU`: The type of VMs to provision into the cluster.
+  This should be one of the supported `Linux VM sizes <https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes>`_.
+
+The script will then provision a cluster in Azure Kubernetes Service and
+install the project via Helm. The secrets to connect to the provisioned
+cluster will be stored in the :code:`secrets` directory.

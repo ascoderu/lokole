@@ -1,0 +1,125 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountSKU": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS"
+      ],
+      "metadata": {
+        "description": "The pricing tier of the Storage Account resources that will be created for the project."
+      }
+    }
+  },
+  "variables": {
+    "appinsightsName": "[concat('opwenlogs', uniqueString(subscription().subscriptionId))]",
+    "clientBlobsName": "[take(concat('opwenclientblobs', uniqueString(subscription().subscriptionId)), 22)]",
+    "serverBlobsName": "[take(concat('opwenserverblobs', uniqueString(subscription().subscriptionId)), 22)]",
+    "serverTablesName": "[take(concat('opwenservertables', uniqueString(subscription().subscriptionId)), 22)]",
+    "serverQueuesName": "[take(concat('opwenserverqueues', uniqueString(subscription().subscriptionId)), 22)]",
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/components",
+      "kind": "other",
+      "apiVersion": "2014-04-01",
+      "name": "[variables('appinsightsName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "ApplicationId": "[variables('appinsightsName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "kind": "Storage",
+      "apiVersion": "2016-01-01",
+      "name": "[variables('serverBlobsName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[parameters('storageAccountSKU')]"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "kind": "Storage",
+      "apiVersion": "2016-01-01",
+      "name": "[variables('clientBlobsName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[parameters('storageAccountSKU')]"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "kind": "Storage",
+      "apiVersion": "2016-01-01",
+      "name": "[variables('serverTablesName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[parameters('storageAccountSKU')]"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "kind": "Storage",
+      "apiVersion": "2016-01-01",
+      "name": "[variables('serverQueuesName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[parameters('storageAccountSKU')]"
+      },
+      "properties": {}
+    }
+  ],
+  "outputs": {
+    "appinsightsName": {
+      "type": "string",
+      "value": "[variables('appinsightsName')]"
+    },
+    "appinsightsKey": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Insights/components', variables('appinsightsName')), '2014-04-01').InstrumentationKey]",
+    },
+    "clientBlobsName": {
+      "type": "string",
+      "value": "[variables('clientBlobsName')]"
+    },
+    "clientBlobsKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('clientBlobsName')), '2016-01-01').keys[0].value]"
+    },
+    "serverBlobsName": {
+      "type": "string",
+      "value": "[variables('serverBlobsName')]"
+    },
+    "serverBlobsKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('serverBlobsName')), '2016-01-01').keys[0].value]"
+    },
+    "serverTablesName": {
+      "type": "string",
+      "value": "[variables('serverTablesName')]"
+    },
+    "serverTablesKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('serverTablesName')), '2016-01-01').keys[0].value]"
+    },
+    "serverQueuesName": {
+      "type": "string",
+      "value": "[variables('serverQueuesName')]"
+    },
+    "serverQueuesKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('serverQueuesName')), '2016-01-01').keys[0].value]"
+    }
+  }
+}

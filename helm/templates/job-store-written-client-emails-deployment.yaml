@@ -1,0 +1,82 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file=compose.yml --chart
+    kompose.version: 1.13.0 (84fa826)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: job-store-written-client-emails
+  name: job-store-written-client-emails
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: job-store-written-client-emails
+    spec:
+      containers:
+      - name: job-store-written-client-emails
+        image: {{.Values.version.imageRegistry}}/opwenserver_job:{{.Values.version.dockerTag}}
+        env:
+        - name: JOB_NAME
+          value: opwen_email_server.jobs.store_written_client_emails
+        - name: LOKOLE_LOG_LEVEL
+          value: {{.Values.logging.level}}
+        - name: LOKOLE_QUEUE_POLL_SECONDS
+          value: "{{.Values.worker.pollingIntervalSeconds}}"
+        - name: LOKOLE_CLIENT_AZURE_STORAGE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_CLIENT_AZURE_STORAGE_KEY
+        - name: LOKOLE_CLIENT_AZURE_STORAGE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_CLIENT_AZURE_STORAGE_NAME
+        - name: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY
+        - name: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME
+        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
+        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
+        - name: LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY
+        - name: LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME
+        - name: LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY
+        - name: LOKOLE_SENDGRID_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sendgrid
+              key: LOKOLE_SENDGRID_KEY
+        resources: {}
+      restartPolicy: Always
+status: {}

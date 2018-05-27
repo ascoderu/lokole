@@ -14,74 +14,57 @@ if [ -z "$PYPI_USERNAME" ] || [ -z "$PYPI_PASSWORD" ]; then
   echo "No PyPI credentials configured, unable to publish builds" >&2; exit 1
 fi
 
-secrets_archive="$(mktemp)"
-compose_env_file='.env'
-secrets_env_file='secrets.env'
-ssh_key_file='id_rsa'
-pypirc_file="$HOME/.pypirc"
+#
+# setup
+#
 
-openssl aes-256-cbc -K "$encrypted_2ff31a343d6c_key" -iv "$encrypted_2ff31a343d6c_iv" -in travis/secrets.tar.enc -out "$secrets_archive" -d
-tar xf "$secrets_archive" -C . "$ssh_key_file" "$secrets_env_file"
+rootdir="$(realpath "$(dirname "$0")"/..)"
 
-cleanup() {
-  rm -f "$compose_env_file" "$secrets_archive" "$ssh_key_file" "$pypirc_file" "$secrets_env_file"
-}
+cleanup() { rm -rf "$rootdir/secrets" "$rootdir/travis/secrets.tar"; }
 trap cleanup EXIT
 
-cat > "$compose_env_file" << EOF
-APP_PORT=80
-BUILD_TAG=${TRAVIS_TAG}
-ENV_FILE=${secrets_env_file}
-CLIENT_READ_API_WORKERS=3
-CLIENT_WRITE_API_WORKERS=3
-EMAIL_RECEIVE_API_WORKERS=5
-EOF
-
-docker-compose build
+#
+# docker deploy
+#
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
-docker-compose push
 
-cat > "$pypirc_file" << EOF
-[distutils]
-index-servers =
-    pypi
+for tag in "latest" "$TRAVIS_TAG"; do
+  BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose build
+  BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose push
 
-[pypi]
-username: $PYPI_USERNAME
-password: $PYPI_PASSWORD
-EOF
+  docker build -t "$DOCKER_USERNAME/opwenserver_setup:$tag" -f "$rootdir/docker/setup/Dockerfile" "$rootdir"
+  docker push "$DOCKER_USERNAME/opwenserver_setup:$tag"
+done
+
+#
+# pypi deploy
+#
+
+py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 
 echo "$TRAVIS_TAG" > version.txt
 
-py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
-python="$py_env/bin/python"
+"$py_env/bin/pip" install twine
+"$py_env/bin/python" setup.py sdist
+"$py_env/bin/twine" upload -u "$PYPI_USERNAME" -p "$PYPI_PASSWORD" dist/*
 
-while ! ${python} setup.py sdist upload; do
-  echo "Unable to upload to PyPI, retrying" >&2
-  sleep 1m
-done
+#
+# production deploy
+#
 
-if [ -z "$VM_HOST" ] || [ -z "$VM_USER" ]; then
-  echo "No deployment target, skipping upgrade of application" >&2; exit 0
+kubectl_file="$rootdir/secrets/kube-config"
+
+if [ ! -f "$kubectl_file" ] || [ -z "$HELM_NAME" ]; then
+  echo "Skipping production deployment since no kubernetes secrets are configured" >&2; exit 0
 fi
 
-if [ ! -f "$ssh_key_file" ] || [ ! -f "$secrets_env_file" ]; then
-  echo "No deployment secrets found, unable to upgrade application" >&2; exit 2
-fi
-
-chmod 600 "$ssh_key_file"
-
-scp -i "$ssh_key_file" -o "StrictHostKeyChecking no" \
-  "$compose_env_file" \
-  "$secrets_env_file" \
-  'docker-compose.yml' \
-  'setup/systemd_start.sh' \
-  'setup/systemd_stop.sh' \
-  "$VM_USER@$VM_HOST":~/opwen_cloudserver
-
-ssh -i "$ssh_key_file" -o "StrictHostKeyChecking no" \
-  "$VM_USER@$VM_HOST" \
-  'sudo systemctl restart opwen_cloudserver'
+docker run \
+  -e IMAGE_REGISTRY="$DOCKER_USERNAME" \
+  -e DOCKER_TAG="$TRAVIS_TAG" \
+  -e HELM_NAME="$HELM_NAME" \
+  -v "$kubectl_file:/secrets/kube-config" \
+  "$DOCKER_USERNAME/opwenserver_setup:$TRAVIS_TAG" \
+  /app/upgrade.sh
 
 echo "All done with deployment" >&2; exit 0
