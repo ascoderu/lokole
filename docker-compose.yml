@@ -9,10 +9,6 @@ services:
       dockerfile: docker/nginx/Dockerfile
     ports:
       - ${APP_PORT}:80
-    links:
-      - api_email_receive:api_email_receive
-      - api_client_write:api_client_write
-      - api_client_read:api_client_read
     depends_on:
       - api_email_receive
       - api_client_write
