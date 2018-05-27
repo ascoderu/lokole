@@ -18,7 +18,7 @@ fi
 # setup
 #
 
-rootdir="$(realpath "$(dirname "$0")"/..)"
+rootdir="$(readlink -f "$(dirname "$0")"/..)"
 
 cleanup() { rm -rf "$rootdir/secrets" "$rootdir/travis/secrets.tar"; }
 trap cleanup EXIT
