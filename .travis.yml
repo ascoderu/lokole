@@ -15,7 +15,6 @@ addons:
     sources:
       - debian-sid
     packages:
-      - shellcheck
       - docker-ce
 
 script: travis/ci.sh
