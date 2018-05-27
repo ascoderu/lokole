@@ -1,6 +1,10 @@
 server {
   listen 80;
 
+  {{#DNS_RESOLVER}}
+  resolver {{DNS_RESOLVER}};
+  {{/DNS_RESOLVER}}
+
   client_max_body_size 50M;
 
   location = /favicon.ico {

@@ -9,6 +9,8 @@ services:
       dockerfile: docker/nginx/Dockerfile
     ports:
       - ${APP_PORT}:80
+    environment:
+      - DNS_RESOLVER=127.0.0.11
     depends_on:
       - api_email_receive
       - api_client_write
