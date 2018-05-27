@@ -29,6 +29,9 @@ trap cleanup EXIT
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 
+touch "$rootdir/secrets/azure.env"
+touch "$rootdir/secrets/sendgrid.env"
+
 for tag in "latest" "$TRAVIS_TAG"; do
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose build
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose push
