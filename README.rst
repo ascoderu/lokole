@@ -7,6 +7,9 @@ Opwen webapp
 .. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
   :target: https://pypi.python.org/pypi/opwen_email_client/
 
+.. image:: https://pyup.io/repos/github/ascoderu/opwen-webapp/shield.svg
+  :target: https://pyup.io/repos/github/ascoderu/opwen-webapp/
+
 What's this?
 ------------
 
