@@ -42,7 +42,7 @@ lint-shell: $(SHELLCHECK)
 lint: lint-python lint-shell
 
 typecheck: venv
-	$(py_env)/bin/mypy --silent-imports $(py_packages)
+	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
 
 ci: tests lint typecheck
 

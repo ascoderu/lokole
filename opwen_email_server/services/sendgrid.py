@@ -34,7 +34,7 @@ class SendgridEmailSender(LogMixin):
         return client
 
     def send_email(self, email: dict) -> bool:
-        email_id = email.get('_uid')
+        email_id = email.get('_uid', '')
         email = self._create_email(email, email_id)
         status, message = self._send_email(email, email_id)
         success = status == 202
@@ -55,7 +55,7 @@ class SendgridEmailSender(LogMixin):
             self.log_exception('error sending email %s:%r:%r',
                                email_id, exception, request)
         except URLError as exception:
-            status = None
+            status = -1
             message = str(exception.reason)
             self.log_exception('error sending email %s:%r:%r',
                                email_id, exception, request)
@@ -104,8 +104,8 @@ class SendgridEmailSender(LogMixin):
 
     @classmethod
     def _create_attachment(cls, attachment: dict) -> Attachment:
-        filename = attachment.get('filename')
-        content = attachment.get('content')
+        filename = attachment.get('filename', '')
+        content = attachment.get('content', '')
 
         mail_attachment = Attachment()
         mail_attachment.disposition = 'attachment'
