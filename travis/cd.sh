@@ -18,9 +18,6 @@ fi
 # setup
 #
 
-cleanup() { rm -rf "./secrets" "./travis/secrets.tar"; }
-trap cleanup EXIT
-
 #
 # docker deploy
 #
@@ -54,16 +51,21 @@ echo "$TRAVIS_TAG" > version.txt
 # production deploy
 #
 
-if [ -z "$HELM_NAME" ]; then
-  echo "Skipping production deployment since no helm name is configured" >&2; exit 0
+if [ -z "$HELM_NAME" ] || [ -z "$KUBECONFIG_URL" ]; then
+  echo "Skipping production deployment since no helm name or kubeconfig url is configured" >&2; exit 0
 fi
+
+kubeconfig_path="$PWD/kube-config"
+curl -sfL "$KUBECONFIG_URL" -o "$kubeconfig_path"
 
 docker run \
   -e IMAGE_REGISTRY="$DOCKER_USERNAME" \
   -e DOCKER_TAG="$TRAVIS_TAG" \
   -e HELM_NAME="$HELM_NAME" \
-  -v "$PWD/secrets/kube-config:/secrets/kube-config" \
+  -v "$kubeconfig_path:/secrets/kube-config" \
   "$DOCKER_USERNAME/opwenserver_setup:$TRAVIS_TAG" \
   /app/upgrade.sh
+
+rm "$kubeconfig_path"
 
 echo "All done with deployment" >&2; exit 0
