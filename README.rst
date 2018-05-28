@@ -63,6 +63,13 @@ First, get the source code.
   git clone git@github.com:ascoderu/opwen-cloudserver.git
   cd opwen-cloudserver
 
+Second, install the system-level dependencies using your package manager,
+e.g. on Ubuntu:
+
+.. sourcecode :: sh
+
+  sudo apt-get install -y make python3-venv shellcheck
+
 You can use the makefile to verify your checkout by running the tests and
 other CI steps such as linting. The makefile will automatically install all
 required dependencies into a virtual environment.
