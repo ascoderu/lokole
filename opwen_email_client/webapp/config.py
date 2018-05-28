@@ -3,7 +3,7 @@ from os import path
 from tempfile import gettempdir
 
 from babel import Locale
-from flask_babel import gettext as _
+from flask_babelex import gettext as _
 
 from opwen_email_client.util.os import getenv
 from opwen_email_client.util.os import subdirectories

@@ -2,7 +2,7 @@ from logging import Formatter
 from logging import StreamHandler
 
 from flask import Flask
-from flask_babel import Babel
+from flask_babelex import Babel
 
 from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder as AttachmentEncoder  # noqa
 from opwen_email_client.domain.email.client import HttpEmailServerClient as EmailServerClient  # noqa

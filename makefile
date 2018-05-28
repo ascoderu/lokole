@@ -26,7 +26,7 @@ $(py_env)/bin/activate: requirements.txt
 venv: $(py_env)/bin/activate
 
 unit-tests: venv
-	$(py_env)/bin/nosetests
+	$(py_env)/bin/nosetests --exe
 
 tests: unit-tests
 
@@ -39,7 +39,7 @@ lint-shell: $(SHELLCHECK)
 lint: lint-python lint-shell
 
 typecheck: venv
-	$(py_env)/bin/mypy --silent-imports $(py_packages)
+	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
 
 ci: lint tests
 
