@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: job-store-written-client-emails
-  name: job-store-written-client-emails
+    io.kompose.service: jobstorewrittenclientemails
+  name: jobstorewrittenclientemails
 spec:
   replicas: 1
   strategy: {}
@@ -15,10 +15,10 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: job-store-written-client-emails
+        io.kompose.service: jobstorewrittenclientemails
     spec:
       containers:
-      - name: job-store-written-client-emails
+      - name: jobstorewrittenclientemails
         image: {{.Values.version.imageRegistry}}/opwenserver_job:{{.Values.version.dockerTag}}
         env:
         - name: JOB_NAME
