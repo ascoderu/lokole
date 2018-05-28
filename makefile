@@ -60,5 +60,9 @@ compile-translations: venv
 
 prepare-server: venv compile-translations build-frontend
 
+clean:
+	find opwen_email_client -name '__pycache__' -type d -print0 | xargs -0 rm -rf
+	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
+
 server: prepare-server
 	$(app_runner)
