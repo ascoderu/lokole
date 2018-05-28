@@ -56,19 +56,15 @@ echo "$TRAVIS_TAG" > version.txt
 # production deploy
 #
 
-kubectl_file="$rootdir/secrets/kube-config"
-echo "HELM_NAME=${HELM_NAME}"
-echo "kubectl_file=${kubectl_file}"
-
-if [ ! -f "$kubectl_file" ] || [ -z "$HELM_NAME" ]; then
-  echo "Skipping production deployment since no kubernetes secrets are configured" >&2; exit 0
+if [ -z "$HELM_NAME" ]; then
+  echo "Skipping production deployment since no helm name is configured" >&2; exit 0
 fi
 
 docker run \
   -e IMAGE_REGISTRY="$DOCKER_USERNAME" \
   -e DOCKER_TAG="$TRAVIS_TAG" \
   -e HELM_NAME="$HELM_NAME" \
-  -v "$kubectl_file:/secrets/kube-config" \
+  -v "$rootdir/secrets/kube-config:/secrets/kube-config" \
   "$DOCKER_USERNAME/opwenserver_setup:$TRAVIS_TAG" \
   /app/upgrade.sh
 
