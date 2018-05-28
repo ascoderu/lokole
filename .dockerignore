@@ -1,5 +1,6 @@
 *.pyc
 .mypy_cache/
+__pycache__/
 docs/
 tests/
 travis/
