@@ -47,7 +47,10 @@ def _parse_sent_at(message: PyzMessage) -> Optional[str]:
     rfc_822 = message.get_decoded_header('date')
     if not rfc_822:
         return None
-    timestamp = mktime_tz(parsedate_tz(rfc_822))
+    date_tz = parsedate_tz(rfc_822)
+    if not date_tz:
+        return None
+    timestamp = mktime_tz(date_tz)
     # noinspection PyUnresolvedReferences
     date_utc = datetime.fromtimestamp(timestamp, timezone.utc)
     return date_utc.strftime('%Y-%m-%d %H:%M')
