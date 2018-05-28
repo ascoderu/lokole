@@ -54,8 +54,8 @@ to address this problem by tackling it from three perspectives:
    is lowest. For example, in the DRC, $1 purchases only 65 MB of data during
    peak hours. At night, however, the same amount of money buys 1 GB of data.
 
-2. The Lokole uses an efficient data exchange format plus compression so that it
-   uses minimal amounts of bandwidth, reducing the cost of service. All
+2. The Lokole uses an efficient data exchange format plus compression so that
+   it uses minimal amounts of bandwidth, reducing the cost of service. All
    expensive operations (e.g. creating and sending of emails with headers,
    managing mailboxes, etc.) are performed on a server in a country where
    bandwidth is cheap.
@@ -63,9 +63,9 @@ to address this problem by tackling it from three perspectives:
 3. The Lokole only uses bandwidth in batches. This means that the cost of
    service can be spread over many people and higher savings from increased
    compression ratios can be achieved. For example, individually purchasing
-   bandwidth for $1 to check emails is economically un-viable for most people in
-   the DRC. However, the same $1 can buy enough bandwidth to provide email for
-   hundreds of people via the Lokole. Spreading the cost in this way makes
+   bandwidth for $1 to check emails is economically un-viable for most people
+   in the DRC. However, the same $1 can buy enough bandwidth to provide email
+   for hundreds of people via the Lokole. Spreading the cost in this way makes
    email access sustainable for local communities.
 
 System overview & Data exchange format
@@ -105,35 +105,41 @@ any of the Flask code or Jinja templates are changed.
 The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
 so take a look there for an overview of the entrypoints into the code.
 
-For local development, you can set the following additional environment variables:
+For local development, you can set the following additional environment
+variables:
 
 .. sourcecode :: sh
 
   OPWEN_ENABLE_DEBUG='True'
   AZURE_ROOT='/tmp/azure'
 
-With these environment variables set, when the Lokole exchanges data with the server,
-it will not make any calls to Azure and instead depend on the files in the `AZURE_ROOT`
-directory. Any files uploaded to the server will be written to a subdirectory of
-`AZURE_ROOT` so that they can be inspected. To test sending emails from the server to
-the Lokole, simply create a file at `$AZURE_ROOT/to-lokole/emails.pack` and the Lokole
-device will ingest the emails in that file during the data exchange.
+With these environment variables set, when the Lokole exchanges data with the
+server, it will not make any calls to Azure and instead depend on the files
+in the `AZURE_ROOT` directory. Any files uploaded to the server will be
+written to a subdirectory of `AZURE_ROOT` so that they can be inspected. To
+test sending emails from the server to the Lokole, simply create a file at
+`$AZURE_ROOT/to-lokole/emails.pack` and the Lokole device will ingest the
+emails in that file during the data exchange.
 
 Production setup
 ----------------
 
 There is a `script <https://github.com/ascoderu/opwen-webapp/blob/master/setup/setup-lokole.sh>`_
-to set up a new Lokole device. The script will install the web app in this repository
-as well as standard web infrastructure like nginx and gunicorn. The script will also
-make ready peripherals like the USB modem used for data exchange, and set up any
-required background jobs such as the email synchronization cron job.
+to set up a new Lokole device. The script will install the web app in this
+repository as well as standard web infrastructure like nginx and gunicorn.
+The script will also make ready peripherals like the USB modem used for data
+exchange, and set up any required background jobs such as the email
+synchronization cron job.
 
 The setup script assumes that you have already set up:
 
-* 3 Azure Storage Accounts, general purpose: for the cloudserver to manage its queues, tables and blobs
-* 1 Azure Storage Account, blob storage: for the cloudserver and webapp to exchange email packages
-* 1 Application Insights account: to collect logs from the cloudserver and monitor its operations
-* 1 SendGrid account: to send and receive emails in the cloudserver
+* 3 Azure Storage Accounts, general purpose: for the cloudserver to manage its
+  queues, tables and blobs.
+* 1 Azure Storage Account, blob storage: for the cloudserver and webapp to
+  exchange email packages.
+* 1 Application Insights account: to collect logs from the cloudserver and
+  monitor its operations.
+* 1 SendGrid account: to send and receive emails in the cloudserver.
 
 The setup script is tested with hardware:
 
