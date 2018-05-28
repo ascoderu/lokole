@@ -5,4 +5,4 @@ azure-storage-queue==1.1.0
 connexion==1.4.2
 pyzmail36==1.0.3
 sendgrid==5.3.0
-typing==3.6.1
+typing==3.6.4
