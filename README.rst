@@ -88,7 +88,7 @@ e.g. on Ubuntu:
 
 .. sourcecode :: sh
 
-  sudo apt-get install -y python3-venv npm shellcheck
+  sudo apt-get install -y make python3-venv npm shellcheck
   sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 Third, use the makefile to verify your installation by running the tests and
