@@ -11,7 +11,7 @@ RUN python3 -m venv /venv \
   && rm -rf /var/lib/apt/lists/* \
   && rm /etc/nginx/sites-enabled/default
 
-ADD docker-entrypoint.sh /run-app.sh
+ADD run-app.sh /run-app.sh
 ADD nginx.conf /etc/nginx/conf.d/frontend.conf
 
 ENV OPWEN_STATE_DIRECTORY=/state
