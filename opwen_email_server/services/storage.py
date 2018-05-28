@@ -107,12 +107,30 @@ class AzureObjectStorage(LogMixin):
         self.log_debug('stored %d objects at %s', num_stored, resource_id)
         return resource_id if num_stored > 0 else None
 
+    @classmethod
+    def _parse_jsonl(cls, serialized: str) -> Optional[str]:
+        serialized = serialized.strip()
+
+        if not serialized.startswith('{'):
+            return None
+
+        if serialized[-1] != '}' and serialized[-1] != ',':
+            return None
+
+        if serialized.endswith(','):
+            serialized = serialized[:len(serialized) - 1]
+
+        return serialized
+
     def fetch_objects(self, resource_id: str) -> Iterable[dict]:
         num_fetched = 0
         with removing(self._file_storage.fetch_file(resource_id)) as path:
             with gzip_open(path, 'rb') as fobj:
                 for encoded in fobj:
                     serialized = encoded.decode(self._encoding)
+                    serialized = self._parse_jsonl(serialized)
+                    if not serialized:
+                        continue
                     obj = loads(serialized)
                     num_fetched += 1
                     self.log_debug('fetched email %s', obj.get('_uid'))
