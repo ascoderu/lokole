@@ -7,7 +7,7 @@ ADD requirements.txt /app/requirements.txt
 ADD requirements-prod.txt /app/requirements-prod.txt
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates curl \
-  && pip3 install -U --no-cache-dir pip setuptools \
+  && pip3 --no-cache-dir -q install -U pip setuptools \
   && pip3 --no-cache-dir -q install -r /app/requirements.txt \
   && pip3 --no-cache-dir -q install -r /app/requirements-prod.txt \
   && rm -rf /var/lib/apt/lists/*

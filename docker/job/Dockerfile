@@ -6,8 +6,8 @@ ENV LOKOLE_QUEUE_ERROR_FILE="/app/queue_health.txt"
 ADD requirements.txt /app/requirements.txt
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates \
-  && pip3 install -U --no-cache-dir pip setuptools \
-  && pip3 --no-cache-dir install -r /app/requirements.txt \
+  && pip3 --no-cache-dir -q install -U pip setuptools \
+  && pip3 --no-cache-dir -q install -r /app/requirements.txt \
   && touch ${LOKOLE_QUEUE_ERROR_FILE} \
   && rm -rf /var/lib/apt/lists/*
 
