@@ -4,11 +4,12 @@ ENV API_NAME="SET_ME"
 ENV GUNICORN_WORKERS="1"
 
 ADD requirements.txt /app/requirements.txt
+ADD requirements-prod.txt /app/requirements-prod.txt
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates curl \
   && pip3 install -U --no-cache-dir pip setuptools \
   && pip3 --no-cache-dir -q install -r /app/requirements.txt \
-  && pip3 --no-cache-dir -q install gunicorn==19.7.1 tornado==4.5.2 \
+  && pip3 --no-cache-dir -q install -r /app/requirements-prod.txt \
   && rm -rf /var/lib/apt/lists/*
 
 ADD opwen_email_server /app/opwen_email_server
