@@ -18,9 +18,7 @@ fi
 # setup
 #
 
-rootdir="$(readlink -f "$(dirname "$0")"/..)"
-
-cleanup() { rm -rf "$rootdir/secrets" "$rootdir/travis/secrets.tar"; }
+cleanup() { rm -rf "./secrets" "./travis/secrets.tar"; }
 trap cleanup EXIT
 
 #
@@ -29,14 +27,14 @@ trap cleanup EXIT
 
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 
-touch "$rootdir/secrets/azure.env"
-touch "$rootdir/secrets/sendgrid.env"
+touch "./secrets/azure.env"
+touch "./secrets/sendgrid.env"
 
 for tag in "latest" "$TRAVIS_TAG"; do
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose build
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose push
 
-  docker build -t "$DOCKER_USERNAME/opwenserver_setup:$tag" -f "$rootdir/docker/setup/Dockerfile" "$rootdir"
+  docker build -t "$DOCKER_USERNAME/opwenserver_setup:$tag" -f "./docker/setup/Dockerfile" "."
   docker push "$DOCKER_USERNAME/opwenserver_setup:$tag"
 done
 
@@ -64,7 +62,7 @@ docker run \
   -e IMAGE_REGISTRY="$DOCKER_USERNAME" \
   -e DOCKER_TAG="$TRAVIS_TAG" \
   -e HELM_NAME="$HELM_NAME" \
-  -v "$rootdir/secrets/kube-config:/secrets/kube-config" \
+  -v "$PWD/secrets/kube-config:/secrets/kube-config" \
   "$DOCKER_USERNAME/opwenserver_setup:$TRAVIS_TAG" \
   /app/upgrade.sh
 
