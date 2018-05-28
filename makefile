@@ -46,6 +46,10 @@ typecheck: venv
 
 ci: tests lint typecheck
 
+clean:
+	find opwen_email_server -name '__pycache__' -type d -print0 | xargs -0 rm -rf
+	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
+
 server: venv
 	$(api_runner)
 
