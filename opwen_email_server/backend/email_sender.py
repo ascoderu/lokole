@@ -18,3 +18,18 @@ def send(email: dict) -> Tuple[str, int]:
         return 'error', 500
 
     return 'sent', 200
+
+
+if __name__ == '__main__':
+    from argparse import ArgumentParser
+    from json import loads
+    from uuid import uuid4
+
+    parser = ArgumentParser()
+    parser.add_argument('email')
+    args = parser.parse_args()
+
+    email = loads(args.email)
+    email.setdefault('_uid', str(uuid4()))
+
+    send(email)
