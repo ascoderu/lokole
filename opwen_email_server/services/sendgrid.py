@@ -35,7 +35,7 @@ class SendgridEmailSender(LogMixin):
 
     def send_email(self, email: dict) -> bool:
         email_id = email.get('_uid')
-        email = self._create_email(email)
+        email = self._create_email(email, email_id)
         status, message = self._send_email(email, email_id)
         success = status == 202
 
@@ -66,26 +66,40 @@ class SendgridEmailSender(LogMixin):
 
         return status, message
 
-    @classmethod
-    def _create_email(cls, email: dict) -> Mail:
+    def _create_email(self, email: dict, email_id: str) -> Mail:
+        self.log_debug('converting email %s to sendgrid format', email_id)
+        mail = Mail()
         personalization = Personalization()
 
-        for to in email.get('to', []):
+        for i, to in enumerate(email.get('to', [])):
             personalization.add_to(Email(to))
-        for cc in email.get('cc', []):
+            self.log_debug('added to %d to email %s', i, email_id)
+
+        for i, cc in enumerate(email.get('cc', [])):
             personalization.add_cc(Email(cc))
-        for bcc in email.get('bcc', []):
+            self.log_debug('added cc %d to email %s', i, email_id)
+
+        for i, bcc in enumerate(email.get('bcc', [])):
             personalization.add_bcc(Email(bcc))
+            self.log_debug('added bcc %d to email %s', i, email_id)
 
-        mail = Mail()
         mail.add_personalization(personalization)
+        self.log_debug('added recipients to email %s', email_id)
+
         mail.set_subject(email.get('subject', '(no subject)'))
+        self.log_debug('added subject to email %s', email_id)
+
         mail.add_content(Content('text/html', email.get('body')))
+        self.log_debug('added content to email %s', email_id)
+
         mail.set_from(Email(email.get('from')))
+        self.log_debug('added from to email %s', email_id)
 
-        for attachment in email.get('attachments', []):
-            mail.add_attachment(cls._create_attachment(attachment))
+        for i, attachment in enumerate(email.get('attachments', [])):
+            mail.add_attachment(self._create_attachment(attachment))
+            self.log_debug('added attachment %d to email %s', i, email_id)
 
+        self.log_debug('converted email %s to sendgrid format', email_id)
         return mail
 
     @classmethod

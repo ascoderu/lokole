@@ -18,10 +18,13 @@ class QueueConsumer(LogMixin):
         raise NotImplementedError
 
     def run_once(self) -> bool:
+        self.log_debug('queue consumer checking for messages')
         did_process = False
 
         with self._dequeue() as messages:
-            for message in messages:
+            self.log_debug('queue consumer got %d messages', len(messages))
+            for i, message in enumerate(messages):
+                self.log_debug('queue consumer processing message %d', i)
                 self._process_message(message)
                 did_process = True
 
@@ -44,6 +47,7 @@ class QueueConsumer(LogMixin):
                     self._wait_for_next_message()
 
     def _wait_for_next_message(self):
+        self.log_debug('queue consumer waiting for %d', self._poll_seconds)
         sleep(self._poll_seconds)
 
     def _report_success(self):
