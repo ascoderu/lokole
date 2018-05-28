@@ -86,13 +86,13 @@ class SendgridEmailSender(LogMixin):
         mail.add_personalization(personalization)
         self.log_debug('added recipients to email %s', email_id)
 
-        mail.set_subject(email.get('subject', '(no subject)'))
+        mail.subject = email.get('subject', '(no subject)')
         self.log_debug('added subject to email %s', email_id)
 
         mail.add_content(Content('text/html', email.get('body')))
         self.log_debug('added content to email %s', email_id)
 
-        mail.set_from(Email(email.get('from')))
+        mail.from_email = Email(email.get('from'))
         self.log_debug('added from to email %s', email_id)
 
         for i, attachment in enumerate(email.get('attachments', [])):
@@ -108,10 +108,10 @@ class SendgridEmailSender(LogMixin):
         content = attachment.get('content')
 
         mail_attachment = Attachment()
-        mail_attachment.set_disposition('attachment')
-        mail_attachment.set_filename(filename)
-        mail_attachment.set_content_id(filename)
-        mail_attachment.set_type(guess_type(filename)[0])
-        mail_attachment.set_content(content)
+        mail_attachment.disposition = 'attachment'
+        mail_attachment.filename = filename
+        mail_attachment.content_id = filename
+        mail_attachment.type = guess_type(filename)[0]
+        mail_attachment.content = content
 
         return mail_attachment
