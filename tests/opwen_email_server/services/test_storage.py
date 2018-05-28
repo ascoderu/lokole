@@ -106,6 +106,16 @@ class AzureObjectStorageTests(TestCase):
         self.assertEqual(client_mock.fetch_file.call_count, 1)
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
+    def test_handles_corrupted_jsonl_entries(self):
+        resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        lines = b'{"foo":"bar"}\n{"corrupted":1,]}\n{"baz":[1,2,3]}'
+        storage, client_mock = self.given_storage(lines)
+
+        objs = list(storage.fetch_objects(resource_id))
+
+        self.assertEqual(client_mock.fetch_file.call_count, 1)
+        self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
+
     def test_stores_objects(self):
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
         storage, client_mock = self.given_storage()
