@@ -57,6 +57,8 @@ echo "$TRAVIS_TAG" > version.txt
 #
 
 kubectl_file="$rootdir/secrets/kube-config"
+echo "HELM_NAME=${HELM_NAME}"
+echo "kubectl_file=${kubectl_file}"
 
 if [ ! -f "$kubectl_file" ] || [ -z "$HELM_NAME" ]; then
   echo "Skipping production deployment since no kubernetes secrets are configured" >&2; exit 0
