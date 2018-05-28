@@ -80,3 +80,7 @@ def _get_recipients(email: dict) -> Iterable[str]:
 def get_domains(email: dict) -> Iterable[str]:
     return frozenset(address.split('@')[-1]
                      for address in _get_recipients(email))
+
+
+def convert_img_url_to_base64(email: dict) -> dict:
+    return email

@@ -80,3 +80,12 @@ class GetDomainsTests(TestCase):
         domains = email_parser.get_domains(email)
 
         self.assertSetEqual(domains, {'bar.com', 'com'})
+
+
+class ConvertImgUrlToBase64(TestCase):
+    def test_foo(self):
+        email = {'to': ['foo@bar.com', 'baz@bar.com', 'foo@com']}
+
+        email = email_parser.convert_img_url_to_base64(email)
+
+        self.assertEqual(email, {'to': ['foo@bar.com', 'baz@bar.com', 'foo@com']})

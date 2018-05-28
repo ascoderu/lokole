@@ -1,6 +1,7 @@
 from opwen_email_server.api import email_receive
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.queue_consumer import QueueConsumer
+from opwen_email_server.utils.email_parser import convert_img_url_to_base64
 from opwen_email_server.utils.email_parser import parse_mime_email
 
 
@@ -14,6 +15,7 @@ class Job(QueueConsumer):
         self.log_info('Fetched inbound MIME email %s', resource_id)
 
         email = parse_mime_email(mime_email)
+        convert_img_url_to_base64(email)
         server_datastore.store_email(resource_id, email)
         self.log_info('Stored inbound email %s', resource_id)
 
