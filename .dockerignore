@@ -6,6 +6,7 @@ node_modules/
 .mypy_cache/
 venv/
 *.pyc
+__pycache__/
 /build/
 /dist/
 /*.egg-info/
