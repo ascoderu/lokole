@@ -3,17 +3,17 @@ FROM python:3.6
 ENV API_NAME="SET_ME"
 ENV GUNICORN_WORKERS="1"
 
-ADD opwen_email_server /app/opwen_email_server
-ADD runserver.py /app/server.py
 ADD requirements.txt /app/requirements.txt
-ADD docker/api/healthcheck.sh /app/healthcheck.sh
-
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates curl \
   && pip3 install -U --no-cache-dir pip setuptools \
   && pip3 --no-cache-dir -q install -r /app/requirements.txt \
   && pip3 --no-cache-dir -q install gunicorn==19.7.1 tornado==4.5.2 \
   && rm -rf /var/lib/apt/lists/*
+
+ADD opwen_email_server /app/opwen_email_server
+ADD runserver.py /app/server.py
+ADD docker/api/healthcheck.sh /app/healthcheck.sh
 
 EXPOSE 80
 WORKDIR /app
