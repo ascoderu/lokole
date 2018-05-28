@@ -6,7 +6,7 @@ from os import getenv
 from typing import Callable
 from typing import Optional
 
-from azure.storage.table import TableService
+from azure.cosmosdb.table.tableservice import TableService
 
 from opwen_email_server.utils.log import LogMixin
 

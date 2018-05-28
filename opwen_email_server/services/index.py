@@ -4,8 +4,8 @@ from typing import Iterable
 from typing import Mapping
 from typing import TypeVar
 
-from azure.storage.table import TableBatch
-from azure.storage.table import TableService
+from azure.cosmosdb.table.tablebatch import TableBatch
+from azure.cosmosdb.table.tableservice import TableService
 
 from opwen_email_server.utils.collections import chunks
 from opwen_email_server.utils.log import LogMixin
