@@ -84,8 +84,9 @@ class GetDomainsTests(TestCase):
 
 class ConvertImgUrlToBase64(TestCase):
     def test_foo(self):
-        email = {'to': ['foo@bar.com', 'baz@bar.com', 'foo@com']}
+        input_html = '<img src="https://avatars3.githubusercontent.com/u/16849118?s=400&u=7ddc13a3f746b0fcd633cd0a2367815dc412718a&v=4"/>'
+        input_email = {'body': input_html}
 
-        email = email_parser.convert_img_url_to_base64(email)
+        output_email = email_parser.convert_img_url_to_base64(input_email)
 
-        self.assertEqual(email, {'to': ['foo@bar.com', 'baz@bar.com', 'foo@com']})
+        self.assertTrue(output_email['body'].startswith('<img src="data:'))

@@ -1,4 +1,5 @@
 from base64 import b64encode
+from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import timezone
 from email.utils import mktime_tz
@@ -10,6 +11,8 @@ from typing import Optional
 
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
+
+import requests
 
 
 def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
@@ -82,5 +85,26 @@ def get_domains(email: dict) -> Iterable[str]:
                      for address in _get_recipients(email))
 
 
+def _get_as_base64(image_url):
+    res = requests.get(image_url)
+
+    if res.status_code != 200:
+        res.raise_for_status()
+        return
+
+    img_type = res.headers['Content-Type']
+    img_content = b64encode(res.content).decode('ascii')
+    uri = "data:" + img_type + ";base64," + img_content
+    return uri
+
+
 def convert_img_url_to_base64(email: dict) -> dict:
+    email_body = email.get('body', '')
+    if email_body:
+        soup = BeautifulSoup(email_body, 'html.parser')
+        for img in soup.find_all('img'):
+            img_url = img.get('src')
+            img_base64 = _get_as_base64(img_url)
+            img['src'] = img_base64
+        email['body'] = str(soup)
     return email
