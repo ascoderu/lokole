@@ -83,7 +83,7 @@ class GetDomainsTests(TestCase):
 
 
 class ConvertImgUrlToBase64(TestCase):
-    def test_foo(self):
+    def test_inlines_image(self):
         input_html = '<img src="https://avatars3.githubusercontent.com/u/16849118?s=400&u=7ddc13a3f746b0fcd633cd0a2367815dc412718a&v=4"/>'
         input_email = {'body': input_html}
 

@@ -90,12 +90,12 @@ def _get_as_base64(image_url):
 
     if res.status_code != 200:
         res.raise_for_status()
-        return
 
     img_type = res.headers['Content-Type']
     img_content = b64encode(res.content).decode('ascii')
-    uri = "data:" + img_type + ";base64," + img_content
-    return uri
+    base64 = "data:" + img_type + ";base64," + img_content
+
+    return base64
 
 
 def convert_img_url_to_base64(email: dict) -> dict:
