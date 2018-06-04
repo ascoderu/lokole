@@ -1,0 +1,26 @@
+swagger: '2.0'
+
+info:
+  title: Opwen Cloudserver Email API.
+  version: '0.1'
+
+basePath: '/job/email/inbound/store'
+
+paths:
+
+  '/':
+
+    post:
+      operationId: opwen_email_server.api.store_inbound_emails.store
+      summary: Queue-triggered endpoint to store an inbound email.
+      consumes:
+        - application/json
+      parameters:
+        - name: resource_id
+          description: The id of the email to store.
+          type: string
+          in: body
+          required: true
+      responses:
+        200:
+          description: The email was stored.

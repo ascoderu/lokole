@@ -1,16 +1,12 @@
 from opwen_email_server.api import email_receive
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.services.queue_consumer import QueueConsumer
 from opwen_email_server.utils.email_parser import inline_images
 from opwen_email_server.utils.email_parser import parse_mime_email
+from opwen_email_server.utils.log import LogMixin
 
 
-class Job(QueueConsumer):
-    def __init__(self):
-        super().__init__(email_receive.QUEUE.dequeue)
-
-    def _process_message(self, message: dict):
-        resource_id = message['resource_id']
+class _InboundStorer(LogMixin):
+    def __call__(self, resource_id: str):
         mime_email = email_receive.STORAGE.fetch_text(resource_id)
         self.log_info('Fetched inbound MIME email %s', resource_id)
 
@@ -22,7 +18,7 @@ class Job(QueueConsumer):
         email_receive.STORAGE.delete(resource_id)
         self.log_info('Deleted inbound MIME email %s', resource_id)
 
+        return 'OK', 200
 
-if __name__ == '__main__':
-    from opwen_email_server.services.queue_consumer import cli
-    cli(Job)
+
+store = _InboundStorer()

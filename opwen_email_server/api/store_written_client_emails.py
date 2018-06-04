@@ -1,16 +1,11 @@
-from opwen_email_server.api import client_write
 from opwen_email_server.backend import client_datastore
 from opwen_email_server.backend import email_sender
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.services.queue_consumer import QueueConsumer
+from opwen_email_server.utils.log import LogMixin
 
 
-class Job(QueueConsumer):
-    def __init__(self):
-        super().__init__(client_write.QUEUE.dequeue)
-
-    def _process_message(self, message: dict):
-        resource_id = message['resource_id']
+class _WrittenStorer(LogMixin):
+    def __call__(self, resource_id: str):
         emails = client_datastore.unpack_emails(resource_id)
         self.log_info('Fetched packaged client emails from %s', resource_id)
 
@@ -30,7 +25,7 @@ class Job(QueueConsumer):
         client_datastore.delete(resource_id)
         self.log_info('Deleted packaged client emails from %s', resource_id)
 
+        return 'OK', 200
 
-if __name__ == '__main__':
-    from opwen_email_server.services.queue_consumer import cli
-    cli(Job)
+
+store = _WrittenStorer()

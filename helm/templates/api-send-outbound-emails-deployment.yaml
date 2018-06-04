@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: jobstorewrittenclientemails
-  name: jobstorewrittenclientemails
+    io.kompose.service: apisendoutboundemails
+  name: apisendoutboundemails
 spec:
   replicas: 1
   strategy: {}
@@ -15,18 +15,18 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: jobstorewrittenclientemails
+        io.kompose.service: apisendoutboundemails
     spec:
       containers:
-      - name: jobstorewrittenclientemails
-        image: {{.Values.version.imageRegistry}}/opwenserver_job:{{.Values.version.dockerTag}}
+      - name: apisendoutboundemails
+        image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
-        - name: JOB_NAME
-          value: opwen_email_server.jobs.store_written_client_emails
+        - name: API_NAME
+          value: opwen_email_server/static/send-outbound-emails.yaml
+        - name: GUNICORN_WORKERS
+          value: "{{.Values.server.gunicornWorkers}}"
         - name: LOKOLE_LOG_LEVEL
           value: {{.Values.logging.level}}
-        - name: LOKOLE_QUEUE_POLL_SECONDS
-          value: "{{.Values.worker.pollingIntervalSeconds}}"
         - name: LOKOLE_CLIENT_AZURE_STORAGE_KEY
           valueFrom:
             secretKeyRef:

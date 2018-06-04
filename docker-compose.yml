@@ -55,40 +55,40 @@ services:
       - ./secrets/azure.env
       - ./secrets/sendgrid.env
 
-  jobsendoutboundemails:
-    image: ${DOCKER_REPO}/opwenserver_job:${BUILD_TAG}
+  apisendoutboundemails:
+    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
-      dockerfile: docker/job/Dockerfile
+      dockerfile: docker/api/Dockerfile
     environment:
-      JOB_NAME: opwen_email_server.jobs.send_outbound_emails
-      LOKOLE_QUEUE_POLL_SECONDS: ${LOKOLE_QUEUE_POLL_SECONDS}
+      API_NAME: opwen_email_server/static/send-outbound-emails.yaml
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
       - ./secrets/azure.env
       - ./secrets/sendgrid.env
 
-  jobstoreinboundemails:
-    image: ${DOCKER_REPO}/opwenserver_job:${BUILD_TAG}
+  apistoreinboundemails:
+    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
-      dockerfile: docker/job/Dockerfile
+      dockerfile: docker/api/Dockerfile
     environment:
-      JOB_NAME: opwen_email_server.jobs.store_inbound_emails
-      LOKOLE_QUEUE_POLL_SECONDS: ${LOKOLE_QUEUE_POLL_SECONDS}
+      API_NAME: opwen_email_server/static/store-inbound-emails.yaml
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
       - ./secrets/azure.env
       - ./secrets/sendgrid.env
 
-  jobstorewritteclientemails:
-    image: ${DOCKER_REPO}/opwenserver_job:${BUILD_TAG}
+  apistorewritteclientemails:
+    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
-      dockerfile: docker/job/Dockerfile
+      dockerfile: docker/api/Dockerfile
     environment:
-      JOB_NAME: opwen_email_server.jobs.store_written_client_emails
-      LOKOLE_QUEUE_POLL_SECONDS: ${LOKOLE_QUEUE_POLL_SECONDS}
+      JOB_NAME: opwen_email_server/static/store-written-emails.yaml
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
     env_file:
       - ./secrets/azure.env
