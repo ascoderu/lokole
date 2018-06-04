@@ -4,7 +4,7 @@ __pycache__/
 docs/
 tests/
 travis/
-venv/
+venv*/
 
 .vs/
 bin/
