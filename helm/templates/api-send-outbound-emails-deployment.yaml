@@ -18,6 +18,28 @@ spec:
         io.kompose.service: apisendoutboundemails
     spec:
       containers:
+      - name: connectorsendoutboundemails
+        image: {{.Values.version.imageRegistry}}/opwenserver_queueconnector:{{.Values.version.dockerTag}}
+        env:
+        - name: LOKOLE_POST_URL
+          value: http://0.0.0.0/job/email/outbound/send
+        - name: LOKOLE_SOURCE_QUEUE
+          value: sengridoutboundemails
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
       - name: apisendoutboundemails
         image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
@@ -47,16 +69,6 @@ spec:
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
         - name: LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY
           valueFrom:
             secretKeyRef:
@@ -77,6 +89,8 @@ spec:
             secretKeyRef:
               name: sendgrid
               key: LOKOLE_SENDGRID_KEY
+        ports:
+        - containerPort: 80
         resources: {}
       restartPolicy: Always
 status: {}

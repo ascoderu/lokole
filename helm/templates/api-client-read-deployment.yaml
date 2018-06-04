@@ -47,16 +47,6 @@ spec:
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
         - name: LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY
           valueFrom:
             secretKeyRef:
