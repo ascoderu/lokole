@@ -1,6 +1,6 @@
 FROM python:3.6
 
-ENV API_NAME="SET_ME"
+ENV CONNEXION_SPEC="SET_ME"
 ENV GUNICORN_WORKERS="1"
 
 ADD requirements.txt /app/requirements.txt
@@ -21,4 +21,4 @@ EXPOSE 80
 WORKDIR /app
 HEALTHCHECK --interval=59m --timeout=5s CMD /app/healthcheck.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/${API_NAME}', '/app/opwen_email_server/static/healthcheck-spec.yaml'], server='tornado')"
+CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/${CONNEXION_SPEC}', '/app/opwen_email_server/static/healthcheck-spec.yaml'], server='tornado')"

@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      API_NAME: opwen_email_server/static/email-receive-spec.yaml
+      CONNEXION_SPEC: opwen_email_server/static/email-receive-spec.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid
@@ -36,7 +36,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      API_NAME: opwen_email_server/static/client-write-spec.yaml
+      CONNEXION_SPEC: opwen_email_server/static/client-write-spec.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid
@@ -50,7 +50,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      API_NAME: opwen_email_server/static/client-read-spec.yaml
+      CONNEXION_SPEC: opwen_email_server/static/client-read-spec.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid
@@ -64,7 +64,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      API_NAME: opwen_email_server/static/send-outbound-emails.yaml
+      CONNEXION_SPEC: opwen_email_server/static/send-outbound-emails.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid
@@ -78,7 +78,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      API_NAME: opwen_email_server/static/store-inbound-emails.yaml
+      CONNEXION_SPEC: opwen_email_server/static/store-inbound-emails.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid
@@ -92,7 +92,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      JOB_NAME: opwen_email_server/static/store-written-emails.yaml
+      CONNEXION_SPEC: opwen_email_server/static/store-written-emails.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid

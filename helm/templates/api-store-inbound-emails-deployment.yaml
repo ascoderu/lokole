@@ -43,7 +43,7 @@ spec:
       - name: apistoreinboundemails
         image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
-        - name: API_NAME
+        - name: CONNEXION_SPEC
           value: opwen_email_server/static/store-inbound-emails.yaml
         - name: GUNICORN_WORKERS
           value: "{{.Values.server.gunicornWorkers}}"
