@@ -16,11 +16,17 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: resource_id
-          description: The id of the email to send.
-          type: string
+        - name: message
           in: body
           required: true
+          schema:
+            type: object
+            required:
+              - resource_id
+            properties:
+              resource_id:
+                type: string
+                description: The id of the email to store.
       responses:
         200:
           description: The email was sent.

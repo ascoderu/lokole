@@ -4,7 +4,8 @@ from opwen_email_server.utils.log import LogMixin
 
 
 class _Sender(LogMixin):
-    def __call__(self, resource_id: str):
+    def __call__(self, message: dict):
+        resource_id = message.get('resource_id', '')
         email = server_datastore.fetch_email(resource_id)
         self.log_info('Fetched outbound email %s for sending', resource_id)
 

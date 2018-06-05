@@ -6,7 +6,8 @@ from opwen_email_server.utils.log import LogMixin
 
 
 class _InboundStorer(LogMixin):
-    def __call__(self, resource_id: str):
+    def __call__(self, message: dict):
+        resource_id = message.get('resource_id', '')
         mime_email = email_receive.STORAGE.fetch_text(resource_id)
         self.log_info('Fetched inbound MIME email %s', resource_id)
 
