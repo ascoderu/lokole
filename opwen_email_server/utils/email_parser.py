@@ -1,5 +1,4 @@
 from base64 import b64encode
-from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import timezone
 from email.utils import mktime_tz
@@ -9,9 +8,9 @@ from typing import Iterable
 from typing import List
 from typing import Optional
 
+from bs4 import BeautifulSoup
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
-
 import requests
 
 

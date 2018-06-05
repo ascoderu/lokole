@@ -15,7 +15,7 @@ class Job(QueueConsumer):
         self.log_info('Fetched inbound MIME email %s', resource_id)
 
         email = parse_mime_email(mime_email)
-        convert_img_url_to_base64(email)
+        email = convert_img_url_to_base64(email)
         server_datastore.store_email(resource_id, email)
         self.log_info('Stored inbound email %s', resource_id)
 
