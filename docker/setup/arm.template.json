@@ -180,7 +180,7 @@
     },
     "serverQueuesSasKey": {
       "type": "string",
-      "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces', variables('serverQueuesName'), variables('serverQueuesSasName')), '2017-04-01').primaryKey]"
+      "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules', variables('serverQueuesName'), variables('serverQueuesSasName')), '2017-04-01').primaryKey]"
     }
   }
 }
