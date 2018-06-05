@@ -87,6 +87,6 @@ class ConvertImgUrlToBase64(TestCase):
         input_html = '<img src="https://avatars3.githubusercontent.com/u/16849118?s=400&u=7ddc13a3f746b0fcd633cd0a2367815dc412718a&v=4"/>'
         input_email = {'body': input_html}
 
-        output_email = email_parser.convert_img_url_to_base64(input_email)
+        output_email = email_parser.inline_images(input_email)
 
         self.assertTrue(output_email['body'].startswith('<img src="data:'))

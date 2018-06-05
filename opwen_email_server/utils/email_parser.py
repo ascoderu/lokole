@@ -84,20 +84,20 @@ def get_domains(email: dict) -> Iterable[str]:
                      for address in _get_recipients(email))
 
 
-def _get_as_base64(image_url):
+def _get_as_base64(image_url: str) -> Optional[str]:
     res = requests.get(image_url)
 
-    if res.status_code != 200:
-        res.raise_for_status()
+    if not res.ok:
+        return None
 
-    img_type = res.headers['Content-Type']
+    img_type = res.headers.get('Content-Type')
     img_content = b64encode(res.content).decode('ascii')
-    base64 = "data:" + img_type + ";base64," + img_content
+    base64 = 'data:{};base64,{}'.format(img_type, img_content)
 
     return base64
 
 
-def convert_img_url_to_base64(email: dict) -> dict:
+def inline_images(email: dict) -> dict:
     email_body = email.get('body', '')
     if email_body:
         soup = BeautifulSoup(email_body, 'html.parser')
