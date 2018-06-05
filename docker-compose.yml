@@ -86,7 +86,7 @@ services:
       - azure
       - sendgrid
 
-  apistorewritteclientemails:
+  apistorewrittenclientemails:
     image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
@@ -134,13 +134,13 @@ services:
       context: .
       dockerfile: docker/queueconnector/Dockerfile
     environment:
-      LOKOLE_POST_URL: http://apistorewritteclientemails/job/email/client/store
+      LOKOLE_POST_URL: http://apistorewrittenclientemails/job/email/client/store
       LOKOLE_SOURCE_QUEUE: lokoleinboundemails
       DOTENV_SECRETS: azure
     secrets:
       - azure
     depends_on:
-      - apistorewritteclientemails
+      - apistorewrittenclientemails
 
 secrets:
   azure:
