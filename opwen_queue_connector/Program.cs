@@ -13,7 +13,7 @@ namespace queueconnector
         private static readonly Lazy<QueueClient> QueueClient = new Lazy<QueueClient>(() =>
             new QueueClient(new ServiceBusConnectionStringBuilder
             {
-                Endpoint = Env.Namespace,
+                Endpoint = $"sb://{Env.Namespace}.servicebus.windows.net/",
                 EntityPath = Env.Queue,
                 SasKey = Env.SasKey,
                 SasKeyName = Env.SasName
