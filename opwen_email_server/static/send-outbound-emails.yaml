@@ -8,25 +8,17 @@ basePath: '/job/email/outbound/send'
 
 paths:
 
-  '/':
+  '/{resource_id}':
 
     post:
       operationId: opwen_email_server.api.send_outbound_emails.send
       summary: Queue-triggered endpoint to send an outbound email.
-      consumes:
-        - application/json
       parameters:
-        - name: message
-          in: body
+        - name: resource_id
+          in: path
           required: true
-          schema:
-            type: object
-            required:
-              - resource_id
-            properties:
-              resource_id:
-                type: string
-                description: The id of the email to store.
+          type: string
+          description: The id of the email to process.
       responses:
         200:
           description: The email was sent.

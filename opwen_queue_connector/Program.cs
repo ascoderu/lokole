@@ -5,6 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace queueconnector
 {
@@ -20,12 +23,7 @@ namespace queueconnector
             }
         ));
 
-        private static readonly Lazy<HttpClient> HttpClient = new Lazy<HttpClient>(() =>
-            new HttpClient
-            {
-                BaseAddress = new Uri(Env.Url)
-            }
-        );
+        private static readonly Lazy<HttpClient> HttpClient = new Lazy<HttpClient>(() => new HttpClient());
 
         public static void Main(string[] args)
         {
@@ -55,14 +53,15 @@ namespace queueconnector
 
         async static private Task HandleMessage(Message message, CancellationToken token)
         {
-            await Console.Out.WriteLineAsync($"Message {message.MessageId}: Received");
+            var messageBody = Encoding.UTF8.GetString(message.Body);
+            await Console.Out.WriteLineAsync($"Message {message.MessageId}: Received {messageBody}");
 
-            HttpResponseMessage response;
-            using (var request = new ByteArrayContent(message.Body))
-            {
-                request.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                response = await HttpClient.Value.PostAsync(string.Empty, request);
-            }
+            var messageJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(messageBody);
+            var resourceId = messageJson["resource_id"];
+            var url = $"{Env.Url}/{resourceId}";
+
+            await Console.Out.WriteLineAsync($"Message {message.MessageId}: Posting to {url}");
+            var response = await HttpClient.Value.PostAsync(url, null);
 
             if (response.IsSuccessStatusCode)
             {

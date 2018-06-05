@@ -12,8 +12,7 @@ QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
 
 
 class _WrittenStorer(LogMixin):
-    def __call__(self, message: dict):
-        resource_id = message.get('resource_id', '')
+    def __call__(self, resource_id: str):
         emails = client_datastore.unpack_emails(resource_id)
         self.log_info('Fetched packaged client emails from %s', resource_id)
 
