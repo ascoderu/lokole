@@ -1,4 +1,4 @@
-applicationinsights==0.11.3
+applicationinsights==0.11.4
 azure-cosmosdb-table==1.0.3
 azure-storage-blob==1.1.0
 azure-storage-queue==1.1.0
