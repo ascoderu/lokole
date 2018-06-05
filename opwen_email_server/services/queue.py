@@ -25,8 +25,10 @@ class AzureQueue(LogMixin):
     def _client(self) -> ServiceBusService:
         if self.__client is not None:
             return self.__client
-        client = self._client_factory(self._namespace, self._sas_name,
-                                      self._sas_key)
+        client = self._client_factory(
+            service_namespace=self._namespace,
+            shared_access_key_name=self._sas_name,
+            shared_access_key_value=self._sas_key)
         self.__client = client
         return client
 
