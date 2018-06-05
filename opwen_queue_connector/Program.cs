@@ -70,7 +70,7 @@ namespace queueconnector
             }
             else
             {
-                var error = response.Content.ReadAsStringAsync();
+                var error = await response.Content.ReadAsStringAsync();
                 await Console.Error.WriteLineAsync($"Message {message.MessageId}: Error {error}");
             }
         }
