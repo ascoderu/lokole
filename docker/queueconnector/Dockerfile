@@ -3,7 +3,7 @@ FROM microsoft/dotnet:2.0-sdk-stretch AS builder
 WORKDIR /app
 COPY opwen_queue_connector/*.csproj ./
 RUN dotnet restore
-COPY opwen_queue_connector/* ./
+COPY opwen_queue_connector/*.cs ./
 RUN dotnet publish -c Release -o out
 
 FROM microsoft/dotnet:2.0-runtime-stretch
