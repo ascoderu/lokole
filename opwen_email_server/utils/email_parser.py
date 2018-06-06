@@ -4,6 +4,8 @@ from datetime import timezone
 from email.utils import mktime_tz
 from email.utils import parsedate_tz
 from itertools import chain
+from mimetypes import guess_type
+from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -84,26 +86,47 @@ def get_domains(email: dict) -> Iterable[str]:
                      for address in _get_recipients(email))
 
 
-def _get_as_base64(image_url: str) -> Optional[str]:
-    res = requests.get(image_url)
+def _get_image_type(response: Any, url: str) -> Optional[str]:
+    content_type = response.headers.get('Content-Type')
+    if not content_type:
+        return guess_type(url)
+    return content_type
 
-    if not res.ok:
+
+def _get_as_base64(image_url: str) -> Optional[str]:
+    response = requests.get(image_url)
+
+    if not image_url:
         return None
 
-    img_type = res.headers.get('Content-Type')
-    img_content = b64encode(res.content).decode('ascii')
-    base64 = 'data:{};base64,{}'.format(img_type, img_content)
+    if not response.ok:
+        return None
 
+    image_type = _get_image_type(response, image_url)
+    image_content = b64encode(response.content).decode('ascii')
+
+    if not image_type or not image_content:
+        return None
+
+    base64 = 'data:{};base64,{}'.format(image_type, image_content)
     return base64
 
 
 def inline_images(email: dict) -> dict:
-    email_body = email.get('body', '')
-    if email_body:
-        soup = BeautifulSoup(email_body, 'html.parser')
-        for img in soup.find_all('img'):
-            img_url = img.get('src')
-            img_base64 = _get_as_base64(img_url)
+    new_email = dict(email)
+    new_email_body = new_email.get('body', '')
+
+    if not new_email_body:
+        return email
+
+    soup = BeautifulSoup(new_email_body, 'html.parser')
+
+    for img in soup.find_all('img'):
+        img_url = img.get('src')
+        img_base64 = _get_as_base64(img_url)
+
+        if img_base64:
             img['src'] = img_base64
-        email['body'] = str(soup)
-    return email
+
+    new_email['body'] = str(soup)
+    return new_email
