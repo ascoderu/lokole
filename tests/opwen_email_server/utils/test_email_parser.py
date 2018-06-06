@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import patch, Mock
 
 from os.path import abspath
 from os.path import dirname
@@ -83,7 +84,19 @@ class GetDomainsTests(TestCase):
 
 
 class ConvertImgUrlToBase64(TestCase):
-    def test_inline_images_with_img_tag(self):
+    def _get_test_image_bytes(self, directory=TEST_DATA_DIRECTORY):
+        with open(join(directory, 'test_mouse_image.jpg'), 'rb') as image:
+            image_bytes = image.read()
+        return image_bytes
+
+    @patch.object(email_parser, 'requests')
+    def test_inline_images_with_img_tag(self, mock_request):
+        mock_response = Mock()
+        mock_request.get.return_value = mock_response
+        mock_response.ok.return_value = True
+        mock_response.content.return_value = self._get_test_image_bytes()
+        mock_response.get.headers.return_value = {'Content-Type': 'image/jpg'}
+
         input_html = '<img src="https://avatars3.githubusercontent.com/u/16849118?s=400&u=7ddc13a3f746b0fcd633cd0a2367815dc412718a&v=4"/>'
         input_email = {'body': input_html}
 
