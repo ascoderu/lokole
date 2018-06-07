@@ -89,15 +89,12 @@ def get_domains(email: dict) -> Iterable[str]:
 def _get_image_type(response: Any, url: str) -> Optional[str]:
     content_type = response.headers.get('Content-Type')
     if not content_type:
-        return guess_type(url)
+        return guess_type(url)[0]
     return content_type
 
 
 def _get_as_base64(image_url: str) -> Optional[str]:
     response = requests.get(image_url)
-
-    if not image_url:
-        return None
 
     if not response.ok:
         return None
@@ -113,20 +110,24 @@ def _get_as_base64(image_url: str) -> Optional[str]:
 
 
 def inline_images(email: dict) -> dict:
-    new_email = dict(email)
-    new_email_body = new_email.get('body', '')
+    email_body = email.get('body', '')
 
-    if not new_email_body:
+    if not email_body:
         return email
 
-    soup = BeautifulSoup(new_email_body, 'html.parser')
+    soup = BeautifulSoup(email_body, 'html.parser')
 
     for img in soup.find_all('img'):
         img_url = img.get('src')
+
+        if not img_url:
+            continue
+
         img_base64 = _get_as_base64(img_url)
 
         if img_base64:
             img['src'] = img_base64
 
+    new_email = dict(email)
     new_email['body'] = str(soup)
     return new_email

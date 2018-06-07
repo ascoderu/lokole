@@ -1,12 +1,12 @@
-from unittest import TestCase
-
 from os.path import abspath
 from os.path import dirname
 from os.path import join
+from unittest import TestCase
+
+import responses
 
 from opwen_email_server.utils import email_parser
-import responses
-import requests
+
 
 TEST_DATA_DIRECTORY = abspath(join(
     dirname(__file__), '..', '..',
@@ -84,21 +84,72 @@ class GetDomainsTests(TestCase):
 
 
 class ConvertImgUrlToBase64(TestCase):
-    def _get_test_image_bytes(self, directory=TEST_DATA_DIRECTORY):
-        with open(join(directory, 'test_image.jpg'), 'rb') as image:
-            image_bytes = image.read()
-        return image_bytes
-
     @responses.activate
     def test_inline_images_with_img_tag(self):
-        responses.add(responses.GET, 'http://test-url',
-                      headers={'Content-Type': 'image/jpg'},
-                      body=self._get_test_image_bytes(),
-                      status=200)
-
-        input_html = '<div><h3>test image</h3><img src="http://test-url"/></div>'
-        input_email = {'body': input_html}
+        self.givenTestImage()
+        input_email = {'body': '<div><h3>test image</h3><img src="http://test-url.jpg"/></div>'}
 
         output_email = email_parser.inline_images(input_email)
 
-        self.assertTrue(output_email['body'].startswith('<div><h3>test image</h3><img src="data:'))
+        self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/jpeg;')
+
+    @responses.activate
+    def test_inline_images_with_img_tag_without_src_attribute(self):
+        input_email = {'body': '<div><img/></div>'}
+
+        output_email = email_parser.inline_images(input_email)
+
+        self.assertEqual(output_email, input_email)
+
+    @responses.activate
+    def test_inline_images_with_bad_request(self):
+        self.givenTestImage(status=404)
+        input_email = {'body': '<div><img src="http://test-url.jpg"/></div>'}
+
+        output_email = email_parser.inline_images(input_email)
+
+        self.assertEqual(output_email, input_email)
+
+    @responses.activate
+    def test_inline_images_with_many_img_tags(self):
+        self.givenTestImage()
+        input_email = {'body': '<div><img src="http://test-url.jpg"/><img src="http://test-url.jpg"/></div>'}
+
+        output_email = email_parser.inline_images(input_email)
+
+        self.assertHasCount(output_email['body'], 'src="data:', 2)
+
+    @responses.activate
+    def test_inline_images_without_img_tags(self):
+        input_email = {'body': '<div></div>'}
+
+        output_email = email_parser.inline_images(input_email)
+
+        self.assertEqual(output_email, input_email)
+
+    @responses.activate
+    def test_inline_images_without_content_type(self):
+        self.givenTestImage(content_type='')
+        input_email = {'body': '<div><img src="http://test-url.jpg"/></div>'}
+
+        output_email = email_parser.inline_images(input_email)
+
+        self.assertStartsWith(output_email['body'], '<div><img src="data:image/jpeg;')
+
+    def assertStartsWith(self, data, prefix):
+        self.assertEqual(data[:len(prefix)], prefix)
+
+    def assertHasCount(self, data, snippet, expected_count):
+        actual_count = data.count(snippet)
+        self.assertEqual(actual_count, expected_count,
+                         'Expected {} to occur {} times but got {}'.format(snippet, expected_count, actual_count))
+
+    @classmethod
+    def givenTestImage(cls, content_type='image/jpeg', status=200):
+        with open(join(TEST_DATA_DIRECTORY, 'test_image.jpg'), 'rb') as image:
+            image_bytes = image.read()
+
+        responses.add(responses.GET, 'http://test-url.jpg',
+                      headers={'Content-Type': content_type},
+                      body=image_bytes,
+                      status=status)
