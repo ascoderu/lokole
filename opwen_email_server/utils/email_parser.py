@@ -5,7 +5,6 @@ from email.utils import mktime_tz
 from email.utils import parsedate_tz
 from itertools import chain
 from mimetypes import guess_type
-from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -13,6 +12,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
+from requests import Response
 import requests
 
 
@@ -86,47 +86,47 @@ def get_domains(email: dict) -> Iterable[str]:
                      for address in _get_recipients(email))
 
 
-def _get_image_type(response: Any, url: str) -> Optional[str]:
+def _get_image_type(response: Response, url: str) -> Optional[str]:
     content_type = response.headers.get('Content-Type')
     if not content_type:
-        return guess_type(url)[0]
+        content_type = guess_type(url)[0]
     return content_type
 
 
-def _get_as_base64(image_url: str) -> Optional[str]:
+def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     response = requests.get(image_url)
-
     if not response.ok:
         return None
 
     image_type = _get_image_type(response, image_url)
-    image_content = b64encode(response.content).decode('ascii')
-
-    if not image_type or not image_content:
+    if not image_type:
         return None
 
-    base64 = 'data:{};base64,{}'.format(image_type, image_content)
-    return base64
+    if not response.content:
+        return None
+
+    image_content = b64encode(response.content).decode('ascii')
+    return 'data:{};base64,{}'.format(image_type, image_content)
 
 
 def inline_images(email: dict) -> dict:
     email_body = email.get('body', '')
-
     if not email_body:
         return email
 
     soup = BeautifulSoup(email_body, 'html.parser')
+    image_tags = soup.find_all('img')
+    if not image_tags:
+        return email
 
-    for img in soup.find_all('img'):
-        img_url = img.get('src')
-
-        if not img_url:
+    for image_tag in image_tags:
+        image_url = image_tag.get('src')
+        if not image_url:
             continue
 
-        img_base64 = _get_as_base64(img_url)
-
-        if img_base64:
-            img['src'] = img_base64
+        encoded_image = _fetch_image_to_base64(image_url)
+        if encoded_image:
+            image_tag['src'] = encoded_image
 
     new_email = dict(email)
     new_email['body'] = str(soup)
