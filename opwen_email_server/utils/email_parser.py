@@ -93,6 +93,10 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
+def set_image_size(image_bytes: str) -> str:
+    # image_bytes = BytesIO(image_bytes)
+    pass
+
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     response = requests.get(image_url)
     if not response.ok:
@@ -106,6 +110,7 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
         return None
 
     image_content = b64encode(response.content).decode('ascii')
+    resized_image_content = set_image_size(image_content)
     return 'data:{};base64,{}'.format(image_type, image_content)
 
 
