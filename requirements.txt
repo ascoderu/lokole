@@ -7,7 +7,7 @@ Flask-Testing==0.7.1
 Flask-WTF==0.14.2
 Flask==1.0.2
 SQLAlchemy==1.2.8
-WTForms==2.2
+WTForms==2.2.1
 azure-storage-blob==1.1.0
 bcrypt==3.1.4
 gunicorn==19.8.1
