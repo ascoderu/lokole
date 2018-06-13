@@ -128,7 +128,7 @@ services:
     depends_on:
       - apistoreinboundemails
 
-  connectorstorewritteclientemails:
+  connectorstorewrittenclientemails:
     image: ${DOCKER_REPO}/opwenserver_queueconnector:${BUILD_TAG}
     build:
       context: .
