@@ -5,9 +5,6 @@ version:
 server:
   gunicornWorkers: 2
 
-worker:
-  pollingIntervalSeconds: 120
-
 logging:
   level: INFO
 
