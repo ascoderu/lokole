@@ -67,6 +67,21 @@ spec:
             secretKeyRef:
               name: sendgrid
               key: LOKOLE_SENDGRID_KEY
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
         ports:
         - containerPort: 80
         resources: {}
