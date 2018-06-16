@@ -18,7 +18,7 @@ spec:
         io.kompose.service: apiclientread
     spec:
       containers:
-      - name: apiclientread
+      - name: api
         image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
         - name: CONNEXION_SPEC

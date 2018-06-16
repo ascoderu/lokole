@@ -18,7 +18,7 @@ spec:
         io.kompose.service: apistoreinboundemails
     spec:
       containers:
-      - name: connectorstoreinboundemails
+      - name: connector
         image: {{.Values.version.imageRegistry}}/opwenserver_queueconnector:{{.Values.version.dockerTag}}
         env:
         - name: LOKOLE_POST_URL
@@ -40,7 +40,7 @@ spec:
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
-      - name: apistoreinboundemails
+      - name: api
         image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
         - name: CONNEXION_SPEC
