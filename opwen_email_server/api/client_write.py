@@ -6,7 +6,9 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.utils.log import LogMixin
 
-QUEUE = AzureQueue(account=config.QUEUES_ACCOUNT, key=config.QUEUES_KEY,
+QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
+                   sas_key=config.QUEUES_SAS_KEY,
+                   sas_name=config.QUEUES_SAS_NAME,
                    name=constants.QUEUE_CLIENT_PACKAGE)
 
 CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,

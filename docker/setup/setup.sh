@@ -16,6 +16,7 @@
 ##
 ## Optional environment variables:
 ##
+##   SERVICE_BUS_SKU
 ##   STORAGE_ACCOUNT_SKU
 ##
 ##   KUBERNETES_RESOURCE_GROUP_NAME
@@ -61,6 +62,7 @@ use_resource_group "${RESOURCE_GROUP_NAME}"
 #
 
 storageaccountsku="${STORAGE_ACCOUNT_SKU:-Standard_GRS}"
+servicebussku="${SERVICE_BUS_SKU:-Basic}"
 deploymentname="opwendeployment$(generate_identifier 8)"
 
 log "Creating resources via deployment ${deploymentname}"
@@ -69,6 +71,7 @@ az group deployment create \
   --name "${deploymentname}" \
   --template-file "${scriptdir}/arm.template.json" \
   --parameters storageAccountSKU="${storageaccountsku}" \
+  --parameters serviceBusSKU="${servicebussku}" \
 > /tmp/deployment.json
 
 cat > /secrets/azure.env << EOF
@@ -78,10 +81,11 @@ LOKOLE_CLIENT_AZURE_STORAGE_KEY=$(jq -r .properties.outputs.clientBlobsKey.value
 LOKOLE_CLIENT_AZURE_STORAGE_NAME=$(jq -r .properties.outputs.clientBlobsName.value /tmp/deployment.json)
 LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY=$(jq -r .properties.outputs.serverBlobsKey.value /tmp/deployment.json)
 LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME=$(jq -r .properties.outputs.serverBlobsName.value /tmp/deployment.json)
-LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY=$(jq -r .properties.outputs.serverQueuesKey.value /tmp/deployment.json)
-LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME=$(jq -r .properties.outputs.serverQueuesName.value /tmp/deployment.json)
 LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY=$(jq -r .properties.outputs.serverTablesKey.value /tmp/deployment.json)
 LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME=$(jq -r .properties.outputs.serverTablesName.value /tmp/deployment.json)
+LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE=$(jq -r .properties.outputs.serverQueuesName.value /tmp/deployment.json)
+LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME=$(jq -r .properties.outputs.serverQueuesSasName.value /tmp/deployment.json)
+LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY=$(jq -r .properties.outputs.serverQueuesSasKey.value /tmp/deployment.json)
 EOF
 
 cat > /secrets/sendgrid.env << EOF

@@ -2,12 +2,12 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   creationTimestamp: null
-  name: jobsendoutboundemails
+  name: apisendoutboundemails
 spec:
   maxReplicas: {{.Values.autoscale.maxPods}}
   minReplicas: {{.Values.autoscale.minPods}}
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: jobsendoutboundemails
+    name: apisendoutboundemails
   targetCPUUtilizationPercentage: {{.Values.autoscale.cpuThreshold}}

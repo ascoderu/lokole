@@ -22,8 +22,8 @@ class ParseMimeEmailTests(TestCase):
         self.assertEqual(email.get('from'), 'clemens.wolff@gmail.com')
         self.assertEqual(email.get('subject'), 'Two recipients')
         self.assertEqual(email.get('sent_at'), '2017-02-13 06:25')
-        self.assertEqual(email.get('to'), ['clemens@victoria.ascoderu.ca',
-                                           'laura@victoria.ascoderu.ca'])
+        self.assertEqual(email.get('to'), ['clemens@victoria.lokole.ca',
+                                           'laura@victoria.lokole.ca'])
 
     def test_prefers_html_body_over_text(self):
         mime_email = self._given_mime_email('email-html.mime')
@@ -38,9 +38,9 @@ class ParseMimeEmailTests(TestCase):
 
         email = email_parser.parse_mime_email(mime_email)
 
-        self.assertEqual(email.get('bcc'), ['laura@ascoderu.ca'])
-        self.assertEqual(email.get('cc'), ['nzola@ascoderu.ca',
-                                           'clemens@ascoderu.ca'])
+        self.assertEqual(email.get('bcc'), ['laura@lokole.ca'])
+        self.assertEqual(email.get('cc'), ['nzola@lokole.ca',
+                                           'clemens@lokole.ca'])
 
     def test_parses_email_with_attachments(self):
         mime_email = self._given_mime_email('email-attachment.mime')

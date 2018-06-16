@@ -1,7 +1,15 @@
+.idea/
+.vscode/
+
 *.pyc
 .mypy_cache/
 __pycache__/
 docs/
 tests/
 travis/
-venv/
+venv*/
+
+.vs/
+bin/
+obj/
+out/

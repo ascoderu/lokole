@@ -1,16 +1,18 @@
-from opwen_email_server.api import client_write
+from opwen_email_server import azure_constants as constants
+from opwen_email_server import config
 from opwen_email_server.backend import client_datastore
-from opwen_email_server.backend import email_sender
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.services.queue_consumer import QueueConsumer
+from opwen_email_server.services.queue import AzureQueue
+from opwen_email_server.utils.log import LogMixin
+
+QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
+                   sas_key=config.QUEUES_SAS_KEY,
+                   sas_name=config.QUEUES_SAS_NAME,
+                   name=constants.QUEUE_EMAIL_SEND)
 
 
-class Job(QueueConsumer):
-    def __init__(self):
-        super().__init__(client_write.QUEUE.dequeue)
-
-    def _process_message(self, message: dict):
-        resource_id = message['resource_id']
+class _WrittenStorer(LogMixin):
+    def __call__(self, resource_id: str):
         emails = client_datastore.unpack_emails(resource_id)
         self.log_info('Fetched packaged client emails from %s', resource_id)
 
@@ -19,7 +21,7 @@ class Job(QueueConsumer):
             server_datastore.store_email(email_id, email)
             self.log_info('Stored packaged client email %s', email_id)
 
-            email_sender.QUEUE.enqueue({
+            QUEUE.enqueue({
                 '_version': '0.1',
                 '_type': 'email_to_send',
                 'resource_id': email_id,
@@ -30,7 +32,7 @@ class Job(QueueConsumer):
         client_datastore.delete(resource_id)
         self.log_info('Deleted packaged client emails from %s', resource_id)
 
+        return 'OK', 200
 
-if __name__ == '__main__':
-    from opwen_email_server.services.queue_consumer import cli
-    cli(Job)
+
+store = _WrittenStorer()

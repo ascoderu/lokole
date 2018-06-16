@@ -12,7 +12,9 @@ STORAGE = AzureTextStorage(account=config.BLOBS_ACCOUNT,
                            key=config.BLOBS_KEY,
                            container=constants.CONTAINER_SENDGRID_MIME)
 
-QUEUE = AzureQueue(account=config.QUEUES_ACCOUNT, key=config.QUEUES_KEY,
+QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
+                   sas_key=config.QUEUES_SAS_KEY,
+                   sas_name=config.QUEUES_SAS_NAME,
                    name=constants.QUEUE_SENDGRID_MIME)
 
 CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,

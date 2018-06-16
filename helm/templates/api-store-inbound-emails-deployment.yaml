@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: jobsendoutboundemails
-  name: jobsendoutboundemails
+    io.kompose.service: apistoreinboundemails
+  name: apistoreinboundemails
 spec:
   replicas: 1
   strategy: {}
@@ -15,18 +15,40 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: jobsendoutboundemails
+        io.kompose.service: apistoreinboundemails
     spec:
       containers:
-      - name: jobsendoutboundemails
-        image: {{.Values.version.imageRegistry}}/opwenserver_job:{{.Values.version.dockerTag}}
+      - name: connectorstoreinboundemails
+        image: {{.Values.version.imageRegistry}}/opwenserver_queueconnector:{{.Values.version.dockerTag}}
         env:
-        - name: JOB_NAME
-          value: opwen_email_server.jobs.send_outbound_emails
+        - name: LOKOLE_POST_URL
+          value: http://0.0.0.0/job/email/inbound/store
+        - name: LOKOLE_SOURCE_QUEUE
+          value: sengridinboundemails
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
+      - name: apistoreinboundemails
+        image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
+        env:
+        - name: CONNEXION_SPEC
+          value: opwen_email_server/static/store-inbound-emails.yaml
+        - name: GUNICORN_WORKERS
+          value: "{{.Values.server.gunicornWorkers}}"
         - name: LOKOLE_LOG_LEVEL
           value: {{.Values.logging.level}}
-        - name: LOKOLE_QUEUE_POLL_SECONDS
-          value: "{{.Values.worker.pollingIntervalSeconds}}"
         - name: LOKOLE_CLIENT_AZURE_STORAGE_KEY
           valueFrom:
             secretKeyRef:
@@ -47,16 +69,6 @@ spec:
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
         - name: LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY
           valueFrom:
             secretKeyRef:
@@ -77,6 +89,8 @@ spec:
             secretKeyRef:
               name: sendgrid
               key: LOKOLE_SENDGRID_KEY
+        ports:
+        - containerPort: 80
         resources: {}
       restartPolicy: Always
 status: {}
