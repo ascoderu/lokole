@@ -397,11 +397,11 @@ write_file "${opwen_webapp_script}" << EOF
 #!/usr/bin/env sh
 . '${opwen_webapp_envs}'
 
-'${opwen_webapp_virtualenv}/bin/gunicorn' \
-  --timeout='${opwen_webapp_timeout_seconds}' \
-  --workers='${opwen_webapp_workers}' \
-  --bind='unix:${opwen_webapp_socket}' \
-  --log-level='${opwen_webapp_log_level}' \
+'${opwen_webapp_virtualenv}/bin/gunicorn' \\
+  --timeout='${opwen_webapp_timeout_seconds}' \\
+  --workers='${opwen_webapp_workers}' \\
+  --bind='unix:${opwen_webapp_socket}' \\
+  --log-level='${opwen_webapp_log_level}' \\
   '${opwen_webapp_service}.webapp:app'
 EOF
 make_executable "${opwen_webapp_script}"
