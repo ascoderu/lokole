@@ -198,11 +198,13 @@ case "${sim_type}" in
   *) fail "Unsupported sim-type: ${sim_type}" ;;
 esac
 
+if [ "${LOKOLE_WIFI}" != "no" ]; then
 case "${opwen_device}" in
   OrangePI|orangepizero) ht_capab='[HT40][DSS_CCK-40]' ;;
   raspberrypi) ht_capab='[HT40][SHORT-GI-20][DSS_CCK-40]' ;;
   *) fail "Unsupported device: ${opwen_device}" ;;
 esac
+fi
 
 opwen_webapp_config_client_domain="${opwen_webapp_config_client_name}.lokole.ca"
 opwen_webapp_config_client_id="$(random_string 32)"
