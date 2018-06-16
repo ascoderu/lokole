@@ -193,6 +193,7 @@ def logout_complete() -> Response:
 @admin_required
 def sync() -> Response:
     sync_emails = SyncEmails(
+        log=app.logger,
         email_sync=app.ioc.email_sync,
         email_store=app.ioc.email_store)
 

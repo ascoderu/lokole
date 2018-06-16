@@ -1,3 +1,5 @@
+from logging import Logger
+
 from flask import render_template
 
 from opwen_email_client.domain.email.store import EmailStore
@@ -6,18 +8,31 @@ from opwen_email_client.webapp.config import i8n
 
 
 class SyncEmails(object):
-    def __init__(self, email_store: EmailStore, email_sync: Sync):
+    def __init__(self, email_store: EmailStore, email_sync: Sync,
+                 log: Logger):
         self._email_store = email_store
         self._email_sync = email_sync
+        self._log = log
 
     def _upload(self):
         pending = self._email_store.pending()
-        uploaded = self._email_sync.upload(pending)
-        self._email_store.mark_sent(uploaded)
+
+        # noinspection PyBroadException
+        try:
+            uploaded = self._email_sync.upload(pending)
+        except Exception:
+            self._log.exception('Unable to upload emails')
+        else:
+            self._email_store.mark_sent(uploaded)
 
     def _download(self):
-        downloaded = self._email_sync.download()
-        self._email_store.create(downloaded)
+        # noinspection PyBroadException
+        try:
+            downloaded = self._email_sync.download()
+        except Exception:
+            self._log.exception('Unable to download emails')
+        else:
+            self._email_store.create(downloaded)
 
     def _sync(self):
         self._upload()
