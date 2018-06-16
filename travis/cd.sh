@@ -34,4 +34,4 @@ docker build \
 docker push "$DOCKER_USERNAME/opwenclient_app:$TRAVIS_TAG"
 
 docker tag "$DOCKER_USERNAME/opwenclient_app:$TRAVIS_TAG" "$DOCKER_USERNAME/opwenclient_app:latest"
-docker push "$DOCKER_USERNAME/opwenclient:latest"
+docker push "$DOCKER_USERNAME/opwenclient_app:latest"
