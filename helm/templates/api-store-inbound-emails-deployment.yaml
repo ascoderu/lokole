@@ -84,6 +84,21 @@ spec:
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
+        - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure
+              key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
         - name: LOKOLE_SENDGRID_KEY
           valueFrom:
             secretKeyRef:
