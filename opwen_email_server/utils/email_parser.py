@@ -3,13 +3,16 @@ from datetime import datetime
 from datetime import timezone
 from email.utils import mktime_tz
 from email.utils import parsedate_tz
+from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from bs4 import BeautifulSoup
+from PIL import Image
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
 from requests import Response
@@ -93,9 +96,34 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
-def set_image_size(image_bytes: str) -> str:
-    # image_bytes = BytesIO(image_bytes)
+def change_image_size(image_bytes: str) -> str:
+    image_bytes = BytesIO(image_bytes)
+    image_bytes.seek(0)
+    image = Image.open(image_bytes)
+    image_format = image.format
+    image_width = image.width
+    image_height = image.height
+    new_size = _get_new_pixel_size(image_width, image_height)
+    # image.save(new_size, image_format)
     pass
+
+
+def _get_new_pixel_size(width: int, height: int) -> Tuple:
+    already_small = height <= 200 and width <= 200
+    if already_small:
+        return (width, height)
+
+    horizontal = height < width
+    vertical = width < height
+
+    if vertical:
+        pass
+    elif horizontal:
+        pass
+    else:
+        new_size = (200, 200)
+    return new_size
+
 
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     response = requests.get(image_url)
@@ -109,8 +137,8 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     if not response.content:
         return None
 
+    change_image_size(response.content)
     image_content = b64encode(response.content).decode('ascii')
-    resized_image_content = set_image_size(image_content)
     return 'data:{};base64,{}'.format(image_type, image_content)
 
 
