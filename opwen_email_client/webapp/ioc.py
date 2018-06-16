@@ -1,6 +1,3 @@
-from logging import Formatter
-from logging import StreamHandler
-
 from flask import Flask
 from flask_babelex import Babel
 
@@ -47,11 +44,6 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     app.ioc = Ioc()
-
-    handler = StreamHandler()
-    handler.setFormatter(Formatter(AppConfig.LOG_FORMAT))
-    app.logger.addHandler(handler)
-    app.logger.setLevel(AppConfig.LOG_LEVEL)
 
     app.babel = Babel(app)
 

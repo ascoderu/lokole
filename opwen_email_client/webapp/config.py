@@ -1,4 +1,3 @@
-from logging import ERROR
 from os import path
 from tempfile import gettempdir
 
@@ -78,9 +77,6 @@ class AppConfig(object):
 
     EMAIL_ADDRESS_DELIMITER = ','
     EMAILS_PER_PAGE = 30
-
-    LOG_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
-    LOG_LEVEL = ERROR
 
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')

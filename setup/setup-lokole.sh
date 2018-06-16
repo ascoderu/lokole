@@ -388,6 +388,7 @@ max_workers=4
 opwen_webapp_timeout_seconds=300
 opwen_webapp_workers=$(min $(($(get_system_ram_kb) / memory_per_worker_kb)) ${max_workers})
 opwen_webapp_socket="${opwen_webapp_run_directory}/nginx_gunicorn.sock"
+opwen_webapp_log_level="error"
 nginx_access_log="${opwen_webapp_run_directory}/nginx_access.log"
 nginx_error_log="${opwen_webapp_run_directory}/nginx_error.log"
 
@@ -400,6 +401,7 @@ write_file "${opwen_webapp_script}" << EOF
   --timeout='${opwen_webapp_timeout_seconds}' \
   --workers='${opwen_webapp_workers}' \
   --bind='unix:${opwen_webapp_socket}' \
+  --log-level='${opwen_webapp_log_level}' \
   '${opwen_webapp_service}.webapp:app'
 EOF
 make_executable "${opwen_webapp_script}"
