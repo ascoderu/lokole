@@ -9,7 +9,6 @@ from mimetypes import guess_type
 from typing import Iterable
 from typing import List
 from typing import Optional
-from typing import Tuple
 
 from bs4 import BeautifulSoup
 from PIL import Image
@@ -76,6 +75,15 @@ def parse_mime_email(mime_email: str) -> dict:
         'body': _parse_body(message),
         'attachments': list(_parse_attachments(message.mailparts)),
     }
+
+
+'''
+def format_email_images(email: dict) -> dict:
+    if not email['body'] and not email['attachments']:
+        return email
+    # call _inline_images(email)
+    # create and call _attached_images(email)
+'''
 
 
 def _get_recipients(email: dict) -> Iterable[str]:
