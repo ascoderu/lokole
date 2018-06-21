@@ -101,28 +101,12 @@ def change_image_size(image_bytes: str) -> str:
     image_bytes.seek(0)
     image = Image.open(image_bytes)
     image_format = image.format
-    image_width = image.width
-    image_height = image.height
-    new_size = _get_new_pixel_size(image_width, image_height)
-    # image.save(new_size, image_format)
-    pass
-
-
-def _get_new_pixel_size(width: int, height: int) -> Tuple:
-    already_small = height <= 200 and width <= 200
-    if already_small:
-        return (width, height)
-
-    horizontal = height < width
-    vertical = width < height
-
-    if vertical:
-        pass
-    elif horizontal:
-        pass
-    else:
-        new_size = (200, 200)
-    return new_size
+    max_size = (100, 100)
+    image.thumbnail(max_size, Image.ANTIALIAS)
+    new_image = BytesIO()
+    image.save(new_image, image_format)
+    new_image.seek(0)
+    return new_image.read()
 
 
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
@@ -137,8 +121,9 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     if not response.content:
         return None
 
-    change_image_size(response.content)
-    image_content = b64encode(response.content).decode('ascii')
+    sized_bytes_image = change_image_size(response.content)
+
+    image_content = b64encode(sized_bytes_image).decode('ascii')
     return 'data:{};base64,{}'.format(image_type, image_content)
 
 
