@@ -92,7 +92,7 @@ services:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      CONNEXION_SPEC: opwen_email_server/static/store-written-emails.yaml
+      CONNEXION_SPEC: opwen_email_server/static/store-written-client-emails.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       DOTENV_SECRETS: azure;sendgrid
