@@ -15,7 +15,7 @@ def send(email: dict) -> Tuple[str, int]:
     return 'sent', 200
 
 
-if __name__ == '__main__':
+def _cli():
     from argparse import ArgumentParser
     from argparse import FileType
     from base64 import b64encode
@@ -39,3 +39,7 @@ if __name__ == '__main__':
         args.attachment.close()
 
     send(email)
+
+
+if __name__ == '__main__':
+    _cli()
