@@ -82,8 +82,12 @@ def _get_recipients(email: dict) -> Iterable[str]:
 
 
 def get_domains(email: dict) -> Iterable[str]:
-    return frozenset(address.split('@')[-1]
+    return frozenset(get_domain(address)
                      for address in _get_recipients(email))
+
+
+def get_domain(address: str) -> str:
+    return address.split('@')[-1]
 
 
 def _get_image_type(response: Response, url: str) -> Optional[str]:

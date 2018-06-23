@@ -3,6 +3,7 @@ from typing import Union
 
 from opwen_email_server import azure_constants as constants
 from opwen_email_server import config
+from opwen_email_server import events
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureObjectStorage
@@ -20,6 +21,7 @@ class _Downloader(LogMixin):
     def __call__(self, client_id) -> Union[dict, Tuple[str, int]]:
         domain = CLIENTS.domain_for(client_id)
         if not domain:
+            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
             return 'client is not registered', 403
 
         delivered = set()
@@ -30,21 +32,17 @@ class _Downloader(LogMixin):
 
         pending = server_datastore.fetch_pending_emails(domain)
         pending = [mark_delivered(email) for email in pending]
-        self.log_info('%s:Got %d pending emails', domain, len(delivered))
 
         resource_id = STORAGE.store_objects(pending)
-        self.log_info('%s:Stored pending emails at %s', domain, resource_id)
 
         server_datastore.mark_emails_as_delivered(domain, delivered)
-        self.log_info('%s:Marked pending emails as delivered', domain)
 
-        response = {
+        self.log_event(events.EMAILS_DELIVERED_TO_CLIENT, {'domain': domain, 'num_emails': len(delivered)})  # noqa: E501
+        return {
             'resource_id': resource_id,
             'resource_container': STORAGE.container,
             'resource_type': 'azure-blob',
         }
-        self.log_info('%s:Returning %r', domain, response)
-        return response
 
 
 download = _Downloader()
