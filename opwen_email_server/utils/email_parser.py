@@ -78,6 +78,30 @@ def parse_mime_email(mime_email: str) -> dict:
     }
 
 
+def format_attachments(email: dict) -> dict:
+    attachments = email.get('attachments', '')
+
+    if not attachments:
+        return email
+
+    formatted_attachments = attachments.copy()
+
+    for i, attachment in enumerate(attachments):
+        content = attachment.get('content', '')
+        formatted_content = _format_attachment(content)
+
+        if content == formatted_content:
+            continue
+
+        new_attachment = attachment.copy()
+        new_attachment['content'] = formatted_content
+        formatted_attachments[i] = new_attachment
+
+    new_email = dict(email)
+    new_email['attachments'] = formatted_attachments
+    return new_email
+
+
 def _format_attachment(content: str) -> str:
     guessed = guess_type(content)
 
@@ -90,26 +114,6 @@ def _format_attachment(content: str) -> str:
         image = _change_image_size(content)
         return image
     return content
-
-
-def format_attachments(email: dict) -> dict:
-    attachments = email.get('attachments', '')
-
-    if not attachments:
-        return email
-
-    formatted_attachments = attachments
-
-    for i, attachment in enumerate(attachments):
-        content = attachment.get('content', '')
-        new_content = _format_attachment(content)
-        if content == new_content:
-            continue
-        formatted_attachments[i] = new_content
-
-    new_email = dict(email)
-    new_email['attachments'] = formatted_attachments
-    return new_email
 
 
 def _get_recipients(email: dict) -> Iterable[str]:
