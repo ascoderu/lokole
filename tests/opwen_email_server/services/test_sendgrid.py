@@ -8,9 +8,9 @@ from opwen_email_server.services import sendgrid
 
 
 class SendgridEmailSenderTests(TestCase):
-    recipient1 = 'clemens@ascoderu.ca'
+    recipient1 = 'clemens@lokole.ca'
     recipient2 = 'clemens.wolff@gmail.com'
-    sender = 'sendgridtests@ascoderu.ca'
+    sender = 'sendgridtests@lokole.ca'
 
     def test_sends_email(self):
         sender = self._given_client()

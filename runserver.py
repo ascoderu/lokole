@@ -22,7 +22,7 @@ def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):
     return app
 
 
-if __name__ == '__main__':
+def _cli():
     from argparse import ArgumentParser
     from argparse import FileType
     from os.path import dirname
@@ -43,7 +43,15 @@ if __name__ == '__main__':
     parser.add_argument('apis', nargs='+', type=FileType('r'))
     args = parser.parse_args()
 
-    app = build_app([api.name for api in args.apis], args.host,
-                    args.port, args.server, args.ui)
+    apis = []
+    for fobj in args.apis:
+        apis.append(fobj.name)
+        fobj.close()
+
+    app = build_app(apis, args.host, args.port, args.server, args.ui)
 
     app.run()
+
+
+if __name__ == '__main__':
+    _cli()

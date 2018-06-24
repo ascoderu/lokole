@@ -13,15 +13,18 @@ Opwen cloudserver
 What's this?
 ------------
 
-This repository contains the source code for the Opwen cloud server. Its purpose
-is to connect the `application <https://github.com/ascoderu/opwen-webapp>`_
-running on the Opwen Lokole devices to the rest of the world.
+This repository contains the source code for the Lokole cloud server. Its
+purpose is to connect the `application <https://github.com/ascoderu/opwen-webapp>`_
+running on the Lokole devices to the rest of the world. Lokole is a project
+by the Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_.
 
 The server has two main responsibilities:
 
 1. Receive emails from the internet that are addressed to Lokole users and
    forward them to the appropriate Lokole device.
 2. Send new emails created by Lokole users to the rest of the internet.
+
+More background information can be found in the `opwen-webapp README <https://github.com/ascoderu/opwen-webapp/blob/master/README.rst>`_.
 
 System overview
 ---------------
@@ -35,10 +38,10 @@ System overview
 Data exchange format
 --------------------
 
-In order to communicate between the Opwen cloud server and the Opwen
-web-application (aka Lokole), a protocol based on gzipped jsonl files uploaded
-to Azure Blob Storage is used. The files contains a JSON object per line.
-Each JSON object describes an email, using the following schema:
+In order to communicate between the Lokole cloud server and the Lokole email
+application, a protocol based on gzipped jsonl files uploaded to Azure Blob
+Storage is used. The files contains a JSON object per line. Each JSON object
+describes an email, using the following schema:
 
 .. sourcecode :: json
 
@@ -98,7 +101,7 @@ to initialize the required cloud resources.
 
 .. sourcecode :: sh
 
-  docker build -t opwenserversetup -f docker/setup/Dockerfile .
+  docker build -t setup -f docker/setup/Dockerfile .
 
   docker run \
     -e SP_APPID={appId field of your service principal} \
@@ -109,7 +112,7 @@ to initialize the required cloud resources.
     -e RESOURCE_GROUP_NAME={the name of the resource group to create or reuse} \
     -e SENDGRID_KEY={the sendgrid key you created earlier} \
     -v ${PWD}/secrets:/secrets \
-    opwenserversetup
+    setup
 
 The secrets to access the Azure resources created by the setup script will be
 stored in files in the :code:`secrets` directory. Other parts of the

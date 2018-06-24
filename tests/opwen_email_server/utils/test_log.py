@@ -11,7 +11,7 @@ class LogMixinTests(TestCase):
                 self.log_info('message %d', 123)
         Foo().foo()
 
-        self.assertDidLog('info', '%s:message %d', 'Foo', 123)
+        self.assertDidLog('info', '%s|message %d', 'Foo', 123)
 
     def test_adds_extra_args_to_output(self):
         class Bar(log.LogMixin):
@@ -23,7 +23,7 @@ class LogMixinTests(TestCase):
                 yield 'b %s', 2
         Bar().bar()
 
-        self.assertDidLog('info', '%s:a %s:b %s:message %d', 'Bar', 1, 2, 3)
+        self.assertDidLog('info', '%s|a %s|b %s|message %d', 'Bar', 1, 2, 3)
 
     def test_important_messages_get_quickly_sent_by_appinsights(self):
         class Foo(log.LogMixin):

@@ -18,10 +18,10 @@ spec:
         io.kompose.service: apiclientread
     spec:
       containers:
-      - name: apiclientread
+      - name: api
         image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
-        - name: API_NAME
+        - name: CONNEXION_SPEC
           value: opwen_email_server/static/client-read-spec.yaml
         - name: GUNICORN_WORKERS
           value: "{{.Values.server.gunicornWorkers}}"
@@ -47,16 +47,6 @@ spec:
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_KEY
-        - name: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
-          valueFrom:
-            secretKeyRef:
-              name: azure
-              key: LOKOLE_EMAIL_SERVER_AZURE_QUEUES_NAME
         - name: LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY
           valueFrom:
             secretKeyRef:

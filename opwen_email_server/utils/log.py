@@ -3,6 +3,7 @@ from logging import StreamHandler
 from logging import getLogger
 from typing import Any
 from typing import Iterable
+from typing import Optional
 from typing import Tuple
 
 from applicationinsights import TelemetryClient
@@ -29,7 +30,7 @@ if APPINSIGHTS_KEY:
 
 
 class LogMixin(object):
-    info_separator = ':'
+    info_separator = '|'
 
     def log_debug(self, message: str, *args: Any):
         self._log('debug', message, args)
@@ -56,6 +57,14 @@ class LogMixin(object):
             _APPINSIGHTS.track_trace(message % tuple(args), {'level': level})
             if self.should_send_message_immediately(level):
                 _APPINSIGHTS.flush()
+
+    # noinspection PyMethodMayBeStatic
+    def log_event(self, event_name: str, properties: Optional[dict]=None):
+        _LOG.info('%s%s%s', event_name, self.info_separator, properties)
+
+        if _APPINSIGHTS:
+            _APPINSIGHTS.track_event(event_name, properties)
+            _APPINSIGHTS.flush()
 
     # noinspection PyMethodMayBeStatic
     def should_send_message_immediately(self, level: str) -> bool:

@@ -1,11 +1,17 @@
 .idea/
+.vscode/
 
 *.pyc
 __pycache__/
 /build/
 /dist/
 /*.egg-info/
-venv/
+venv*/
 .mypy_cache/
 
 serviceprincipal.json
+
+.vs/
+bin/
+obj/
+out/
