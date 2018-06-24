@@ -29,7 +29,7 @@ $(py_env)/bin/activate: requirements.txt
 venv: $(py_env)/bin/activate
 
 unit-tests: venv
-	$(py_env)/bin/nosetests --exe
+	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=$(py_packages)
 
 tests: unit-tests
 
