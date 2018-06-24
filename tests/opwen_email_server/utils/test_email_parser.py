@@ -87,11 +87,11 @@ class ConvertImgUrlToBase64(TestCase):
     @responses.activate
     def test_format_inline_images_with_img_tag(self):
         self.givenTestImage()
-        input_email = {'body': '<div><h3>test image</h3><img src="http://test-url.jpg"/></div>'}
+        input_email = {'body': '<div><h3>test image</h3><img src="http://test-url.png"/></div>'}
 
         output_email = email_parser.format_inline_images(input_email)
 
-        self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/jpeg;')
+        self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/png;')
 
     @responses.activate
     def test_format_inline_images_with_img_tag_without_src_attribute(self):
@@ -104,7 +104,7 @@ class ConvertImgUrlToBase64(TestCase):
     @responses.activate
     def test_format_inline_images_with_bad_request(self):
         self.givenTestImage(status=404)
-        input_email = {'body': '<div><img src="http://test-url.jpg"/></div>'}
+        input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
 
         output_email = email_parser.format_inline_images(input_email)
 
@@ -113,7 +113,7 @@ class ConvertImgUrlToBase64(TestCase):
     @responses.activate
     def test_format_inline_images_with_many_img_tags(self):
         self.givenTestImage()
-        input_email = {'body': '<div><img src="http://test-url.jpg"/><img src="http://test-url.jpg"/></div>'}
+        input_email = {'body': '<div><img src="http://test-url.png"/><img src="http://test-url.png"/></div>'}
 
         output_email = email_parser.format_inline_images(input_email)
 
@@ -130,11 +130,11 @@ class ConvertImgUrlToBase64(TestCase):
     @responses.activate
     def test_format_inline_images_without_content_type(self):
         self.givenTestImage(content_type='')
-        input_email = {'body': '<div><img src="http://test-url.jpg"/></div>'}
+        input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
 
         output_email = email_parser.format_inline_images(input_email)
 
-        self.assertStartsWith(output_email['body'], '<div><img src="data:image/jpeg;')
+        self.assertStartsWith(output_email['body'], '<div><img src="data:image/png;')
 
     def assertStartsWith(self, data, prefix):
         self.assertEqual(data[:len(prefix)], prefix)
@@ -145,11 +145,47 @@ class ConvertImgUrlToBase64(TestCase):
                          'Expected {} to occur {} times but got {}'.format(snippet, expected_count, actual_count))
 
     @classmethod
-    def givenTestImage(cls, content_type='image/jpeg', status=200):
-        with open(join(TEST_DATA_DIRECTORY, 'test_image.jpg'), 'rb') as image:
+    def givenTestImage(cls, content_type='image/png', status=200):
+        with open(join(TEST_DATA_DIRECTORY, 'test_image.png'), 'rb') as image:
             image_bytes = image.read()
 
-        responses.add(responses.GET, 'http://test-url.jpg',
+        responses.add(responses.GET, 'http://test-url.png',
                       headers={'Content-Type': content_type},
                       body=image_bytes,
                       status=status)
+
+
+class FormatAttachedFiles(TestCase):
+
+    def test_format_attachments_without_attachment(self):
+        input_email = {'attachments': []}
+
+        output_email = email_parser.format_attachments(input_email)
+
+        self.assertEqual(input_email, output_email)
+
+    def test_format_attachments_with_image(self):
+        input_filename = 'test_image.png'
+        input_content = self.givenBase64Test()
+        attachment = {
+            'filename': input_filename,
+            'content': input_content
+        }
+        input_email = {'attachments': [attachment]}
+
+        output_email = email_parser.format_attachments(input_email)
+        output_attachments = output_email.get('attachments', '')
+        output_filename = ''
+        output_content = ''
+        if output_attachments:
+            output_filename = output_attachments[0].get('filename', '')
+            output_content = output_attachments[0].get('content', '')
+
+        self.assertNotEqual(input_content, output_content)
+        self.assertEqual(input_filename, output_filename)
+        self.assertEqual(len(output_attachments), 1)
+
+    @classmethod
+    def givenBase64Test(cls):
+        with open(join(TEST_DATA_DIRECTORY, 'image_base64.txt'), 'r', encoding='utf-8') as b64:
+            return b64.read()

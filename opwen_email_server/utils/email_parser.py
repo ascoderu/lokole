@@ -1,4 +1,6 @@
+from base64 import b64decode
 from base64 import b64encode
+from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
 from email.utils import mktime_tz
@@ -79,36 +81,36 @@ def parse_mime_email(mime_email: str) -> dict:
 
 
 def format_attachments(email: dict) -> dict:
-    attachments = email.get('attachments', '')
+    attachments = email.get('attachments', [])
 
     if not attachments:
         return email
 
-    formatted_attachments = attachments.copy()
+    formatted_attachments = deepcopy(attachments)
+    is_any_attachment_changed = False
 
     for i, attachment in enumerate(attachments):
+        filename = attachment.get('filename', '')
         content = attachment.get('content', '')
-        formatted_content = _format_attachment(content)
+        formatted_content = _format_attachment(filename, content)
 
-        if content == formatted_content:
-            continue
+        if content != formatted_content:
+            formatted_attachments[i]['content'] = formatted_content
+            is_any_attachment_changed = True
 
-        new_attachment = attachment.copy()
-        new_attachment['content'] = formatted_content
-        formatted_attachments[i] = new_attachment
+    if not is_any_attachment_changed:
+        return email
 
     new_email = dict(email)
     new_email['attachments'] = formatted_attachments
     return new_email
 
 
-def _format_attachment(content: str) -> str:
-    guessed = guess_type(content)
+def _format_attachment(filename: str, content: str) -> str:
+    guessed_type = guess_type(filename)[0]
 
-    if not guessed:
+    if not guessed_type:
         return content
-
-    guessed_type = guessed[0]
 
     if 'image' in guessed_type.lower():
         image = _change_image_size(content)
@@ -134,7 +136,8 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
-def _change_image_size(image_bytes: str) -> str:
+def _change_image_size(image_b64: str) -> str:
+    image_bytes = b64decode(image_b64)
     image_bytes = BytesIO(image_bytes)
     image_bytes.seek(0)
     image = Image.open(image_bytes)
@@ -146,7 +149,9 @@ def _change_image_size(image_bytes: str) -> str:
     new_image = BytesIO()
     image.save(new_image, image_format)
     new_image.seek(0)
-    return new_image.read()
+    new_image_bytes = new_image.read()
+    new_b64 = b64encode(new_image_bytes).decode('ascii')
+    return new_b64
 
 
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
@@ -161,9 +166,10 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     if not response.content:
         return None
 
-    sized_bytes_image = _change_image_size(response.content)
-    image_content = b64encode(sized_bytes_image).decode('ascii')
-    return 'data:{};base64,{}'.format(image_type, image_content)
+    image_content = b64encode(response.content).decode('ascii')
+    image_content = _change_image_size(image_content)
+    base64 = 'data:{};base64,{}'.format(image_type, image_content)
+    return base64
 
 
 def format_inline_images(email: dict) -> dict:
