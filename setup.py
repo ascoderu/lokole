@@ -28,9 +28,16 @@ setup(
     author_email='clemens.wolff+pypi@gmail.com',
     packages=packages,
     url='https://github.com/ascoderu/opwen-cloudserver',
-    license='License :: OSI Approved :: Apache Software License',
+    license='Apache Software License',
     description='Email server for the Opwen project',
     long_description=long_description,
     scripts=scripts,
     include_package_data=True,
-    install_requires=install_requires)
+    install_requires=install_requires,
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 3',
+        'Topic :: Communications :: Email',
+    ])
