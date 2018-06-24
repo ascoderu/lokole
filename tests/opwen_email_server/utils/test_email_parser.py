@@ -2,6 +2,7 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 from unittest import TestCase
+import json
 
 import responses
 
@@ -11,6 +12,13 @@ from opwen_email_server.utils import email_parser
 TEST_DATA_DIRECTORY = abspath(join(
     dirname(__file__), '..', '..',
     'files', 'opwen_email_server', 'utils', 'test_email_parser'))
+
+
+def _given_test_image_base64(size):
+    b64_images_file = join(TEST_DATA_DIRECTORY, 'image_base64.json')
+    with open(b64_images_file, 'r', encoding='utf-8') as b64_images:
+        json_images = json.load(b64_images)
+        return json_images[size]
 
 
 class ParseMimeEmailTests(TestCase):
@@ -82,6 +90,22 @@ class GetDomainsTests(TestCase):
 
         self.assertSetEqual(domains, {'bar.com', 'com'})
 
+
+class ResizeImage(TestCase):
+    def test_change_image_size(self):
+        input_base64 = _given_test_image_base64(size='large')
+        output_base64 = email_parser._change_image_size(input_base64)
+        self.assertNotEqual(input_base64, output_base64, self.getErrorMessage())
+
+    def test_change_image_size_when_already_small(self):
+        input_base64 = _given_test_image_base64(size='small')
+        output_base64 = email_parser._change_image_size(input_base64)
+        self.assertEqual(input_base64, output_base64, self.getErrorMessage())
+
+    @classmethod
+    def getErrorMessage(cls):
+        return 'If default MAX_WIDTH_IMAGES and/or MAX_HEIGHT_IMAGES were changed ' \
+               'you may need to change the test base64 in "image_base64.json".'
 
 class ConvertImgUrlToBase64(TestCase):
     @responses.activate
@@ -166,7 +190,7 @@ class FormatAttachedFiles(TestCase):
 
     def test_format_attachments_with_image(self):
         input_filename = 'test_image.png'
-        input_content = self.givenBase64Test()
+        input_content = _given_test_image_base64(size='large')
         attachment = {
             'filename': input_filename,
             'content': input_content
@@ -184,8 +208,3 @@ class FormatAttachedFiles(TestCase):
         self.assertNotEqual(input_content, output_content)
         self.assertEqual(input_filename, output_filename)
         self.assertEqual(len(output_attachments), 1)
-
-    @classmethod
-    def givenBase64Test(cls):
-        with open(join(TEST_DATA_DIRECTORY, 'image_base64.txt'), 'r', encoding='utf-8') as b64:
-            return b64.read()

@@ -9,7 +9,7 @@ from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
 from opwen_email_server import config
-from typing import Iterable
+from typing import Iterable, Tuple
 from typing import List
 from typing import Optional
 
@@ -136,16 +136,33 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
+def _get_max_sizes() -> Tuple:
+    max_width = config.MAX_WIDTH_IMAGES
+    max_height = config.MAX_HEIGHT_IMAGES
+    return max_width, max_height
+
+
+def _is_size_already_small(size: Tuple) -> bool:
+    width = size[0]
+    height = size[1]
+    max_width = _get_max_sizes()[0]
+    max_height = _get_max_sizes()[1]
+    if width <= max_width and height <= max_height:
+        return True
+    return False
+
+
 def _change_image_size(image_content_b64: str) -> str:
     image_content_bytes = b64decode(image_content_b64)
     image_bytes = BytesIO(image_content_bytes)
     image_bytes.seek(0)
     image = Image.open(image_bytes)
     image_format = image.format
-    max_width = config.MAX_WIDTH_IMAGES
-    max_height = config.MAX_HEIGHT_IMAGES
-    img_size = (max_width, max_height)
-    image.thumbnail(img_size, Image.ANTIALIAS)
+    is_already_small = _is_size_already_small(image.size)
+    if is_already_small:
+        return image_content_b64
+    new_size = _get_max_sizes()
+    image.thumbnail(new_size, Image.ANTIALIAS)
     new_image = BytesIO()
     image.save(new_image, image_format)
     new_image.seek(0)
