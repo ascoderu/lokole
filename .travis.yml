@@ -11,6 +11,12 @@ services:
 
 script: travis/ci.sh
 
+install:
+  - pip install codecov
+
+after_success:
+  - codecov
+
 deploy:
   - provider: script
     script: travis/cd.sh

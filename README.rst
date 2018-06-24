@@ -10,6 +10,9 @@ Opwen webapp
 .. image:: https://pyup.io/repos/github/ascoderu/opwen-webapp/shield.svg
   :target: https://pyup.io/repos/github/ascoderu/opwen-webapp/
 
+.. image:: https://codecov.io/gh/ascoderu/opwen-webapp/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/ascoderu/opwen-webapp
+
 What's this?
 ------------
 

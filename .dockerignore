@@ -3,6 +3,7 @@
 bower_components/
 node_modules/
 
+.coverage
 .mypy_cache/
 venv/
 *.pyc
