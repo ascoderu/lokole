@@ -24,6 +24,8 @@ The server has two main responsibilities:
    forward them to the appropriate Lokole device.
 2. Send new emails created by Lokole users to the rest of the internet.
 
+More background information can be found in the `opwen-webapp README <https://github.com/ascoderu/opwen-webapp/blob/master/README.rst>`_.
+
 System overview
 ---------------
 
