@@ -22,6 +22,8 @@ from pyzmail.parse import MailPart
 from requests import Response
 import requests
 
+from opwen_email_server import config
+
 
 def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
     body_parts = (message.html_part, message.text_part)
