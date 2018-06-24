@@ -29,7 +29,7 @@ setup(
     packages=packages,
     url='https://github.com/ascoderu/opwen-cloudserver',
     license='Apache Software License',
-    description='Email server for the Opwen project',
+    description='Email server for the Lokole project: https://ascoderu.ca',
     long_description=long_description,
     scripts=scripts,
     include_package_data=True,
