@@ -6,6 +6,7 @@ from email.utils import parsedate_tz
 from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
+from opwen_email_server import config
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -77,13 +78,38 @@ def parse_mime_email(mime_email: str) -> dict:
     }
 
 
-'''
-def format_email_images(email: dict) -> dict:
-    if not email['body'] and not email['attachments']:
+def _format_attachment(content: str) -> str:
+    guessed = guess_type(content)
+
+    if not guessed:
+        return content
+
+    guessed_type = guessed[0]
+
+    if 'image' in guessed_type.lower():
+        image = _change_image_size(content)
+        return image
+    return content
+
+
+def format_attachments(email: dict) -> dict:
+    attachments = email.get('attachments', '')
+
+    if not attachments:
         return email
-    # call _inline_images(email)
-    # create and call _attached_images(email)
-'''
+
+    formatted_attachments = attachments
+
+    for i, attachment in enumerate(attachments):
+        content = attachment.get('content', '')
+        new_content = _format_attachment(content)
+        if content == new_content:
+            continue
+        formatted_attachments[i] = new_content
+
+    new_email = dict(email)
+    new_email['attachments'] = formatted_attachments
+    return new_email
 
 
 def _get_recipients(email: dict) -> Iterable[str]:
@@ -104,13 +130,15 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
-def change_image_size(image_bytes: str) -> str:
+def _change_image_size(image_bytes: str) -> str:
     image_bytes = BytesIO(image_bytes)
     image_bytes.seek(0)
     image = Image.open(image_bytes)
     image_format = image.format
-    max_size = (100, 100)
-    image.thumbnail(max_size, Image.ANTIALIAS)
+    max_width = config.MAX_WIDTH_IMAGES
+    max_height = config.MAX_HEIGHT_IMAGES
+    img_size = (max_width, max_height)
+    image.thumbnail(img_size, Image.ANTIALIAS)
     new_image = BytesIO()
     image.save(new_image, image_format)
     new_image.seek(0)
@@ -129,13 +157,12 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     if not response.content:
         return None
 
-    sized_bytes_image = change_image_size(response.content)
-
+    sized_bytes_image = _change_image_size(response.content)
     image_content = b64encode(sized_bytes_image).decode('ascii')
     return 'data:{};base64,{}'.format(image_type, image_content)
 
 
-def inline_images(email: dict) -> dict:
+def format_inline_images(email: dict) -> dict:
     email_body = email.get('body', '')
     if not email_body:
         return email

@@ -85,54 +85,54 @@ class GetDomainsTests(TestCase):
 
 class ConvertImgUrlToBase64(TestCase):
     @responses.activate
-    def test_inline_images_with_img_tag(self):
+    def test_format_inline_images_with_img_tag(self):
         self.givenTestImage()
         input_email = {'body': '<div><h3>test image</h3><img src="http://test-url.jpg"/></div>'}
 
-        output_email = email_parser.inline_images(input_email)
+        output_email = email_parser.format_inline_images(input_email)
 
         self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/jpeg;')
 
     @responses.activate
-    def test_inline_images_with_img_tag_without_src_attribute(self):
+    def test_format_inline_images_with_img_tag_without_src_attribute(self):
         input_email = {'body': '<div><img/></div>'}
 
-        output_email = email_parser.inline_images(input_email)
+        output_email = email_parser.format_inline_images(input_email)
 
         self.assertEqual(output_email, input_email)
 
     @responses.activate
-    def test_inline_images_with_bad_request(self):
+    def test_format_inline_images_with_bad_request(self):
         self.givenTestImage(status=404)
         input_email = {'body': '<div><img src="http://test-url.jpg"/></div>'}
 
-        output_email = email_parser.inline_images(input_email)
+        output_email = email_parser.format_inline_images(input_email)
 
         self.assertEqual(output_email, input_email)
 
     @responses.activate
-    def test_inline_images_with_many_img_tags(self):
+    def test_format_inline_images_with_many_img_tags(self):
         self.givenTestImage()
         input_email = {'body': '<div><img src="http://test-url.jpg"/><img src="http://test-url.jpg"/></div>'}
 
-        output_email = email_parser.inline_images(input_email)
+        output_email = email_parser.format_inline_images(input_email)
 
         self.assertHasCount(output_email['body'], 'src="data:', 2)
 
     @responses.activate
-    def test_inline_images_without_img_tags(self):
+    def test_format_inline_images_without_img_tags(self):
         input_email = {'body': '<div></div>'}
 
-        output_email = email_parser.inline_images(input_email)
+        output_email = email_parser.format_inline_images(input_email)
 
         self.assertEqual(output_email, input_email)
 
     @responses.activate
-    def test_inline_images_without_content_type(self):
+    def test_format_inline_images_without_content_type(self):
         self.givenTestImage(content_type='')
         input_email = {'body': '<div><img src="http://test-url.jpg"/></div>'}
 
-        output_email = email_parser.inline_images(input_email)
+        output_email = email_parser.format_inline_images(input_email)
 
         self.assertStartsWith(output_email['body'], '<div><img src="data:image/jpeg;')
 
