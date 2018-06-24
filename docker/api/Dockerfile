@@ -15,10 +15,11 @@ RUN apt-get update \
 ADD opwen_email_server /app/opwen_email_server
 ADD runserver.py /app/server.py
 ADD docker/api/healthcheck.sh /app/healthcheck.sh
+ADD docker/api/run-gunicorn.sh /app/run-gunicorn.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 EXPOSE 80
 WORKDIR /app
 HEALTHCHECK --interval=59m --timeout=5s CMD /app/healthcheck.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD "gunicorn" "-w" "${GUNICORN_WORKERS}" "-b" "0.0.0.0:80" "server:build_app(apis=['/app/${CONNEXION_SPEC}', '/app/opwen_email_server/static/healthcheck-spec.yaml'], server='tornado')"
+CMD ["/app/run-gunicorn.sh"]
