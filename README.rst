@@ -10,6 +10,9 @@ Opwen cloudserver
 .. image:: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/shield.svg
   :target: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/
 
+.. image:: https://codecov.io/gh/ascoderu/opwen-cloudserver/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/ascoderu/opwen-cloudserver
+
 What's this?
 ------------
 
