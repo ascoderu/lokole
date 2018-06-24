@@ -107,14 +107,14 @@ def format_attachments(email: dict) -> dict:
 
 
 def _format_attachment(filename: str, content: str) -> str:
-    guessed_type = guess_type(filename)[0]
+    attachment_type = guess_type(filename)[0]
 
-    if not guessed_type:
+    if not attachment_type:
         return content
 
-    if 'image' in guessed_type.lower():
-        image = _change_image_size(content)
-        return image
+    if 'image' in attachment_type.lower():
+        content = _change_image_size(content)
+
     return content
 
 
