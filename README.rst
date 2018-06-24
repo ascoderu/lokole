@@ -13,9 +13,10 @@ Opwen webapp
 What's this?
 ------------
 
-This repository contains the source code for the Opwen Lokole web-application.
+This repository contains the source code for the Lokole email application.
+Lokole is a project by the Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_.
 
-The Lokole is a simple email client that has functionality like:
+The Lokole is a simple email client that offers functionality like:
 
 1. Self-service creation of user accounts
 2. Read emails sent to the account
@@ -25,11 +26,11 @@ The Lokole is a simple email client that has functionality like:
 All emails are stored in a local SQLite database. Once per day, the emails that
 were written during the past 24 hours get exported from the database, stored in
 a JSON file, compressed and uploaded to a location on Azure Blob Storage. The
-`Opwen Server <https://github.com/ascoderu/opwen-cloudserver>`_ picks up these JSON
-files, manages the actual mailboxes for the users on the Lokole and sends new
-emails back to the Lokole by using the same compressed file exchange format.
+`Lokole Server <https://github.com/ascoderu/opwen-cloudserver>`_ picks up these
+JSON files, manages the actual mailboxes for the users on the Lokole and sends
+new emails back to the Lokole by using the same compressed file exchange format.
 
-The Lokole web-application is intended to run on low-spec Raspberry Pi 3
+The Lokole email application is intended to run on low-spec Raspberry Pi 3
 hardware (or similar). Read the "Production setup" section below for further
 information on how to set up the client devices.
 
@@ -46,8 +47,8 @@ local purchasing power. For example, in the Democratic Republic of the Congo
 (DRC) only 3% of the population have access to emails which leaves 75 million
 people unconnected.
 
-The Opwen Lokole is a project by the Canadian-Congolese NGO Ascoderu that aims
-to address this problem by tackling it from three perspectives:
+The Lokole is a project by the Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_
+that aims to address this problem by tackling it from three perspectives:
 
 1. The Lokole is an email client that only uses bandwidth on a schedule. This
    reduces the cost of service as bandwidth can now be purchased when the cost
@@ -71,7 +72,7 @@ to address this problem by tackling it from three perspectives:
 System overview & Data exchange format
 --------------------------------------
 
-Can be found in the `opwen-cloudserver readme <https://github.com/ascoderu/opwen-cloudserver/blob/master/README.rst>`_.
+Can be found in the `opwen-cloudserver README <https://github.com/ascoderu/opwen-cloudserver/blob/master/README.rst>`_.
 
 Development setup
 -----------------
@@ -125,8 +126,8 @@ Production setup
 ----------------
 
 There is a `script <https://github.com/ascoderu/opwen-webapp/blob/master/setup/setup-lokole.sh>`_
-to set up a new Lokole device. The script will install the web app in this
-repository as well as standard web infrastructure like nginx and gunicorn.
+to set up a new Lokole device. The script will install the email app in this
+repository as well as standard infrastructure like nginx and gunicorn.
 The script will also make ready peripherals like the USB modem used for data
 exchange, and set up any required background jobs such as the email
 synchronization cron job.
@@ -135,7 +136,7 @@ The setup script assumes that you have already set up:
 
 * 3 Azure Storage Accounts, general purpose: for the cloudserver to manage its
   queues, tables and blobs.
-* 1 Azure Storage Account, blob storage: for the cloudserver and webapp to
+* 1 Azure Storage Account, blob storage: for the cloudserver and email app to
   exchange email packages.
 * 1 Application Insights account: to collect logs from the cloudserver and
   monitor its operations.
@@ -159,7 +160,7 @@ The setup script is also tested with USB modems:
 * `Huawei E3131 <http://consumer.huawei.com/lk/mobile-broadband/dongles/tech-specs/e3131-lk.htm>`_
 * `Huawei MS2131i-8 <http://consumer.huawei.com/en/solutions/m2m-solutions/products/tech-specs/ms2131-en.htm>`_
 
-The setup script installs the latest version of the webapp published to PyPI.
+The setup script installs the latest version of the email app published to PyPI.
 New versions get automatically published to PyPI (via Travis) whenever a new
 `release <https://github.com/ascoderu/opwen-webapp/releases/new>`_ is created
 on Github.

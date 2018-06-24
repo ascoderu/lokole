@@ -26,7 +26,7 @@ setup(
     packages=packages,
     url='https://github.com/ascoderu/opwen-webapp',
     license='Apache Software License',
-    description='Email client for the Opwen project',
+    description='Email client for the Lokole project: https://ascoderu.ca',
     long_description=long_description,
     include_package_data=True,
     scripts=scripts,
