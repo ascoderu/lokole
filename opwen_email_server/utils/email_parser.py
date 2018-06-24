@@ -136,9 +136,9 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
-def _change_image_size(image_b64: str) -> str:
-    image_bytes = b64decode(image_b64)
-    image_bytes = BytesIO(image_bytes)
+def _change_image_size(image_content_b64: str) -> str:
+    image_content_bytes = b64decode(image_content_b64)
+    image_bytes = BytesIO(image_content_bytes)
     image_bytes.seek(0)
     image = Image.open(image_bytes)
     image_format = image.format
