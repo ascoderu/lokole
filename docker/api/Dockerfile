@@ -7,9 +7,10 @@ ADD requirements.txt /app/requirements.txt
 ADD requirements-prod.txt /app/requirements-prod.txt
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates curl \
-  && pip3 --no-cache-dir -q install -U pip setuptools \
-  && pip3 --no-cache-dir -q install -r /app/requirements.txt \
-  && pip3 --no-cache-dir -q install -r /app/requirements-prod.txt \
+  && python3 -m venv /venv \
+  && /venv/bin/pip3 --no-cache-dir -q install -U pip setuptools \
+  && /venv/bin/pip3 --no-cache-dir -q install -r /app/requirements.txt \
+  && /venv/bin/pip3 --no-cache-dir -q install -r /app/requirements-prod.txt \
   && rm -rf /var/lib/apt/lists/*
 
 ADD opwen_email_server /app/opwen_email_server

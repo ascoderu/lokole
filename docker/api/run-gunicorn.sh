@@ -10,7 +10,7 @@ for spec in "${api_spec}" "${healthcheck_spec}"; do
   fi
 done
 
-gunicorn \
+/venv/bin/gunicorn \
   --workers="${GUNICORN_WORKERS}" \
   --bind="0.0.0.0:80" \
   "server:build_app(apis=['${api_spec}','${healthcheck_spec}'], server='tornado')"
