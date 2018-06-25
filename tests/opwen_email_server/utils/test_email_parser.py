@@ -91,7 +91,7 @@ class GetDomainsTests(TestCase):
         self.assertSetEqual(domains, {'bar.com', 'com'})
 
 
-class ResizeImage(TestCase):
+class ResizeImageTests(TestCase):
     def test_change_image_size(self):
         input_base64 = _given_test_image_base64(size='large')
         output_base64 = email_parser._change_image_size(input_base64)
@@ -107,7 +107,8 @@ class ResizeImage(TestCase):
         return 'If default MAX_WIDTH_IMAGES and/or MAX_HEIGHT_IMAGES were changed ' \
                'you may need to change the test base64 in "image_base64.json".'
 
-class ConvertImgUrlToBase64(TestCase):
+
+class ConvertImgUrlToBase64Tests(TestCase):
     @responses.activate
     def test_format_inline_images_with_img_tag(self):
         self.givenTestImage()
@@ -179,7 +180,7 @@ class ConvertImgUrlToBase64(TestCase):
                       status=status)
 
 
-class FormatAttachedFiles(TestCase):
+class FormatAttachedFilesTests(TestCase):
 
     def test_format_attachments_without_attachment(self):
         input_email = {'attachments': []}
@@ -191,20 +192,16 @@ class FormatAttachedFiles(TestCase):
     def test_format_attachments_with_image(self):
         input_filename = 'test_image.png'
         input_content = _given_test_image_base64(size='large')
-        attachment = {
-            'filename': input_filename,
-            'content': input_content
-        }
+        attachment = {'filename': input_filename, 'content': input_content}
         input_email = {'attachments': [attachment]}
 
         output_email = email_parser.format_attachments(input_email)
         output_attachments = output_email.get('attachments', '')
-        output_filename = ''
-        output_content = ''
-        if output_attachments:
-            output_filename = output_attachments[0].get('filename', '')
-            output_content = output_attachments[0].get('content', '')
+
+        self.assertEqual(len(output_attachments), 1)
+
+        output_filename = output_attachments[0].get('filename', '')
+        output_content = output_attachments[0].get('content', '')
 
         self.assertNotEqual(input_content, output_content)
         self.assertEqual(input_filename, output_filename)
-        self.assertEqual(len(output_attachments), 1)

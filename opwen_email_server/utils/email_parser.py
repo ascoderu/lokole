@@ -22,8 +22,6 @@ from pyzmail.parse import MailPart
 from requests import Response
 import requests
 
-from opwen_email_server import config
-
 
 def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
     body_parts = (message.html_part, message.text_part)
@@ -144,7 +142,7 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
-def _is_size_already_small(size: Tuple) -> bool:
+def _is_size_already_small(size: Tuple[int, int]) -> bool:
     width, height = size
     return width <= MAX_WIDTH_IMAGES and height <= MAX_HEIGHT_IMAGES
 
