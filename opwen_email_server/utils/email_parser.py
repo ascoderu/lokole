@@ -8,8 +8,6 @@ from email.utils import parsedate_tz
 from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
-from opwen_email_server.config import MAX_HEIGHT_IMAGES
-from opwen_email_server.config import MAX_WIDTH_IMAGES
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -21,6 +19,9 @@ from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
 from requests import Response
 import requests
+
+from opwen_email_server.config import MAX_HEIGHT_IMAGES
+from opwen_email_server.config import MAX_WIDTH_IMAGES
 
 
 def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
