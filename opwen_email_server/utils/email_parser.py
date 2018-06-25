@@ -142,7 +142,7 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
-def _is_size_already_small(size: Tuple[int, int]) -> bool:
+def _is_already_small(size: Tuple[int, int]) -> bool:
     width, height = size
     return width <= MAX_WIDTH_IMAGES and height <= MAX_HEIGHT_IMAGES
 
@@ -152,14 +152,14 @@ def _change_image_size(image_content_b64: str) -> str:
     image_bytes = BytesIO(image_content_bytes)
     image_bytes.seek(0)
     image = Image.open(image_bytes)
-    image_format = image.format
-    is_already_small = _is_size_already_small(image.size)
-    if is_already_small:
+
+    if _is_already_small(image.size):
         return image_content_b64
+
     new_size = (MAX_WIDTH_IMAGES, MAX_HEIGHT_IMAGES)
     image.thumbnail(new_size, Image.ANTIALIAS)
     new_image = BytesIO()
-    image.save(new_image, image_format)
+    image.save(new_image, image.format)
     new_image.seek(0)
     new_image_bytes = new_image.read()
     new_b64 = b64encode(new_image_bytes).decode('ascii')
@@ -180,8 +180,7 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
 
     image_content = b64encode(response.content).decode('ascii')
     image_content = _change_image_size(image_content)
-    base64 = 'data:{};base64,{}'.format(image_type, image_content)
-    return base64
+    return 'data:{};base64,{}'.format(image_type, image_content)
 
 
 def format_inline_images(email: dict) -> dict:

@@ -1,3 +1,6 @@
+from enum import Enum
+from enum import auto
+from enum import unique
 from os.path import abspath
 from os.path import dirname
 from os.path import join
@@ -14,11 +17,17 @@ TEST_DATA_DIRECTORY = abspath(join(
     'files', 'opwen_email_server', 'utils', 'test_email_parser'))
 
 
-def _given_test_image_base64(size):
+@unique
+class ImageSize(Enum):
+    large = auto()
+    small = auto()
+
+
+def _given_test_image_base64(size: ImageSize):
     b64_images_file = join(TEST_DATA_DIRECTORY, 'image_base64.json')
     with open(b64_images_file, 'r', encoding='utf-8') as b64_images:
         json_images = json.load(b64_images)
-        return json_images[size]
+        return json_images[size.name]
 
 
 class ParseMimeEmailTests(TestCase):
