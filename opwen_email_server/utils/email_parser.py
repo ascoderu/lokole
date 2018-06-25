@@ -1,19 +1,27 @@
+from base64 import b64decode
 from base64 import b64encode
+from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
 from email.utils import mktime_tz
 from email.utils import parsedate_tz
+from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from bs4 import BeautifulSoup
+from PIL import Image
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
 from requests import Response
 import requests
+
+from opwen_email_server.config import MAX_HEIGHT_IMAGES
+from opwen_email_server.config import MAX_WIDTH_IMAGES
 
 
 def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
@@ -75,6 +83,44 @@ def parse_mime_email(mime_email: str) -> dict:
     }
 
 
+def format_attachments(email: dict) -> dict:
+    attachments = email.get('attachments', [])
+
+    if not attachments:
+        return email
+
+    formatted_attachments = deepcopy(attachments)
+    is_any_attachment_changed = False
+
+    for i, attachment in enumerate(attachments):
+        filename = attachment.get('filename', '')
+        content = attachment.get('content', '')
+        formatted_content = _format_attachment(filename, content)
+
+        if content != formatted_content:
+            formatted_attachments[i]['content'] = formatted_content
+            is_any_attachment_changed = True
+
+    if not is_any_attachment_changed:
+        return email
+
+    new_email = dict(email)
+    new_email['attachments'] = formatted_attachments
+    return new_email
+
+
+def _format_attachment(filename: str, content: str) -> str:
+    attachment_type = guess_type(filename)[0]
+
+    if not attachment_type:
+        return content
+
+    if 'image' in attachment_type.lower():
+        content = _change_image_size(content)
+
+    return content
+
+
 def _get_recipients(email: dict) -> Iterable[str]:
     return chain(email.get('to') or [],
                  email.get('cc') or [],
@@ -97,6 +143,30 @@ def _get_image_type(response: Response, url: str) -> Optional[str]:
     return content_type
 
 
+def _is_already_small(size: Tuple[int, int]) -> bool:
+    width, height = size
+    return width <= MAX_WIDTH_IMAGES and height <= MAX_HEIGHT_IMAGES
+
+
+def _change_image_size(image_content_b64: str) -> str:
+    image_content_bytes = b64decode(image_content_b64)
+    image_bytes = BytesIO(image_content_bytes)
+    image_bytes.seek(0)
+    image = Image.open(image_bytes)
+
+    if _is_already_small(image.size):
+        return image_content_b64
+
+    new_size = (MAX_WIDTH_IMAGES, MAX_HEIGHT_IMAGES)
+    image.thumbnail(new_size, Image.ANTIALIAS)
+    new_image = BytesIO()
+    image.save(new_image, image.format)
+    new_image.seek(0)
+    new_image_bytes = new_image.read()
+    new_b64 = b64encode(new_image_bytes).decode('ascii')
+    return new_b64
+
+
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     response = requests.get(image_url)
     if not response.ok:
@@ -110,10 +180,11 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
         return None
 
     image_content = b64encode(response.content).decode('ascii')
+    image_content = _change_image_size(image_content)
     return 'data:{};base64,{}'.format(image_type, image_content)
 
 
-def inline_images(email: dict) -> dict:
+def format_inline_images(email: dict) -> dict:
     email_body = email.get('body', '')
     if not email_body:
         return email
