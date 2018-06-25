@@ -24,7 +24,7 @@ class ImageSize(Enum):
 
 
 def _given_test_image_base64(size: ImageSize):
-    b64_images_file = join(TEST_DATA_DIRECTORY, 'image_base64.json')
+    b64_images_file = join(TEST_DATA_DIRECTORY, 'images_base64.json')
     with open(b64_images_file, 'r', encoding='utf-8') as b64_images:
         json_images = json.load(b64_images)
         return json_images[size.name]
@@ -106,12 +106,12 @@ class ResizeImageTests(TestCase):
                     'you may need to change the test base64 in "images_base64.json".'
 
     def test_change_image_size(self):
-        input_base64 = _given_test_image_base64(size='large')
+        input_base64 = _given_test_image_base64(size=ImageSize.large)
         output_base64 = email_parser._change_image_size(input_base64)
         self.assertNotEqual(input_base64, output_base64, self.error_message)
 
     def test_change_image_size_when_already_small(self):
-        input_base64 = _given_test_image_base64(size='small')
+        input_base64 = _given_test_image_base64(size=ImageSize.small)
         output_base64 = email_parser._change_image_size(input_base64)
         self.assertEqual(input_base64, output_base64, self.error_message)
 
@@ -199,7 +199,7 @@ class FormatAttachedFilesTests(TestCase):
 
     def test_format_attachments_with_image(self):
         input_filename = 'test_image.png'
-        input_content = _given_test_image_base64(size='large')
+        input_content = _given_test_image_base64(size=ImageSize.large)
         attachment = {'filename': input_filename, 'content': input_content}
         input_email = {'attachments': [attachment]}
 
