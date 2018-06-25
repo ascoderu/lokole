@@ -101,7 +101,6 @@ class GetDomainsTests(TestCase):
 
 
 class ResizeImageTests(TestCase):
-
     error_message = 'If default MAX_WIDTH_IMAGES and/or MAX_HEIGHT_IMAGES were changed ' \
                     'you may need to change the test base64 in "images_base64.json".'
 
@@ -189,7 +188,6 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
 
 class FormatAttachedFilesTests(TestCase):
-
     def test_format_attachments_without_attachment(self):
         input_email = {'attachments': []}
 
