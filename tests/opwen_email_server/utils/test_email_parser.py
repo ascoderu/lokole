@@ -92,20 +92,19 @@ class GetDomainsTests(TestCase):
 
 
 class ResizeImageTests(TestCase):
+
+    error_message = 'If default MAX_WIDTH_IMAGES and/or MAX_HEIGHT_IMAGES were changed ' \
+                    'you may need to change the test base64 in "images_base64.json".'
+
     def test_change_image_size(self):
         input_base64 = _given_test_image_base64(size='large')
         output_base64 = email_parser._change_image_size(input_base64)
-        self.assertNotEqual(input_base64, output_base64, self.getErrorMessage())
+        self.assertNotEqual(input_base64, output_base64, self.error_message)
 
     def test_change_image_size_when_already_small(self):
         input_base64 = _given_test_image_base64(size='small')
         output_base64 = email_parser._change_image_size(input_base64)
-        self.assertEqual(input_base64, output_base64, self.getErrorMessage())
-
-    @classmethod
-    def getErrorMessage(cls):
-        return 'If default MAX_WIDTH_IMAGES and/or MAX_HEIGHT_IMAGES were changed ' \
-               'you may need to change the test base64 in "image_base64.json".'
+        self.assertEqual(input_base64, output_base64, self.error_message)
 
 
 class ConvertImgUrlToBase64Tests(TestCase):
