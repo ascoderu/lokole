@@ -160,6 +160,6 @@ HELM_NAME=${helmname}
 APP_IP=${ingressip}
 EOF
 
-now=date +"%Y-%m-%d-%H-%M"
+now=$(date +"%Y-%m-%d-%H-%M")
 az storage container create --name "secrets_${now}"
 az storage blob upload-batch --destination "secrets_${now}" --source "/secrets"
