@@ -92,6 +92,9 @@ cat > /secrets/sendgrid.env << EOF
 LOKOLE_SENDGRID_KEY=${SENDGRID_KEY}
 EOF
 
+# az storage container create --name "${backup-secrets}"
+# az storage blob upload-batch --destination "${backup-secrets}" --source "/secrets"
+
 #
 # create production deployment
 #
