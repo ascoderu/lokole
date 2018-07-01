@@ -92,10 +92,6 @@ cat > /secrets/sendgrid.env << EOF
 LOKOLE_SENDGRID_KEY=${SENDGRID_KEY}
 EOF
 
-# backup-secrets-name="backup-secrets"
-# az storage container create --name "${backup-secrets-name}"
-# az storage blob upload-batch --destination "${backup-secrets-name}" --source "/secrets"
-
 #
 # create production deployment
 #
@@ -163,3 +159,7 @@ RESOURCE_GROUP=${KUBERNETES_RESOURCE_GROUP_NAME}
 HELM_NAME=${helmname}
 APP_IP=${ingressip}
 EOF
+
+now=date +"%Y-%m-%d-%H-%M"
+az storage container create --name "secrets_${now}"
+az storage blob upload-batch --destination "secrets_${now}" --source "/secrets"
