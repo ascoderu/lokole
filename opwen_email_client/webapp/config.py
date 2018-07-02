@@ -27,6 +27,7 @@ class i8n(object):
     LOGGED_OUT = _('You have logged out successfully.')
     WELCOME = _('Welcome!')
     EMAIL_CHARACTERS = _('Please only use letters, numbers, dots and dashes.')
+    FORBIDDEN_ACCOUNT = _('This account name is not available.')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
     ACCOUNT_SUSPENDED = _('Your account has been suspended. '
                           'Please contact your administrator.')
@@ -94,3 +95,4 @@ class AppConfig(object):
     CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
     CLIENT_ID = getenv('OPWEN_CLIENT_ID')
     CLIENT_EMAIL_HOST = EMAIL_HOST_FORMAT.format(CLIENT_NAME)
+    FORBIDDEN_ACCOUNTS = ('admin', 'news')

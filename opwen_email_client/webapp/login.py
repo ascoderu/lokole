@@ -18,6 +18,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
 from wtforms import IntegerField
+from wtforms.validators import NoneOf
 from wtforms.validators import Regexp
 
 from opwen_email_client.util.wtforms import SuffixedStringField
@@ -90,11 +91,20 @@ class LoginForm(_LoginForm):
         suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST))
 
 
+email_character_validator = Regexp(
+    '^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS)
+
+forbidden_account_validator = NoneOf(
+    ['{}@{}'.format(name, AppConfig.CLIENT_EMAIL_HOST)
+     for name in AppConfig.FORBIDDEN_ACCOUNTS],
+    message=i8n.FORBIDDEN_ACCOUNT)
+
+
 # noinspection PyClassHasNoInit
 class RegisterForm(_RegisterForm):
     email = SuffixedStringField(
         suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
-        validators=[Regexp('^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS),
+        validators=[email_character_validator, forbidden_account_validator,
                     email_required, email_validator, unique_user_email])
 
     timezone_offset_minutes = IntegerField(default=0)
