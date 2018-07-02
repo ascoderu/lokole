@@ -10,6 +10,7 @@ from opwen_email_client.util.os import subdirectories
 
 state_basedir = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
 app_basedir = path.abspath(path.dirname(__file__))
+root_domain = getenv('OPWEN_ROOT_DOMAIN', 'lokole.ca')
 
 
 # noinspection PyPep8Naming
@@ -86,7 +87,7 @@ class AppConfig(object):
 
     EMAIL_SERVER_READ_API_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_READ_API')
     EMAIL_SERVER_WRITE_API_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_WRITE_API')
-    EMAIL_HOST_FORMAT = '{}.lokole.ca'
+    EMAIL_HOST_FORMAT = '{}.{}'.format(root_domain)
     STORAGE_CONTAINER = 'compressedpackages'
     STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
     STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
