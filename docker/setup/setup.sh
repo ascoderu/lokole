@@ -159,3 +159,7 @@ RESOURCE_GROUP=${KUBERNETES_RESOURCE_GROUP_NAME}
 HELM_NAME=${helmname}
 APP_IP=${ingressip}
 EOF
+
+container_name="secrets_$(date +"%Y-%m-%d-%H-%M")"
+az storage container create --name "${container_name}"
+az storage blob upload-batch --destination "${container_name}" --source "/secrets"
