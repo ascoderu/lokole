@@ -73,10 +73,10 @@ printf "/state" > /envs/prod/OPWEN_STATE_DIRECTORY
 random_string > /envs/prod/OPWEN_ADMIN_SECRET
 random_string > /envs/prod/OPWEN_SESSION_KEY
 random_string > /envs/prod/OPWEN_PASSWORD_SALT
-printf "${OPWEN_EMAIL_SERVER_READ_API}" > /envs/prod/OPWEN_EMAIL_SERVER_READ_API
-printf "${OPWEN_EMAIL_SERVER_WRITE_API}" > /envs/prod/OPWEN_EMAIL_SERVER_WRITE_API
-printf "${OPWEN_ROOT_DOMAIN}" > /envs/prod/OPWEN_ROOT_DOMAIN
-printf "${OPWEN_REMOTE_ACCOUNT_NAME}" > /envs/prod/OPWEN_REMOTE_ACCOUNT_NAME
-printf "${OPWEN_REMOTE_ACCOUNT_KEY}" > /envs/prod/OPWEN_REMOTE_ACCOUNT_KEY
-printf "${OPWEN_CLIENT_NAME}" > /envs/prod/OPWEN_CLIENT_NAME
-printf "${opwen_client_id}" > /envs/prod/OPWEN_CLIENT_ID
+printf "%s" "${OPWEN_EMAIL_SERVER_READ_API}" > /envs/prod/OPWEN_EMAIL_SERVER_READ_API
+printf "%s" "${OPWEN_EMAIL_SERVER_WRITE_API}" > /envs/prod/OPWEN_EMAIL_SERVER_WRITE_API
+printf "%s" "${OPWEN_ROOT_DOMAIN}" > /envs/prod/OPWEN_ROOT_DOMAIN
+printf "%s" "${OPWEN_REMOTE_ACCOUNT_NAME}" > /envs/prod/OPWEN_REMOTE_ACCOUNT_NAME
+printf "%s" "${OPWEN_REMOTE_ACCOUNT_KEY}" > /envs/prod/OPWEN_REMOTE_ACCOUNT_KEY
+printf "%s" "${OPWEN_CLIENT_NAME}" > /envs/prod/OPWEN_CLIENT_NAME
+printf "%s" "${opwen_client_id}" > /envs/prod/OPWEN_CLIENT_ID

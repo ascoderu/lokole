@@ -87,7 +87,7 @@ class AppConfig(object):
 
     EMAIL_SERVER_READ_API_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_READ_API')
     EMAIL_SERVER_WRITE_API_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_WRITE_API')
-    EMAIL_HOST_FORMAT = '{}.{}'.format(root_domain)
+    EMAIL_HOST_FORMAT = '{}.' + root_domain
     STORAGE_CONTAINER = 'compressedpackages'
     STORAGE_ACCOUNT_NAME = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
     STORAGE_ACCOUNT_KEY = getenv('OPWEN_REMOTE_ACCOUNT_KEY')
