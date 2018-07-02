@@ -6,5 +6,5 @@ beautifulsoup4==4.6.0
 connexion==1.4.2
 pyzmail36==1.0.3
 requests==2.19.1
-sendgrid==5.4.0
+sendgrid==5.4.1
 typing==3.6.4
