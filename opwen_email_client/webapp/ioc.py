@@ -24,6 +24,7 @@ class Ioc(object):
         client_id=AppConfig.CLIENT_ID)
 
     email_store = EmailStore(
+        restricted={AppConfig.NEWS_INBOX: AppConfig.NEWS_SENDERS},
         database_path=AppConfig.LOCAL_EMAIL_STORE)
 
     email_sync = Sync(

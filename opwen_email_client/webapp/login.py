@@ -95,9 +95,7 @@ email_character_validator = Regexp(
     '^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS)
 
 forbidden_account_validator = NoneOf(
-    ['{}@{}'.format(name, AppConfig.CLIENT_EMAIL_HOST)
-     for name in AppConfig.FORBIDDEN_ACCOUNTS],
-    message=i8n.FORBIDDEN_ACCOUNT)
+    AppConfig.FORBIDDEN_ACCOUNTS, message=i8n.FORBIDDEN_ACCOUNT)
 
 
 # noinspection PyClassHasNoInit

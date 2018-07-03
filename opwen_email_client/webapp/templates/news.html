@@ -1,0 +1,11 @@
+{% extends "_base.html" %}
+
+{% from 'macros/email.html' import email_display with context %}
+
+{% block style %}{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.min.css') }}">
+{% endblock %}
+
+{% block content %}{{ super() }}
+{{ email_display(emails, _('No news.'), show_actions=False, show_sent_at=False, show_sent_to=False, show_attachments=False) }}
+{% endblock %}

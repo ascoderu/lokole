@@ -95,4 +95,7 @@ class AppConfig(object):
     CLIENT_NAME = getenv('OPWEN_CLIENT_NAME')
     CLIENT_ID = getenv('OPWEN_CLIENT_ID')
     CLIENT_EMAIL_HOST = EMAIL_HOST_FORMAT.format(CLIENT_NAME)
-    FORBIDDEN_ACCOUNTS = ('admin', 'news')
+    NEWS_INBOX = 'news@{}'.format(CLIENT_EMAIL_HOST)
+    ADMIN_INBOX = 'admin@{}'.format(CLIENT_EMAIL_HOST)
+    NEWS_SENDERS = set(getenv('OPWEN_NEWS_SENDERS', '').split(','))
+    FORBIDDEN_ACCOUNTS = [NEWS_INBOX, ADMIN_INBOX]

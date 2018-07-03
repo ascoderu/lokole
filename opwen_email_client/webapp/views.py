@@ -53,6 +53,16 @@ def about() -> Response:
     return _view('about.html')
 
 
+@app.route('/news', defaults={'page': 1})
+@app.route('/news/<int:page>')
+@track_history
+def news(page: int) -> Response:
+    email_store = app.ioc.email_store
+    news_inbox = app.config['NEWS_INBOX']
+
+    return _emails_view(email_store.inbox(news_inbox), page, 'news.html')
+
+
 @app.route('/email')
 @app.route('/email/inbox', defaults={'page': 1})
 @app.route('/email/inbox/<int:page>')
@@ -316,7 +326,8 @@ def _localeselector() -> str:
 def _emails_view(emails: Iterable[dict], page: int,
                  template: str='email.html') -> Response:
     attachments_session = app.ioc.attachments_session
-    timezone_offset = timedelta(minutes=current_user.timezone_offset_minutes)
+    offset_minutse = getattr(current_user, 'timezone_offset_minutes', 0)
+    timezone_offset = timedelta(minutes=offset_minutse)
 
     if page < 1:
         return abort(404)

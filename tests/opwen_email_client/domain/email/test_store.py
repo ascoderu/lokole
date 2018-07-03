@@ -10,7 +10,7 @@ from opwen_email_client.domain.email.store import EmailStore
 class Base(object):
     class EmailStoreTests(TestCase, metaclass=ABCMeta):
         @abstractmethod
-        def create_email_store(self) -> EmailStore:
+        def create_email_store(self, restricted=None) -> EmailStore:
             raise NotImplementedError
 
         def setUp(self):
@@ -36,6 +36,31 @@ class Base(object):
                 {'to': ['foo@bar.com']})[0]
 
             self.assertIsNotNone(email.get('_uid'), 'email id was not set')
+
+        def test_filters_restricted_inboxes(self):
+            restricted1 = 'restricted@test.com'
+            allowed1, allowed2 = 'allowed1@bar.com', 'allowed2@baz.com'
+
+            self.email_store = self.create_email_store(
+                {restricted1: {allowed1, allowed2}})
+
+            kept = self.given_emails(
+                {'to': [restricted1], 'from': allowed1},
+                {'to': [restricted1], 'from': allowed1},
+                {'cc': [restricted1], 'from': allowed2},
+                {'bcc': [restricted1, allowed1], 'from': allowed2})
+            self.given_emails(
+                {'to': [restricted1], 'from': 'unknown1@baz.com'},
+                {'cc': [restricted1], 'from': 'unknown2@baz.com'},
+                {'cc': [restricted1], 'from': 'unknown2@baz.com'},
+                {'bcc': [restricted1], 'from': 'unknown3@baz.com'})
+
+            results = list(self.email_store.inbox(restricted1))
+            self.assertEqual(len(results), 4)
+            self.assertContainsEmail(kept[0], results)
+            self.assertContainsEmail(kept[1], results)
+            self.assertContainsEmail(kept[2], results)
+            self.assertContainsEmail(kept[3], results)
 
         def test_does_not_overwrite_email_id(self):
             emails1 = self.given_emails(

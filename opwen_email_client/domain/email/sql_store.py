@@ -149,7 +149,8 @@ class _Email(_Base):
 
 
 class _SqlalchemyEmailStore(EmailStore):
-    def __init__(self, database_uri: str):
+    def __init__(self, database_uri: str, restricted=None):
+        super().__init__(restricted)
         self._base = _Base
         self._engine = create_database(database_uri, self._base)
         self._sesion_maker = sessionmaker(autocommit=False, autoflush=False,
@@ -242,8 +243,8 @@ class _SqlalchemyEmailStore(EmailStore):
 
 
 class SqliteEmailStore(_SqlalchemyEmailStore):
-    def __init__(self, database_path: str):
-        super().__init__('sqlite:///{}'.format(database_path))
+    def __init__(self, database_path: str, restricted=None):
+        super().__init__('sqlite:///{}'.format(database_path), restricted)
 
 
 def _can_access(email_address):

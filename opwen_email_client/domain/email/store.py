@@ -1,14 +1,28 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from typing import Dict
 from typing import Iterable
 from typing import Optional
+from typing import Set
 from typing import Union
 from uuid import uuid4
 
 
 class EmailStore(metaclass=ABCMeta):
+    def __init__(self, restricted: Optional[Dict[str, Set[str]]]=None):
+        self._restricted = restricted or {}
+
     def create(self, emails: Iterable[dict]):
-        self._create(map(_add_uid, emails))
+        self._create((_add_uid(email) for email in emails
+                      if not self._is_restricted(email)))
+
+    def _is_restricted(self, email: dict) -> bool:
+        sender = email.get('from', '')
+        recipients = _get_recipients(email)
+
+        return any(
+            restricted_inbox in recipients and sender not in allowed_senders
+            for restricted_inbox, allowed_senders in self._restricted.items())
 
     @abstractmethod
     def _create(self, emails: Iterable[dict]):
@@ -71,6 +85,14 @@ def _get_uid(email_or_uid: Union[str, dict]) -> str:
         return email_or_uid['_uid']
     except TypeError:
         return email_or_uid
+
+
+def _get_recipients(email: dict) -> Set[str]:
+    recipients = set()
+    recipients.update(email.get('to', []))
+    recipients.update(email.get('cc', []))
+    recipients.update(email.get('bcc', []))
+    return recipients
 
 
 def _add_uid(email: dict) -> dict:

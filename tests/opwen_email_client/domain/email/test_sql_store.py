@@ -8,8 +8,8 @@ from tests.opwen_email_client.domain.email.test_store import Base
 class SqliteEmailStoreTests(Base.EmailStoreTests):
     store_location = None
 
-    def create_email_store(self):
-        return SqliteEmailStore(self.store_location)
+    def create_email_store(self, restricted=None):
+        return SqliteEmailStore(self.store_location, restricted)
 
     @classmethod
     def setUpClass(cls):

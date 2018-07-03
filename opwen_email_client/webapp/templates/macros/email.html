@@ -13,7 +13,7 @@
 </form>
 {% endmacro %}
 
-{% macro email_display(emails, empty_text) %}
+{% macro email_display(emails, empty_text, show_actions=True, show_sent_to=True, show_sent_at=True, show_attachments=True) %}
 <div class="email-display">
   <div class="panel-group" id="accordion">
     {% for email in emails %}
@@ -22,6 +22,7 @@
         <h4 class="panel-title">
           <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" class="email-row">
             <div class="row">
+              {% if show_sent_to %}
               <div class="col-sm-3">
                 <span class="email-sent-to">
                   {% if email['from'] == current_user.email %}
@@ -33,19 +34,24 @@
                   {% endif %}
                 </span>
               </div>
+              {% endif %}
               <div class="col-sm-3">
                 <span class="visible-print">{{ _('Subject: %(subject)s', subject=email['subject']) }}</span>
                 <span class="email-subject hidden-print">{{ email['subject'] }}</span>
               </div>
+              {% if show_sent_at %}
               <div class="col-sm-2">
                 <span class="visible-print">{{ _('Sent at: %(date)s', date=email['sent_at']) }}</span>
                 <span class="email-sent-at hidden-print">{{ email['sent_at'] or '' }}</span>
               </div>
+              {% endif %}
+              {% if show_attachments %}
               <div class="col-sm-1 text-right">
                 {% if email['attachments'] %}
                 <span class="fa fa-paperclip hidden-print"></span>
                 {% endif %}
               </div>
+              {% endif %}
             </div>
           </a>
         </h4>
@@ -57,6 +63,7 @@
               <span class="email-body">{{ email['body'] | replace('\n', '<br>') | safe }}</span>
             </div>
           </div>
+          {% if show_attachments %}
           {% if email['attachments'] %}
           <div class="row hidden-print">
             <div class="col-sm-12">
@@ -70,6 +77,8 @@
             </div>
           </div>
           {% endif %}
+          {% endif %}
+          {% if show_actions %}
           <div class="row">
             <div class="col-sm-12">
               <div class="btn-group email-actions hidden-print">
@@ -95,6 +104,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
