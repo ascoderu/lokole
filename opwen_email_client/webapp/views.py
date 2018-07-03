@@ -15,7 +15,7 @@ from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
-from flask_security.utils import encrypt_password
+from flask_security.utils import hash_password
 from passlib.pwd import genword
 
 from opwen_email_client.util.pagination import Pagination
@@ -266,7 +266,7 @@ def reset_password(userid: str) -> Response:
         return redirect(url_for('admin'))
 
     new_password = genword()
-    user.password = encrypt_password(new_password)
+    user.password = hash_password(new_password)
     user.save()
 
     flash(i8n.PASSWORD_CHANGED_BY_ADMIN + new_password, category='success')

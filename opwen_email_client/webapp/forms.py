@@ -114,6 +114,7 @@ class NewEmailForm(Form):
 class ToEmailForm(NewEmailForm):
     action_name = 'to'
 
+    # noinspection PyUnusedLocal
     def _populate(self, email: Optional[dict], to: Optional[str]):
         self.to.data = to or ''
 
@@ -121,6 +122,7 @@ class ToEmailForm(NewEmailForm):
 class ReplyEmailForm(NewEmailForm):
     action_name = 'reply'
 
+    # noinspection PyUnusedLocal
     def _populate(self, email: Optional[dict], to: Optional[str]):
         if not email:
             return
@@ -133,6 +135,7 @@ class ReplyEmailForm(NewEmailForm):
 class ReplyAllEmailForm(NewEmailForm):
     action_name = 'reply_all'
 
+    # noinspection PyUnusedLocal
     def _populate(self, email: Optional[dict], to: Optional[str]):
         if not email:
             return
@@ -145,6 +148,7 @@ class ReplyAllEmailForm(NewEmailForm):
 class ForwardEmailForm(NewEmailForm):
     action_name = 'forward'
 
+    # noinspection PyUnusedLocal
     def _populate(self, email: Optional[dict], to: Optional[str]):
         if not email:
             return
