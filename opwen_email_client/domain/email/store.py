@@ -14,15 +14,7 @@ class EmailStore(metaclass=ABCMeta):
 
     def create(self, emails: Iterable[dict]):
         self._create((_add_uid(email) for email in emails
-                      if not self._is_restricted(email)))
-
-    def _is_restricted(self, email: dict) -> bool:
-        sender = email.get('from', '')
-        recipients = _get_recipients(email)
-
-        return any(
-            restricted_inbox in recipients and sender not in allowed_senders
-            for restricted_inbox, allowed_senders in self._restricted.items())
+                      if not _is_restricted(email, self._restricted)))
 
     @abstractmethod
     def _create(self, emails: Iterable[dict]):
@@ -78,6 +70,14 @@ class EmailStore(metaclass=ABCMeta):
     @abstractmethod
     def _mark_read(self, email_address: str, uids: Iterable[str]):
         raise NotImplementedError  # pragma: no cover
+
+
+def _is_restricted(email: dict, restricted: Dict[str, Set[str]]) -> bool:
+    sender = email.get('from', '')
+    recipients = _get_recipients(email)
+
+    return any(restricted_inbox in recipients and sender not in allowed_senders
+               for restricted_inbox, allowed_senders in restricted.items())
 
 
 def _get_uid(email_or_uid: Union[str, dict]) -> str:
