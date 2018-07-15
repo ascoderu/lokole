@@ -32,11 +32,11 @@ More background information can be found in the `opwen-webapp README <https://gi
 System overview
 ---------------
 
-.. image:: docs/system-overview.png
+.. image:: https://user-images.githubusercontent.com/1086421/42739204-67798f44-8847-11e8-9613-312a860cfb1e.png
   :width: 800
   :align: center
   :alt: Overview of the Lokole system
-  :target: https://raw.githubusercontent.com/ascoderu/opwen-cloudserver/master/docs/system-overview.png
+  :target: https://user-images.githubusercontent.com/1086421/42739204-67798f44-8847-11e8-9613-312a860cfb1e.png
 
 Data exchange format
 --------------------
