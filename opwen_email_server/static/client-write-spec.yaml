@@ -51,3 +51,8 @@ definitions:
         description: The provider where the resource containing emails can be found.
         type: string
         enum: [ 'azure-blob' ]
+    required:
+     - resource_id
+     - resource_container
+     - resource_type
+

@@ -20,8 +20,6 @@ class _Uploader(LogMixin):
         domain = CLIENTS.domain_for(client_id)
         if not domain:
             return 'client is not registered', 403
-        if not upload_info:
-            return 'invalid request - empty payload', 400
 
         resource_type = upload_info.get('resource_type')
         resource_id = upload_info.get('resource_id')
