@@ -13,7 +13,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['bower_components/components-font-awesome/fonts/*'],
+            src: ['node_modules/@bower_components/components-font-awesome/fonts/*'],
             dest: 'opwen_email_client/webapp/static/fonts/',
             filter: 'isFile'
           },
@@ -21,11 +21,11 @@ module.exports = function(grunt) {
             expand: true,
             flatten: true,
             src: [
-              'bower_components/flag-icon-css/flags/4x3/ca.svg',
-              'bower_components/flag-icon-css/flags/4x3/cd.svg',
-              'bower_components/flag-icon-css/flags/4x3/pt.svg',
-              'bower_components/flag-icon-css/flags/4x3/tz.svg',
-              'bower_components/flag-icon-css/flags/4x3/fr.svg',
+              'node_modules/@bower_components/flag-icon-css/flags/4x3/ca.svg',
+              'node_modules/@bower_components/flag-icon-css/flags/4x3/cd.svg',
+              'node_modules/@bower_components/flag-icon-css/flags/4x3/pt.svg',
+              'node_modules/@bower_components/flag-icon-css/flags/4x3/tz.svg',
+              'node_modules/@bower_components/flag-icon-css/flags/4x3/fr.svg',
             ],
             dest: 'opwen_email_client/webapp/static/flags/4x3/'
           },
@@ -33,10 +33,10 @@ module.exports = function(grunt) {
             expand: true,
             flatten: true,
             src: [
-              'bower_components/jquery/dist/jquery.min.js',
-              'bower_components/bootstrap/dist/js/bootstrap.min.js',
-              'bower_components/bootstrap-fileinput/js/fileinput.min.js',
-              'bower_components/bootstrap3-wysihtml5-bower/dist/bootstrap3-wysihtml5.all.min.js',
+              'node_modules/@bower_components/jquery/dist/jquery.min.js',
+              'node_modules/@bower_components/bootstrap/dist/js/bootstrap.min.js',
+              'node_modules/@bower_components/bootstrap-fileinput/js/fileinput.min.js',
+              'node_modules/@bower_components/bootstrap3-wysihtml5-bower/dist/bootstrap3-wysihtml5.all.min.js',
             ],
             dest: 'opwen_email_client/webapp/static/js/'
           },
@@ -44,11 +44,11 @@ module.exports = function(grunt) {
             expand: true,
             flatten: true,
             src: [
-              'bower_components/components-font-awesome/css/font-awesome.min.css',
-              'bower_components/flag-icon-css/css/flag-icon.min.css',
-              'bower_components/bootstrap/dist/css/bootstrap.min.css',
-              'bower_components/bootstrap-fileinput/css/fileinput.min.css',
-              'bower_components/bootstrap3-wysihtml5-bower/dist/bootstrap3-wysihtml5.min.css',
+              'node_modules/@bower_components/components-font-awesome/css/font-awesome.min.css',
+              'node_modules/@bower_components/flag-icon-css/css/flag-icon.min.css',
+              'node_modules/@bower_components/bootstrap/dist/css/bootstrap.min.css',
+              'node_modules/@bower_components/bootstrap-fileinput/css/fileinput.min.css',
+              'node_modules/@bower_components/bootstrap3-wysihtml5-bower/dist/bootstrap3-wysihtml5.min.css',
             ],
             dest: 'opwen_email_client/webapp/static/css/'
           },
@@ -84,7 +84,7 @@ module.exports = function(grunt) {
         },
         files: {
           'opwen_email_client/webapp/static/js/printThis.min.js': [
-            'bower_components/printThis/printThis.js',
+            'node_modules/@bower_components/printThis/printThis.js',
           ]
         }
       },

@@ -2,7 +2,7 @@
 # System configuration
 #
 PYTHON=/usr/bin/python3
-NPM=/usr/bin/npm
+YARN=/usr/bin/yarn
 SHELLCHECK=/usr/bin/shellcheck
 
 #
@@ -43,8 +43,8 @@ typecheck: venv
 
 ci: lint tests
 
-$(grunt): package.json bower.json
-	$(NPM) install
+$(grunt): package.json
+	$(YARN) install
 
 build-frontend: $(grunt) Gruntfile.js
 	$(grunt)

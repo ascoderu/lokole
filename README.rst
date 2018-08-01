@@ -92,8 +92,10 @@ e.g. on Ubuntu:
 
 .. sourcecode :: sh
 
-  sudo apt-get install -y make python3-venv npm shellcheck
-  sudo ln -s /usr/bin/nodejs /usr/bin/node
+  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+  echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  sudo apt-get update
+  sudo apt-get install -y yarn make python3 python3-venv shellcheck
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
