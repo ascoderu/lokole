@@ -44,7 +44,10 @@ lint: lint-python lint-shell
 typecheck: venv
 	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
 
-ci: tests lint typecheck
+bandit: venv
+	$(py_env)/bin/bandit -r . -x venv/
+
+ci: tests lint typecheck bandit
 
 clean:
 	find opwen_email_server -name '__pycache__' -type d -print0 | xargs -0 rm -rf

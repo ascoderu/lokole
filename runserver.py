@@ -5,7 +5,7 @@ from opwen_email_server.utils.imports import can_import
 
 
 _servers = list(filter(can_import, ('tornado', 'gevent', 'flask')))
-_hosts = ['127.0.0.1', '0.0.0.0']
+_hosts = ['127.0.0.1', '0.0.0.0']  # nosec
 
 _server = _servers[0]
 _host = _hosts[0]
