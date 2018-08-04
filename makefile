@@ -45,7 +45,7 @@ typecheck: venv
 	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
 
 bandit: venv
-	$(py_env)/bin/bandit -r . -x venv/
+	$(py_env)/bin/bandit -r . -x $(py_env)
 
 ci: tests lint typecheck bandit
 
