@@ -14,7 +14,7 @@ class DevServerCommand(Command):
         templates_paths = _templates_paths_for(app, '*.html')
         reload_server_if_changed = templates_paths
 
-        app.run(debug=True, extra_files=reload_server_if_changed)
+        app.run(debug=True, extra_files=reload_server_if_changed)  # nosec
 
 
 def _load_environment(app: Flask) -> None:

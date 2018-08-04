@@ -41,7 +41,10 @@ lint: lint-python lint-shell
 typecheck: venv
 	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
 
-ci: lint tests
+bandit: venv
+	$(py_env)/bin/bandit -r . -x $(py_env)
+
+ci: lint bandit tests
 
 $(grunt): package.json
 	$(YARN) install
