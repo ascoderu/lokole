@@ -71,6 +71,9 @@ module.exports = function(grunt) {
           ],
           'opwen_email_client/webapp/static/css/home.min.css': [
             'opwen_email_client/webapp/static/css/home.css',
+          ],
+          'opwen_email_client/webapp/static/css/email_new.min.css': [
+            'opwen_email_client/webapp/static/css/email_new.css',
           ]
         }
       }
