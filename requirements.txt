@@ -7,4 +7,4 @@ connexion==1.5.2
 pyzmail36==1.0.3
 requests==2.19.1
 sendgrid==5.6.0
-typing==3.6.4
+typing==3.6.6
