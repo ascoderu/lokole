@@ -7,7 +7,7 @@ Flask-Security==3.0.0
 Flask-Testing==0.7.1
 Flask-WTF==0.14.2
 Flask==1.0.2
-SQLAlchemy==1.2.10
+SQLAlchemy==1.2.11
 WTForms==2.2.1
 Werkzeug==0.14.1
 azure-storage-blob==1.3.1
@@ -15,5 +15,5 @@ bcrypt==3.1.4
 gunicorn==19.8.1
 passlib==1.7.1
 requests==2.19.1
-typing==3.6.4
+typing==3.6.6
 tzlocal==1.5.1
