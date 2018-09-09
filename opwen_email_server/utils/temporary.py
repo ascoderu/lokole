@@ -1,15 +1,14 @@
 from contextlib import contextmanager
 from contextlib import suppress
-from os import close
 from os import remove
-from tempfile import mkstemp
+from os.path import join
+from tempfile import gettempdir
 from typing import Generator
+from uuid import uuid4
 
 
 def create_tempfilename() -> str:
-    file_descriptor, filename = mkstemp()
-    close(file_descriptor)
-    return filename
+    return join(gettempdir(), str(uuid4()))
 
 
 @contextmanager
