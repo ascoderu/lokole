@@ -1,154 +1,137 @@
-from collections import namedtuple
 from gzip import GzipFile
+from io import BytesIO
+from os import listdir
+from os import mkdir
 from os import remove
+from os.path import join
+from shutil import rmtree
 from tempfile import NamedTemporaryFile
+from tempfile import mkdtemp
 from unittest import TestCase
-from unittest.mock import MagicMock
 
-# noinspection PyProtectedMember
-from opwen_email_server.services.storage import _AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
-from opwen_email_server.utils.serialization import gzip_string
+# noinspection PyProtectedMember
+from opwen_email_server.services.storage import _AzureFileStorage
 
 
 class AzureTextStorageTests(TestCase):
-    def test_creates_container_only_once(self):
-        expected_content = 'some content'
-        storage, client_mock = self.given_storage(expected_content)
+    def test_stores_and_fetches_text(self):
+        resource_id, expected_content = 'id1', 'some content'
 
-        storage.fetch_text('id1')
-        storage.fetch_text('id1')
+        self._storage.store_text(resource_id, expected_content)
+        actual_content = self._storage.fetch_text(resource_id)
 
-        self.assertEqual(client_mock.create_container.call_count, 1)
+        self.assertEqual(actual_content, expected_content)
 
-    def test_fetches_text(self):
-        expected_content = 'some content'
-        storage, client_mock = self.given_storage(expected_content)
+    def setUp(self):
+        self._folder = mkdtemp()
+        self._container = 'container'
+        self._storage = AzureTextStorage(
+            account=self._folder, key='key',
+            container=self._container, provider='LOCAL')
 
-        content = storage.fetch_text('id1')
-
-        self.assertEqual(client_mock.get_blob_to_bytes.call_count, 1)
-        self.assertEqual(content, expected_content)
-
-    def test_stores_text(self):
-        storage, client_mock = self.given_storage()
-
-        storage.store_text('id1', 'content')
-
-        self.assertEqual(client_mock.create_blob_from_bytes.call_count, 1)
-
-    # noinspection PyTypeChecker
-    @classmethod
-    def given_storage(cls, content=None):
-        client_mock = MagicMock()
-        storage = AzureTextStorage(
-            account='account', key='key', container='name',
-            factory=lambda *args, **kwargs: client_mock)
-
-        if content:
-            build_blob = namedtuple('Blob', 'content')
-            data = gzip_string(content)
-            client_mock.get_blob_to_bytes.return_value = build_blob(data)
-
-        return storage, client_mock
+    def tearDown(self):
+        rmtree(self._folder)
 
 
 class AzureFileStorageTests(TestCase):
-    def test_fetches_file(self):
-        storage, client_mock = self.given_storage()
+    def test_stores_and_fetches_file(self):
+        resource_id, expected_content = 'id1', 'some content'
+        self._given_file(resource_id, expected_content)
 
-        self.when_fetching_file(storage)
+        actual_path = self._storage.fetch_file(resource_id)
 
-        self.assertEqual(client_mock.get_blob_to_path.call_count, 1)
+        self.assertFileContains(actual_path, expected_content)
 
-    # noinspection PyTypeChecker
-    @classmethod
-    def given_storage(cls):
-        client_mock = MagicMock()
-        storage = _AzureFileStorage(
-            account='account', key='key', container='name',
-            factory=lambda *args, **kwargs: client_mock)
+    def assertFileContains(self, path: str, content: str):
+        with open(path, encoding='utf-8') as fobj:
+            self.assertEqual(fobj.read(), content)
 
-        return storage, client_mock
-
-    def when_fetching_file(self, storage):
-        filename = storage.fetch_file('id1')
-        self._filenames.add(filename)
-        return filename
+    def _given_file(self, resource_id: str, expected_content: str):
+        with NamedTemporaryFile('w', encoding='utf-8', delete=False) as fobj:
+            fobj.write(expected_content)
+            fobj.seek(0)
+            self._storage.store_file(resource_id, fobj.name)
+            self._extra_files.add(fobj.name)
 
     def setUp(self):
-        self._filenames = set()
+        self._folder = mkdtemp()
+        self._container = 'container'
+        self._storage = _AzureFileStorage(
+            account=self._folder, key='key',
+            container=self._container, provider='LOCAL')
+        self._extra_files = set()
 
     def tearDown(self):
-        for filename in self._filenames:
-            remove(filename)
+        rmtree(self._folder)
+        for path in self._extra_files:
+            remove(path)
 
 
 class AzureObjectStorageTests(TestCase):
     def test_fetches_jsonl_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
         lines = b'{"foo":"bar"}\n{"baz":[1,2,3]}'
-        storage, client_mock = self.given_storage(lines)
+        self._given_resource(resource_id, lines)
 
-        objs = list(storage.fetch_objects(resource_id))
+        objs = list(self._storage.fetch_objects(resource_id))
 
-        self.assertEqual(client_mock.fetch_file.call_count, 1)
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_fetches_json_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
         lines = b'{"emails":[\n{"foo":"bar"},\n{"baz":[1,2,3]}\n]}'
-        storage, client_mock = self.given_storage(lines)
+        self._given_resource(resource_id, lines)
 
-        objs = list(storage.fetch_objects(resource_id))
+        objs = list(self._storage.fetch_objects(resource_id))
 
-        self.assertEqual(client_mock.fetch_file.call_count, 1)
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_handles_corrupted_jsonl_entries(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
         lines = b'{"foo":"bar"}\n{"corrupted":1,]}\n{"baz":[1,2,3]}'
-        storage, client_mock = self.given_storage(lines)
+        self._given_resource(resource_id, lines)
 
-        objs = list(storage.fetch_objects(resource_id))
+        objs = list(self._storage.fetch_objects(resource_id))
 
-        self.assertEqual(client_mock.fetch_file.call_count, 1)
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_stores_objects(self):
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
-        storage, client_mock = self.given_storage()
 
-        resource_id = storage.store_objects(objs)
+        resource_id = self._storage.store_objects(objs)
 
         self.assertIsNotNone(resource_id)
-        self.assertEqual(client_mock.store_file.call_count, 1)
+        self.assertContainerHasNumFiles(1)
 
     def test_does_not_create_file_without_objects(self):
         objs = []
-        storage, client_mock = self.given_storage()
 
-        resource_id = storage.store_objects(objs)
+        resource_id = self._storage.store_objects(objs)
 
         self.assertIsNone(resource_id)
-        self.assertEqual(client_mock.store_file.call_count, 0)
+        self.assertContainerHasNumFiles(0)
 
-    # noinspection PyTypeChecker
-    @classmethod
-    def given_storage(cls, lines=None):
-        client_mock = MagicMock()
-        storage = AzureObjectStorage(
-            account='account', key='key', container='container',
-            file_storage=client_mock)
+    def assertContainerHasNumFiles(self, count: int):
+        path = join(self._folder, self._container)
+        self.assertEqual(len(listdir(path)), count)
 
-        if lines:
-            # noinspection PyUnusedLocal
-            def compress_data(*args, **kwargs):
-                with NamedTemporaryFile(mode='wb', delete=False) as fobj:
-                    with GzipFile(fileobj=fobj, mode='wb') as gzip_fobj:
-                        gzip_fobj.write(lines)
-                return fobj.name
-            client_mock.fetch_file.side_effect = compress_data
+    def _given_resource(self, resource_id: str, lines: bytes):
+        client = self._storage._file_storage._client
+        buffer = BytesIO()
+        with GzipFile(mode='wb', fileobj=buffer) as fobj:
+            fobj.write(lines)
+        buffer.seek(0)
+        client.upload_object_via_stream(buffer, resource_id)
 
-        return storage, client_mock
+    def setUp(self):
+        self._folder = mkdtemp()
+        self._container = 'container'
+        mkdir(join(self._folder, self._container))
+        self._storage = AzureObjectStorage(
+            account=self._folder, key='unused',
+            container=self._container, provider='LOCAL')
+
+    def tearDown(self):
+        rmtree(self._folder)

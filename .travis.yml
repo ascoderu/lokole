@@ -10,13 +10,6 @@ services:
 
 cache: pip
 
-addons:
-  apt:
-    sources:
-      - debian-sid
-    packages:
-      - docker-ce
-
 script: travis/ci.sh
 
 install:
