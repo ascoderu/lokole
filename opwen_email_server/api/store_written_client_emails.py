@@ -21,13 +21,16 @@ class _WrittenStorer(LogMixin):
         num_stored = 0
         for email in emails:
             email_id = email['_uid']
-            server_datastore.store_email(email_id, email)
+            server_datastore.store_outbound_email(email_id, email)
+
+            # noinspection PyProtectedMember
+            container = server_datastore._get_email_storage().container
 
             QUEUE.enqueue({
                 '_version': '0.1',
                 '_type': 'email_to_send',
                 'resource_id': email_id,
-                'container_name': server_datastore.STORAGE.container,
+                'container_name': container,
             })
             num_stored += 1
             domain = get_domain(email.get('from', ''))

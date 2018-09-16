@@ -15,7 +15,7 @@ class _InboundStorer(LogMixin):
         email = parse_mime_email(mime_email)
         email = format_attachments(email)
         email = format_inline_images(email)
-        server_datastore.store_email(resource_id, email)
+        server_datastore.store_inbound_email(resource_id, email)
 
         email_receive.STORAGE.delete(resource_id)
 

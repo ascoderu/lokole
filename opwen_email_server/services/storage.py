@@ -2,6 +2,7 @@ from gzip import open as gzip_open
 from io import BytesIO
 from json import loads
 from typing import Iterable
+from typing import Iterator
 from typing import Optional
 from uuid import uuid4
 
@@ -49,6 +50,10 @@ class _BaseAzureStorage(LogMixin):
     def delete(self, resource_id: str):
         resource = self._client.get_object(resource_id)
         resource.delete()
+
+    def __iter__(self) -> Iterator[str]:
+        for resource in self._client.list_objects():
+            yield resource.name
 
 
 class _AzureFileStorage(_BaseAzureStorage):

@@ -7,7 +7,7 @@ from opwen_email_server.api import store_inbound_emails
 
 class StoreInboundEmailsTests(TestCase):
     @patch.object(store_inbound_emails.email_receive, 'STORAGE')
-    @patch.object(server_datastore, 'store_email')
+    @patch.object(server_datastore, 'store_inbound_email')
     @patch.object(store_inbound_emails, 'parse_mime_email')
     def test_reads_message_and_stores_email(
             self, parser_mock, store_mock, storage_mock):
