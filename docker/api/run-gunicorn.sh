@@ -13,4 +13,4 @@ done
 /venv/bin/gunicorn \
   --workers="${GUNICORN_WORKERS}" \
   --bind="0.0.0.0:80" \
-  "server:build_app(apis=['${api_spec}','${healthcheck_spec}'], server='tornado')"
+  "server:build_app(apis=['${api_spec}','${healthcheck_spec}'], server='tornado', ui=${TESTING_UI})"
