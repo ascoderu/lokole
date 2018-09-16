@@ -9,6 +9,8 @@ from tempfile import NamedTemporaryFile
 from tempfile import mkdtemp
 from unittest import TestCase
 
+from libcloud.storage.types import ObjectDoesNotExistError
+
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 # noinspection PyProtectedMember
@@ -16,13 +18,17 @@ from opwen_email_server.services.storage import _AzureFileStorage
 
 
 class AzureTextStorageTests(TestCase):
-    def test_stores_and_fetches_text(self):
+    def test_stores_fetches_and_deletes_text(self):
         resource_id, expected_content = 'id1', 'some content'
 
         self._storage.store_text(resource_id, expected_content)
         actual_content = self._storage.fetch_text(resource_id)
 
         self.assertEqual(actual_content, expected_content)
+
+        self._storage.delete(resource_id)
+        with self.assertRaises(ObjectDoesNotExistError):
+            self._storage.fetch_text(resource_id)
 
     def setUp(self):
         self._folder = mkdtemp()
@@ -36,13 +42,17 @@ class AzureTextStorageTests(TestCase):
 
 
 class AzureFileStorageTests(TestCase):
-    def test_stores_and_fetches_file(self):
+    def test_stores_fetches_and_deletes_file(self):
         resource_id, expected_content = 'id1', 'some content'
         self._given_file(resource_id, expected_content)
 
         actual_path = self._storage.fetch_file(resource_id)
 
         self.assertFileContains(actual_path, expected_content)
+
+        self._storage.delete(resource_id)
+        with self.assertRaises(ObjectDoesNotExistError):
+            self._storage.fetch_file(resource_id)
 
     def assertFileContains(self, path: str, content: str):
         with open(path, encoding='utf-8') as fobj:
