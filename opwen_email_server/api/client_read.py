@@ -7,6 +7,7 @@ from opwen_email_server import events
 from opwen_email_server.backend import server_datastore
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
 STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
@@ -14,10 +15,12 @@ STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                              container=constants.CONTAINER_CLIENT_PACKAGES,
                              provider=config.STORAGE_PROVIDER)
 
-CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT,
-                    key=config.TABLES_KEY,
-                    table=constants.TABLE_AUTH,
-                    provider=config.STORAGE_PROVIDER)
+CLIENTS = AzureAuth(
+    storage=AzureTextStorage(
+        account=config.TABLES_ACCOUNT,
+        key=config.TABLES_KEY,
+        container=constants.TABLE_AUTH,
+        provider=config.STORAGE_PROVIDER))
 
 
 class _Downloader(LogMixin):

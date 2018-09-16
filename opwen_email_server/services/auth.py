@@ -1,6 +1,4 @@
 from functools import lru_cache
-from json import loads
-from os import getenv
 from typing import Optional
 
 from libcloud.storage.types import ObjectDoesNotExistError
@@ -10,12 +8,8 @@ from opwen_email_server.utils.log import LogMixin
 
 
 class AzureAuth(LogMixin):
-    def __init__(self, account: str, key: str, table: str,
-                 provider: str) -> None:
-        self._storage = AzureTextStorage(account, key, table, provider)
-
-        for client in loads(getenv('LOKOLE_DEFAULT_CLIENTS', '[]')):
-            self.insert(client['id'], client['domain'])
+    def __init__(self, storage: AzureTextStorage) -> None:
+        self._storage = storage
 
     def insert(self, client_id: str, domain: str):
         self._storage.store_text(client_id, domain)
