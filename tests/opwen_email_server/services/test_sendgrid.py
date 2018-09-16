@@ -1,8 +1,6 @@
-from collections import namedtuple
 from unittest import TestCase
-from unittest.mock import Mock
 
-from opwen_email_server.services import sendgrid
+from opwen_email_server.services.sendgrid import SendgridEmailSender
 
 
 class SendgridEmailSenderTests(TestCase):
@@ -11,7 +9,7 @@ class SendgridEmailSenderTests(TestCase):
     sender = 'sendgridtests@lokole.ca'
 
     def test_sends_email(self):
-        sender = self._given_client()
+        sender = SendgridEmailSender(key='')
 
         success = sender.send_email({
             'to': [self.recipient1],
@@ -22,7 +20,7 @@ class SendgridEmailSenderTests(TestCase):
         self.assertTrue(success)
 
     def test_sends_email_with_attachments(self):
-        sender = self._given_client()
+        sender = SendgridEmailSender(key='')
 
         success = sender.send_email({
             'to': [self.recipient1],
@@ -38,7 +36,7 @@ class SendgridEmailSenderTests(TestCase):
         self.assertTrue(success)
 
     def test_sends_email_to_multiple_recipients(self):
-        sender = self._given_client()
+        sender = SendgridEmailSender(key='')
 
         success = sender.send_email({
             'to': [self.recipient1, self.recipient2],
@@ -47,28 +45,3 @@ class SendgridEmailSenderTests(TestCase):
             'message': 'simple email with two recipients'})
 
         self.assertTrue(success)
-
-    # noinspection PyTypeChecker
-    @classmethod
-    def _given_client(cls, status_code=202, exception=None):
-        mock_client = Mock()
-
-        if exception is None:
-            _respond(mock_client.client.mail.send.post, status_code)
-        else:
-            _raise(mock_client.client.mail.send.post, exception)
-
-        return sendgrid.SendgridEmailSender('fake', mock_client)
-
-
-def _raise(mock, exception):
-    # noinspection PyUnusedLocal
-    def raises(*args, **kwargs):
-        raise exception
-    mock.side_effect = raises
-
-
-def _respond(mock, status_code, headers=''):
-    fakeresponse = namedtuple('Response', 'status_code headers')
-    response = fakeresponse(status_code=status_code, headers=headers)
-    mock.return_value = response
