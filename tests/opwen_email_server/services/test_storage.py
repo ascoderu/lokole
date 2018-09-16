@@ -11,10 +11,9 @@ from unittest import TestCase
 
 from libcloud.storage.types import ObjectDoesNotExistError
 
+from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
-# noinspection PyProtectedMember
-from opwen_email_server.services.storage import _AzureFileStorage
 
 
 class AzureTextStorageTests(TestCase):
@@ -76,7 +75,7 @@ class AzureFileStorageTests(TestCase):
     def setUp(self):
         self._folder = mkdtemp()
         self._container = 'container'
-        self._storage = _AzureFileStorage(
+        self._storage = AzureFileStorage(
             account=self._folder, key='key',
             container=self._container, provider='LOCAL')
         self._extra_files = set()
@@ -148,8 +147,11 @@ class AzureObjectStorageTests(TestCase):
         self._container = 'container'
         mkdir(join(self._folder, self._container))
         self._storage = AzureObjectStorage(
-            account=self._folder, key='unused',
-            container=self._container, provider='LOCAL')
+            file_storage=AzureFileStorage(
+                account=self._folder,
+                key='unused',
+                container=self._container,
+                provider='LOCAL'))
 
     def tearDown(self):
         rmtree(self._folder)

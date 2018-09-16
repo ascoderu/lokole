@@ -5,6 +5,7 @@ from opwen_email_server import config
 from opwen_email_server import events
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.queue import AzureQueue
+from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
 QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
@@ -12,10 +13,12 @@ QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
                    sas_name=config.QUEUES_SAS_NAME,
                    name=constants.QUEUE_CLIENT_PACKAGE)
 
-CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT,
-                    key=config.TABLES_KEY,
-                    table=constants.TABLE_AUTH,
-                    provider=config.STORAGE_PROVIDER)
+CLIENTS = AzureAuth(
+    storage=AzureTextStorage(
+        account=config.TABLES_ACCOUNT,
+        key=config.TABLES_KEY,
+        container=constants.TABLE_AUTH,
+        provider=config.STORAGE_PROVIDER))
 
 
 class _Uploader(LogMixin):

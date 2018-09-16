@@ -3,13 +3,18 @@ from tempfile import mkdtemp
 from unittest import TestCase
 
 from opwen_email_server.services.auth import AzureAuth
+from opwen_email_server.services.storage import AzureTextStorage
 
 
 class AzureAuthTests(TestCase):
     def setUp(self):
         self._folder = mkdtemp()
-        self._auth = AzureAuth(account=self._folder, key='key',
-                               table='auth', provider='LOCAL')
+        self._auth = AzureAuth(
+            storage=AzureTextStorage(
+                account=self._folder,
+                key='key',
+                container='auth',
+                provider='LOCAL'))
 
     def tearDown(self):
         rmtree(self._folder)
