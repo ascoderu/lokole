@@ -13,14 +13,16 @@ from opwen_email_server.utils.serialization import to_json
 def _get_email_storage():
     return AzureTextStorage(account=config.BLOBS_ACCOUNT,
                             key=config.BLOBS_KEY,
-                            container=constants.CONTAINER_EMAILS)
+                            container=constants.CONTAINER_EMAILS,
+                            provider=config.STORAGE_PROVIDER)
 
 
 @lru_cache(maxsize=128)
 def _get_pending_storage(domain: str) -> AzureTextStorage:
     return AzureTextStorage(account=config.TABLES_ACCOUNT,
                             key=config.TABLES_KEY,
-                            container=domain)
+                            container=domain,
+                            provider=config.STORAGE_PROVIDER)
 
 
 def fetch_email(email_id: str) -> dict:

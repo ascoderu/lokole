@@ -11,7 +11,7 @@ from opwen_email_server.utils.log import LogMixin
 
 class AzureAuth(LogMixin):
     def __init__(self, account: str, key: str, table: str,
-                 provider: Optional[str]=None) -> None:
+                 provider: str) -> None:
         self._storage = AzureTextStorage(account, key, table, provider)
 
         for client in loads(getenv('LOKOLE_DEFAULT_CLIENTS', '[]')):

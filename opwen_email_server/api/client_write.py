@@ -12,8 +12,10 @@ QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
                    sas_name=config.QUEUES_SAS_NAME,
                    name=constants.QUEUE_CLIENT_PACKAGE)
 
-CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
-                    table=constants.TABLE_AUTH)
+CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT,
+                    key=config.TABLES_KEY,
+                    table=constants.TABLE_AUTH,
+                    provider=config.STORAGE_PROVIDER)
 
 
 class _Uploader(LogMixin):
