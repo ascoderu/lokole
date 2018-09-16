@@ -21,10 +21,14 @@ api_runner=$(py_env)/bin/python runserver.py --port=$(app_port) --ui $(api_specs
 default: server
 
 $(py_env)/bin/activate: requirements.txt
-	test -d $(py_env) || $(PYTHON) -m venv $(py_env)
-	$(py_env)/bin/pip install -U pip wheel
-	$(py_env)/bin/pip install -r requirements.txt
-	test -f requirements-dev.txt && $(py_env)/bin/pip install -r requirements-dev.txt
+	if [ ! -d $(py_env) ]; then \
+      $(PYTHON) -m venv $(py_env); \
+      $(py_env)/bin/pip install -U pip wheel; \
+      $(py_env)/bin/pip install -r requirements.txt; \
+      if [ -f requirements-dev.txt ]; then \
+        $(py_env)/bin/pip install -r requirements-dev.txt; \
+      fi \
+    fi
 
 venv: $(py_env)/bin/activate
 
