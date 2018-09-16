@@ -2,10 +2,8 @@ from contextlib import contextmanager
 from typing import Mapping
 from typing import Optional
 
-from opwen_email_server.services.auth import Auth
 
-
-class FakeAuth(Auth):
+class FakeAuth(object):
     def __init__(self, clients: Mapping[str, str]):
         self._clients = dict(clients.items())
 
