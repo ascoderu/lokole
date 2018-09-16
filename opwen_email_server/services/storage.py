@@ -55,7 +55,7 @@ class _BaseAzureStorage(LogMixin):
             yield resource.name
 
 
-class _AzureFileStorage(_BaseAzureStorage):
+class AzureFileStorage(_BaseAzureStorage):
     def store_file(self, resource_id: str, path: str):
         self.log_debug('storing file %s at %s', path, resource_id)
         self._client.upload_object(path, resource_id)
@@ -90,11 +90,8 @@ class AzureTextStorage(_BaseAzureStorage):
 class AzureObjectStorage(LogMixin):
     _encoding = 'utf-8'
 
-    def __init__(self, account: str, key: str, container: str,
-                 provider: str) -> None:
-        self._file_storage = _AzureFileStorage(
-            account=account, key=key, container=container,
-            provider=provider)
+    def __init__(self, file_storage: AzureFileStorage) -> None:
+        self._file_storage = file_storage
 
     @property
     def container(self) -> str:
