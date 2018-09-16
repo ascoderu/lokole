@@ -30,6 +30,14 @@ class AzureTextStorageTests(TestCase):
         with self.assertRaises(ObjectDoesNotExistError):
             self._storage.fetch_text(resource_id)
 
+    def test_list(self):
+        self._storage.store_text('resource1', 'a')
+        self._storage.store_text('resource2', 'b')
+        self.assertEqual(list(self._storage), ['resource1', 'resource2'])
+
+        self._storage.delete('resource2')
+        self.assertEqual(list(self._storage), ['resource1'])
+
     def setUp(self):
         self._folder = mkdtemp()
         self._container = 'container'
