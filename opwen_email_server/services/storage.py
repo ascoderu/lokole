@@ -47,7 +47,8 @@ class _BaseAzureStorage(LogMixin):
         yield 'container %s', self._container
 
     def delete(self, resource_id: str):
-        self._client.delete_object(resource_id)
+        resource = self._client.get_object(resource_id)
+        resource.delete()
 
 
 class _AzureFileStorage(_BaseAzureStorage):
