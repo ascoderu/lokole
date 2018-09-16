@@ -1,5 +1,4 @@
 from enum import Enum
-from enum import auto
 from enum import unique
 from os.path import abspath
 from os.path import dirname
@@ -19,8 +18,8 @@ TEST_DATA_DIRECTORY = abspath(join(
 
 @unique
 class ImageSize(Enum):
-    large = auto()
-    small = auto()
+    large = 1
+    small = 2
 
 
 def _given_test_image_base64(size: ImageSize):
