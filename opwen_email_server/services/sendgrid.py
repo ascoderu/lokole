@@ -16,12 +16,10 @@ from opwen_email_server.utils.log import LogMixin
 
 class SendgridEmailSender(LogMixin):
     def __init__(self, key: str,
-                 on_error: Callable[[int, str], None]=None,
                  client: SendGridAPIClient=None,
                  factory: Callable[..., SendGridAPIClient]=SendGridAPIClient
                  ) -> None:
         self._key = key
-        self._on_error = on_error
         self.__client = client
         self._client_factory = factory
 
@@ -37,12 +35,8 @@ class SendgridEmailSender(LogMixin):
         email_id = email.get('_uid', '')
         email = self._create_email(email, email_id)
         status, message = self._send_email(email, email_id)
-        success = status == 202
 
-        if not success and self._on_error:
-            self._on_error(status, message)
-
-        return success
+        return status in (200, 201, 202)
 
     def _send_email(self, email: Mail, email_id: str) -> Tuple[int, str]:
         self.log_debug('about to send email %s', email_id)
