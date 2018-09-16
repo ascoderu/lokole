@@ -11,10 +11,13 @@ from opwen_email_server.utils.log import LogMixin
 
 STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                              key=config.CLIENT_STORAGE_KEY,
-                             container=constants.CONTAINER_CLIENT_PACKAGES)
+                             container=constants.CONTAINER_CLIENT_PACKAGES,
+                             provider=config.STORAGE_PROVIDER)
 
-CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT, key=config.TABLES_KEY,
-                    table=constants.TABLE_AUTH)
+CLIENTS = AzureAuth(account=config.TABLES_ACCOUNT,
+                    key=config.TABLES_KEY,
+                    table=constants.TABLE_AUTH,
+                    provider=config.STORAGE_PROVIDER)
 
 
 class _Downloader(LogMixin):

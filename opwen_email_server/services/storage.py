@@ -13,7 +13,6 @@ from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import Provider
 
-from opwen_email_server.config import STORAGE_PROVIDER
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import gunzip_string
 from opwen_email_server.utils.serialization import gzip_string
@@ -24,11 +23,11 @@ from opwen_email_server.utils.temporary import removing
 
 class _BaseAzureStorage(LogMixin):
     def __init__(self, account: str, key: str, container: str,
-                 provider: Optional[str]=None) -> None:
+                 provider: str) -> None:
         self._account = account
         self._key = key
         self._container = container
-        self._provider = getattr(Provider, provider or STORAGE_PROVIDER)
+        self._provider = getattr(Provider, provider)
 
     @cached_property
     def _client(self) -> Container:
@@ -92,7 +91,7 @@ class AzureObjectStorage(LogMixin):
     _encoding = 'utf-8'
 
     def __init__(self, account: str, key: str, container: str,
-                 provider: Optional[str]=None) -> None:
+                 provider: str) -> None:
         self._file_storage = _AzureFileStorage(
             account=account, key=key, container=container,
             provider=provider)

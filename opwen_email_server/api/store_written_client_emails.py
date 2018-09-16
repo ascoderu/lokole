@@ -14,7 +14,8 @@ QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
 
 STORAGE = AzureObjectStorage(account=config.CLIENT_STORAGE_ACCOUNT,
                              key=config.CLIENT_STORAGE_KEY,
-                             container=constants.CONTAINER_CLIENT_PACKAGES)
+                             container=constants.CONTAINER_CLIENT_PACKAGES,
+                             provider=config.STORAGE_PROVIDER)
 
 
 class _WrittenStorer(LogMixin):
