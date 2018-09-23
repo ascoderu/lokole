@@ -21,7 +21,8 @@ purpose is to connect the `application <https://github.com/ascoderu/opwen-webapp
 running on the Lokole devices to the rest of the world. Lokole is a project
 by the Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_.
 
-The server has two main responsibilities:
+The server is implemented using `Connexion <https://jobs.zalando.com/tech/blog/crafting-effective-microservices-in-python/>`_
+and has two main responsibilities:
 
 1. Receive emails from the internet that are addressed to Lokole users and
    forward them to the appropriate Lokole device.
