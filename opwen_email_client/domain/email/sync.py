@@ -20,6 +20,10 @@ from opwen_email_client.util.serialization import Serializer
 
 T = TypeVar('T')
 
+EXCLUDED_FIELDS = frozenset([
+    'read',
+])
+
 
 class Sync(metaclass=ABCMeta):
     @abstractmethod
@@ -93,7 +97,8 @@ class AzureSync(Sync):
             with self._open(workspace, 'wb') as uploaded:
                 for item in items:
                     item = {key: value for (key, value) in item.items()
-                            if value is not None}
+                            if value is not None
+                            and key not in EXCLUDED_FIELDS}
                     serialized = self._serializer.serialize(item)
                     uploaded.write(serialized)
                     uploaded.write(b'\n')

@@ -58,7 +58,7 @@ class AzureSyncTests(TestCase):
     def test_upload(self):
         uploaded = self.given_upload()
 
-        self.sync.upload(items=[{'foo': 'bar'}])
+        self.sync.upload(items=[{'foo': 'bar', 'read': True}])
 
         self.assertUploadIs(uploaded, b'{"foo":"bar"}\n')
         self.assertTrue(self.email_server_client_mock.upload.called)
