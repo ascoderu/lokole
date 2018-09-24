@@ -1,19 +1,19 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from gzip import GzipFile
-from io import BytesIO
 from io import TextIOBase
-from os import getenv
-from os import makedirs
-from os import path
-from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
+from typing import IO
 from typing import Iterable
 from typing import TypeVar
 from uuid import uuid4
 
-from azure.common import AzureMissingResourceHttpError
-from azure.storage.blob import BlockBlobService
+from cached_property import cached_property
+from libcloud.storage.base import StorageDriver
+from libcloud.storage.providers import Provider
+from libcloud.storage.providers import get_driver
+from libcloud.storage.types import ContainerDoesNotExistError
+from libcloud.storage.types import ObjectDoesNotExistError
 
 from opwen_email_client.domain.email.client import EmailServerClient
 from opwen_email_client.util.serialization import Serializer
@@ -39,43 +39,49 @@ class AzureSync(Sync):
     def __init__(self, container: str, serializer: Serializer,
                  account_name: str, account_key: str,
                  email_server_client: EmailServerClient,
-                 azure_client: BlockBlobService=None):
+                 provider: str):
 
         self._container = container
         self._serializer = serializer
-        self._account_name = account_name
-        self._account_key = account_key
+        self._account = account_name
+        self._key = account_key
         self._email_server_client = email_server_client
-        self.__azure_client = azure_client
+        self._provider = getattr(Provider, provider)
 
-    @property
-    def _azure_client(self) -> BlockBlobService:
-        if not self.__azure_client:
-            self.__azure_client = BlockBlobService(self._account_name,
-                                                   self._account_key)
-        return self.__azure_client
+    @cached_property
+    def _azure_client(self) -> StorageDriver:
+        driver = get_driver(self._provider)
+        client = driver(self._account, self._key)
+        try:
+            client.get_container(self._container)
+        except ContainerDoesNotExistError:
+            client.create_container(self._container)
+        return client
 
     @classmethod
     def _workspace(cls) -> TextIOBase:
         return NamedTemporaryFile()
 
     @classmethod
-    def _open(cls, fileobj: BytesIO, mode: str='rb') -> TextIOBase:
+    def _open(cls, fileobj: IO, mode: str='rb') -> GzipFile:
         return GzipFile(fileobj=fileobj, mode=mode)
 
     def _download_to_stream(self, blobname: str, container: str,
-                            stream: TextIOBase) -> bool:
+                            stream: IO) -> bool:
 
         try:
-            self._azure_client.get_blob_to_stream(container, blobname, stream)
-        except AzureMissingResourceHttpError:
+            container = self._azure_client.get_container(container)
+            resource = container.get_object(blobname)
+        except ObjectDoesNotExistError:
             return False
         else:
+            for chunk in resource.as_stream():
+                stream.write(chunk)
             return True
 
     def _upload_from_stream(self, blobname: str, stream: TextIOBase):
-        self._azure_client.create_blob_from_stream(self._container,
-                                                   blobname, stream)
+        container = self._azure_client.get_container(self._container)
+        container.upload_object_via_stream(stream, blobname)
 
     def download(self):
         resource_id, container = self._email_server_client.download()
@@ -111,26 +117,3 @@ class AzureSync(Sync):
                                                  self._container)
 
         return uploaded_ids
-
-
-class LocalAzureSync(AzureSync):
-    def _upload_from_stream(self, blobname: str, stream: TextIOBase):
-        upload_directory = path.join(getenv('AZURE_ROOT'), self._container)
-        makedirs(upload_directory, exist_ok=True)
-        local_filename = path.join(upload_directory, blobname)
-
-        with open(local_filename, 'wb') as fobj:
-            copyfileobj(stream, fobj)
-
-    def _download_to_stream(self, blobname: str, container: str,
-                            stream: TextIOBase):
-        download_directory = path.join(getenv('AZURE_ROOT'), container)
-        local_filename = path.join(download_directory, blobname)
-
-        try:
-            with open(local_filename, 'rb') as fobj:
-                copyfileobj(fobj, stream)
-        except FileNotFoundError:
-            return False
-        else:
-            return True

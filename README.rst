@@ -116,16 +116,17 @@ variables:
 
 .. sourcecode :: sh
 
-  OPWEN_ENABLE_DEBUG='True'
-  AZURE_ROOT='/tmp/azure'
+  OPWEN_ENABLE_DEBUG="True"
+  LOKOLE_STORAGE_PROVIDER="LOCAL"
+  OPWEN_REMOTE_ACCOUNT_NAME="./tests/files/opwen_email_client"
 
 With these environment variables set, when the Lokole exchanges data with the
 server, it will not make any calls to Azure and instead depend on the files
-in the `AZURE_ROOT` directory. Any files uploaded to the server will be
-written to a subdirectory of `AZURE_ROOT` so that they can be inspected. To
-test sending emails from the server to the Lokole, simply create a file at
-`$AZURE_ROOT/to-lokole/emails.pack` and the Lokole device will ingest the
-emails in that file during the data exchange.
+in the `./tests/files/opwen_email_client` directory. Any files uploaded to the
+server will be written to the `compressedpackages` subdirectory so that they
+can be inspected. To test sending emails from the server to the Lokole, a
+sample email batch file is included in the `downloads` directory. This file
+will be ingested by the client when the `/sync` endpoint is called.
 
 Production setup
 ----------------

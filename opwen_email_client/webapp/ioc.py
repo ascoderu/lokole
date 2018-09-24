@@ -12,7 +12,6 @@ from opwen_email_client.webapp.session import AttachmentsStore
 
 if AppConfig.TESTING:
     from opwen_email_client.domain.email.client import LocalEmailServerClient as EmailServerClient  # noqa
-    from opwen_email_client.domain.email.sync import LocalAzureSync as Sync  # noqa
 
 
 class Ioc(object):
@@ -32,6 +31,7 @@ class Ioc(object):
         account_key=AppConfig.STORAGE_ACCOUNT_KEY,
         email_server_client=email_server_client,
         container=AppConfig.STORAGE_CONTAINER,
+        provider=AppConfig.STORAGE_PROVIDER,
         serializer=serializer)
 
     attachment_encoder = AttachmentEncoder()

@@ -79,12 +79,13 @@ class LocalEmailServerClient(EmailServerClient):
         pass
 
     def download(self) -> Tuple[str, str]:
-        container, resource_id = 'to-lokole', 'emails.pack'
-        local_file = path.join(getenv('AZURE_ROOT'), container, resource_id)
+        root = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
+        container = 'downloads'
+        resource_id = 'emails.jsonl.gz'
+        local_file = path.join(root, container, resource_id)
         if not path.isfile(local_file):
             return '', ''
         return resource_id, container
 
     def upload(self, resource_id: str, container: str):
-        upload_directory = path.join(getenv('AZURE_ROOT'), container)
-        print('Uploaded to {}'.format(upload_directory))
+        print('Uploaded {}/{}'.format(container, resource_id))
