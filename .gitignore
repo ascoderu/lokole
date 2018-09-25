@@ -16,3 +16,4 @@ serviceprincipal.json
 bin/
 obj/
 out/
+.DS_Store

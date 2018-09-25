@@ -4,14 +4,11 @@ from opwen_email_server import azure_constants as constants
 from opwen_email_server import config
 from opwen_email_server import events
 from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.queue import AzureQueue
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
-QUEUE = AzureQueue(namespace=config.QUEUES_NAMESPACE,
-                   sas_key=config.QUEUES_SAS_KEY,
-                   sas_name=config.QUEUES_SAS_NAME,
-                   name=constants.QUEUE_CLIENT_PACKAGE)
+import celery
+from opwen_email_server.api.store_written_client_emails import store
 
 CLIENTS = AzureAuth(
     storage=AzureTextStorage(
@@ -32,13 +29,7 @@ class _Uploader(LogMixin):
         resource_id = upload_info.get('resource_id')
         resource_container = upload_info.get('resource_container')
 
-        QUEUE.enqueue({
-            '_version': '0.1',
-            '_type': 'lokole_emails_received',
-            '_resource_type': resource_type,
-            'resource_id': resource_id,
-            'container_name': resource_container,
-        })
+        result = store.delay(resource_id)
 
         self.log_event(events.EMAILS_RECEIVED_FROM_CLIENT, {'domain': domain})  # noqa: E501
         return 'uploaded', 200
