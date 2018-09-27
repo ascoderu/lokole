@@ -13,7 +13,8 @@ client-name:              The name that should be assigned to the Opwen device
                           a bunch of things.
 
 sim-type:                 The mobile network to which to connect to upload data
-                          to the cloud, e.g. Hologram_World or Vodacom_DRC.
+                          to the cloud, e.g. Hologram_World, LocalOnly,
+                          Ethernet, or mkwvconf.
 
 storage-account-name:     The name of the account on the external storage
                           service (e.g. Azure Blob Storage, Amazon S3, etc.)
@@ -195,6 +196,7 @@ case "${sim_type}" in
   Hologram_World) ;;
   Ethernet) ;;
   LocalOnly) ;;
+  mkwvconf) ;;
   *) fail "Unsupported sim-type: ${sim_type}" ;;
 esac
 
@@ -527,6 +529,12 @@ Modem Type = Analog Modem
 Modem = /dev/ttyUSB0
 IDSN = 0
 EOF
+
+if [ "${sim_type}" = "mkwvconf" ]; then
+  install_system_package 'mobile-broadband-provider-info'
+  "${opwen_webapp_virtualenv}/bin/pip" install mkwvconf
+  "${opwen_webapp_virtualenv}/bin/mkwvconf.py" --configPath="${opwen_dialer_config_directory}/${sim_type}"
+fi
 
 copy_file "${opwen_dialer_config_directory}/${sim_type}" "${internet_dialer_config}"
 
