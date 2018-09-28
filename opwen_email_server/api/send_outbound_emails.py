@@ -7,14 +7,10 @@ from opwen_email_server.services.sendgrid import SendgridEmailSender
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.log import LogMixin
 
-from opwen_email_server.celery.celery import celery
-
-EMAIL = SendgridEmailSender(key=config.EMAIL_SENDER_KEY)
-
-logger = LogMixin()
-
-@celery.task
 def send(resource_id: str) -> Tuple[str, int]:
+    logger = LogMixin()
+    EMAIL = SendgridEmailSender(key=config.EMAIL_SENDER_KEY)
+
     email = server_datastore.fetch_email(resource_id)
 
     success = EMAIL.send_email(email)

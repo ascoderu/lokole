@@ -1,16 +1,22 @@
-from __future__ import absolute_import
 from celery import Celery
+from opwen_email_server import config
+from opwen_email_server.api import send_outbound_emails
+from opwen_email_server.api import store_inbound_emails
+from opwen_email_server.api import store_written_client_emails
 
-celery = Celery(include = [ "opwen_email_server.api.store_written_client_emails",
-                            "opwen_email_server.api.send_outbound_emails",
-                            "opwen_email_server.api.store_inbound_emails"])
+celery = Celery(broker = config.CELERY_BROKER)
 
-class Config:
-    BROKER_URL = "amqp://"
-    CELERY_RESULT_BACKEND = "amqp://"
+@celery.task(ignore_result=True)
+def inbound_store(resource_id):
+    store_inbound_emails.store(resource_id)
 
-celery.config_from_object(Config)
+@celery.task(ignore_result=True)
+def written_store(resource_id):
+    store_written_client_emails.store(resource_id)
 
+@celery.task(ignore_result=True)
+def send(resource_id):
+    send_outbound_emails.send(resource_id)
 
 if __name__ == "__main__":
     celery.start()

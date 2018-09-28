@@ -7,8 +7,7 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
-import celery
-from opwen_email_server.api.store_written_client_emails import store
+from opwen_email_server.celery import celery
 
 CLIENTS = AzureAuth(
     storage=AzureTextStorage(
@@ -29,7 +28,7 @@ class _Uploader(LogMixin):
         resource_id = upload_info.get('resource_id')
         resource_container = upload_info.get('resource_container')
 
-        result = store.delay(resource_id)
+        celery.written_store.delay(resource_id)
 
         self.log_event(events.EMAILS_RECEIVED_FROM_CLIENT, {'domain': domain})  # noqa: E501
         return 'uploaded', 200

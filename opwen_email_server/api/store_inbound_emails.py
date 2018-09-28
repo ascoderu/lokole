@@ -6,12 +6,9 @@ from opwen_email_server.utils.email_parser import format_inline_images
 from opwen_email_server.utils.email_parser import parse_mime_email
 from opwen_email_server.utils.log import LogMixin
 
-from opwen_email_server.celery.celery import celery
 
-logger = LogMixin()
-
-@celery.task
 def store(resource_id: str):
+    logger = LogMixin()
     mime_email = email_receive.STORAGE.fetch_text(resource_id)
 
     email = parse_mime_email(mime_email)

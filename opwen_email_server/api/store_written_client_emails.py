@@ -7,20 +7,18 @@ from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.log import LogMixin
 
-from opwen_email_server.celery.celery import celery
-from opwen_email_server.api.send_outbound_emails import send
+from opwen_email_server.celery import celery
 
-STORAGE = AzureObjectStorage(
-    file_storage=AzureFileStorage(
-        account=config.CLIENT_STORAGE_ACCOUNT,
-        key=config.CLIENT_STORAGE_KEY,
-        container=constants.CONTAINER_CLIENT_PACKAGES,
-        provider=config.STORAGE_PROVIDER))
 
-logger = LogMixin()
-
-@celery.task
 def store(resource_id: str):
+    logger = LogMixin()
+    STORAGE = AzureObjectStorage(
+        file_storage=AzureFileStorage(
+            account=config.CLIENT_STORAGE_ACCOUNT,
+            key=config.CLIENT_STORAGE_KEY,
+            container=constants.CONTAINER_CLIENT_PACKAGES,
+            provider=config.STORAGE_PROVIDER))
+
     emails = STORAGE.fetch_objects(resource_id)
 
     domain = ''
@@ -32,7 +30,7 @@ def store(resource_id: str):
         # noinspection PyProtectedMember
         container = server_datastore._get_email_storage().container
 
-        result = send.delay(email_id)
+        celery.send.delay(email_id)
 
         num_stored += 1
         domain = get_domain(email.get('from', ''))
