@@ -10,7 +10,7 @@ _hosts = ['127.0.0.1', '0.0.0.0']  # nosec
 _server = _servers[0]
 _host = _hosts[0]
 _port = 8080
-_ui = True
+_ui = False
 
 
 def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):

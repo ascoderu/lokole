@@ -1,8 +1,8 @@
 #
 # System configuration
 #
-PYTHON=/Library/Frameworks/Python.framework/Versions/3.6/bin/python3
-SHELLCHECK=/usr/local/Cellar/shellcheck/0.5.0/bin/shellcheck
+PYTHON=/usr/bin/python3
+SHELLCHECK=/usr/bin/shellcheck
 
 #
 # Server configuration

@@ -19,7 +19,7 @@ ADD docker/api/healthcheck.sh /app/healthcheck.sh
 ADD docker/api/run-gunicorn.sh /app/run-gunicorn.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 
-ENV TESTING_UI="True"
+ENV TESTING_UI="False"
 
 EXPOSE 80
 WORKDIR /app
