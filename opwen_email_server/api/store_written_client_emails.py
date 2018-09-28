@@ -9,15 +9,16 @@ from opwen_email_server.utils.log import LogMixin
 
 from opwen_email_server.celery import celery
 
+STORAGE = AzureObjectStorage(
+    file_storage=AzureFileStorage(
+        account=config.CLIENT_STORAGE_ACCOUNT,
+        key=config.CLIENT_STORAGE_KEY,
+        container=constants.CONTAINER_CLIENT_PACKAGES,
+        provider=config.STORAGE_PROVIDER))
+
+logger = LogMixin()
 
 def store(resource_id: str):
-    logger = LogMixin()
-    STORAGE = AzureObjectStorage(
-        file_storage=AzureFileStorage(
-            account=config.CLIENT_STORAGE_ACCOUNT,
-            key=config.CLIENT_STORAGE_KEY,
-            container=constants.CONTAINER_CLIENT_PACKAGES,
-            provider=config.STORAGE_PROVIDER))
 
     emails = STORAGE.fetch_objects(resource_id)
 
