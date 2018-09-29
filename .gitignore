@@ -16,6 +16,3 @@ serviceprincipal.json
 bin/
 obj/
 out/
-.DS_Store
-*.DS_Store
-opwen_email_server/config.py

@@ -9,15 +9,17 @@ from opwen_email_server.utils.log import LogMixin
 
 EMAIL = SendgridEmailSender(key=config.EMAIL_SENDER_KEY)
 
-logger = LogMixin()
 
-def send(resource_id: str) -> Tuple[str, int]:
+class _Sender(LogMixin):
+    def __call__(self, resource_id: str) -> Tuple[str, int]:
+        email = server_datastore.fetch_email(resource_id)
 
-    email = server_datastore.fetch_email(resource_id)
+        success = EMAIL.send_email(email)
+        if not success:
+            return 'error', 500
 
-    success = EMAIL.send_email(email)
-    if not success:
-        return 'error', 500
+        self.log_event(events.EMAIL_DELIVERED_FROM_CLIENT, {'domain': get_domain(email.get('from', ''))})  # noqa: E501
+        return 'OK', 200
 
-    logger.log_event(events.EMAIL_DELIVERED_FROM_CLIENT, {'domain': get_domain(email.get('from', ''))})  # noqa: E501
-    return 'OK', 200
+
+send = _Sender()

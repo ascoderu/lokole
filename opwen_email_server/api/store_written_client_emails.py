@@ -28,9 +28,6 @@ def store(resource_id: str):
         email_id = email['_uid']
         server_datastore.store_outbound_email(email_id, email)
 
-        # noinspection PyProtectedMember
-        container = server_datastore._get_email_storage().container
-
         celery.send.delay(email_id)
 
         num_stored += 1
