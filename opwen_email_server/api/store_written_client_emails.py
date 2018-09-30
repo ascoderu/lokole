@@ -2,7 +2,7 @@ from opwen_email_server import azure_constants as constants
 from opwen_email_server import config
 from opwen_email_server import events
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.celery import celery
+from opwen_email_server.services import celery
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.email_parser import get_domain

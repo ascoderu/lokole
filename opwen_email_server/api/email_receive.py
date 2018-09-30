@@ -8,7 +8,7 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
-from opwen_email_server.celery import celery
+from opwen_email_server.services import celery
 
 STORAGE = AzureTextStorage(account=config.BLOBS_ACCOUNT,
                            key=config.BLOBS_KEY,
