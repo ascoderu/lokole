@@ -11,52 +11,21 @@ services:
       - ${APP_PORT}:80
     environment:
       DNS_RESOLVER: 127.0.0.11
+      HOSTNAME_EMAIL_RECEIVE: api
+      HOSTNAME_CLIENT_WRITE: api
+      HOSTNAME_CLIENT_READ: api
     depends_on:
-      - apiemailreceive
-      - apiclientwrite
-      - apiclientread
+      - api
 
-  apiemailreceive:
+  api:
     image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/api/Dockerfile
     environment:
-      CONNEXION_SPEC: opwen_email_server/static/email-receive-spec.yaml
+      CONNEXION_SPEC: opwen_email_server/static/email-receive-spec.yaml,opwen_email_server/static/client-read-spec.yaml,opwen_email_server/static/client-write-spec.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-      DOTENV_SECRETS: azure;sendgrid
-    secrets:
-      - azure
-      - sendgrid
-
-  apiclientwrite:
-    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/api/Dockerfile
-    environment:
-      CONNEXION_SPEC: opwen_email_server/static/client-write-spec.yaml
-      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
-      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-      DOTENV_SECRETS: azure;sendgrid
-    secrets:
-      - azure
-      - sendgrid
-
-  apiclientread:
-    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/api/Dockerfile
-    environment:
-      CONNEXION_SPEC: opwen_email_server/static/client-read-spec.yaml
-      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
-      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-      DOTENV_SECRETS: azure;sendgrid
-    secrets:
-      - azure
-      - sendgrid
 
   worker:
     image: ${DOCKER_REPO}/opwenserver_worker:${BUILD_TAG}
