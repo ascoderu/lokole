@@ -56,11 +56,5 @@ clean:
 server: venv
 	$(api_runner)
 
-inbound-store-worker: venv
-	$(py_env)/bin/python opwen_email_server/jobs/store_inbound_emails.py
-
-outbound-send-worker: venv
-	$(py_env)/bin/python opwen_email_server/jobs/send_outbound_emails.py
-
-outbound-store-worker: venv
-	$(py_env)/bin/python opwen_email_server/jobs/store_outbound_emails.py
+worker: venv
+	$(py_env)/bin/celery --app=opwen_email_server.services.celery worker --loglevel=DEBUG
