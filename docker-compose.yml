@@ -26,6 +26,7 @@ services:
       CONNEXION_SPEC: opwen_email_server/static/email-receive-spec.yaml,opwen_email_server/static/client-read-spec.yaml,opwen_email_server/static/client-write-spec.yaml
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
+      CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
 
   worker:
     image: ${DOCKER_REPO}/opwenserver_worker:${BUILD_TAG}
@@ -34,11 +35,15 @@ services:
       dockerfile: docker/worker/Dockerfile
     environment:
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
+      CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
       CELERY_WORKERS: ${CELERY_WORKERS}
       DOTENV_SECRETS: azure;sendgrid
     secrets:
       - azure
       - sendgrid
+
+  rabbitmq:
+    image: rabbitmq:3.7.8-management
 
 secrets:
   azure:
