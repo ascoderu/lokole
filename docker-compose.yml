@@ -58,89 +58,18 @@ services:
       - azure
       - sendgrid
 
-  apisendoutboundemails:
-    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
+  worker:
+    image: ${DOCKER_REPO}/opwenserver_worker:${BUILD_TAG}
     build:
       context: .
-      dockerfile: docker/api/Dockerfile
+      dockerfile: docker/worker/Dockerfile
     environment:
-      CONNEXION_SPEC: opwen_email_server/static/send-outbound-emails.yaml
-      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
+      CELERY_WORKERS: ${CELERY_WORKERS}
       DOTENV_SECRETS: azure;sendgrid
     secrets:
       - azure
       - sendgrid
-
-  apistoreinboundemails:
-    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/api/Dockerfile
-    environment:
-      CONNEXION_SPEC: opwen_email_server/static/store-inbound-emails.yaml
-      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
-      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-      DOTENV_SECRETS: azure;sendgrid
-    secrets:
-      - azure
-      - sendgrid
-
-  apistorewrittenclientemails:
-    image: ${DOCKER_REPO}/opwenserver_api:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/api/Dockerfile
-    environment:
-      CONNEXION_SPEC: opwen_email_server/static/store-written-client-emails.yaml
-      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
-      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-      DOTENV_SECRETS: azure;sendgrid
-    secrets:
-      - azure
-      - sendgrid
-
-  connectorsendoutboundemails:
-    image: ${DOCKER_REPO}/opwenserver_queueconnector:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/queueconnector/Dockerfile
-    environment:
-      LOKOLE_POST_URL: http://apisendoutboundemails/job/email/outbound/send
-      LOKOLE_SOURCE_QUEUE: sengridoutboundemails
-      DOTENV_SECRETS: azure
-    secrets:
-      - azure
-    depends_on:
-      - apisendoutboundemails
-
-  connectorstoreinboundemails:
-    image: ${DOCKER_REPO}/opwenserver_queueconnector:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/queueconnector/Dockerfile
-    environment:
-      LOKOLE_POST_URL: http://apistoreinboundemails/job/email/inbound/store
-      LOKOLE_SOURCE_QUEUE: sengridinboundemails
-      DOTENV_SECRETS: azure
-    secrets:
-      - azure
-    depends_on:
-      - apistoreinboundemails
-
-  connectorstorewrittenclientemails:
-    image: ${DOCKER_REPO}/opwenserver_queueconnector:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/queueconnector/Dockerfile
-    environment:
-      LOKOLE_POST_URL: http://apistorewrittenclientemails/job/email/client/store
-      LOKOLE_SOURCE_QUEUE: lokoleinboundemails
-      DOTENV_SECRETS: azure
-    secrets:
-      - azure
-    depends_on:
-      - apistorewrittenclientemails
 
 secrets:
   azure:
