@@ -6,7 +6,7 @@ from opwen_email_server.api import store_written_client_emails
 
 
 class StoreWrittenClientEmailsTests(TestCase):
-    @patch.object(store_written_client_emails, 'QUEUE')
+    @patch.object(store_written_client_emails, 'celery')
     @patch.object(store_written_client_emails, 'STORAGE')
     @patch.object(server_datastore, 'store_outbound_email')
     def test_reads_message_and_stores_email(
@@ -23,7 +23,7 @@ class StoreWrittenClientEmailsTests(TestCase):
 
         self.assertEqual(client_storage_mock.fetch_objects.call_count, 1)
         self.assertEqual(client_storage_mock.delete.call_count, 1)
-        self.assertEqual(send_queue_mock.enqueue.call_count, 2)
+        self.assertEqual(send_queue_mock.send.delay.call_count, 2)
         self.assertEqual(store_mock.call_count, 2)
         store_mock.assert_any_call(email1_id, email1)
         store_mock.assert_any_call(email2_id, email2)
