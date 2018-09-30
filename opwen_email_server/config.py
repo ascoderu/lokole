@@ -23,4 +23,8 @@ APPINSIGHTS_KEY = environ.get('LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY', '')
 MAX_WIDTH_IMAGES = int(environ.get('MAX_WIDTH_EMAIL_IMAGES', '200'))
 MAX_HEIGHT_IMAGES = int(environ.get('MAX_HEIGHT_EMAIL_IMAGES', '200'))
 
+<<<<<<< HEAD
 CELERY_BROKER = environ.get('CELERY_BROKER_URL', 'amqp://')
+=======
+CELERY_BROKER = environ.get('CELERY_BROKER_URL' ,'amqp://')
+>>>>>>> 88ebcac219e6a4878d7607af4778fe9a702dafe5
