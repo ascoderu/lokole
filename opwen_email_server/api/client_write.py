@@ -24,9 +24,7 @@ class _Uploader(LogMixin):
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
             return 'client is not registered', 403
 
-        resource_type = upload_info.get('resource_type')
         resource_id = upload_info.get('resource_id')
-        resource_container = upload_info.get('resource_container')
 
         celery.written_store.delay(resource_id)
 

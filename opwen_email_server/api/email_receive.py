@@ -22,6 +22,7 @@ CLIENTS = AzureAuth(
         container=constants.TABLE_AUTH,
         provider=config.STORAGE_PROVIDER))
 
+
 class _Receiver(LogMixin):
     def __call__(self, client_id: str, email: str) -> Tuple[str, int]:
         domain = CLIENTS.domain_for(client_id)
