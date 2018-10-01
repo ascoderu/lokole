@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file=compose.yml --chart
+    kompose.version: 1.13.0 (84fa826)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api
+  name: api
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: api
+    spec:
+      containers:
+      - name: api
+        image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
+        env:
+        - name: CONNEXION_SPEC
+          value: opwen_email_server/static/email-receive-spec.yaml,opwen_email_server/static/client-read-spec.yaml,opwen_email_server/static/client-write-spec.yaml
+        - name: GUNICORN_WORKERS
+          value: "{{.Values.server.gunicornWorkers}}"
+        {{ include "opwen.environment.shared" }}
+        ports:
+        - containerPort: 80
+        resources: {}
+      restartPolicy: Always
+status: {}

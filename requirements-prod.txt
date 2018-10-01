@@ -1,2 +1,3 @@
+azure-servicebus==0.21.1
 gunicorn==19.8.1
 tornado==5.1

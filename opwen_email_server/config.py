@@ -23,4 +23,9 @@ APPINSIGHTS_KEY = environ.get('LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY', '')
 MAX_WIDTH_IMAGES = int(environ.get('MAX_WIDTH_EMAIL_IMAGES', '200'))
 MAX_HEIGHT_IMAGES = int(environ.get('MAX_HEIGHT_EMAIL_IMAGES', '200'))
 
-CELERY_BROKER = environ.get('CELERY_BROKER_URL')
+CELERY_BROKER = environ.get('CELERY_BROKER_URL') or (
+    '{scheme}://{username}:{password}@{host}'.format(
+        scheme=environ.get('CELERY_BROKER_SCHEME'),
+        username=environ.get('CELERY_BROKER_USERNAME'),
+        password=environ.get('CELERY_BROKER_PASSWORD'),
+        host=environ.get('CELERY_BROKER_HOST')))
