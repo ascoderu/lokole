@@ -1,8 +1,5 @@
 FROM python:3.6
 
-ENV CONNEXION_SPEC="SET_ME"
-ENV GUNICORN_WORKERS="1"
-
 ADD requirements.txt /app/requirements.txt
 ADD requirements-prod.txt /app/requirements-prod.txt
 RUN apt-get update \
@@ -20,6 +17,8 @@ ADD docker/api/run-gunicorn.sh /app/run-gunicorn.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 ENV TESTING_UI="False"
+ENV CONNEXION_SPEC="SET_ME"
+ENV GUNICORN_WORKERS="1"
 
 EXPOSE 80
 WORKDIR /app
