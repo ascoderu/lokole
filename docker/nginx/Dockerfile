@@ -14,9 +14,9 @@ ADD docker/nginx/run-nginx.sh /app/run-nginx.sh
 RUN rm /etc/nginx/conf.d/default.conf
 
 ENV DNS_RESOLVER=""
-ENV HOSTNAME_EMAIL_RECEIVE="apiemailreceive"
-ENV HOSTNAME_CLIENT_WRITE="apiclientwrite"
-ENV HOSTNAME_CLIENT_READ="apiclientread"
+ENV HOSTNAME_EMAIL_RECEIVE="SET_ME"
+ENV HOSTNAME_CLIENT_WRITE="SET_ME"
+ENV HOSTNAME_CLIENT_READ="SET_ME"
 
 ADD docker/nginx/healthcheck.sh /app/healthcheck.sh
 HEALTHCHECK --interval=89s --timeout=17s CMD /app/healthcheck.sh
