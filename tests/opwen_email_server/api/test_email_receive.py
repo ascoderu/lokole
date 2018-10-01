@@ -6,7 +6,7 @@ from tests.opwen_email_server.api.api_test_base import AuthTestMixin
 
 
 class ReceiveTests(TestCase, AuthTestMixin):
-    @patch.object(email_receive, 'celery')
+    @patch.object(email_receive, 'tasks')
     @patch.object(email_receive, 'STORAGE')
     def test_stores_and_processes_new_email(self, storage_mock, queue_mock):
         with self.given_clients(email_receive, {'client1': 'id1'}):

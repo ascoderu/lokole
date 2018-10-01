@@ -6,7 +6,7 @@ from opwen_email_server.api import store_written_client_emails
 
 
 class StoreWrittenClientEmailsTests(TestCase):
-    @patch.object(store_written_client_emails, 'celery')
+    @patch.object(store_written_client_emails, 'tasks')
     @patch.object(store_written_client_emails, 'STORAGE')
     @patch.object(server_datastore, 'store_outbound_email')
     def test_reads_message_and_stores_email(
