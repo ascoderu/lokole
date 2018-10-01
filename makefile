@@ -57,4 +57,4 @@ server: venv
 	$(api_runner)
 
 worker: venv
-	$(py_env)/bin/celery --app=opwen_email_server.services.celery worker --loglevel=DEBUG
+	$(py_env)/bin/celery --app=opwen_email_server.services.tasks worker --loglevel=DEBUG
