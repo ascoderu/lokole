@@ -9,17 +9,17 @@ celery = Celery(broker=config.CELERY_BROKER)
 
 
 @celery.task(ignore_result=True)
-def inbound_store(resource_id):
+def inbound_store(resource_id: str) -> None:
     store_inbound_emails.store(resource_id)
 
 
 @celery.task(ignore_result=True)
-def written_store(resource_id):
+def written_store(resource_id: str) -> None:
     store_written_client_emails.store(resource_id)
 
 
 @celery.task(ignore_result=True)
-def send(resource_id):
+def send(resource_id: str) -> None:
     send_outbound_emails.send(resource_id)
 
 
