@@ -19,5 +19,6 @@ apis="[${apis:1:${#apis}-1}]"
 
 /venv/bin/gunicorn \
   --workers="${GUNICORN_WORKERS}" \
+  --log-level="${LOKOLE_LOG_LEVEL}" \
   --bind="0.0.0.0:80" \
   "server:build_app(apis=${apis}, server='tornado', ui=${TESTING_UI})"
