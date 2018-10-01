@@ -2,7 +2,7 @@ from opwen_email_server import azure_constants as constants
 from opwen_email_server import config
 from opwen_email_server import events
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.services import celery
+from opwen_email_server.services import tasks
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.email_parser import get_domain
@@ -26,7 +26,7 @@ class _WrittenStorer(LogMixin):
             email_id = email['_uid']
             server_datastore.store_outbound_email(email_id, email)
 
-            celery.send.delay(email_id)
+            tasks.send.delay(email_id)
 
             num_stored += 1
             domain = get_domain(email.get('from', ''))

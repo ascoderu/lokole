@@ -8,7 +8,7 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
-from opwen_email_server.services import celery
+from opwen_email_server.services import tasks
 
 STORAGE = AzureTextStorage(account=config.BLOBS_ACCOUNT,
                            key=config.BLOBS_KEY,
@@ -34,7 +34,7 @@ class _Receiver(LogMixin):
 
         STORAGE.store_text(email_id, email)
 
-        celery.inbound_store.delay(email_id)
+        tasks.inbound_store.delay(email_id)
 
         self.log_event(events.EMAIL_RECEIVED_FOR_CLIENT, {'domain': domain})  # noqa: E501
         return 'received', 200
