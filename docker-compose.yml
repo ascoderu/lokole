@@ -27,6 +27,10 @@ services:
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
+      DOTENV_SECRETS: azure;sendgrid
+    secrets:
+    - azure
+    - sendgrid
 
   worker:
     image: ${DOCKER_REPO}/opwenserver_worker:${BUILD_TAG}
