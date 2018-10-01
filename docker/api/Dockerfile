@@ -17,6 +17,7 @@ ADD docker/api/run-gunicorn.sh /app/run-gunicorn.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 ENV TESTING_UI="False"
+ENV CONNEXION_SERVER="tornado"
 ENV CONNEXION_SPEC="SET_ME"
 ENV GUNICORN_WORKERS="1"
 
