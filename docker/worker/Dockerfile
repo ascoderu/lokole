@@ -14,6 +14,9 @@ ADD opwen_email_server /app/opwen_email_server
 ADD docker/worker/run-celery.sh /app/run-celery.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 
+ENV CELERY_WORKERS="1"
+ENV LOKOLE_LOG_LEVEL="INFO"
+
 WORKDIR /app
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/app/run-celery.sh"]
