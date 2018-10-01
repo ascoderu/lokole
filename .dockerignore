@@ -9,8 +9,3 @@ docs/
 tests/
 travis/
 venv*/
-
-.vs/
-bin/
-obj/
-out/
