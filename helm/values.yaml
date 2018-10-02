@@ -5,10 +5,8 @@ version:
 server:
   gunicornWorkers: 2
 
+worker:
+  celeryWorkers: 1
+
 logging:
   level: INFO
-
-autoscale:
-  minPods: 1
-  maxPods: 5
-  cpuThreshold: 75

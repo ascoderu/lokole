@@ -11,8 +11,3 @@ venv*/
 .mypy_cache/
 
 serviceprincipal.json
-
-.vs/
-bin/
-obj/
-out/

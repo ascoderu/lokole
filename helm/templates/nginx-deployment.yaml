@@ -23,6 +23,12 @@ spec:
         env:
         - name: DNS_RESOLVER
           value: 127.0.0.1:53 ipv6=off
+        - name: HOSTNAME_CLIENT_READ
+          value: api
+        - name: HOSTNAME_CLIENT_WRITE
+          value: api
+        - name: HOSTNAME_EMAIL_RECEIVE
+          value: api
         ports:
         - containerPort: 80
         resources: {}

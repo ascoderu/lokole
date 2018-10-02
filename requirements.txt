@@ -8,4 +8,6 @@ pyzmail36==1.0.3
 requests==2.19.1
 sendgrid==5.6.0
 typing==3.6.6
+https://github.com/celery/kombu/archive/b3dc9208837566193deda824bc67dc900c7ed9a6.zip
+celery[librabbitmq]==4.2.1
 https://github.com/apache/libcloud/archive/7d5eb6fffc4521824c87b2cf71d47bdcd2161cae.zip

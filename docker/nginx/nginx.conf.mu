@@ -21,15 +21,15 @@ server {
     proxy_set_header X-Scheme \$scheme;
 
     location /api/email/sendgrid {
-      proxy_pass http://apiemailreceive;
+      proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
     }
 
     location /api/email/upload {
-      proxy_pass http://apiclientwrite;
+      proxy_pass http://{{HOSTNAME_CLIENT_WRITE}};
     }
 
     location /api/email/download {
-      proxy_pass http://apiclientread;
+      proxy_pass http://{{HOSTNAME_CLIENT_READ}};
     }
   }
 }

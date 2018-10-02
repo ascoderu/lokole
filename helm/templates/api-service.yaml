@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: apiclientread
-  name: apiclientread
+    io.kompose.service: api
+  name: api
 spec:
   ports:
   - name: "80"
     port: 80
     targetPort: 80
   selector:
-    io.kompose.service: apiclientread
+    io.kompose.service: api
 status:
   loadBalancer: {}
