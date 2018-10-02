@@ -22,7 +22,7 @@ spec:
         image: {{.Values.version.imageRegistry}}/opwenserver_api:{{.Values.version.dockerTag}}
         env:
         - name: CONNEXION_SPEC
-          value: opwen_email_server/static/email-receive-spec.yaml,opwen_email_server/static/client-read-spec.yaml,opwen_email_server/static/client-write-spec.yaml
+          value: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
         - name: GUNICORN_WORKERS
           value: "{{.Values.server.gunicornWorkers}}"
         {{ include "opwen.environment.shared" }}

@@ -5,17 +5,10 @@ PYTHON=/usr/bin/python3
 SHELLCHECK=/usr/bin/shellcheck
 
 #
-# Server configuration
-#
-app_port=8080
-api_specs=opwen_email_server/static/email-receive-spec.yaml opwen_email_server/static/client-write-spec.yaml opwen_email_server/static/client-read-spec.yaml opwen_email_server/static/healthcheck-spec.yaml
-
-#
 # You shouldn't need to touch anything below this line.
 #
 py_env=venv
 py_packages=opwen_email_server
-api_runner=$(py_env)/bin/python runserver.py --port=$(app_port) --ui $(api_specs)
 
 .PHONY: default
 default: server
@@ -54,7 +47,17 @@ clean:
 	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 server: venv
-	$(api_runner)
+	PY_ENV="$(py_env)" \
+    GUNICORN_WORKERS=1 \
+    LOKOLE_LOG_LEVEL=DEBUG \
+    TESTING_UI="True" \
+    PORT="8080" \
+    CONNEXION_SERVER="flask" \
+    CONNEXION_SPEC="./opwen_email_server/static/email-receive-spec.yaml,./opwen_email_server/static/client-write-spec.yaml,./opwen_email_server/static/client-read-spec.yaml,./opwen_email_server/static/healthcheck-spec.yaml" \
+    ./docker/api/run-gunicorn.sh
 
 worker: venv
-	$(py_env)/bin/celery --app=opwen_email_server.services.tasks worker --loglevel=DEBUG
+	PY_ENV="$(py_env)" \
+    CELERY_WORKERS=1 \
+    LOKOLE_LOG_LEVEL=DEBUG \
+    ./docker/worker/run-celery.sh
