@@ -131,7 +131,9 @@ Finall, run the application stack via Docker:
 
 There are OpenAPI specifications that document the functionality of the
 application and provide references to the entry points into the code
-(look for "some-api-name-spec.yaml" files in the repository).
+(look for "some-api-name-spec.yaml" files in the repository). The various
+APIs can also be easily called via the testing console that is available
+by adding /ui to the end of the API's URL.
 
 Production setup
 ----------------
