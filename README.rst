@@ -92,6 +92,23 @@ manage all of the moving pieces via Docker, so install Docker on your machine
 by following the `Docker setup instructions <https://docs.docker.com/install/>`_
 for your platform.
 
+After installing Docker, you can run the application stack with one command:
+
+.. sourcecode :: sh
+
+  docker-compose up --build
+
+There are OpenAPI specifications that document the functionality of the
+application and provide references to the entry points into the code
+(look for "some-api-name-spec.yaml" files in the repository). The various
+APIs can also be easily called via the testing console that is available
+by adding /ui to the end of the API's URL.
+
+Note that by default the application is run in a fully local mode, without
+leveraging any cloud services. For most development purposes this is fine
+but if you wish to set up the full end-to-end stack that leverages the
+same services as we use in production, keep on reading.
+
 The project uses Sendgrid, so to emulate a full production environment,
 follow these `Sendgrid setup instructions <https://sendgrid.com/free/>`_ to
 create a free account and take note of you API key for sending emails.
@@ -122,18 +139,6 @@ The secrets to access the Azure resources created by the setup script will be
 stored in files in the :code:`secrets` directory. Other parts of the
 project's tooling (e.g. docker-compose) depend on these files so make sure to
 not delete them.
-
-Finall, run the application stack via Docker:
-
-.. sourcecode :: sh
-
-  docker-compose up --build
-
-There are OpenAPI specifications that document the functionality of the
-application and provide references to the entry points into the code
-(look for "some-api-name-spec.yaml" files in the repository). The various
-APIs can also be easily called via the testing console that is available
-by adding /ui to the end of the API's URL.
 
 Production setup
 ----------------

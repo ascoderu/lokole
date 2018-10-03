@@ -1,4 +1,13 @@
-version: '3.3'
+version: '3.4'
+
+x-shared-environment:
+  &shared-environment
+  CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
+  LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
+  LOKOLE_STORAGE_PROVIDER: "LOCAL"
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME: "/data/server-blobs"
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME: "/data/server-tables"
+  LOKOLE_CLIENT_AZURE_STORAGE_NAME: "/data/client-blobs"
 
 services:
 
@@ -22,35 +31,25 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+      args:
+        USE_DEVTOOLS: "${USE_DEVTOOLS}"
     environment:
-      CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
+      << : *shared-environment
       CONNEXION_SPEC: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
+      CONNEXION_SERVER: flask
       GUNICORN_WORKERS: ${GUNICORN_WORKERS}
-      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       TESTING_UI: "True"
-    secrets:
-    - azure
-    - sendgrid
 
   worker:
     image: ${DOCKER_REPO}/opwenserver_worker:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/worker/Dockerfile
+      args:
+        USE_DEVTOOLS: "${USE_DEVTOOLS}"
     environment:
-      CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
+      << : *shared-environment
       CELERY_WORKERS: ${CELERY_WORKERS}
-      DOTENV_SECRETS: azure;sendgrid
-      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-    secrets:
-      - azure
-      - sendgrid
 
   rabbitmq:
     image: rabbitmq:3.7.8-management
-
-secrets:
-  azure:
-    file: ./secrets/azure.env
-  sendgrid:
-    file: ./secrets/sendgrid.env
