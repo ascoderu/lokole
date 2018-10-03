@@ -54,10 +54,10 @@ server: venv
     PORT="8080" \
     CONNEXION_SERVER="flask" \
     CONNEXION_SPEC="./opwen_email_server/static/email-receive-spec.yaml,./opwen_email_server/static/client-write-spec.yaml,./opwen_email_server/static/client-read-spec.yaml,./opwen_email_server/static/healthcheck-spec.yaml" \
-    ./docker/api/run-gunicorn.sh
+    ./docker/app/run-gunicorn.sh
 
 worker: venv
 	PY_ENV="$(py_env)" \
     CELERY_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
-    ./docker/worker/run-celery.sh
+    ./docker/app/run-celery.sh

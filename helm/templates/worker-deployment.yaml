@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
       - name: worker
-        image: {{.Values.version.imageRegistry}}/opwenserver_worker:{{.Values.version.dockerTag}}
+        image: {{.Values.version.imageRegistry}}/opwenserver_app:{{.Values.version.dockerTag}}
+        command: ["/app/run-celery.sh"]
         env:
         - name: CELERY_WORKERS
           value: "{{.Values.worker.celeryWorkers}}"
