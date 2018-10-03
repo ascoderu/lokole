@@ -21,19 +21,19 @@ RUN if [ "${USE_DEVTOOLS}" = "True" ]; then \
 
 ADD opwen_email_server /app/opwen_email_server
 ADD runserver.py /app/runserver.py
-ADD docker/api/healthcheck.sh /app/healthcheck.sh
-ADD docker/api/run-gunicorn.sh /app/run-gunicorn.sh
+ADD docker/app/run-gunicorn.sh /app/run-gunicorn.sh
+ADD docker/app/run-celery.sh /app/run-celery.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 ENV TESTING_UI="False"
 ENV CONNEXION_SERVER="tornado"
 ENV CONNEXION_SPEC="SET_ME"
 ENV GUNICORN_WORKERS="1"
+ENV CELERY_WORKERS="1"
 ENV LOKOLE_LOG_LEVEL="INFO"
 ENV PORT="80"
 
 EXPOSE ${PORT}
 WORKDIR /app
-HEALTHCHECK --interval=59m --timeout=5s CMD /app/healthcheck.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/app/run-gunicorn.sh"]
+CMD ["bash"]
