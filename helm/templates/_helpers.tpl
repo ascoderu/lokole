@@ -41,19 +41,19 @@
     secretKeyRef:
       name: sendgrid
       key: LOKOLE_SENDGRID_KEY
-- name: CELERY_BROKER_SCHEME
+- name: QUEUE_BROKER_SCHEME
   value: azureservicebus
-- name: CELERY_BROKER_USERNAME
+- name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
   valueFrom:
     secretKeyRef:
       name: azure
       key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
-- name: CELERY_BROKER_PASSWORD
+- name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
   valueFrom:
     secretKeyRef:
       name: azure
       key: LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY
-- name: CELERY_BROKER_HOST
+- name: LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE
   valueFrom:
     secretKeyRef:
       name: azure

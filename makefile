@@ -48,7 +48,7 @@ clean:
 
 server: venv
 	PY_ENV="$(py_env)" \
-    GUNICORN_WORKERS=1 \
+    SERVER_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
     TESTING_UI="True" \
     PORT="8080" \
@@ -58,6 +58,6 @@ server: venv
 
 worker: venv
 	PY_ENV="$(py_env)" \
-    CELERY_WORKERS=1 \
+    QUEUE_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
     ./docker/app/run-celery.sh

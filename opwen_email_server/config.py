@@ -18,9 +18,10 @@ APPINSIGHTS_KEY = environ.get('LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY', '')
 MAX_WIDTH_IMAGES = int(environ.get('MAX_WIDTH_EMAIL_IMAGES', '200'))
 MAX_HEIGHT_IMAGES = int(environ.get('MAX_HEIGHT_EMAIL_IMAGES', '200'))
 
-CELERY_BROKER = environ.get('CELERY_BROKER_URL') or (
-    '{scheme}://{username}:{password}@{host}'.format(
-        scheme=environ.get('CELERY_BROKER_SCHEME'),
-        username=environ.get('CELERY_BROKER_USERNAME'),
-        password=environ.get('CELERY_BROKER_PASSWORD'),
-        host=environ.get('CELERY_BROKER_HOST')))
+if environ.get('QUEUE_BROKER_SCHEME') == 'azureservicebus':
+    QUEUE_BROKER = 'azureservicebus://{username}:{password}@{host}'.format(
+        username=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME'),
+        password=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY'),
+        host=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE'))
+else:
+    QUEUE_BROKER = environ.get('QUEUE_BROKER_URL', '')
