@@ -140,6 +140,13 @@ stored in files in the :code:`secrets` directory. Other parts of the
 project's tooling (e.g. docker-compose) depend on these files so make sure to
 not delete them.
 
+To run the project using the Azure resources created by the setup, use the
+following command:
+
+.. sourcecode :: sh
+
+  docker-compose -f docker-compose.yml -f docker-compose.secrets.yml up --build
+
 Production setup
 ----------------
 

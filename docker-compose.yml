@@ -2,7 +2,7 @@ version: '3.4'
 
 x-shared-app-environment:
   &shared-app-environment
-  CELERY_BROKER_URL: pyamqp://guest:guest@rabbitmq
+  QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
   LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
   LOKOLE_STORAGE_PROVIDER: "LOCAL"
   LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME: "/data/server-blobs"
@@ -42,7 +42,7 @@ services:
       << : *shared-app-environment
       CONNEXION_SPEC: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
       CONNEXION_SERVER: flask
-      GUNICORN_WORKERS: ${GUNICORN_WORKERS}
+      SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
 
   worker:
@@ -50,7 +50,7 @@ services:
     command: ["/app/run-celery.sh"]
     environment:
       << : *shared-app-environment
-      CELERY_WORKERS: ${CELERY_WORKERS}
+      QUEUE_WORKERS: ${QUEUE_WORKERS}
 
   rabbitmq:
     image: rabbitmq:3.7.8-management

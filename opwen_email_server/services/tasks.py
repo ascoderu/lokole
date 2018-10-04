@@ -5,7 +5,7 @@ from opwen_email_server.api import send_outbound_emails
 from opwen_email_server.api import store_inbound_emails
 from opwen_email_server.api import store_written_client_emails
 
-celery = Celery(broker=config.CELERY_BROKER)
+celery = Celery(broker=config.QUEUE_BROKER)
 
 
 @celery.task(ignore_result=True)

@@ -3,10 +3,10 @@ version:
   dockerTag: latest
 
 server:
-  gunicornWorkers: 2
+  serverWorkers: 2
 
 worker:
-  celeryWorkers: 1
+  queueWorkers: 1
 
 logging:
   level: INFO
