@@ -26,7 +26,7 @@ class _Uploader(LogMixin):
 
         resource_id = upload_info.get('resource_id')
 
-        tasks.written_store.delay(resource_id)
+        tasks.written_store.apply_async(args=resource_id, queue='written_store')
 
         self.log_event(events.EMAILS_RECEIVED_FROM_CLIENT, {'domain': domain})  # noqa: E501
         return 'uploaded', 200

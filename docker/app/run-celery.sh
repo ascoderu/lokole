@@ -5,3 +5,18 @@
   worker \
   --concurrency="${QUEUE_WORKERS}" \
   --loglevel="${LOKOLE_LOG_LEVEL}"
+  --Q="written_store"
+
+"${PY_ENV}/bin/celery" \
+    --app="opwen_email_server.services.tasks" \
+    worker \
+    --concurrency="${QUEUE_WORKERS}" \
+    --loglevel="${LOKOLE_LOG_LEVEL}"
+    --Q="send"
+
+"${PY_ENV}/bin/celery" \
+    --app="opwen_email_server.services.tasks" \
+    worker \
+    --concurrency="${QUEUE_WORKERS}" \
+    --loglevel="${LOKOLE_LOG_LEVEL}"
+    --Q="inbound_store"

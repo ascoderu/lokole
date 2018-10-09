@@ -25,3 +25,10 @@ if environ.get('QUEUE_BROKER_SCHEME') == 'azureservicebus':
         host=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE'))
 else:
     QUEUE_BROKER = environ.get('QUEUE_BROKER_URL', '')
+
+
+def str2bool(s):
+  return s.lower() in ("true")
+
+
+CREATE_MISSING = str2bool(environ.get('CREATE_QUEUES', 'TRUE'))
