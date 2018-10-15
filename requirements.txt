@@ -4,7 +4,7 @@ azure-servicebus==0.21.1
 beautifulsoup4==4.6.3
 cached-property==1.5.1
 connexion==1.5.3
-gunicorn==19.8.1
+gunicorn==19.9.0
 pyzmail36==1.0.3
 requests==2.19.1
 sendgrid==5.6.0
