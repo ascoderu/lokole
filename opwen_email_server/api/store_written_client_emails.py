@@ -26,7 +26,7 @@ class _WrittenStorer(LogMixin):
             email_id = email['_uid']
             server_datastore.store_outbound_email(email_id, email)
 
-            tasks.send.apply_async(args=email_id, queue='send')
+            tasks.send.delay(email_id)
 
             num_stored += 1
             domain = get_domain(email.get('from', ''))

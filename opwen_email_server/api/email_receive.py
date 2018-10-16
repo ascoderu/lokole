@@ -34,7 +34,7 @@ class _Receiver(LogMixin):
 
         STORAGE.store_text(email_id, email)
 
-        tasks.inbound_store.apply_async(args=email_id, queue='inbound_store')
+        tasks.inbound_store.delay(email_id)
 
         self.log_event(events.EMAIL_RECEIVED_FOR_CLIENT, {'domain': domain})  # noqa: E501
         return 'received', 200
