@@ -176,7 +176,7 @@ class _SqlalchemyEmailStore(EmailStore):
         with self._dbwrite() as db:
             db.query(_Email)\
                 .filter(_match_email_uid(uids))\
-                .update(set_sent_at)
+                .update(set_sent_at, synchronize_session='fetch')
 
     def _mark_read(self, email_address, uids):
         set_read = {_Email.read: True}
@@ -253,4 +253,4 @@ def _can_access(email_address):
 
 
 def _match_email_uid(uids):
-    return or_(*(_Email.uid == uid for uid in uids))
+    return _Email.uid.in_(uids)
