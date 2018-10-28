@@ -7,7 +7,7 @@ from typing import Optional
 from flask import render_template
 from flask import request
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.datastructures import FileStorage
 from wtforms import FileField
 from wtforms import StringField
@@ -23,7 +23,7 @@ from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 
 
-class NewEmailForm(Form):
+class NewEmailForm(FlaskForm):
     to = StringField(
         validators=[DataRequired(i8n.EMAIL_TO_REQUIRED),
                     Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,

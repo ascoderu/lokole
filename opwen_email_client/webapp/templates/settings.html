@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+
+{% from 'macros/form.html' import render_field %}
+{% from 'macros/form.html' import render_button %}
+
+{% block libs %}{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/settings.min.css') }}">
+{% endblock %}
+
+{% block content %}{{ super() }}
+<form action="{{ url_for('settings') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+
+  <fieldset>
+    <legend>{{ _('Configure dial-up information') }}</legend>
+    {{ render_field(form.wvdial) }}
+  </fieldset>
+
+  {{ render_button(form.submit, _('Save settings')) }}
+</form>
+{% endblock %}

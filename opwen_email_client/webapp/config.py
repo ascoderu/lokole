@@ -15,6 +15,8 @@ root_domain = getenv('OPWEN_ROOT_DOMAIN', 'lokole.ca')
 
 # noinspection PyPep8Naming
 class i8n(object):
+    SETTINGS_UPDATED = _('Settings updated!')
+    WVDIAL_REQUIRED = _('Dial-up information required.')
     LOGIN_REQUIRED = _('Please log in to access this page.')
     UNAUTHORIZED = _('You do not have permission to view this page.')
     INVALID_PASSWORD = _('Invalid password.')
@@ -75,6 +77,7 @@ class AppConfig(object):
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
+    WVDIAL_PATH = '/etc/wvdial.conf'
     LOCAL_EMAIL_STORE = path.join(state_basedir, 'emails.sqlite3')
 
     EMAIL_ADDRESS_DELIMITER = ','

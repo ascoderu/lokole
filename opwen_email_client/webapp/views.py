@@ -24,7 +24,8 @@ from opwen_email_client.webapp.actions import SendWelcomeEmail
 from opwen_email_client.webapp.actions import SyncEmails
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
-from opwen_email_client.webapp.forms import NewEmailForm
+from opwen_email_client.webapp.forms.email import NewEmailForm
+from opwen_email_client.webapp.forms.settings import SettingsForm
 from opwen_email_client.webapp.login import User
 from opwen_email_client.webapp.login import admin_required
 from opwen_email_client.webapp.login import login_required
@@ -230,6 +231,20 @@ def users() -> Response:
                  users=User.query.all())
 
 
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@admin_required
+@track_history
+def settings() -> Response:
+    form = SettingsForm()
+    if form.validate_on_submit():
+        form.update_wvdial(AppConfig.WVDIAL_PATH)
+        flash(i8n.SETTINGS_UPDATED, category='success')
+        return redirect(url_for('settings'))
+
+    return _view('settings.html', form=SettingsForm.with_defaults(
+        wvdial_path=AppConfig.WVDIAL_PATH))
+
+
 @app.route('/admin/suspend/<userid>')
 @admin_required
 def suspend(userid: str) -> Response:
@@ -237,17 +252,17 @@ def suspend(userid: str) -> Response:
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
-        return redirect(url_for('admin'))
+        return redirect(url_for('users'))
 
     if user.is_admin:
         flash(i8n.ADMIN_CANNOT_BE_SUSPENDED, category='error')
-        return redirect(url_for('admin'))
+        return redirect(url_for('users'))
 
     user.active = False
     user.save()
 
     flash(i8n.USER_SUSPENDED, category='success')
-    return redirect(url_for('admin'))
+    return redirect(url_for('users'))
 
 
 @app.route('/admin/unsuspend/<userid>')
@@ -257,13 +272,13 @@ def unsuspend(userid: str) -> Response:
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
-        return redirect(url_for('admin'))
+        return redirect(url_for('users'))
 
     user.active = True
     user.save()
 
     flash(i8n.USER_UNSUSPENDED, category='success')
-    return redirect(url_for('admin'))
+    return redirect(url_for('users'))
 
 
 @app.route('/admin/password/reset/<userid>')
@@ -273,14 +288,14 @@ def reset_password(userid: str) -> Response:
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
-        return redirect(url_for('admin'))
+        return redirect(url_for('users'))
 
     new_password = genword()
     user.password = hash_password(new_password)
     user.save()
 
     flash(i8n.PASSWORD_CHANGED_BY_ADMIN + new_password, category='success')
-    return redirect(url_for('admin'))
+    return redirect(url_for('users'))
 
 
 # noinspection PyUnusedLocal

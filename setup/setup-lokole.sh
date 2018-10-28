@@ -78,6 +78,7 @@ create_link() { sudo ln -s "$1" "$2" || true; }
 copy_file() { sudo cp -f "$1" "$2" || echo "$1 does not exist, skipping copy to $2"; }
 delete() { if [ ! -L "$1" ]; then sudo rm -rf "$1"; else sudo unlink "$1"; fi }
 make_executable() { sudo chmod a+x "$1"; }
+make_writable() { sudo chmod a+rw "$1"; }
 create_virtualenv() { python3 -m venv "$1"; }
 change_password() { echo "$1:$2" | sudo chpasswd; }
 required_param() { [ -z "$1" ] && echo "Missing required parameter: $2" && (echo "$3" | head -1) && exit 1; }
@@ -537,6 +538,7 @@ if [ "${sim_type}" = "mkwvconf" ]; then
 fi
 
 copy_file "${opwen_dialer_config_directory}/${sim_type}" "${internet_dialer_config}"
+make_writable "${internet_dialer_config}"
 
 write_file "${internet_modem_config_e303}" << EOF
 DefaultVendor = 0x12d1
