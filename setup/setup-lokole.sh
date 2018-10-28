@@ -48,6 +48,10 @@ sync-schedule:            How often the Lokole should sync with the server. In
 Environment variables:
 --------------------------
 
+LOKOLE_ADMIN_NAME:        If set, create an admin user with this account name.
+
+LOKOLE_ADMIN_PASSWORD:    If set, create an admin user with this password.
+
 LOKOLE_PASSWORD:          If set to a non-empty string, updates the password of
                           the current user to this value as part of the setup.
                           Useful for fully automated setups of new devices that
@@ -377,6 +381,13 @@ export OPWEN_CLIENT_NAME='${opwen_webapp_config_client_name}'
 export OPWEN_EMAIL_SERVER_READ_API='${opwen_server_read_host}'
 export OPWEN_EMAIL_SERVER_WRITE_API='${opwen_server_write_host}'
 EOF
+
+if [ -n "${LOKOLE_ADMIN_NAME}" ] && [ -n "${LOKOLE_ADMIN_PASSWORD}" ]; then
+  . "${opwen_webapp_envs}"
+  "${opwen_webapp_virtualenv}/bin/manage.py" createadmin \
+    --name="${LOKOLE_ADMIN_NAME}" \
+    --password="${LOKOLE_ADMIN_PASSWORD}"
+fi
 
 
 info '
