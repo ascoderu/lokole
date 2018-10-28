@@ -15,8 +15,6 @@ from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
-from flask_security.utils import hash_password
-from passlib.pwd import genword
 
 from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
@@ -281,6 +279,26 @@ def unsuspend(userid: str) -> Response:
     return redirect(url_for('users'))
 
 
+@app.route('/admin/promote/<userid>')
+@admin_required
+def promote(userid: str) -> Response:
+    user = User.query.filter_by(id=userid).first()
+
+    if user is None:
+        flash(i8n.USER_DOES_NOT_EXIST, category='error')
+        return redirect(url_for('users'))
+
+    if user.is_admin:
+        flash(i8n.ALREADY_PROMOTED, category='error')
+        return redirect(url_for('users'))
+
+    user.make_admin()
+    user.save()
+
+    flash(i8n.USER_PROMOTED, category='success')
+    return redirect(url_for('users'))
+
+
 @app.route('/admin/password/reset/<userid>')
 @admin_required
 def reset_password(userid: str) -> Response:
@@ -290,8 +308,11 @@ def reset_password(userid: str) -> Response:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
         return redirect(url_for('users'))
 
-    new_password = genword()
-    user.password = hash_password(new_password)
+    if user.is_admin:
+        flash(i8n.ADMIN_PASSWORD_CANNOT_BE_RESET, category='error')
+        return redirect(url_for('users'))
+
+    new_password = user.reset_password()
     user.save()
 
     flash(i8n.PASSWORD_CHANGED_BY_ADMIN + new_password, category='success')

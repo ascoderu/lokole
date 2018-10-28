@@ -14,7 +14,9 @@ from flask_security import roles_required
 from flask_security.forms import email_required
 from flask_security.forms import email_validator
 from flask_security.forms import unique_user_email
+from flask_security.utils import hash_password
 from flask_sqlalchemy import SQLAlchemy
+from passlib.pwd import genword
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
 from wtforms import IntegerField
@@ -56,6 +58,14 @@ class User(_db.Model, UserMixin):
     @property
     def is_admin(self) -> bool:
         return self.has_role('admin')
+
+    def make_admin(self):
+        user_datastore.add_role_to_user(self, admin_role)
+
+    def reset_password(self) -> str:
+        new_password = genword()
+        self.password = hash_password(new_password)
+        return new_password
 
     def format_last_login(self, timezone_offset_minutes) -> str:
         if not self.last_login_at:

@@ -34,12 +34,17 @@ class i8n(object):
     ACCOUNT_SUSPENDED = _('Your account has been suspended. '
                           'Please contact your administrator.')
     SYNC_COMPLETE = _('Email synchronization completed.')
-    UNEXPECTED_ERROR = _('Unexpected error. Please contact your admin.')
+    UNEXPECTED_ERROR = _('Unexpected error. Please contact your '
+                         'administrator.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
     USER_DOES_NOT_EXIST = _('This user does not exist.')
     USER_SUSPENDED = _('The user was suspended.')
     USER_UNSUSPENDED = _('The user was un-suspended.')
+    USER_PROMOTED = _('The user now is an administrator.')
+    ALREADY_PROMOTED = _('The user already is an administrator.')
     ADMIN_CANNOT_BE_SUSPENDED = _("Administrators can't be suspended.")
+    ADMIN_PASSWORD_CANNOT_BE_RESET = _("Administrator password can't be "
+                                       "reset.")
     PASSWORD_CHANGED_BY_ADMIN = _('Password was reset by administrator to: ')
     SAME_PASSWORD = _(' Your new password must be different than your '
                       'previous password.')

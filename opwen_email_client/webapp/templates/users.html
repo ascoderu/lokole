@@ -37,9 +37,15 @@
           <span class="fa fa-unlock-alt" aria-hidden="true"></span> {{ _('Activate') }}
         </a>
         {% endif %}
+
+        {% if not user.is_admin %}
+        <a class="btn btn-default" href="{{ url_for('promote', userid=user.get_id()) }}">
+          <span class="fa fa-star" aria-hidden="true"></span> {{ _('Make administrator') }}
+        </a>
         <a class="btn btn-default" href="{{ url_for('reset_password', userid=user.get_id()) }}">
           <span class="fa fa-key" aria-hidden="true"></span> {{ _('Reset password') }}
         </a>
+        {% endif %}
         {% endif %}
       </div>
     </td>
