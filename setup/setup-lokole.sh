@@ -594,7 +594,7 @@ dialer_is_running() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidf
 connect_to_internet() { /usr/bin/wvdial --config="\${dialer_config}" 2> "\${dialer_logfile}" & echo \$! > "\${dialer_pidfile}"; }
 dialer_is_connected() { test -f "\${dialer_logfile}" && grep -q 'secondary DNS address' "\${dialer_logfile}"; }
 kill_dialer() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidfile}" && kill "\${pid}" && rm "\${dialer_pidfile}" && rm "\${dialer_logfile}"; }
-sync_emails() { /usr/bin/curl "http://localhost:${opwen_port}/sync?secret=\${sync_secret}"; }
+sync_emails() { /usr/bin/curl "http://localhost:${opwen_port}/admin/sync?secret=\${sync_secret}"; }
 
 setup_modem() {
   if   modem_is_e353;  then modem_target_mode='1001'; /usr/sbin/usb_modeswitch --config-file '${internet_modem_config_e353}'
@@ -667,7 +667,6 @@ main_with_retry() {
 }
 
 main_with_retry
-
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 

@@ -198,7 +198,7 @@ def logout_complete() -> Response:
     return redirect(url_for('home'))
 
 
-@app.route('/sync')
+@app.route('/admin/sync')
 @admin_required
 def sync() -> Response:
     sync_emails = SyncEmails(
