@@ -646,7 +646,28 @@ main() {
   fi
 }
 
-main 2>&1 | tee --append "\${sync_logfile}"
+main_with_retry() {
+  local attempts=0
+  local timeout=5
+
+  until [ "\${attempts}" -ge 5 ]; do
+    set -o pipefail
+    main 2>&1 | tee --append "\${sync_logfile}"
+    local exitcode="\$?"
+    set +o pipefail
+
+    if [ "\${exitcode}" -eq 0 ]; then
+      break
+    fi
+
+    attempts="\$((attempts+1))"
+    timeout="\$((timeout*2))"
+    sleep "\${timeout}"
+  done
+}
+
+main_with_retry
+
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 
