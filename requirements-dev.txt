@@ -1,5 +1,5 @@
 coverage==4.5.1
-flake8==3.5.0
+flake8==3.6.0
 librabbitmq==2.0.0
 lockfile==0.12.2
 mypy==0.641
