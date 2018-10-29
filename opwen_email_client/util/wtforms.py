@@ -68,7 +68,7 @@ class HtmlTextAreaField(TextAreaField):
 
 
 class SuffixedStringField(StringField):
-    def __init__(self, suffix: str='', *args, **kwargs):
+    def __init__(self, suffix: str = '', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._suffix = suffix
 

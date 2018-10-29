@@ -63,7 +63,7 @@ class User(_db.Model, UserMixin):
     def make_admin(self):
         user_datastore.add_role_to_user(self, admin_role)
 
-    def reset_password(self, password: Optional[str]=None) -> str:
+    def reset_password(self, password: Optional[str] = None) -> str:
         new_password = password or genword()
         self.password = hash_password(new_password)
         return new_password

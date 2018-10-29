@@ -9,7 +9,7 @@ from typing import TypeVar
 T = TypeVar('T')
 
 
-def getenv(key: str, default: T=None) -> T:
+def getenv(key: str, default: T = None) -> T:
     value = _getenv(key, default)
     try:
         return literal_eval(value)

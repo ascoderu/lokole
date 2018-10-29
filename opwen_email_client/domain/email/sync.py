@@ -63,7 +63,7 @@ class AzureSync(Sync):
         return NamedTemporaryFile()
 
     @classmethod
-    def _open(cls, fileobj: IO, mode: str='rb') -> GzipFile:
+    def _open(cls, fileobj: IO, mode: str = 'rb') -> GzipFile:
         return GzipFile(fileobj=fileobj, mode=mode)
 
     def _download_to_stream(self, blobname: str, container: str,

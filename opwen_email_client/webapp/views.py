@@ -360,7 +360,7 @@ def _localeselector() -> str:
 
 
 def _emails_view(emails: Iterable[dict], page: int,
-                 template: str='email.html') -> Response:
+                 template: str = 'email.html') -> Response:
     attachments_session = app.ioc.attachments_session
     offset_minutse = getattr(current_user, 'timezone_offset_minutes', 0)
     timezone_offset = timedelta(minutes=offset_minutse)

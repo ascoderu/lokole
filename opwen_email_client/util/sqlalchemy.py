@@ -18,7 +18,7 @@ def create_database(uri: str, base):
     return engine
 
 
-def get_or_create(db, model, create_method: str='',
+def get_or_create(db, model, create_method: str = '',
                   create_method_kwargs=None, **kwargs):
     try:
         return db.query(model).filter_by(**kwargs).one()
@@ -39,7 +39,7 @@ def get_or_create(db, model, create_method: str='',
 
 
 @contextmanager
-def session(session_maker, commit: bool=False):
+def session(session_maker, commit: bool = False):
     session_factory = scoped_session(session_maker)
     db = session_factory()
 
