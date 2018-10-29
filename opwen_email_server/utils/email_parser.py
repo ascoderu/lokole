@@ -24,7 +24,7 @@ from opwen_email_server.config import MAX_HEIGHT_IMAGES
 from opwen_email_server.config import MAX_WIDTH_IMAGES
 
 
-def _parse_body(message: PyzMessage, default_charset: str='ascii') -> str:
+def _parse_body(message: PyzMessage, default_charset: str = 'ascii') -> str:
     body_parts = (message.html_part, message.text_part)
     for part in body_parts:
         if part is None:
