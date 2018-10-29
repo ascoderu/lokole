@@ -59,7 +59,7 @@ class LogMixin(object):
                 _APPINSIGHTS.flush()
 
     # noinspection PyMethodMayBeStatic
-    def log_event(self, event_name: str, properties: Optional[dict]=None):
+    def log_event(self, event_name: str, properties: Optional[dict] = None):
         _LOG.info('%s%s%s', event_name, self.info_separator, properties)
 
         if _APPINSIGHTS:
