@@ -22,6 +22,8 @@ spec:
         image: {{.Values.version.imageRegistry}}/opwenserver_app:{{.Values.version.dockerTag}}
         command: ["/app/run-celery.sh"]
         env:
+        - name: CELERY_QUEUE_NAMES
+          value: written_store,inbound_store,send
         - name: QUEUE_WORKERS
           value: "{{.Values.worker.queueWorkers}}"
         {{ include "opwen.environment.shared" }}
