@@ -5,3 +5,4 @@
   worker \
   --concurrency="${QUEUE_WORKERS}" \
   --loglevel="${LOKOLE_LOG_LEVEL}"
+  --Q="${CELERY_QUEUE_NAMES}"

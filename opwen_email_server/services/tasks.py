@@ -23,5 +23,15 @@ def send(resource_id: str) -> None:
     send_outbound_emails.send(resource_id)
 
 
+task_routes = ([
+     (inbound_store, {'queue': 'inbound_store'}),
+     (written_store, {'queue': 'written_store'}),
+     (send, {'queue': 'send'})
+])
+
+celery.conf.update(
+    task_routes=task_routes
+)
+
 if __name__ == "__main__":
     celery.start()
