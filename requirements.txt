@@ -1,4 +1,5 @@
 Pillow==5.3.0
+apache-libcloud==2.4.0
 applicationinsights==0.11.7
 azure-servicebus==0.21.1
 beautifulsoup4==4.6.3
@@ -11,4 +12,3 @@ sendgrid==5.6.0
 typing==3.6.6
 https://github.com/celery/kombu/archive/b3dc9208837566193deda824bc67dc900c7ed9a6.zip
 celery==4.2.1
-https://github.com/apache/libcloud/archive/7d5eb6fffc4521824c87b2cf71d47bdcd2161cae.zip
