@@ -7,14 +7,14 @@ Flask-Security==3.0.0
 Flask-Testing==0.7.1
 Flask-WTF==0.14.2
 Flask==1.0.2
-SQLAlchemy==1.2.13
+SQLAlchemy==1.2.14
 WTForms==2.2.1
 Werkzeug==0.14.1
 bcrypt==3.1.4
 cached-property==1.5.1
 gunicorn==19.9.0
 passlib==1.7.1
-requests==2.20.0
+requests==2.20.1
 typing==3.6.6
 tzlocal==1.5.1
 https://github.com/apache/libcloud/archive/7d5eb6fffc4521824c87b2cf71d47bdcd2161cae.zip
