@@ -1,29 +1,11 @@
 from typing import Tuple
 from typing import Union
 
-from opwen_email_server import azure_constants as constants
-from opwen_email_server import config
 from opwen_email_server import events
 from opwen_email_server.backend import server_datastore
-from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.storage import AzureFileStorage
-from opwen_email_server.services.storage import AzureObjectStorage
-from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.backend.services import AUTH as CLIENTS
+from opwen_email_server.backend.services import CLIENT_STORAGE as STORAGE
 from opwen_email_server.utils.log import LogMixin
-
-STORAGE = AzureObjectStorage(
-    file_storage=AzureFileStorage(
-        account=config.CLIENT_STORAGE_ACCOUNT,
-        key=config.CLIENT_STORAGE_KEY,
-        container=constants.CONTAINER_CLIENT_PACKAGES,
-        provider=config.STORAGE_PROVIDER))
-
-CLIENTS = AzureAuth(
-    storage=AzureTextStorage(
-        account=config.TABLES_ACCOUNT,
-        key=config.TABLES_KEY,
-        container=constants.TABLE_AUTH,
-        provider=config.STORAGE_PROVIDER))
 
 
 class _Downloader(LogMixin):

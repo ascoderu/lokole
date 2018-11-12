@@ -1,20 +1,9 @@
 from typing import Tuple
 
-from opwen_email_server import azure_constants as constants
-from opwen_email_server import config
 from opwen_email_server import events
-from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.storage import AzureTextStorage
-from opwen_email_server.utils.log import LogMixin
-
+from opwen_email_server.backend.services import AUTH as CLIENTS
 from opwen_email_server.services import tasks
-
-CLIENTS = AzureAuth(
-    storage=AzureTextStorage(
-        account=config.TABLES_ACCOUNT,
-        key=config.TABLES_KEY,
-        container=constants.TABLE_AUTH,
-        provider=config.STORAGE_PROVIDER))
+from opwen_email_server.utils.log import LogMixin
 
 
 class _Uploader(LogMixin):
