@@ -1,13 +1,13 @@
 from re import match
 from unittest import TestCase
 
-from opwen_email_server import azure_constants
+from opwen_email_server.constants import azure
 
 
-class ConfigTests(TestCase):
+class AzureTests(TestCase):
     def test_azure_names_are_valid(self):
         acceptable_config_value = '^[a-z]{3,63}$'
-        constants = _get_constants(azure_constants)
+        constants = _get_constants(azure)
 
         for constant, value in constants:
             if not match(acceptable_config_value, value):

@@ -20,7 +20,6 @@ RUN if [ "${USE_DEVTOOLS}" = "True" ]; then \
     fi
 
 ADD opwen_email_server /app/opwen_email_server
-ADD runserver.py /app/runserver.py
 ADD docker/app/run-gunicorn.sh /app/run-gunicorn.sh
 ADD docker/app/run-celery.sh /app/run-celery.sh
 ADD docker/docker-entrypoint.sh /docker-entrypoint.sh

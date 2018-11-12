@@ -25,15 +25,6 @@ def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):
 def _cli():
     from argparse import ArgumentParser
     from argparse import FileType
-    from os.path import dirname
-    from os.path import join
-
-    try:
-        # noinspection PyUnresolvedReferences
-        from dotenv import load_dotenv
-        load_dotenv(join(dirname(__file__), '.env'))
-    except ImportError:
-        pass
 
     parser = ArgumentParser()
     parser.add_argument('--host', choices=_hosts, default=_host)

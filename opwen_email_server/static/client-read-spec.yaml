@@ -11,7 +11,7 @@ paths:
   '/{client_id}':
 
     get:
-      operationId: opwen_email_server.api.client_read.download
+      operationId: opwen_email_server.integration.connexion.client_read
       summary: Endpoint that the Lokole clients call to get their new emails from the server.
       produces:
         - application/json

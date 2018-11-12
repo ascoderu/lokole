@@ -1,6 +1,11 @@
 from gzip import GzipFile
 from io import BytesIO
 from json import dumps
+from json import loads
+
+
+def from_json(obj: str) -> dict:
+    return loads(obj)
 
 
 def to_json(obj: object) -> str:

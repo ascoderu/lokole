@@ -11,7 +11,7 @@ paths:
   '/{client_id}':
 
     post:
-      operationId: opwen_email_server.api.client_write.upload
+      operationId: opwen_email_server.integration.connexion.client_write
       summary: Endpoint where Lokole clients notify the server that they wish to send/upload some emails.
       consumes:
         - application/json

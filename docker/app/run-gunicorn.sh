@@ -5,7 +5,7 @@ api_spec_paths=(${CONNEXION_SPEC//,/ })
 
 apis=""
 for api_spec_path in "${api_spec_paths[@]}"; do
-  if [ ! -f "${api_spec_path}" ]; then
+  if [[ ! -f "${api_spec_path}" ]]; then
     echo "Unable to start server: connexion spec file ${api_spec_path} does not exist" >&2
     exit 1
   fi
@@ -17,4 +17,4 @@ apis="[${apis:1:${#apis}-1}]"
   --workers="${SERVER_WORKERS}" \
   --log-level="${LOKOLE_LOG_LEVEL}" \
   --bind="0.0.0.0:${PORT}" \
-  "runserver:build_app(apis=${apis}, server='${CONNEXION_SERVER}', ui=${TESTING_UI})"
+  "opwen_email_server.integration.wsgi:build_app(apis=${apis}, server='${CONNEXION_SERVER}', ui=${TESTING_UI})"

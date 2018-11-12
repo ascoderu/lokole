@@ -12,7 +12,7 @@ from unittest import TestCase
 from libcloud.storage.types import ObjectDoesNotExistError
 
 from opwen_email_server.services.storage import AzureFileStorage
-from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
 
 
@@ -32,10 +32,10 @@ class AzureTextStorageTests(TestCase):
     def test_list(self):
         self._storage.store_text('resource1', 'a')
         self._storage.store_text('resource2', 'b')
-        self.assertEqual(list(self._storage), ['resource1', 'resource2'])
+        self.assertEqual(list(self._storage.iter()), ['resource1', 'resource2'])
 
         self._storage.delete('resource2')
-        self.assertEqual(list(self._storage), ['resource1'])
+        self.assertEqual(list(self._storage.iter()), ['resource1'])
 
     def setUp(self):
         self._folder = mkdtemp()
@@ -146,7 +146,7 @@ class AzureObjectStorageTests(TestCase):
         self._folder = mkdtemp()
         self._container = 'container'
         mkdir(join(self._folder, self._container))
-        self._storage = AzureObjectStorage(
+        self._storage = AzureObjectsStorage(
             file_storage=AzureFileStorage(
                 account=self._folder,
                 key='unused',

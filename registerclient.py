@@ -2,11 +2,11 @@
 
 from argparse import ArgumentParser
 
-from opwen_email_server import azure_constants as constants
+from opwen_email_server.constants import azure as constants
 from opwen_email_server import config
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureFileStorage
-from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
 
 parser = ArgumentParser()
@@ -32,7 +32,7 @@ auth.insert(client_id=args.client, domain=args.domain)
 
 # noinspection PyStatementEffect,PyProtectedMember
 # hack to ensure that the container gets created before the client accesses it
-storage = AzureObjectStorage(
+storage = AzureObjectsStorage(
     file_storage=AzureFileStorage(
         account=args.client_account,
         key=args.client_key,
