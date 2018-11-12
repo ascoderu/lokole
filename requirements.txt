@@ -6,7 +6,7 @@ cached-property==1.5.1
 connexion==2.0.1
 gunicorn==19.9.0
 pyzmail36==1.0.3
-requests==2.20.0
+requests==2.20.1
 sendgrid==5.6.0
 typing==3.6.6
 https://github.com/celery/kombu/archive/b3dc9208837566193deda824bc67dc900c7ed9a6.zip
