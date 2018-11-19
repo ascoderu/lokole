@@ -4,7 +4,7 @@ applicationinsights==0.11.7
 azure-servicebus==0.21.1
 beautifulsoup4==4.6.3
 cached-property==1.5.1
-connexion==2.0.1
+connexion==2.0.2
 gunicorn==19.9.0
 pyzmail36==1.0.3
 requests==2.20.1
