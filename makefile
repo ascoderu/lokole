@@ -18,7 +18,8 @@ $(py_env)/bin/activate: requirements.txt
 	test -d $(py_env) || $(PYTHON) -m venv $(py_env)
 	$(py_env)/bin/pip install -U pip wheel
 	$(py_env)/bin/pip install -r requirements.txt
-	test -f requirements-dev.txt && $(py_env)/bin/pip install -r requirements-dev.txt
+	$(py_env)/bin/pip install -r requirements-dev.txt
+	$(py_env)/bin/pip install -r requirements-prod.txt
 
 venv: $(py_env)/bin/activate
 
