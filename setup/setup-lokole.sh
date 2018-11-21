@@ -49,8 +49,10 @@ Environment variables:
 --------------------------
 
 LOKOLE_ADMIN_NAME:        If set, create an admin user with this account name.
+                          Default: admin
 
 LOKOLE_ADMIN_PASSWORD:    If set, create an admin user with this password.
+                          Default: lokole1Admin
 
 LOKOLE_PASSWORD:          If set to a non-empty string, updates the password of
                           the current user to this value as part of the setup.
@@ -382,12 +384,13 @@ export OPWEN_EMAIL_SERVER_READ_API='${opwen_server_read_host}'
 export OPWEN_EMAIL_SERVER_WRITE_API='${opwen_server_write_host}'
 EOF
 
-if [ -n "${LOKOLE_ADMIN_NAME}" ] && [ -n "${LOKOLE_ADMIN_PASSWORD}" ]; then
-  . "${opwen_webapp_envs}"
-  "${opwen_webapp_virtualenv}/bin/manage.py" createadmin \
-    --name="${LOKOLE_ADMIN_NAME}" \
-    --password="${LOKOLE_ADMIN_PASSWORD}"
-fi
+lokole_admin_name="${LOKOLE_ADMIN_NAME:-admin}"
+lokole_admin_password="${LOKOLE_ADMIN_PASSWORD:-lokole1admin}"
+
+. "${opwen_webapp_envs}"
+"${opwen_webapp_virtualenv}/bin/manage.py" createadmin \
+  --name="${lokole_admin_name}" \
+  --password="${lokole_admin_password}"
 
 
 info '
