@@ -14,7 +14,8 @@ _ui = False
 
 
 def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):
-    app = App(__name__, host=host, port=port, server=server, swagger_ui=ui)
+    app = App(__name__, host=host, port=port, server=server,
+              options={'swagger_ui': ui})
 
     for api in apis:
         app.add_api(api)
