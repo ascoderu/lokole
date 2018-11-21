@@ -1,0 +1,3 @@
+[run]
+omit =
+    opwen_email_server/integration/*

@@ -7,6 +7,7 @@ SHELLCHECK=/usr/bin/shellcheck
 #
 # You shouldn't need to touch anything below this line.
 #
+pwd=$(shell pwd)
 py_env=venv
 py_packages=opwen_email_server
 
@@ -17,12 +18,13 @@ $(py_env)/bin/activate: requirements.txt
 	test -d $(py_env) || $(PYTHON) -m venv $(py_env)
 	$(py_env)/bin/pip install -U pip wheel
 	$(py_env)/bin/pip install -r requirements.txt
-	test -f requirements-dev.txt && $(py_env)/bin/pip install -r requirements-dev.txt
+	$(py_env)/bin/pip install -r requirements-dev.txt
+	$(py_env)/bin/pip install -r requirements-prod.txt
 
 venv: $(py_env)/bin/activate
 
 unit-tests: venv
-	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=$(py_packages)
+	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=$(py_packages) --cover-html
 
 tests: unit-tests
 
@@ -53,11 +55,11 @@ server: venv
     TESTING_UI="True" \
     PORT="8080" \
     CONNEXION_SERVER="flask" \
-    CONNEXION_SPEC="./opwen_email_server/static/email-receive-spec.yaml,./opwen_email_server/static/client-write-spec.yaml,./opwen_email_server/static/client-read-spec.yaml,./opwen_email_server/static/healthcheck-spec.yaml" \
-    ./docker/app/run-gunicorn.sh
+    CONNEXION_SPEC="$(pwd)/opwen_email_server/static/email-receive-spec.yaml,$(pwd)/opwen_email_server/static/client-write-spec.yaml,$(pwd)/opwen_email_server/static/client-read-spec.yaml,$(pwd)/opwen_email_server/static/healthcheck-spec.yaml" \
+    $(pwd)/docker/app/run-gunicorn.sh
 
 worker: venv
 	PY_ENV="$(py_env)" \
     QUEUE_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
-    ./docker/app/run-celery.sh
+    $(pwd)/docker/app/run-celery.sh

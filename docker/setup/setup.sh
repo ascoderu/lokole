@@ -96,7 +96,7 @@ EOF
 # create production deployment
 #
 
-if [ -z "${KUBERNETES_RESOURCE_GROUP_NAME}" ] || [ -z "${KUBERNETES_NODE_COUNT}" ] || [ -z "${KUBERNETES_NODE_SKU}" ]; then
+if [[ -z "${KUBERNETES_RESOURCE_GROUP_NAME}" ]] || [[ -z "${KUBERNETES_NODE_COUNT}" ]] || [[ -z "${KUBERNETES_NODE_SKU}" ]]; then
   log "Skipping production deployment to kubernetes since KUBERNETES_RESOURCE_GROUP_NAME, KUBERNETES_NODE_COUNT, or KUBERNETES_NODE_SKU are not set"
   exit 0
 fi
@@ -142,12 +142,12 @@ while :; do
     --set version.dockerTag="${k8sdockertag}" \
     "${scriptdir}/helm"
 
-  if [ "$?" -ne 0 ]; then log "Intermittent error for ${helmname}"; sleep 30s; else break; fi
+  if [[ "$?" -ne 0 ]]; then log "Intermittent error for ${helmname}"; sleep 30s; else break; fi
 done
 
 while :; do
   ingressip="$(kubectl get service --selector io.kompose.service=nginx --output jsonpath={..ip})"
-  if [ -z "${ingressip}" ]; then log "Waiting for ${k8sname} public IP"; sleep 30s; else break; fi
+  if [[ -z "${ingressip}" ]]; then log "Waiting for ${k8sname} public IP"; sleep 30s; else break; fi
 done
 
 cp ~/.kube/config /secrets/kube-config

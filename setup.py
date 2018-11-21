@@ -16,7 +16,6 @@ with open('version.txt') as fobj:
 
 packages = find_packages(exclude=['tests*'])
 scripts = [
-    'runserver.py',
     'registerclient.py',
 ]
 

@@ -14,7 +14,8 @@ _ui = False
 
 
 def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):
-    app = App(__name__, host=host, port=port, server=server, swagger_ui=ui)
+    app = App(__name__, host=host, port=port, server=server,
+              options={'swagger_ui': ui})
 
     for api in apis:
         app.add_api(api)
@@ -25,15 +26,6 @@ def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):
 def _cli():
     from argparse import ArgumentParser
     from argparse import FileType
-    from os.path import dirname
-    from os.path import join
-
-    try:
-        # noinspection PyUnresolvedReferences
-        from dotenv import load_dotenv
-        load_dotenv(join(dirname(__file__), '.env'))
-    except ImportError:
-        pass
 
     parser = ArgumentParser()
     parser.add_argument('--host', choices=_hosts, default=_host)

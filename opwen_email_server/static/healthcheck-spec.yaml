@@ -11,7 +11,7 @@ paths:
   '/ping':
 
     get:
-      operationId: opwen_email_server.api.healthcheck.ping
+      operationId: opwen_email_server.integration.connexion.healthcheck
       summary: Endpoint that the load-balancer hits to check if the server is healthy.
       responses:
         200:

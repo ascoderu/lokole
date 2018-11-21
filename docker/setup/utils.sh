@@ -21,7 +21,7 @@ required_env() {
   local scriptname="$1"
   local envname="$2"
 
-  if [ -z "${!envname}" ]; then
+  if [[ -z "${!envname}" ]]; then
     echo "${envname} must be set" >&2
     usage "${scriptname}"
     exit 1
@@ -32,7 +32,7 @@ required_file() {
   local scriptname="$1"
   local filename="$2"
 
-  if [ ! -f "${filename}" ]; then
+  if [[ ! -f "${filename}" ]]; then
     echo "${filename} must exist" >&2
     usage "${scriptname}"
     exit 1
@@ -55,7 +55,7 @@ get_dotenv() {
 use_resource_group() {
   local name="$1"
 
-  if [ "$(az group exists --name "${name}")" = "false" ]; then
+  if [[ "$(az group exists --name "${name}")" = "false" ]]; then
     log "Creating resource group ${name}"
 
     az group create --name "${name}"

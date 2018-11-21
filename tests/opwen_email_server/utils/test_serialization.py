@@ -11,6 +11,14 @@ class ToJsonTests(TestCase):
         self.assertNotIn(' ', serialized)
 
 
+class FromJsonTests(TestCase):
+    def test_roundtrip(self):
+        obj = {'a': 1, 'b': [2]}
+
+        self.assertEqual(obj, serialization.from_json(
+            serialization.to_json(obj)))
+
+
 class GzipTests(TestCase):
     sample_string = 'hello world\n'
 

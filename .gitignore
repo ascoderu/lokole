@@ -8,6 +8,7 @@ __pycache__/
 /*.egg-info/
 venv*/
 .coverage
+cover/
 .mypy_cache/
 
 serviceprincipal.json

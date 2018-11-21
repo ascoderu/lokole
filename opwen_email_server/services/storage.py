@@ -1,6 +1,5 @@
 from gzip import open as gzip_open
 from io import BytesIO
-from json import loads
 from typing import Iterable
 from typing import Iterator
 from typing import Optional
@@ -14,6 +13,7 @@ from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import Provider
 
 from opwen_email_server.utils.log import LogMixin
+from opwen_email_server.utils.serialization import from_json
 from opwen_email_server.utils.serialization import gunzip_string
 from opwen_email_server.utils.serialization import gzip_string
 from opwen_email_server.utils.serialization import to_json
@@ -50,7 +50,7 @@ class _BaseAzureStorage(LogMixin):
         resource = self._client.get_object(resource_id)
         resource.delete()
 
-    def __iter__(self) -> Iterator[str]:
+    def iter(self) -> Iterator[str]:
         for resource in self._client.list_objects():
             yield resource.name
 
@@ -87,7 +87,7 @@ class AzureTextStorage(_BaseAzureStorage):
         return text
 
 
-class AzureObjectStorage(LogMixin):
+class AzureObjectsStorage(LogMixin):
     _encoding = 'utf-8'
 
     def __init__(self, file_storage: AzureFileStorage) -> None:
@@ -132,7 +132,7 @@ class AzureObjectStorage(LogMixin):
             serialized = serialized[:len(serialized) - 1]
 
         try:
-            return loads(serialized)
+            return from_json(serialized)
         except ValueError:
             self.log_debug('Skipping non-JSONL line %s', line)
             return None
@@ -153,3 +153,16 @@ class AzureObjectStorage(LogMixin):
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
+
+
+class AzureObjectStorage(LogMixin):
+    def __init__(self, text_storage: AzureTextStorage):
+        self._text_storage = text_storage
+
+    def fetch_object(self, resource_id: str) -> dict:
+        serialized = self._text_storage.fetch_text(resource_id)
+        return from_json(serialized)
+
+    def store_object(self, resource_id: str, obj: dict) -> None:
+        serialized = to_json(obj)
+        self._text_storage.store_text(resource_id, serialized)
