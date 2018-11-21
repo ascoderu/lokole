@@ -1,11 +1,5 @@
-.idea/
-.vscode/
-
-*.pyc
-.coverage
-.mypy_cache/
-__pycache__/
-docs/
-tests/
-travis/
-venv*/
+*
+!docker/
+!helm/
+!opwen_email_server/
+!requirements*.txt
