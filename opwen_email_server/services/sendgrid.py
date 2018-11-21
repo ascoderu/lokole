@@ -108,7 +108,7 @@ class SendgridEmailSender(LogMixin):
         return mail_attachment
 
 
-def _cli():
+def _cli():  # pragma: no cover
     from argparse import ArgumentParser
     from argparse import FileType
     from base64 import b64encode

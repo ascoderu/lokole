@@ -12,6 +12,7 @@ from unittest import TestCase
 from libcloud.storage.types import ObjectDoesNotExistError
 
 from opwen_email_server.services.storage import AzureFileStorage
+from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
 
@@ -86,7 +87,7 @@ class AzureFileStorageTests(TestCase):
             remove(path)
 
 
-class AzureObjectStorageTests(TestCase):
+class AzureObjectsStorageTests(TestCase):
     def test_fetches_jsonl_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
         lines = b'{"foo":"bar"}\n{"baz":[1,2,3]}'
@@ -148,6 +149,31 @@ class AzureObjectStorageTests(TestCase):
         mkdir(join(self._folder, self._container))
         self._storage = AzureObjectsStorage(
             file_storage=AzureFileStorage(
+                account=self._folder,
+                key='unused',
+                container=self._container,
+                provider='LOCAL'))
+
+    def tearDown(self):
+        rmtree(self._folder)
+
+
+class AzureObjectStorageTests(TestCase):
+    def test_roundtrip(self):
+        given = {'a': 1}
+        resource_id = '123'
+
+        self._storage.store_object(resource_id, given)
+        actual = self._storage.fetch_object(resource_id)
+
+        self.assertEqual(given, actual)
+
+    def setUp(self):
+        self._folder = mkdtemp()
+        self._container = 'container'
+        mkdir(join(self._folder, self._container))
+        self._storage = AzureObjectStorage(
+            text_storage=AzureTextStorage(
                 account=self._folder,
                 key='unused',
                 container=self._container,
