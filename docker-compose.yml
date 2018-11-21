@@ -52,6 +52,8 @@ services:
       << : *shared-app-environment
       CELERY_QUEUE_NAMES: written_store,inbound_store,send
       QUEUE_WORKERS: ${QUEUE_WORKERS}
+    depends_on:
+      - rabbitmq
 
   rabbitmq:
     image: rabbitmq:3.7.8-management
