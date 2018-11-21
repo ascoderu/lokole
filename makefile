@@ -7,6 +7,7 @@ SHELLCHECK=/usr/bin/shellcheck
 #
 # You shouldn't need to touch anything below this line.
 #
+pwd=$(shell pwd)
 py_env=venv
 py_packages=opwen_email_server
 
@@ -53,11 +54,11 @@ server: venv
     TESTING_UI="True" \
     PORT="8080" \
     CONNEXION_SERVER="flask" \
-    CONNEXION_SPEC="./opwen_email_server/static/email-receive-spec.yaml,./opwen_email_server/static/client-write-spec.yaml,./opwen_email_server/static/client-read-spec.yaml,./opwen_email_server/static/healthcheck-spec.yaml" \
-    ./docker/app/run-gunicorn.sh
+    CONNEXION_SPEC="$(pwd)/opwen_email_server/static/email-receive-spec.yaml,$(pwd)/opwen_email_server/static/client-write-spec.yaml,$(pwd)/opwen_email_server/static/client-read-spec.yaml,$(pwd)/opwen_email_server/static/healthcheck-spec.yaml" \
+    $(pwd)/docker/app/run-gunicorn.sh
 
 worker: venv
 	PY_ENV="$(py_env)" \
     QUEUE_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
-    ./docker/app/run-celery.sh
+    $(pwd)/docker/app/run-celery.sh
