@@ -1,7 +1,10 @@
+from opwen_email_server import config
 from opwen_email_server.actions import DownloadClientEmails
 from opwen_email_server.actions import Ping
 from opwen_email_server.actions import ReceiveInboundEmail
+from opwen_email_server.actions import RegisterClient
 from opwen_email_server.actions import UploadClientEmails
+from opwen_email_server.integration.dns import setup_email_dns
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
@@ -24,5 +27,11 @@ client_read = DownloadClientEmails(
     client_storage=get_client_storage(),
     email_storage=get_email_storage(),
     pending_factory=get_pending_storage)
+
+client_register = RegisterClient(
+    auth=get_auth(),
+    client_storage_account=config.CLIENT_STORAGE_ACCOUNT,
+    client_storage_key=config.CLIENT_STORAGE_KEY,
+    setup_email_dns=setup_email_dns)
 
 healthcheck = Ping()

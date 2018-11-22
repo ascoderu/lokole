@@ -116,12 +116,12 @@ def _cli():  # pragma: no cover
     from os.path import basename
     from uuid import uuid4
 
-    from opwen_email_server.config import EMAIL_SENDER_KEY
+    from opwen_email_server.config import SENDGRID_KEY
 
     parser = ArgumentParser()
     parser.add_argument('email')
     parser.add_argument('--attachment', type=FileType('rb'))
-    parser.add_argument('--key', default=EMAIL_SENDER_KEY)
+    parser.add_argument('--key', default=SENDGRID_KEY)
     args = parser.parse_args()
 
     email = loads(args.email)

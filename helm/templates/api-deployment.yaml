@@ -23,10 +23,25 @@ spec:
         command: ["/app/run-gunicorn.sh"]
         env:
         - name: CONNEXION_SPEC
-          value: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
+          value: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/client-register-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
         - name: SERVER_WORKERS
           value: "{{.Values.server.serverWorkers}}"
         {{ include "opwen.environment.shared" }}
+        - name: LOKOLE_CLOUDFLARE_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare
+              key: LOKOLE_CLOUDFLARE_USER
+        - name: LOKOLE_CLOUDFLARE_ZONE
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare
+              key: LOKOLE_CLOUDFLARE_ZONE
+        - name: LOKOLE_CLOUDFLARE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare
+              key: LOKOLE_CLOUDFLARE_KEY
         ports:
         - containerPort: 80
         resources: {}

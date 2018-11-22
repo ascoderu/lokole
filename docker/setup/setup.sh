@@ -12,7 +12,6 @@
 ##   SUBSCRIPTION_ID
 ##   LOCATION
 ##   RESOURCE_GROUP_NAME
-##   SENDGRID_KEY
 ##
 ## Optional environment variables:
 ##
@@ -40,7 +39,6 @@ required_env "${scriptname}" "SP_TENANT"
 required_env "${scriptname}" "SUBSCRIPTION_ID"
 required_env "${scriptname}" "LOCATION"
 required_env "${scriptname}" "RESOURCE_GROUP_NAME"
-required_env "${scriptname}" "SENDGRID_KEY"
 
 #
 # connect to azure
@@ -88,10 +86,6 @@ LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME=$(jq -r .properties.outputs.serverQueuesSasN
 LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY=$(jq -r .properties.outputs.serverQueuesSasKey.value /tmp/deployment.json)
 EOF
 
-cat > /secrets/sendgrid.env << EOF
-LOKOLE_SENDGRID_KEY=${SENDGRID_KEY}
-EOF
-
 #
 # create production deployment
 #
@@ -126,6 +120,8 @@ az aks get-credentials --name "${k8sname}"
 log "Setting up kubernetes secrets for ${k8sname}"
 
 kubectl create secret generic "azure" --from-env-file "/secrets/azure.env"
+kubectl create secret generic "cloudflare" --from-env-file "/secrets/cloudflare.env"
+kubectl create secret generic "nginx" --from-env-file "/secrets/nginx.env"
 kubectl create secret generic "sendgrid" --from-env-file "/secrets/sendgrid.env"
 
 log "Setting up helm chart in cluster ${k8sname}"

@@ -122,6 +122,21 @@ to initialize the required cloud resources.
 
 .. sourcecode :: sh
 
+  cat > ${PWD}/secrets/sendgrid.env << EOM
+  LOKOLE_SENDGRID_KEY={the sendgrid key you created earlier}
+  EOM
+
+  cat > ${PWD}/secrets/cloudflare.env << EOM
+  LOKOLE_CLOUDFLARE_USER={the cloudflare user you created earlier}
+  LOKOLE_CLOUDFLARE_KEY={the cloudflare key you created earlier}
+  LOKOLE_CLOUDFLARE_ZONE={the cloudflare zone you created earlier}
+  EOM
+
+  cat > ${PWD}/secrets/nginx.env << EOM
+  REGISTRATION_USERNAME={some username for the registration endpoint}
+  REGISTRATION_PASSWORD={some password for the registration endpoint}
+  EOM
+
   docker build -t setup -f docker/setup/Dockerfile .
 
   docker run \
@@ -131,7 +146,6 @@ to initialize the required cloud resources.
     -e SUBSCRIPTION_ID={subscription id of your service principal} \
     -e LOCATION={an azure location like eastus} \
     -e RESOURCE_GROUP_NAME={the name of the resource group to create or reuse} \
-    -e SENDGRID_KEY={the sendgrid key you created earlier} \
     -v ${PWD}/secrets:/secrets \
     setup
 

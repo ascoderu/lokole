@@ -29,6 +29,18 @@ spec:
           value: api
         - name: HOSTNAME_EMAIL_RECEIVE
           value: api
+        - name: HOSTNAME_CLIENT_REGISTER
+          value: api
+        - name: REGISTRATION_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: nginx
+              key: REGISTRATION_USERNAME
+        - name: REGISTRATION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: nginx
+              key: REGISTRATION_PASSWORD
         ports:
         - containerPort: 80
         resources: {}

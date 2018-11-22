@@ -228,3 +228,28 @@ class UploadClientEmailsTests(TestCase):
         self.assertEqual(status, 200)
         self.auth.domain_for.assert_called_once_with(client_id)
         self.next_task.assert_called_once_with(resource_id)
+
+
+# noinspection PyTypeChecker
+class RegisterClientTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.client_id_source = MagicMock()
+        self.setup_email_dns = MagicMock()
+
+    def test_200(self):
+        client_id = str(uuid4())
+        client_storage_account = 'account'
+        client_storage_key = 'key'
+        domain = 'test.com'
+
+        self.client_id_source.return_value = client_id
+
+        action = actions.RegisterClient(self.auth, client_storage_account, client_storage_key, self.setup_email_dns, self.client_id_source)
+        response = action({'domain': domain})
+
+        self.assertEqual(response['client_id'], client_id)
+        self.assertEqual(response['storage_account'], client_storage_account)
+        self.assertEqual(response['storage_key'], client_storage_key)
+        self.auth.insert.assert_called_once_with(client_id, domain)
+        self.setup_email_dns.assert_called_once_with(client_id, domain)

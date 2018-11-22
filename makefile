@@ -55,7 +55,7 @@ server: venv
     TESTING_UI="True" \
     PORT="8080" \
     CONNEXION_SERVER="flask" \
-    CONNEXION_SPEC="$(pwd)/opwen_email_server/static/email-receive-spec.yaml,$(pwd)/opwen_email_server/static/client-write-spec.yaml,$(pwd)/opwen_email_server/static/client-read-spec.yaml,$(pwd)/opwen_email_server/static/healthcheck-spec.yaml" \
+    CONNEXION_SPEC="$(pwd)/opwen_email_server/static/email-receive-spec.yaml,$(pwd)/opwen_email_server/static/client-write-spec.yaml,$(pwd)/opwen_email_server/static/client-read-spec.yaml,$(pwd)/opwen_email_server/static/client-register-spec.yaml,$(pwd)/opwen_email_server/static/healthcheck-spec.yaml" \
     $(pwd)/docker/app/run-gunicorn.sh
 
 worker: venv

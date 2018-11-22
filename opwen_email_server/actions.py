@@ -217,3 +217,36 @@ class UploadClientEmails(LogMixin):
 
         self.log_event(events.EMAILS_RECEIVED_FROM_CLIENT, {'domain': domain})  # noqa: E501
         return 'uploaded', 200
+
+
+class RegisterClient(LogMixin):
+    def __init__(self,
+                 auth: AzureAuth,
+                 client_storage_account: str,
+                 client_storage_key: str,
+                 setup_email_dns: Callable[[str, str], None],
+                 client_id_source: Callable[[], str] = None):
+
+        self._auth = auth
+        self._client_storage_account = client_storage_account
+        self._client_storage_key = client_storage_key
+        self._setup_email_dns = setup_email_dns
+        self._client_id_source = client_id_source or self._new_client_id
+
+    def __call__(self, client: dict) -> Response:
+        client_id = self._client_id_source()
+        domain = client['domain']
+
+        self._setup_email_dns(client_id, domain)
+        self._auth.insert(client_id, domain)
+
+        self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501
+        return {
+            'client_id': client_id,
+            'storage_account': self._client_storage_account,
+            'storage_key': self._client_storage_key,
+        }
+
+    @classmethod
+    def _new_client_id(cls) -> str:
+        return str(uuid4())
