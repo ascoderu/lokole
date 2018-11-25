@@ -1,4 +1,6 @@
 from logging import Formatter
+from logging import Logger
+from logging import Handler
 from logging import StreamHandler
 from logging import getLogger
 from typing import Any
@@ -13,23 +15,37 @@ from opwen_email_server.config import LOG_LEVEL
 from opwen_email_server.constants.logging import SEPARATOR
 from opwen_email_server.constants.logging import STDERR
 
-_STDERR = StreamHandler()
-_STDERR.setFormatter(Formatter(STDERR))
 
-_LOG = getLogger()
-_LOG.addHandler(_STDERR)
-_LOG.setLevel(LOG_LEVEL)
+def _get_log_handlers() -> Iterable[Handler]:
+    stderr = StreamHandler()
+    stderr.setFormatter(Formatter(STDERR))
+    yield stderr
 
-_APPINSIGHTS = None  # type: TelemetryClient
 
-if APPINSIGHTS_KEY:
-    _APPINSIGHTS = TelemetryClient(APPINSIGHTS_KEY)
-    _APPINSIGHTS.channel.sender.send_interval_in_milliseconds = 30 * 1000
-    _APPINSIGHTS.channel.sender.max_queue_item_count = 10
+def _get_logger() -> Logger:
+    log = getLogger()
+    for handler in _get_log_handlers():
+        log.addHandler(handler)
+    log.setLevel(LOG_LEVEL)
+    return log
+
+
+def _get_telemetry_client() -> Optional[TelemetryClient]:
+    if not APPINSIGHTS_KEY:
+        return None
+
+    telemetry_client = TelemetryClient(APPINSIGHTS_KEY)
+    telemetry_client.channel.sender.send_interval_in_milliseconds = 30 * 1000
+    telemetry_client.channel.sender.max_queue_item_count = 10
     exceptions.enable(APPINSIGHTS_KEY)
+
+    return telemetry_client
 
 
 class LogMixin(object):
+    _logger = _get_logger()
+    _telemetry_client = _get_telemetry_client()
+
     def log_debug(self, message: str, *args: Any):
         self._log('debug', message, args)
 
@@ -48,21 +64,23 @@ class LogMixin(object):
         message_parts.append(log_message)
         args.extend(log_args)
         message = SEPARATOR.join(message_parts)
-        log = getattr(_LOG, level)
+        log = getattr(self._logger, level)
         log(message, *args)
 
-        if _APPINSIGHTS:
-            _APPINSIGHTS.track_trace(message % tuple(args), {'level': level})
+        if self._telemetry_client:
+            self._telemetry_client.track_trace(
+                message % tuple(args), {'level': level})
+
             if self.should_send_message_immediately(level):
-                _APPINSIGHTS.flush()
+                self._telemetry_client.flush()
 
     # noinspection PyMethodMayBeStatic
     def log_event(self, event_name: str, properties: Optional[dict] = None):
-        _LOG.info('%s%s%s', event_name, SEPARATOR, properties)
+        self._logger.info('%s%s%s', event_name, SEPARATOR, properties)
 
-        if _APPINSIGHTS:
-            _APPINSIGHTS.track_event(event_name, properties)
-            _APPINSIGHTS.flush()
+        if self._telemetry_client:
+            self._telemetry_client.track_event(event_name, properties)
+            self._telemetry_client.flush()
 
     # noinspection PyMethodMayBeStatic
     def should_send_message_immediately(self, level: str) -> bool:

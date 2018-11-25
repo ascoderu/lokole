@@ -1,12 +1,12 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from opwen_email_server.utils import log
+from opwen_email_server.utils.log import LogMixin
 
 
 class LogMixinTests(TestCase):
     def test_adds_class_name_to_output(self):
-        class Foo(log.LogMixin):
+        class Foo(LogMixin):
             def foo(self):
                 self.log_info('message %d', 123)
         Foo().foo()
@@ -14,14 +14,14 @@ class LogMixinTests(TestCase):
         self.assertDidLog('info', '%s|message %d', 'Foo', 123)
 
     def test_important_messages_get_quickly_sent_by_appinsights(self):
-        class Foo(log.LogMixin):
+        class Foo(LogMixin):
             def foo(self):
                 self.log_info('message %d', 123)
         Foo().foo()
         self.assertAppInsightsIsSent()
 
     def test_not_important_messages_get_delayed_by_appinsights(self):
-        class Foo(log.LogMixin):
+        class Foo(LogMixin):
             def foo(self):
                 self.log_debug('message %d', 123)
         Foo().foo()
@@ -51,9 +51,9 @@ class LogMixinTests(TestCase):
             self.fail('unable to format string: %s %% %r' % (fmt, args))
 
     def setUp(self):
-        self.log_patcher = patch.object(log, '_LOG')
-        self.appinsights_patcher = patch.object(log, '_APPINSIGHTS')
-        self.logger_mock = self.log_patcher.start()
-        self.appinsights_mock = self.appinsights_patcher.start()
-        self.addCleanup(self.log_patcher.stop)
-        self.addCleanup(self.appinsights_patcher.stop)
+        log_patcher = patch.object(LogMixin, '_logger')
+        appinsights_patcher = patch.object(LogMixin, '_telemetry_client')
+        self.logger_mock = log_patcher.start()
+        self.appinsights_mock = appinsights_patcher.start()
+        self.addCleanup(log_patcher.stop)
+        self.addCleanup(appinsights_patcher.stop)
