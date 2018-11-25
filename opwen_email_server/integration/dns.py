@@ -60,9 +60,6 @@ class SetupEmailDns(LogMixin):
         ).raise_for_status()
 
 
-setup_email_dns = SetupEmailDns()
-
-
 def _cli():
     from argparse import ArgumentParser
 
@@ -71,6 +68,7 @@ def _cli():
     parser.add_argument('--domain', required=True)
     args = parser.parse_args()
 
+    setup_email_dns = SetupEmailDns()
     setup_email_dns(args.client_id, args.domain)
 
 

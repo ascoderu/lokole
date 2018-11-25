@@ -10,7 +10,7 @@ from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.celery import inbound_store
 from opwen_email_server.integration.celery import written_store
-from opwen_email_server.integration.dns import setup_email_dns
+from opwen_email_server.integration.dns import SetupEmailDns
 
 email_receive = ReceiveInboundEmail(
     auth=get_auth(),
@@ -30,6 +30,6 @@ client_read = DownloadClientEmails(
 client_register = RegisterClient(
     auth=get_auth(),
     client_storage=get_client_storage(),
-    setup_email_dns=setup_email_dns)
+    setup_email_dns=SetupEmailDns())
 
 healthcheck = Ping()
