@@ -1,3 +1,4 @@
+=================
 Opwen cloudserver
 =================
 
@@ -13,6 +14,7 @@ Opwen cloudserver
 .. image:: https://codecov.io/gh/ascoderu/opwen-cloudserver/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/ascoderu/opwen-cloudserver
 
+------------
 What's this?
 ------------
 
@@ -30,6 +32,7 @@ and has two main responsibilities:
 
 More background information can be found in the `opwen-webapp README <https://github.com/ascoderu/opwen-webapp/blob/master/README.rst>`_.
 
+---------------
 System overview
 ---------------
 
@@ -39,6 +42,7 @@ System overview
   :alt: Overview of the Lokole system
   :target: https://user-images.githubusercontent.com/1086421/42739204-67798f44-8847-11e8-9613-312a860cfb1e.png
 
+--------------------
 Data exchange format
 --------------------
 
@@ -60,6 +64,7 @@ describes an email, using the following schema:
     "attachments": [{"filename": "string", "content": "base64"}]
   }
 
+-----------------
 Development setup
 -----------------
 
@@ -97,6 +102,9 @@ After installing Docker, you can run the application stack with one command:
 .. sourcecode :: sh
 
   docker-compose up --build
+
+Finding your way around the project
+===================================
 
 There are OpenAPI specifications that document the functionality of the
 application and provide references to the entry points into the code
@@ -148,6 +156,9 @@ Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine
 but if you wish to set up the full end-to-end stack that leverages the
 same services as we use in production, keep on reading.
+
+Integration setup
+=================
 
 The project uses Sendgrid, so to emulate a full production environment,
 follow these `Sendgrid setup instructions <https://sendgrid.com/free/>`_ to
@@ -201,8 +212,9 @@ following command:
 
   docker-compose -f docker-compose.yml -f docker-compose.secrets.yml up --build
 
-Production setup
-----------------
+---------------------
+Production deployment
+---------------------
 
 To set up a production-ready deployment of the system, follow the development
 setup scripts described above, but additionally also pass the following
