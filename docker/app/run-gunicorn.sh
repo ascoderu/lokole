@@ -13,6 +13,13 @@ for api_spec_path in "${api_spec_paths[@]}"; do
 done
 apis="[${apis:1:${#apis}-1}]"
 
+
+if [[ "${LOKOLE_STORAGE_PROVIDER}" = "LOCAL" ]]; then
+  mkdir -p "${LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME}"
+  mkdir -p "${LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME}"
+  mkdir -p "${LOKOLE_CLIENT_AZURE_STORAGE_NAME}"
+fi
+
 "${PY_ENV}/bin/gunicorn" \
   --workers="${SERVER_WORKERS}" \
   --log-level="${LOKOLE_LOG_LEVEL}" \

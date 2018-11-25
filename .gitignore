@@ -12,3 +12,6 @@ cover/
 .mypy_cache/
 
 serviceprincipal.json
+volumes/
+register.json
+download.json
