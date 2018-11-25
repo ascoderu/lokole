@@ -13,18 +13,6 @@ class LogMixinTests(TestCase):
 
         self.assertDidLog('info', '%s|message %d', 'Foo', 123)
 
-    def test_adds_extra_args_to_output(self):
-        class Bar(log.LogMixin):
-            def bar(self):
-                self.log_info('message %d', 3)
-
-            def extra_log_args(self):
-                yield 'a %s', 1
-                yield 'b %s', 2
-        Bar().bar()
-
-        self.assertDidLog('info', '%s|a %s|b %s|message %d', 'Bar', 1, 2, 3)
-
     def test_important_messages_get_quickly_sent_by_appinsights(self):
         class Foo(log.LogMixin):
             def foo(self):

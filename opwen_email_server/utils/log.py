@@ -4,17 +4,17 @@ from logging import getLogger
 from typing import Any
 from typing import Iterable
 from typing import Optional
-from typing import Tuple
 
 from applicationinsights import TelemetryClient
 from applicationinsights import exceptions
 
 from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
+from opwen_email_server.constants.logging import SEPARATOR
+from opwen_email_server.constants.logging import STDERR
 
-_STDERR_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
 _STDERR = StreamHandler()
-_STDERR.setFormatter(Formatter(_STDERR_FORMAT))
+_STDERR.setFormatter(Formatter(STDERR))
 
 _LOG = getLogger()
 _LOG.addHandler(_STDERR)
@@ -30,8 +30,6 @@ if APPINSIGHTS_KEY:
 
 
 class LogMixin(object):
-    info_separator = '|'
-
     def log_debug(self, message: str, *args: Any):
         self._log('debug', message, args)
 
@@ -47,12 +45,9 @@ class LogMixin(object):
     def _log(self, level: str, log_message: str, log_args: Iterable[Any]):
         message_parts = ['%s']
         args = [self.__class__.__name__]
-        for message_part, arg in self.extra_log_args():
-            message_parts.append(message_part)
-            args.append(arg)
         message_parts.append(log_message)
         args.extend(log_args)
-        message = self.info_separator.join(message_parts)
+        message = SEPARATOR.join(message_parts)
         log = getattr(_LOG, level)
         log(message, *args)
 
@@ -63,7 +58,7 @@ class LogMixin(object):
 
     # noinspection PyMethodMayBeStatic
     def log_event(self, event_name: str, properties: Optional[dict] = None):
-        _LOG.info('%s%s%s', event_name, self.info_separator, properties)
+        _LOG.info('%s%s%s', event_name, SEPARATOR, properties)
 
         if _APPINSIGHTS:
             _APPINSIGHTS.track_event(event_name, properties)
@@ -72,7 +67,3 @@ class LogMixin(object):
     # noinspection PyMethodMayBeStatic
     def should_send_message_immediately(self, level: str) -> bool:
         return level != 'debug'
-
-    # noinspection PyMethodMayBeStatic
-    def extra_log_args(self) -> Iterable[Tuple[str, Any]]:
-        return []
