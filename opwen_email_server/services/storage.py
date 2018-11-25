@@ -115,7 +115,7 @@ class AzureObjectsStorage(LogMixin):
                     fobj.write(encoded)
                     fobj.write(b'\n')
                     num_stored += 1
-                    self.log_debug('stored email %s', obj.get('_uid'))
+                    self.log_debug('stored object %s', obj.get('_uid', ''))
 
             if num_stored > 0:
                 self._file_storage.store_file(resource_id, path)
