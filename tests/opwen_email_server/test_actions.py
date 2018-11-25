@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from opwen_email_server import actions
+from opwen_email_server.services.storage import AccessInfo
 
 
 class PingTests(TestCase):
@@ -228,3 +229,49 @@ class UploadClientEmailsTests(TestCase):
         self.assertEqual(status, 200)
         self.auth.domain_for.assert_called_once_with(client_id)
         self.next_task.assert_called_once_with(resource_id)
+
+
+# noinspection PyTypeChecker
+class RegisterClientTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.client_storage = Mock()
+        self.setup_email_dns = MagicMock()
+        self.client_id_source = MagicMock()
+
+    def test_409(self):
+        domain = 'test.com'
+
+        self.client_storage.exists.return_value = True
+
+        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_email_dns, self.client_id_source)
+        _, status = action({'domain': domain})
+
+        self.assertEqual(status, 409)
+        self.client_storage.exists.assert_called_once_with(domain)
+
+    def test_200(self):
+        client_id = str(uuid4())
+        client_storage_account = 'account'
+        client_storage_key = 'key'
+        client_storage_container = 'container'
+        domain = 'test.com'
+
+        self.client_id_source.return_value = client_id
+        self.client_storage.exists.return_value = False
+        self.client_storage.access_info.return_value = AccessInfo(
+            account=client_storage_account,
+            key=client_storage_key,
+            container=client_storage_container)
+
+        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_email_dns, self.client_id_source)
+        response = action({'domain': domain})
+
+        self.assertEqual(response['client_id'], client_id)
+        self.assertEqual(response['storage_account'], client_storage_account)
+        self.assertEqual(response['storage_key'], client_storage_key)
+        self.assertEqual(response['resource_container'], client_storage_container)
+        self.auth.insert.assert_called_once_with(client_id, domain)
+        self.assertEqual(self.client_storage.store_objects.call_count, 1)
+        self.client_storage.exists.assert_called_once_with(domain)
+        self.setup_email_dns.assert_called_once_with(client_id, domain)

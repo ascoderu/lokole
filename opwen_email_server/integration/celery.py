@@ -45,12 +45,16 @@ def send(resource_id: str) -> None:
     action(resource_id)
 
 
+def _fqn(task):
+    return '{}.{}'.format(__name__, task.__name__)
+
+
 celery.conf.update(
-    task_routes=([
-         (inbound_store, {'queue': INBOUND_STORE_QUEUE}),
-         (written_store, {'queue': WRITTEN_STORE_QUEUE}),
-         (send, {'queue': SEND_QUEUE})
-    ]))
+    task_routes={
+         _fqn(inbound_store): {'queue': INBOUND_STORE_QUEUE},
+         _fqn(written_store): {'queue': WRITTEN_STORE_QUEUE},
+         _fqn(send): {'queue': SEND_QUEUE}
+    })
 
 
 if __name__ == '__main__':

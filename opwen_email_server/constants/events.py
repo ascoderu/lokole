@@ -1,3 +1,4 @@
+NEW_CLIENT_REGISTERED = 'new_client_registered'
 UNREGISTERED_CLIENT = 'unregistered_client'
 EMAILS_DELIVERED_TO_CLIENT = 'emails_delivered_to_client'
 EMAILS_RECEIVED_FROM_CLIENT = 'emails_received_from_client'

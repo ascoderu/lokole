@@ -31,5 +31,11 @@ server {
     location /api/email/download {
       proxy_pass http://{{HOSTNAME_CLIENT_READ}};
     }
+
+    location /api/email/register {
+      auth_basic "Authorized requests only";
+      auth_basic_user_file /etc/nginx/.htpasswd;
+      proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
+    }
   }
 }

@@ -42,7 +42,7 @@ def get_raw_email_storage() -> AzureTextStorage:
 @lru_cache(maxsize=1)
 def get_email_sender() -> SendgridEmailSender:
     return SendgridEmailSender(
-        key=config.EMAIL_SENDER_KEY)
+        key=config.SENDGRID_KEY)
 
 
 @lru_cache(maxsize=1)

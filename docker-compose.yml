@@ -32,6 +32,9 @@ services:
       HOSTNAME_CLIENT_READ: api
       HOSTNAME_CLIENT_WRITE: api
       HOSTNAME_EMAIL_RECEIVE: api
+      HOSTNAME_CLIENT_REGISTER: api
+      REGISTRATION_USERNAME: admin
+      REGISTRATION_PASSWORD: password
     depends_on:
       - api
 
@@ -40,10 +43,12 @@ services:
     command: ["/app/run-gunicorn.sh"]
     environment:
       << : *shared-app-environment
-      CONNEXION_SPEC: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
+      CONNEXION_SPEC: /app/opwen_email_server/static/email-receive-spec.yaml,/app/opwen_email_server/static/client-read-spec.yaml,/app/opwen_email_server/static/client-write-spec.yaml,/app/opwen_email_server/static/client-register-spec.yaml,/app/opwen_email_server/static/healthcheck-spec.yaml
       CONNEXION_SERVER: flask
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
+    volumes:
+      - ./volumes/data:/data
 
   worker:
     << : *shared-app-build
@@ -54,6 +59,8 @@ services:
       QUEUE_WORKERS: ${QUEUE_WORKERS}
     depends_on:
       - rabbitmq
+    volumes:
+      - ./volumes/data:/data
 
   rabbitmq:
     image: rabbitmq:3.7.8-management

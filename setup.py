@@ -15,10 +15,6 @@ with open('version.txt') as fobj:
 
 
 packages = find_packages(exclude=['tests*'])
-scripts = [
-    'registerclient.py',
-]
-
 
 setup(
     name='opwen_email_server',
@@ -30,7 +26,6 @@ setup(
     license='Apache Software License',
     description='Email server for the Lokole project: https://ascoderu.ca',
     long_description=long_description,
-    scripts=scripts,
     include_package_data=True,
     install_requires=install_requires,
     classifiers=[

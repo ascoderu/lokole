@@ -1,0 +1,54 @@
+swagger: '2.0'
+
+info:
+  title: Opwen Cloudserver Email API.
+  version: '0.1'
+
+basePath: '/api/email/register'
+
+paths:
+
+  '/':
+
+    post:
+      operationId: opwen_email_server.integration.connexion.client_register
+      summary: Endpoint where Lokole clients register themselves.
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: client
+        in: body
+        required: true
+        description: Registration of the Lokole client.
+        schema:
+          type: object
+          properties:
+            domain:
+              description: Domain for which to register the client.
+              type: string
+          required:
+          - domain
+      responses:
+        200:
+          description: The client was successfully registered.
+          schema:
+            properties:
+              client_id:
+                description: Registered Lokole client.
+                type: string
+              storage_account:
+                description: Storage account name for the client.
+                type: string
+              storage_key:
+                description: Storage account key for the client.
+                type: string
+              resource_container:
+                description: Storage account container for the client.
+                type: string
+            required:
+            - client_id
+            - storage_account
+            - storage_key
+            - resource_container
