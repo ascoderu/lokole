@@ -44,7 +44,11 @@ paths:
               storage_key:
                 description: Storage account key for the client.
                 type: string
+              resource_container:
+                description: Storage account container for the client.
+                type: string
             required:
             - client_id
             - storage_account
             - storage_key
+            - resource_container

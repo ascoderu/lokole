@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from opwen_email_server import actions
+from opwen_email_server.services.storage import AccessInfo
 
 
 class PingTests(TestCase):
@@ -234,22 +235,30 @@ class UploadClientEmailsTests(TestCase):
 class RegisterClientTests(TestCase):
     def setUp(self):
         self.auth = Mock()
-        self.client_id_source = MagicMock()
+        self.client_storage = Mock()
         self.setup_email_dns = MagicMock()
+        self.client_id_source = MagicMock()
 
     def test_200(self):
         client_id = str(uuid4())
         client_storage_account = 'account'
         client_storage_key = 'key'
+        client_storage_container = 'container'
         domain = 'test.com'
 
         self.client_id_source.return_value = client_id
+        self.client_storage.access_info.return_value = AccessInfo(
+            account=client_storage_account,
+            key=client_storage_key,
+            container=client_storage_container)
 
-        action = actions.RegisterClient(self.auth, client_storage_account, client_storage_key, self.setup_email_dns, self.client_id_source)
+        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_email_dns, self.client_id_source)
         response = action({'domain': domain})
 
         self.assertEqual(response['client_id'], client_id)
         self.assertEqual(response['storage_account'], client_storage_account)
         self.assertEqual(response['storage_key'], client_storage_key)
+        self.assertEqual(response['resource_container'], client_storage_container)
         self.auth.insert.assert_called_once_with(client_id, domain)
+        self.assertEqual(self.client_storage.store_objects.call_count, 1)
         self.setup_email_dns.assert_called_once_with(client_id, domain)

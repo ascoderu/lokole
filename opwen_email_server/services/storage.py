@@ -1,3 +1,4 @@
+from collections import namedtuple
 from gzip import open as gzip_open
 from io import BytesIO
 from typing import Iterable
@@ -20,6 +21,8 @@ from opwen_email_server.utils.serialization import to_json
 from opwen_email_server.utils.temporary import create_tempfilename
 from opwen_email_server.utils.temporary import removing
 
+AccessInfo = namedtuple('AccessInfo', ['account', 'key', 'container'])
+
 
 class _BaseAzureStorage(LogMixin):
     def __init__(self, account: str, key: str, container: str,
@@ -39,9 +42,11 @@ class _BaseAzureStorage(LogMixin):
             container = client.create_container(self._container)
         return container
 
-    @property
-    def container(self) -> str:
-        return self._container
+    def access_info(self) -> AccessInfo:
+        return AccessInfo(
+            account=self._account,
+            key=self._key,
+            container=self._container)
 
     def extra_log_args(self):
         yield 'container %s', self._container
@@ -93,12 +98,13 @@ class AzureObjectsStorage(LogMixin):
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
 
-    @property
-    def container(self) -> str:
-        return self._file_storage.container
+    def access_info(self) -> AccessInfo:
+        return self._file_storage.access_info()
 
-    def store_objects(self, objs: Iterable[dict]) -> Optional[str]:
-        resource_id = str(uuid4())
+    def store_objects(self, objs: Iterable[dict],
+                      resource_id: Optional[str] = None) -> Optional[str]:
+
+        resource_id = resource_id or str(uuid4())
 
         num_stored = 0
         with removing(create_tempfilename()) as path:

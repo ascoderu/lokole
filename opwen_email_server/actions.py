@@ -182,8 +182,6 @@ class DownloadClientEmails(LogMixin):
         self.log_event(events.EMAILS_DELIVERED_TO_CLIENT, {'domain': domain, 'num_emails': len(delivered)})  # noqa: E501
         return {
             'resource_id': resource_id,
-            'resource_container': self._client_storage.container,
-            'resource_type': 'azure-blob',
         }
 
     def _fetch_pending_emails(self, pending_storage: AzureTextStorage):
@@ -222,29 +220,30 @@ class UploadClientEmails(LogMixin):
 class RegisterClient(LogMixin):
     def __init__(self,
                  auth: AzureAuth,
-                 client_storage_account: str,
-                 client_storage_key: str,
+                 client_storage: AzureObjectsStorage,
                  setup_email_dns: Callable[[str, str], None],
                  client_id_source: Callable[[], str] = None):
 
         self._auth = auth
-        self._client_storage_account = client_storage_account
-        self._client_storage_key = client_storage_key
+        self._client_storage = client_storage
         self._setup_email_dns = setup_email_dns
         self._client_id_source = client_id_source or self._new_client_id
 
     def __call__(self, client: dict) -> Response:
         client_id = self._client_id_source()
         domain = client['domain']
+        access_info = self._client_storage.access_info()
 
         self._setup_email_dns(client_id, domain)
+        self._client_storage.store_objects([{'client_id': client_id}], domain)
         self._auth.insert(client_id, domain)
 
         self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501
         return {
             'client_id': client_id,
-            'storage_account': self._client_storage_account,
-            'storage_key': self._client_storage_key,
+            'storage_account': access_info.account,
+            'storage_key': access_info.key,
+            'resource_container': access_info.container,
         }
 
     @classmethod
