@@ -22,7 +22,7 @@ class SendgridEmailSender(LogMixin):
     def _client(self) -> Callable[[dict], int]:
         if not self._key:
             def send_email_fake(email: dict) -> int:
-                self.log_info('No key set, not sending email %r', email)
+                self.log_warning('No key, not sending email %r', email)
                 return 202
             return send_email_fake
 

@@ -38,6 +38,9 @@ class LogMixin(object):
     def log_info(self, message: str, *args: Any):
         self._log('info', message, args)
 
+    def log_warning(self, message: str, *args: Any):
+        self._log('warning', message, args)
+
     def log_exception(self, message: str, *args: Any):
         self._log('exception', message, args)
 

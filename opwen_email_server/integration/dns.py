@@ -21,7 +21,7 @@ class SetupEmailDns(LogMixin):
 
     def _configure_mailbox(self, client_id: str, domain: str):
         if not SENDGRID_KEY:
-            self.log_info('No key set, skipping mailbox setup for %s', domain)
+            self.log_warning('No key, skipping mailbox setup for %s', domain)
             return
 
         requests.post(
@@ -39,7 +39,7 @@ class SetupEmailDns(LogMixin):
 
     def _configure_mx_record(self, domain: str):
         if not CLOUDFLARE_KEY:
-            self.log_info('No key set, skipping MX setup for %s', domain)
+            self.log_warning('No key, skipping MX setup for %s', domain)
             return
 
         client_name = domain.split('.')[0]
