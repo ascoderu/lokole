@@ -75,7 +75,7 @@ e.g. on Ubuntu:
 
 .. sourcecode :: sh
 
-  sudo apt-get install -y make python3-venv shellcheck
+  sudo apt-get install -y make python3 python3-venv shellcheck jq
 
 You can use the makefile to verify your checkout by running the tests and
 other CI steps such as linting. The makefile will automatically install all
@@ -102,7 +102,47 @@ There are OpenAPI specifications that document the functionality of the
 application and provide references to the entry points into the code
 (look for "some-api-name-spec.yaml" files in the repository). The various
 APIs can also be easily called via the testing console that is available
-by adding /ui to the end of the API's URL.
+by adding /ui to the end of the API's URL. Sample workflows are shown
+below.
+
+.. sourcecode :: sh
+
+  # precondition:
+  # register a new client
+  curl "http://localhost:8080/api/email/register/" \
+    -H "Content-Type: application/json" \
+    -u "admin:password" \
+    -d '{"domain":"developer.lokole.ca"}' \
+  | tee register.json
+
+  # workflow 1:
+  # simulate delivering emails from client to online email provider
+  emails_to_send="./tests/files/end_to_end/client-emails.jsonl.gz"
+  client_id="$(jq -r '.client_id' < register.json)"
+  resource_container="$(jq -r '.resource_container' < register.json)"
+  resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))')"
+  cp "${emails_to_send}" "./volumes/data/client-blobs/${resource_container}/${resource_id}"
+  curl "http://localhost:8080/api/email/upload/${client_id}" \
+    -H "Content-Type: application/json" \
+    -d '{"resource_id":"'"${resource_id}"'"}'
+
+  # workflow 2a:
+  # simulate receiving email sent from online email provider to client
+  email_to_receive="./tests/files/end_to_end/inbound-email.mime"
+  client_id="$(jq -r '.client_id' < register.json)"
+  curl "http://localhost:8080/api/email/sendgrid/${client_id}" \
+    -H "Content-Type: multipart/form-data" \
+    -F "email=$(cat "${email_to_receive}")"
+
+  # workflow 2b:
+  # simulate delivering emails sent from online email provider to client
+  client_id="$(jq -r '.client_id' < register.json)"
+  resource_container="$(jq -r '.resource_container' < register.json)"
+  curl "http://localhost:8080/api/email/download/${client_id}" \
+    -H "Accept: application/json" \
+  | tee download.json
+  resource_id="$(jq -r '.resource_id' < download.json)"
+  echo "./volumes/data/client-blobs/${resource_container}/${resource_id}"
 
 Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine
