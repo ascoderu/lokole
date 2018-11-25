@@ -230,8 +230,11 @@ class RegisterClient(LogMixin):
         self._client_id_source = client_id_source or self._new_client_id
 
     def __call__(self, client: dict) -> Response:
-        client_id = self._client_id_source()
         domain = client['domain']
+        if self._client_storage.exists(domain):
+            return 'client already exists', 409
+
+        client_id = self._client_id_source()
         access_info = self._client_storage.access_info()
 
         self._setup_email_dns(client_id, domain)

@@ -11,6 +11,7 @@ from libcloud.storage.base import Container
 from libcloud.storage.base import StorageDriver  # noqa
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
+from libcloud.storage.types import ObjectDoesNotExistError
 from libcloud.storage.types import Provider
 
 from opwen_email_server.utils.log import LogMixin
@@ -66,8 +67,8 @@ class AzureFileStorage(_BaseAzureStorage):
         self._client.upload_object(path, resource_id)
 
     def fetch_file(self, resource_id: str) -> str:
-        path = create_tempfilename()
         resource = self._client.get_object(resource_id)
+        path = create_tempfilename()
         resource.download(path)
         self.log_debug('fetched file %s from %s', path, resource_id)
         return path
@@ -156,6 +157,14 @@ class AzureObjectsStorage(LogMixin):
                     self.log_debug('fetched email %s', obj.get('_uid'))
                     yield obj
         self.log_debug('fetched %d objects from %s', num_fetched, resource_id)
+
+    def exists(self, resource_id: str) -> bool:
+        try:
+            self._file_storage.fetch_file(resource_id)
+        except ObjectDoesNotExistError:
+            return False
+        else:
+            return True
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)

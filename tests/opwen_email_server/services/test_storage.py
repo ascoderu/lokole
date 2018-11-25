@@ -123,6 +123,16 @@ class AzureObjectsStorageTests(TestCase):
         self.assertIsNotNone(resource_id)
         self.assertContainerHasNumFiles(1)
 
+    def test_exists(self):
+        resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        objs = [{'foo': 'bar'}]
+
+        self.assertFalse(self._storage.exists(resource_id))
+
+        self._storage.store_objects(objs, resource_id)
+
+        self.assertTrue(self._storage.exists(resource_id))
+
     def test_does_not_create_file_without_objects(self):
         objs = []
 
