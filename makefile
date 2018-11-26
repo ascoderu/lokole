@@ -13,10 +13,8 @@ $(py_env)/bin/activate: requirements.txt
 
 venv: $(py_env)/bin/activate
 
-unit-tests: venv
+tests: venv
 	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=opwen_email_server --cover-html
-
-tests: unit-tests
 
 lint-swagger: venv
 	find opwen_email_server/swagger -type f -name '*.yaml' \
