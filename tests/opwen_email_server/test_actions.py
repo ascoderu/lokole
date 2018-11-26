@@ -236,7 +236,8 @@ class RegisterClientTests(TestCase):
     def setUp(self):
         self.auth = Mock()
         self.client_storage = Mock()
-        self.setup_email_dns = MagicMock()
+        self.setup_mailbox = MagicMock()
+        self.setup_mx_records = MagicMock()
         self.client_id_source = MagicMock()
 
     def test_409(self):
@@ -244,7 +245,7 @@ class RegisterClientTests(TestCase):
 
         self.client_storage.exists.return_value = True
 
-        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_email_dns, self.client_id_source)
+        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_mailbox, self.setup_mx_records, self.client_id_source)
         _, status = action({'domain': domain})
 
         self.assertEqual(status, 409)
@@ -264,7 +265,7 @@ class RegisterClientTests(TestCase):
             key=client_storage_key,
             container=client_storage_container)
 
-        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_email_dns, self.client_id_source)
+        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_mailbox, self.setup_mx_records, self.client_id_source)
         response = action({'domain': domain})
 
         self.assertEqual(response['client_id'], client_id)
@@ -274,4 +275,5 @@ class RegisterClientTests(TestCase):
         self.auth.insert.assert_called_once_with(client_id, domain)
         self.assertEqual(self.client_storage.store_objects.call_count, 1)
         self.client_storage.exists.assert_called_once_with(domain)
-        self.setup_email_dns.assert_called_once_with(client_id, domain)
+        self.setup_mailbox.assert_called_once_with(client_id, domain)
+        self.setup_mx_records.assert_called_once_with(domain)

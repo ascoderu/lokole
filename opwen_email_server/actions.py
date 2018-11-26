@@ -221,12 +221,14 @@ class RegisterClient(LogMixin):
     def __init__(self,
                  auth: AzureAuth,
                  client_storage: AzureObjectsStorage,
-                 setup_email_dns: Callable[[str, str], None],
+                 setup_mailbox: Callable[[str, str], None],
+                 setup_mx_records: Callable[[str], None],
                  client_id_source: Callable[[], str] = None):
 
         self._auth = auth
         self._client_storage = client_storage
-        self._setup_email_dns = setup_email_dns
+        self._setup_mailbox = setup_mailbox
+        self._setup_mx_records = setup_mx_records
         self._client_id_source = client_id_source or self._new_client_id
 
     def __call__(self, client: dict) -> Response:
@@ -237,7 +239,8 @@ class RegisterClient(LogMixin):
         client_id = self._client_id_source()
         access_info = self._client_storage.access_info()
 
-        self._setup_email_dns(client_id, domain)
+        self._setup_mailbox(client_id, domain)
+        self._setup_mx_records(domain)
         self._client_storage.store_objects([{'client_id': client_id}], domain)
         self._auth.insert(client_id, domain)
 
