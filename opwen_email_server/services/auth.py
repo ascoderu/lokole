@@ -3,6 +3,7 @@ from typing import Optional
 
 from libcloud.storage.types import ObjectDoesNotExistError
 
+from opwen_email_server.constants.cache import AUTH_DOMAIN_CACHE_SIZE
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 
@@ -25,6 +26,6 @@ class AzureAuth(LogMixin):
             self.log_debug('Client %s has domain %s', client_id, domain)
             return domain
 
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=AUTH_DOMAIN_CACHE_SIZE)
     def _domain_for_cached(self, client_id: str) -> str:
         return self._storage.fetch_text(client_id)

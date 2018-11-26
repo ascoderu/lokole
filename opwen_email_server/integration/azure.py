@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from opwen_email_server import config
 from opwen_email_server.constants import azure as constants
+from opwen_email_server.constants.cache import PENDING_STORAGE_CACHE_SIZE
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.sendgrid import SendgridEmailSender
 from opwen_email_server.services.storage import AzureFileStorage
@@ -56,7 +57,7 @@ def get_email_storage() -> AzureObjectStorage:
             provider=config.STORAGE_PROVIDER))
 
 
-@lru_cache(maxsize=128)
+@lru_cache(maxsize=PENDING_STORAGE_CACHE_SIZE)
 def get_pending_storage(domain: str) -> AzureTextStorage:
     return AzureTextStorage(
         account=config.TABLES_ACCOUNT,
