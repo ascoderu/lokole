@@ -1,4 +1,4 @@
-import requests
+from requests import post as http_post
 
 from opwen_email_server.constants.cloudflare import DNS_URL
 from opwen_email_server.constants.sendgrid import MX_RECORD
@@ -18,7 +18,7 @@ class SetupCloudflareMxRecords(LogMixin):
 
         client_name = domain.split('.')[0]
 
-        requests.post(
+        http_post(
             url=DNS_URL.format(self._zone),
             json={
                 'type': 'MX',

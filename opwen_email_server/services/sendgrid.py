@@ -3,8 +3,8 @@ from typing import Callable
 from urllib.error import HTTPError
 from urllib.error import URLError
 
-import requests
 from cached_property import cached_property
+from requests import post as http_post
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
 from sendgrid.helpers.mail import Content
@@ -120,7 +120,7 @@ class SetupSendgridMailbox(LogMixin):
             self.log_warning('No key, skipping mailbox setup for %s', domain)
             return
 
-        requests.post(
+        http_post(
             url=MAILBOX_URL,
             json={
                 'hostname': domain,
