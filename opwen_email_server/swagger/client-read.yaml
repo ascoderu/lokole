@@ -29,10 +29,10 @@ parameters:
 
   ClientId:
     name: client_id
-    in: path
-    required: true
     description: Id of the Lokole client.
+    in: path
     type: string
+    required: true
 
 definitions:
 
@@ -41,3 +41,5 @@ definitions:
       resource_id:
         description: Id of the resource containing the emails (gzip jsonl file).
         type: string
+    required:
+      - resource_id
