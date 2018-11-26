@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 from connexion import App
-from opwen_email_server.utils.imports import can_import
 
+from opwen_email_server.utils.imports import can_import
 
 _servers = list(filter(can_import, ('tornado', 'gevent', 'flask')))
 _hosts = ['127.0.0.1', '0.0.0.0']  # nosec
