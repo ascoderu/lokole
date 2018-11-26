@@ -1,3 +1,4 @@
+from functools import lru_cache
 from logging import Formatter
 from logging import Handler
 from logging import Logger
@@ -18,12 +19,14 @@ from opwen_email_server.constants.logging import TELEMETRY_QUEUE_ITEMS
 from opwen_email_server.constants.logging import TELEMETRY_QUEUE_SECONDS
 
 
+@lru_cache(maxsize=1)
 def _get_log_handlers() -> Iterable[Handler]:
     stderr = StreamHandler()
     stderr.setFormatter(Formatter(STDERR))
-    yield stderr
+    return [stderr]
 
 
+@lru_cache(maxsize=1)
 def _get_logger() -> Logger:
     log = getLogger()
     for handler in _get_log_handlers():
@@ -32,6 +35,7 @@ def _get_logger() -> Logger:
     return log
 
 
+@lru_cache(maxsize=1)
 def _get_telemetry_client() -> Optional[TelemetryClient]:
     if not APPINSIGHTS_KEY:
         return None
