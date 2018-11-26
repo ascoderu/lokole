@@ -1,6 +1,6 @@
 from logging import Formatter
-from logging import Logger
 from logging import Handler
+from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
 from typing import Any
@@ -14,6 +14,8 @@ from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
 from opwen_email_server.constants.logging import SEPARATOR
 from opwen_email_server.constants.logging import STDERR
+from opwen_email_server.constants.logging import TELEMETRY_QUEUE_ITEMS
+from opwen_email_server.constants.logging import TELEMETRY_QUEUE_SECONDS
 
 
 def _get_log_handlers() -> Iterable[Handler]:
@@ -35,8 +37,10 @@ def _get_telemetry_client() -> Optional[TelemetryClient]:
         return None
 
     telemetry_client = TelemetryClient(APPINSIGHTS_KEY)
-    telemetry_client.channel.sender.send_interval_in_milliseconds = 30 * 1000
-    telemetry_client.channel.sender.max_queue_item_count = 10
+    telemetry_client.channel.sender.send_interval_in_milliseconds = \
+        TELEMETRY_QUEUE_SECONDS * 1000
+    telemetry_client.channel.sender.max_queue_item_count = \
+        TELEMETRY_QUEUE_ITEMS
     exceptions.enable(APPINSIGHTS_KEY)
 
     return telemetry_client
