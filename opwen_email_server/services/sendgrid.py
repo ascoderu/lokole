@@ -134,37 +134,3 @@ class SetupSendgridMailbox(LogMixin):
         ).raise_for_status()
 
         self.log_debug('Set up mailbox for %s', domain)
-
-
-def _cli():  # pragma: no cover
-    from argparse import ArgumentParser
-    from argparse import FileType
-    from base64 import b64encode
-    from json import loads
-    from os.path import basename
-    from uuid import uuid4
-
-    from opwen_email_server.config import SENDGRID_KEY
-
-    parser = ArgumentParser()
-    parser.add_argument('email')
-    parser.add_argument('--attachment', type=FileType('rb'))
-    parser.add_argument('--key', default=SENDGRID_KEY)
-    args = parser.parse_args()
-
-    email = loads(args.email)
-    email.setdefault('_uid', str(uuid4()))
-
-    if args.attachment:
-        email.setdefault('attachments', []).append({
-            'filename': basename(args.attachment.name),
-            'content': b64encode(args.attachment.read()).decode('ascii')
-        })
-        args.attachment.close()
-
-    send_email = SendSendgridEmail(args.key)
-    send_email(email)
-
-
-if __name__ == '__main__':
-    _cli()
