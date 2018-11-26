@@ -88,8 +88,7 @@ required dependencies into a virtual environment.
 
 .. sourcecode :: sh
 
-  make tests
-  make lint
+  make tests lint
 
 This project consists of a number of microservices and background jobs. You
 can run all the pieces via the makefile, however, it's easiest to run and
@@ -101,7 +100,7 @@ After installing Docker, you can run the application stack with one command:
 
 .. sourcecode :: sh
 
-  docker-compose up --build
+  make run
 
 Finding your way around the project
 ===================================

@@ -2,7 +2,7 @@ pwd=$(shell pwd)
 py_env=venv
 
 .PHONY: default
-default: server
+default: run
 
 venv: requirements.txt requirements-dev.txt requirements-prod.txt
 	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel; fi
@@ -37,6 +37,10 @@ clean:
 	rm -rf $$(find opwen_email_server -name '__pycache__' -type d)
 	rm -rf $$(find tests -name '__pycache__' -type d)
 	rm -rf $(py_env) .mypy_cache cover .coverage
+	docker-compose down && rm -rf volumes register.json download.json
+
+run:
+	docker-compose up --build
 
 server: venv
 	PY_ENV="$(py_env)" \
