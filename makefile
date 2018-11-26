@@ -5,8 +5,7 @@ py_env=venv
 default: server
 
 $(py_env)/bin/activate: requirements.txt
-	test -d $(py_env) || python3 -m venv $(py_env)
-	$(py_env)/bin/pip install -U pip wheel
+	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel; fi
 	$(py_env)/bin/pip install -r requirements.txt
 	$(py_env)/bin/pip install -r requirements-dev.txt
 	$(py_env)/bin/pip install -r requirements-prod.txt
