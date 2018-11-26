@@ -40,7 +40,7 @@ def written_store(resource_id: str) -> None:
 def send(resource_id: str) -> None:
     action = SendOutboundEmails(
         email_storage=get_email_storage(),
-        email_sender=get_email_sender())
+        send_email=get_email_sender())
 
     action(resource_id)
 

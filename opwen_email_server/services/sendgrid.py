@@ -4,6 +4,7 @@ from urllib.error import HTTPError
 from urllib.error import URLError
 
 from cached_property import cached_property
+from requests import post as http_post
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
 from sendgrid.helpers.mail import Content
@@ -11,10 +12,12 @@ from sendgrid.helpers.mail import Email
 from sendgrid.helpers.mail import Mail
 from sendgrid.helpers.mail import Personalization
 
+from opwen_email_server.constants.sendgrid import INBOX_URL
+from opwen_email_server.constants.sendgrid import MAILBOX_URL
 from opwen_email_server.utils.log import LogMixin
 
 
-class SendgridEmailSender(LogMixin):
+class SendSendgridEmail(LogMixin):
     def __init__(self, key: str) -> None:
         self._key = key
 
@@ -34,7 +37,7 @@ class SendgridEmailSender(LogMixin):
 
         return send_email
 
-    def send_email(self, email: dict) -> bool:
+    def __call__(self, email: dict) -> bool:
         email_id = email.get('_uid', '')
         email = self._create_email(email, email_id)
         return self._send_email(email, email_id)
@@ -108,35 +111,26 @@ class SendgridEmailSender(LogMixin):
         return mail_attachment
 
 
-def _cli():  # pragma: no cover
-    from argparse import ArgumentParser
-    from argparse import FileType
-    from base64 import b64encode
-    from json import loads
-    from os.path import basename
-    from uuid import uuid4
+class SetupSendgridMailbox(LogMixin):
+    def __init__(self, key: str) -> None:
+        self._key = key
 
-    from opwen_email_server.config import SENDGRID_KEY
+    def __call__(self, client_id: str, domain: str) -> None:
+        if not self._key:
+            self.log_warning('No key, skipping mailbox setup for %s', domain)
+            return
 
-    parser = ArgumentParser()
-    parser.add_argument('email')
-    parser.add_argument('--attachment', type=FileType('rb'))
-    parser.add_argument('--key', default=SENDGRID_KEY)
-    args = parser.parse_args()
+        http_post(
+            url=MAILBOX_URL,
+            json={
+                'hostname': domain,
+                'url': INBOX_URL.format(client_id),
+                'spam_check': True,
+                'send_raw': True,
+            },
+            headers={
+                'Authorization': 'Bearer {}'.format(self._key),
+            }
+        ).raise_for_status()
 
-    email = loads(args.email)
-    email.setdefault('_uid', str(uuid4()))
-
-    if args.attachment:
-        email.setdefault('attachments', []).append({
-            'filename': basename(args.attachment.name),
-            'content': b64encode(args.attachment.read()).decode('ascii')
-        })
-        args.attachment.close()
-
-    sender = SendgridEmailSender(args.key)
-    sender.send_email(email)
-
-
-if __name__ == '__main__':
-    _cli()
+        self.log_debug('Set up mailbox for %s', domain)
