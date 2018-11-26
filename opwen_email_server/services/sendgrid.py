@@ -3,6 +3,7 @@ from typing import Callable
 from urllib.error import HTTPError
 from urllib.error import URLError
 
+import requests
 from cached_property import cached_property
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
@@ -11,6 +12,8 @@ from sendgrid.helpers.mail import Email
 from sendgrid.helpers.mail import Mail
 from sendgrid.helpers.mail import Personalization
 
+from opwen_email_server.constants.sendgrid import INBOX_URL
+from opwen_email_server.constants.sendgrid import MAILBOX_URL
 from opwen_email_server.utils.log import LogMixin
 
 
@@ -106,6 +109,31 @@ class SendSendgridEmail(LogMixin):
         mail_attachment.content = content
 
         return mail_attachment
+
+
+class SetupSendgridMailbox(LogMixin):
+    def __init__(self, key: str) -> None:
+        self._key = key
+
+    def __call__(self, client_id: str, domain: str) -> None:
+        if not self._key:
+            self.log_warning('No key, skipping mailbox setup for %s', domain)
+            return
+
+        requests.post(
+            url=MAILBOX_URL,
+            json={
+                'hostname': domain,
+                'url': INBOX_URL.format(client_id),
+                'spam_check': True,
+                'send_raw': True,
+            },
+            headers={
+                'Authorization': 'Bearer {}'.format(self._key),
+            }
+        ).raise_for_status()
+
+        self.log_debug('Set up mailbox for %s', domain)
 
 
 def _cli():  # pragma: no cover

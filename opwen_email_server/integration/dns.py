@@ -4,11 +4,8 @@ from opwen_email_server.config import CLOUDFLARE_KEY
 from opwen_email_server.config import CLOUDFLARE_USER
 from opwen_email_server.config import CLOUDFLARE_ZONE
 from opwen_email_server.config import SENDGRID_KEY
+from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 from opwen_email_server.utils.log import LogMixin
-
-SENDGRID_URL = 'https://api.sendgrid.com/v3/user/webhooks/parse/settings'
-
-INBOX_URL = 'http://mailserver.lokole.ca/api/email/sendgrid/{}'
 
 CLOUDFLARE_URL = 'https://api.cloudflare.com/client/v4/zones' \
                  '/{}/dns_records'.format(CLOUDFLARE_ZONE)
@@ -16,26 +13,8 @@ CLOUDFLARE_URL = 'https://api.cloudflare.com/client/v4/zones' \
 
 class SetupEmailDns(LogMixin):
     def __call__(self, client_id: str, domain: str):
-        self._configure_mailbox(client_id, domain)
+        SetupSendgridMailbox(SENDGRID_KEY)(client_id, domain)
         self._configure_mx_record(domain)
-
-    def _configure_mailbox(self, client_id: str, domain: str):
-        if not SENDGRID_KEY:
-            self.log_warning('No key, skipping mailbox setup for %s', domain)
-            return
-
-        requests.post(
-            url=SENDGRID_URL,
-            json={
-                'hostname': domain,
-                'url': INBOX_URL.format(client_id),
-                'spam_check': True,
-                'send_raw': True,
-            },
-            headers={
-                'Authorization': 'Bearer {}'.format(SENDGRID_KEY),
-            }
-        ).raise_for_status()
 
     def _configure_mx_record(self, domain: str):
         if not CLOUDFLARE_KEY:
