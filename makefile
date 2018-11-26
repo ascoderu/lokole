@@ -9,7 +9,6 @@ SHELLCHECK=/usr/bin/shellcheck
 #
 pwd=$(shell pwd)
 py_env=venv
-py_packages=opwen_email_server
 
 .PHONY: default
 default: server
@@ -24,20 +23,24 @@ $(py_env)/bin/activate: requirements.txt
 venv: $(py_env)/bin/activate
 
 unit-tests: venv
-	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=$(py_packages) --cover-html
+	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=opwen_email_server --cover-html
 
 tests: unit-tests
 
+lint-swagger: venv
+	find opwen_email_server/swagger -type f -name '*.yaml' \
+    | while read swagger; do $(py_env)/bin/swagger-flex --source="$$swagger" || exit 1; done
+
 lint-python: venv
-	$(py_env)/bin/flake8 $(py_packages)
+	$(py_env)/bin/flake8 opwen_email_server
 
 lint-shell: $(SHELLCHECK)
 	$(SHELLCHECK) --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh' -not -path './venv*/*')
 
-lint: lint-python lint-shell
+lint: lint-python lint-shell lint-swagger
 
 typecheck: venv
-	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
+	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_server
 
 bandit: venv
 	$(py_env)/bin/bandit -r . -x $(py_env)

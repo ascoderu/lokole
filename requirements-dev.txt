@@ -1,5 +1,6 @@
 coverage==4.5.2
 flake8==3.6.0
+flex==6.13.2
 librabbitmq==2.0.0
 lockfile==0.12.2
 mypy==0.641
