@@ -17,11 +17,7 @@ paths:
         - application/json
       parameters:
         - $ref: '#/parameters/ClientId'
-        - name: upload_info
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/EmailPackage'
+        - $ref: '#/parameters/UploadInfo'
       responses:
         200:
           description: The emails were successfully uploaded from the Lokole.
@@ -32,17 +28,25 @@ parameters:
 
   ClientId:
     name: client_id
-    in: path
-    required: true
     description: Id of the Lokole client.
+    in: path
     type: string
+    required: true
+
+  UploadInfo:
+    name: upload_info
+    description: The emails to be uploaded.
+    in: body
+    schema:
+      $ref: '#/definitions/UploadInfo'
+    required: true
 
 definitions:
 
-  EmailPackage:
+  UploadInfo:
     properties:
       resource_id:
         description: Id of the resource containing the emails (gzip jsonl file).
         type: string
     required:
-     - resource_id
+      - resource_id

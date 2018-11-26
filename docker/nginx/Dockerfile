@@ -8,8 +8,7 @@ RUN apt-get -qq update \
   && chmod +x /usr/local/bin/mo \
   && rm -rf /var/lib/apt/lists/*
 
-ADD opwen_email_server/static/favicon.ico /static/favicon.ico
-ADD opwen_email_server/static/robots.txt /static/robots.txt
+ADD docker/nginx/static /static
 ADD docker/nginx/nginx.conf.mu /app/frontend.conf.mu
 ADD docker/nginx/run-nginx.sh /app/run-nginx.sh
 
