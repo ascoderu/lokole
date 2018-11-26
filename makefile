@@ -4,13 +4,11 @@ py_env=venv
 .PHONY: default
 default: server
 
-$(py_env)/bin/activate: requirements.txt
+venv: requirements.txt requirements-dev.txt requirements-prod.txt
 	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel; fi
 	$(py_env)/bin/pip install -r requirements.txt
 	$(py_env)/bin/pip install -r requirements-dev.txt
 	$(py_env)/bin/pip install -r requirements-prod.txt
-
-venv: $(py_env)/bin/activate
 
 tests: venv
 	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=opwen_email_server --cover-html
