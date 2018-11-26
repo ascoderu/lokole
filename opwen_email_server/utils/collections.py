@@ -1,4 +1,6 @@
+from functools import lru_cache
 from itertools import islice
+from typing import Callable
 from typing import Iterable
 from typing import Optional
 from typing import TypeVar
@@ -18,3 +20,7 @@ def chunks(iterable: Iterable[T], chunk_size: int) -> Iterable[Iterable[T]]:
         if not chunk:
             return
         yield chunk
+
+
+def singleton(func: Callable) -> Callable:
+    return lru_cache(maxsize=1)(func)

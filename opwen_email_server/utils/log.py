@@ -1,36 +1,58 @@
 from logging import Formatter
+from logging import Handler
+from logging import Logger
 from logging import StreamHandler
 from logging import getLogger
 from typing import Any
 from typing import Iterable
 from typing import Optional
-from typing import Tuple
 
 from applicationinsights import TelemetryClient
 from applicationinsights import exceptions
 
 from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
+from opwen_email_server.constants.logging import SEPARATOR
+from opwen_email_server.constants.logging import STDERR
+from opwen_email_server.constants.logging import TELEMETRY_QUEUE_ITEMS
+from opwen_email_server.constants.logging import TELEMETRY_QUEUE_SECONDS
+from opwen_email_server.utils.collections import singleton
 
-_STDERR_FORMAT = '%(asctime)s\t%(levelname)s\t%(message)s'
-_STDERR = StreamHandler()
-_STDERR.setFormatter(Formatter(_STDERR_FORMAT))
 
-_LOG = getLogger()
-_LOG.addHandler(_STDERR)
-_LOG.setLevel(LOG_LEVEL)
+@singleton
+def _get_log_handlers() -> Iterable[Handler]:
+    stderr = StreamHandler()
+    stderr.setFormatter(Formatter(STDERR))
+    return [stderr]
 
-_APPINSIGHTS = None  # type: TelemetryClient
 
-if APPINSIGHTS_KEY:
-    _APPINSIGHTS = TelemetryClient(APPINSIGHTS_KEY)
-    _APPINSIGHTS.channel.sender.send_interval_in_milliseconds = 30 * 1000
-    _APPINSIGHTS.channel.sender.max_queue_item_count = 10
+@singleton
+def _get_logger() -> Logger:
+    log = getLogger()
+    for handler in _get_log_handlers():
+        log.addHandler(handler)
+    log.setLevel(LOG_LEVEL)
+    return log
+
+
+@singleton
+def _get_telemetry_client() -> Optional[TelemetryClient]:
+    if not APPINSIGHTS_KEY:
+        return None
+
+    telemetry_client = TelemetryClient(APPINSIGHTS_KEY)
+    telemetry_client.channel.sender.send_interval_in_milliseconds = \
+        TELEMETRY_QUEUE_SECONDS * 1000
+    telemetry_client.channel.sender.max_queue_item_count = \
+        TELEMETRY_QUEUE_ITEMS
     exceptions.enable(APPINSIGHTS_KEY)
+
+    return telemetry_client
 
 
 class LogMixin(object):
-    info_separator = '|'
+    _logger = _get_logger()
+    _telemetry_client = _get_telemetry_client()
 
     def log_debug(self, message: str, *args: Any):
         self._log('debug', message, args)
@@ -47,32 +69,27 @@ class LogMixin(object):
     def _log(self, level: str, log_message: str, log_args: Iterable[Any]):
         message_parts = ['%s']
         args = [self.__class__.__name__]
-        for message_part, arg in self.extra_log_args():
-            message_parts.append(message_part)
-            args.append(arg)
         message_parts.append(log_message)
         args.extend(log_args)
-        message = self.info_separator.join(message_parts)
-        log = getattr(_LOG, level)
+        message = SEPARATOR.join(message_parts)
+        log = getattr(self._logger, level)
         log(message, *args)
 
-        if _APPINSIGHTS:
-            _APPINSIGHTS.track_trace(message % tuple(args), {'level': level})
+        if self._telemetry_client:
+            self._telemetry_client.track_trace(
+                message % tuple(args), {'level': level})
+
             if self.should_send_message_immediately(level):
-                _APPINSIGHTS.flush()
+                self._telemetry_client.flush()
 
     # noinspection PyMethodMayBeStatic
     def log_event(self, event_name: str, properties: Optional[dict] = None):
-        _LOG.info('%s%s%s', event_name, self.info_separator, properties)
+        self._logger.info('%s%s%s', event_name, SEPARATOR, properties)
 
-        if _APPINSIGHTS:
-            _APPINSIGHTS.track_event(event_name, properties)
-            _APPINSIGHTS.flush()
+        if self._telemetry_client:
+            self._telemetry_client.track_event(event_name, properties)
+            self._telemetry_client.flush()
 
     # noinspection PyMethodMayBeStatic
     def should_send_message_immediately(self, level: str) -> bool:
         return level != 'debug'
-
-    # noinspection PyMethodMayBeStatic
-    def extra_log_args(self) -> Iterable[Tuple[str, Any]]:
-        return []
