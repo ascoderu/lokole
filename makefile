@@ -36,6 +36,7 @@ ci: tests lint typecheck bandit
 clean:
 	rm -rf $$(find opwen_email_server -name '__pycache__' -type d)
 	rm -rf $$(find tests -name '__pycache__' -type d)
+	rm -rf $(py_env)
 
 server: venv
 	PY_ENV="$(py_env)" \
