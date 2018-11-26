@@ -27,8 +27,7 @@ class SendOutboundEmailsTests(TestCase):
         self.email_storage.fetch_object.return_value = email
         self.send_email.return_value = True
 
-        action = actions.SendOutboundEmails(self.email_storage, self.send_email)
-        _, status = action(resource_id)
+        _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(resource_id)
@@ -41,12 +40,18 @@ class SendOutboundEmailsTests(TestCase):
         self.email_storage.fetch_object.return_value = email
         self.send_email.return_value = False
 
-        action = actions.SendOutboundEmails(self.email_storage, self.send_email)
-        _, status = action(resource_id)
+        _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 500)
         self.email_storage.fetch_object.assert_called_once_with(resource_id)
         self.send_email.assert_called_once_with(email)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.SendOutboundEmails(
+            email_storage=self.email_storage,
+            send_email=self.send_email)
+
+        return action(*args, **kwargs)
 
 
 # noinspection PyTypeChecker
@@ -68,8 +73,7 @@ class StoreInboundEmailsTests(TestCase):
         self.pending_factory.return_value = self.pending_storage
         self.email_parser.return_value = email
 
-        action = actions.StoreInboundEmails(self.raw_email_storage, self.email_storage, self.pending_factory, self.email_parser)
-        _, status = action(resource_id)
+        _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
         self.raw_email_storage.fetch_text.assert_called_once_with(resource_id)
@@ -78,6 +82,15 @@ class StoreInboundEmailsTests(TestCase):
         self.pending_factory.assert_called_once_with(domain)
         self.pending_storage.store_text.assert_called_once_with(resource_id, 'pending')
         self.email_parser.assert_called_once_with(raw_email)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.StoreInboundEmails(
+            raw_email_storage=self.raw_email_storage,
+            email_storage=self.email_storage,
+            pending_factory=self.pending_factory,
+            email_parser=self.email_parser)
+
+        return action(*args, **kwargs)
 
 
 # noinspection PyTypeChecker
@@ -94,14 +107,21 @@ class StoreWrittenClientEmailsTests(TestCase):
 
         self.client_storage.fetch_objects.return_value = [email]
 
-        action = actions.StoreWrittenClientEmails(self.client_storage, self.email_storage, self.next_task)
-        _, status = action(resource_id)
+        _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
         self.client_storage.fetch_objects.assert_called_once_with(resource_id)
         self.email_storage.store_object.assert_called_once_with(email_id, email)
         self.next_task.assert_called_once_with(email_id)
         self.client_storage.delete.assert_called_once_with(resource_id)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.StoreWrittenClientEmails(
+            client_storage=self.client_storage,
+            email_storage=self.email_storage,
+            next_task=self.next_task)
+
+        return action(*args, **kwargs)
 
 
 # noinspection PyTypeChecker
@@ -119,8 +139,7 @@ class ReceiveInboundEmailTests(TestCase):
 
         self.auth.domain_for.return_value = domain
 
-        action = actions.ReceiveInboundEmail(self.auth, self.raw_email_storage, self.next_task, self.email_id_source)
-        _, status = action(client_id, email)
+        _, status = self._execute_action(client_id, email)
 
         self.assertEqual(status, 403)
         self.auth.domain_for.assert_called_once_with(client_id)
@@ -134,14 +153,22 @@ class ReceiveInboundEmailTests(TestCase):
         self.auth.domain_for.return_value = domain
         self.email_id_source.return_value = email_id
 
-        action = actions.ReceiveInboundEmail(self.auth, self.raw_email_storage, self.next_task, self.email_id_source)
-        _, status = action(client_id, email)
+        _, status = self._execute_action(client_id, email)
 
         self.assertEqual(status, 200)
         self.auth.domain_for.assert_called_once_with(client_id)
         self.email_id_source.assert_called_once_with()
         self.raw_email_storage.store_text.assert_called_once_with(email_id, email)
         self.next_task.assert_called_once_with(email_id)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.ReceiveInboundEmail(
+            auth=self.auth,
+            raw_email_storage=self.raw_email_storage,
+            next_task=self.next_task,
+            email_id_source=self.email_id_source)
+
+        return action(*args, **kwargs)
 
 
 # noinspection PyTypeChecker
@@ -159,8 +186,7 @@ class DownloadClientEmailsTests(TestCase):
 
         self.auth.domain_for.return_value = domain
 
-        action = actions.DownloadClientEmails(self.auth, self.client_storage, self.email_storage, self.pending_factory)
-        _, status = action(client_id)
+        _, status = self._execute_action(client_id)
 
         self.assertEqual(status, 403)
         self.auth.domain_for.assert_called_once_with(client_id)
@@ -184,8 +210,7 @@ class DownloadClientEmailsTests(TestCase):
         self.email_storage.fetch_object.return_value = email
         self.client_storage.store_objects.side_effect = store_objects_mock
 
-        action = actions.DownloadClientEmails(self.auth, self.client_storage, self.email_storage, self.pending_factory)
-        response = action(client_id)
+        response = self._execute_action(client_id)
 
         self.assertEqual(response.get('resource_id'), resource_id)
         self.auth.domain_for.assert_called_once_with(client_id)
@@ -194,6 +219,15 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_storage.delete.assert_called_once_with(email_id)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
         self.assertEqual(_stored, [email])
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.DownloadClientEmails(
+            auth=self.auth,
+            client_storage=self.client_storage,
+            email_storage=self.email_storage,
+            pending_factory=self.pending_factory)
+
+        return action(*args, **kwargs)
 
 
 # noinspection PyTypeChecker
@@ -209,8 +243,7 @@ class UploadClientEmailsTests(TestCase):
 
         self.auth.domain_for.return_value = domain
 
-        action = actions.UploadClientEmails(self.auth, self.next_task)
-        _, status = action(client_id, upload_info)
+        _, status = self._execute_action(client_id, upload_info)
 
         self.assertEqual(status, 403)
         self.auth.domain_for.assert_called_once_with(client_id)
@@ -223,12 +256,18 @@ class UploadClientEmailsTests(TestCase):
 
         self.auth.domain_for.return_value = domain
 
-        action = actions.UploadClientEmails(self.auth, self.next_task)
-        _, status = action(client_id, upload_info)
+        _, status = self._execute_action(client_id, upload_info)
 
         self.assertEqual(status, 200)
         self.auth.domain_for.assert_called_once_with(client_id)
         self.next_task.assert_called_once_with(resource_id)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.UploadClientEmails(
+            auth=self.auth,
+            next_task=self.next_task)
+
+        return action(*args, **kwargs)
 
 
 # noinspection PyTypeChecker
@@ -245,8 +284,7 @@ class RegisterClientTests(TestCase):
 
         self.client_storage.exists.return_value = True
 
-        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_mailbox, self.setup_mx_records, self.client_id_source)
-        _, status = action({'domain': domain})
+        _, status = self._execute_action({'domain': domain})
 
         self.assertEqual(status, 409)
         self.client_storage.exists.assert_called_once_with(domain)
@@ -265,8 +303,7 @@ class RegisterClientTests(TestCase):
             key=client_storage_key,
             container=client_storage_container)
 
-        action = actions.RegisterClient(self.auth, self.client_storage, self.setup_mailbox, self.setup_mx_records, self.client_id_source)
-        response = action({'domain': domain})
+        response = self._execute_action({'domain': domain})
 
         self.assertEqual(response['client_id'], client_id)
         self.assertEqual(response['storage_account'], client_storage_account)
@@ -277,3 +314,13 @@ class RegisterClientTests(TestCase):
         self.client_storage.exists.assert_called_once_with(domain)
         self.setup_mailbox.assert_called_once_with(client_id, domain)
         self.setup_mx_records.assert_called_once_with(domain)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.RegisterClient(
+            auth=self.auth,
+            client_storage=self.client_storage,
+            setup_mailbox=self.setup_mailbox,
+            setup_mx_records=self.setup_mx_records,
+            client_id_source=self.client_id_source)
+
+        return action(*args, **kwargs)
