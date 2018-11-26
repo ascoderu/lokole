@@ -1,3 +1,4 @@
+from collections import Counter
 from unittest import TestCase
 
 from opwen_email_server.utils import collections
@@ -29,3 +30,30 @@ class ChunksTests(TestCase):
         chunks = collections.chunks([1, 2, 3, 4], 3)
 
         self.assertEqual(list(chunks), [(1, 2, 3), (4, )])
+
+
+class SingletonTests(TestCase):
+    def test_creates_object_only_once(self):
+        value1 = self.function1()
+        value2 = self.function1()
+        value3 = self.function2()
+        value4 = self.function2()
+
+        self.assertIs(value1, value2)
+        self.assertIs(value3, value4)
+        self.assertIsNot(value1, value3)
+        self.assertEqual(self.call_counts['function1'], 1)
+        self.assertEqual(self.call_counts['function2'], 1)
+
+    def setUp(self):
+        self.call_counts = Counter()
+
+    @collections.singleton
+    def function1(self):
+        self.call_counts['function1'] += 1
+        return 'some-value'
+
+    @collections.singleton
+    def function2(self):
+        self.call_counts['function2'] += 1
+        return 'some-other-value'

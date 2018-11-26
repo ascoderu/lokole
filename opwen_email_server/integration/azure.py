@@ -8,9 +8,10 @@ from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.utils.collections import singleton
 
 
-@lru_cache(maxsize=1)
+@singleton
 def get_auth() -> AzureAuth:
     return AzureAuth(
         storage=AzureTextStorage(
@@ -20,7 +21,7 @@ def get_auth() -> AzureAuth:
             provider=config.STORAGE_PROVIDER))
 
 
-@lru_cache(maxsize=1)
+@singleton
 def get_client_storage() -> AzureObjectsStorage:
     return AzureObjectsStorage(
         file_storage=AzureFileStorage(
@@ -30,7 +31,7 @@ def get_client_storage() -> AzureObjectsStorage:
             provider=config.STORAGE_PROVIDER))
 
 
-@lru_cache(maxsize=1)
+@singleton
 def get_raw_email_storage() -> AzureTextStorage:
     return AzureTextStorage(
         account=config.BLOBS_ACCOUNT,
@@ -39,13 +40,13 @@ def get_raw_email_storage() -> AzureTextStorage:
         provider=config.STORAGE_PROVIDER)
 
 
-@lru_cache(maxsize=1)
+@singleton
 def get_email_sender() -> SendgridEmailSender:
     return SendgridEmailSender(
         key=config.SENDGRID_KEY)
 
 
-@lru_cache(maxsize=1)
+@singleton
 def get_email_storage() -> AzureObjectStorage:
     return AzureObjectStorage(
         text_storage=AzureTextStorage(
