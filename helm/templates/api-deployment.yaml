@@ -23,7 +23,7 @@ spec:
         command: ["/app/run-gunicorn.sh"]
         env:
         - name: CONNEXION_SPEC
-          value: /app/opwen_email_server/swagger/email-receive.yaml,/app/opwen_email_server/swagger/client-read.yaml,/app/opwen_email_server/swagger/client-write.yaml,/app/opwen_email_server/swagger/client-register.yaml,/app/opwen_email_server/swagger/healthcheck.yaml
+          value: dir:/app/opwen_email_server/swagger
         - name: SERVER_WORKERS
           value: "{{.Values.server.serverWorkers}}"
         {{ include "opwen.environment.shared" }}

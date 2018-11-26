@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
 declare -a api_spec_paths
-api_spec_paths=(${CONNEXION_SPEC//,/ })
+
+case "${CONNEXION_SPEC}" in
+  file:*)
+    specs="${CONNEXION_SPEC:5}"
+    api_spec_paths=(${specs//,/ })
+    ;;
+  dir:*)
+    specs="${CONNEXION_SPEC:4}"
+    api_spec_paths=($(find "${specs}" -type f -name '*.yaml'))
+    ;;
+esac
 
 apis=""
 for api_spec_path in "${api_spec_paths[@]}"; do
