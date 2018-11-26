@@ -13,12 +13,12 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from bs4 import BeautifulSoup
 from PIL import Image
+from bs4 import BeautifulSoup
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
 from requests import Response
-import requests
+from requests import get as http_get
 
 from opwen_email_server.config import MAX_HEIGHT_IMAGES
 from opwen_email_server.config import MAX_WIDTH_IMAGES
@@ -168,7 +168,7 @@ def _change_image_size(image_content_b64: str) -> str:
 
 
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
-    response = requests.get(image_url)
+    response = http_get(image_url)
     if not response.ok:
         return None
 

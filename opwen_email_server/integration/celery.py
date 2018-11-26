@@ -3,15 +3,15 @@ from celery import Celery
 from opwen_email_server.actions import SendOutboundEmails
 from opwen_email_server.actions import StoreInboundEmails
 from opwen_email_server.actions import StoreWrittenClientEmails
-from opwen_email_server.integration.azure import get_client_storage
-from opwen_email_server.integration.azure import get_email_sender
-from opwen_email_server.integration.azure import get_email_storage
-from opwen_email_server.integration.azure import get_raw_email_storage
-from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.config import QUEUE_BROKER
 from opwen_email_server.constants.queues import INBOUND_STORE_QUEUE
 from opwen_email_server.constants.queues import SEND_QUEUE
 from opwen_email_server.constants.queues import WRITTEN_STORE_QUEUE
+from opwen_email_server.integration.azure import get_client_storage
+from opwen_email_server.integration.azure import get_email_sender
+from opwen_email_server.integration.azure import get_email_storage
+from opwen_email_server.integration.azure import get_pending_storage
+from opwen_email_server.integration.azure import get_raw_email_storage
 
 celery = Celery(broker=QUEUE_BROKER)
 

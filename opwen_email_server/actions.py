@@ -7,8 +7,8 @@ from uuid import uuid4
 from opwen_email_server.constants import events
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.sendgrid import SendSendgridEmail
-from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.email_parser import format_attachments
 from opwen_email_server.utils.email_parser import format_inline_images
