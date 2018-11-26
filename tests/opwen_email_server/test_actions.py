@@ -18,35 +18,35 @@ class PingTests(TestCase):
 class SendOutboundEmailsTests(TestCase):
     def setUp(self):
         self.email_storage = Mock()
-        self.email_sender = Mock()
+        self.send_email = MagicMock()
 
     def test_200(self):
         resource_id = str(uuid4())
         email = {'subject': 'test'}
 
         self.email_storage.fetch_object.return_value = email
-        self.email_sender.send_email.return_value = True
+        self.send_email.return_value = True
 
-        action = actions.SendOutboundEmails(self.email_storage, self.email_sender)
+        action = actions.SendOutboundEmails(self.email_storage, self.send_email)
         _, status = action(resource_id)
 
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(resource_id)
-        self.email_sender.send_email.assert_called_once_with(email)
+        self.send_email.assert_called_once_with(email)
 
     def test_500(self):
         resource_id = str(uuid4())
         email = {'subject': 'test'}
 
         self.email_storage.fetch_object.return_value = email
-        self.email_sender.send_email.return_value = False
+        self.send_email.return_value = False
 
-        action = actions.SendOutboundEmails(self.email_storage, self.email_sender)
+        action = actions.SendOutboundEmails(self.email_storage, self.send_email)
         _, status = action(resource_id)
 
         self.assertEqual(status, 500)
         self.email_storage.fetch_object.assert_called_once_with(resource_id)
-        self.email_sender.send_email.assert_called_once_with(email)
+        self.send_email.assert_called_once_with(email)
 
 
 # noinspection PyTypeChecker

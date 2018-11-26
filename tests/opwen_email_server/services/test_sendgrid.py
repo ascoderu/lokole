@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from opwen_email_server.services.sendgrid import SendgridEmailSender
+from opwen_email_server.services.sendgrid import SendSendgridEmail
 
 
 class SendgridEmailSenderTests(TestCase):
@@ -9,9 +9,9 @@ class SendgridEmailSenderTests(TestCase):
     sender = 'sendgridtests@lokole.ca'
 
     def test_sends_email(self):
-        sender = SendgridEmailSender(key='')
+        send_email = SendSendgridEmail(key='')
 
-        success = sender.send_email({
+        success = send_email({
             'to': [self.recipient1],
             'from': self.sender,
             'subject': self.test_sends_email.__name__,
@@ -20,9 +20,9 @@ class SendgridEmailSenderTests(TestCase):
         self.assertTrue(success)
 
     def test_sends_email_with_attachments(self):
-        sender = SendgridEmailSender(key='')
+        send_email = SendSendgridEmail(key='')
 
-        success = sender.send_email({
+        success = send_email({
             'to': [self.recipient1],
             'from': self.sender,
             'subject': self.test_sends_email_with_attachments.__name__,
@@ -36,9 +36,9 @@ class SendgridEmailSenderTests(TestCase):
         self.assertTrue(success)
 
     def test_sends_email_to_multiple_recipients(self):
-        sender = SendgridEmailSender(key='')
+        send_email = SendSendgridEmail(key='')
 
-        success = sender.send_email({
+        success = send_email({
             'to': [self.recipient1, self.recipient2],
             'from': self.sender,
             'subject': self.test_sends_email_to_multiple_recipients.__name__,

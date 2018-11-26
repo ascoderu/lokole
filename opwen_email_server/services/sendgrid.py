@@ -14,7 +14,7 @@ from sendgrid.helpers.mail import Personalization
 from opwen_email_server.utils.log import LogMixin
 
 
-class SendgridEmailSender(LogMixin):
+class SendSendgridEmail(LogMixin):
     def __init__(self, key: str) -> None:
         self._key = key
 
@@ -34,7 +34,7 @@ class SendgridEmailSender(LogMixin):
 
         return send_email
 
-    def send_email(self, email: dict) -> bool:
+    def __call__(self, email: dict) -> bool:
         email_id = email.get('_uid', '')
         email = self._create_email(email, email_id)
         return self._send_email(email, email_id)
@@ -134,8 +134,8 @@ def _cli():  # pragma: no cover
         })
         args.attachment.close()
 
-    sender = SendgridEmailSender(args.key)
-    sender.send_email(email)
+    send_email = SendSendgridEmail(args.key)
+    send_email(email)
 
 
 if __name__ == '__main__':

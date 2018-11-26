@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from opwen_email_server.constants import events
 from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.sendgrid import SendgridEmailSender
+from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
@@ -28,15 +28,15 @@ class Ping(object):
 class SendOutboundEmails(LogMixin):
     def __init__(self,
                  email_storage: AzureObjectStorage,
-                 email_sender: SendgridEmailSender):
+                 send_email: SendSendgridEmail):
 
         self._email_storage = email_storage
-        self._email_sender = email_sender
+        self._send_email = send_email
 
     def __call__(self, resource_id: str) -> Response:
         email = self._email_storage.fetch_object(resource_id)
 
-        success = self._email_sender.send_email(email)
+        success = self._send_email(email)
         if not success:
             return 'error', 500
 
