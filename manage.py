@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from glob import glob
+from os import remove
 from os.path import join
 from typing import List
 
@@ -35,6 +36,12 @@ def devserver():
     reload_server_if_changed = templates_paths
 
     app.run(debug=True, extra_files=reload_server_if_changed)  # nosec
+
+
+@manager.command
+def resetdb():
+    remove(AppConfig.LOCAL_EMAIL_STORE)
+    remove(AppConfig.SQLITE_PATH)
 
 
 @manager.option('-n', '--name', required=True)
