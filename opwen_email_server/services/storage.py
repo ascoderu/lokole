@@ -1,8 +1,8 @@
 from collections import namedtuple
 from io import BytesIO
 from tarfile import TarFile
+from tarfile import TarInfo
 from tarfile import open as tarfile_open
-from tempfile import NamedTemporaryFile
 from typing import Iterable
 from typing import Iterator
 from typing import Optional
@@ -141,16 +141,22 @@ class AzureObjectsStorage(LogMixin):
         num_stored = 0
         with removing(create_tempfilename()) as path:
             with self._open_archive(path, 'w') as archive:
-                with NamedTemporaryFile() as fobj:
-                    for obj in objs:
-                        serialized = to_json(obj)
-                        encoded = serialized.encode(self._encoding)
-                        fobj.write(encoded)
-                        fobj.write(b'\n')
-                        num_stored += 1
-                        self.log_debug('stored obj %s', obj.get('_uid', ''))
+                fobj = BytesIO()
+                num_bytes = 0
+                for obj in objs:
+                    serialized = to_json(obj)
+                    encoded = serialized.encode(self._encoding)
+                    fobj.write(encoded)
+                    fobj.write(b'\n')
+                    num_bytes += len(encoded) + 1
+                    num_stored += 1
+                    self.log_debug('stored obj %s', obj.get('_uid', ''))
+
+                if num_bytes > 0:
                     fobj.seek(0)
-                    archive.add(fobj.name, name)
+                    member = TarInfo(name)
+                    member.size = num_bytes
+                    archive.addfile(member, fobj)
 
             if num_stored > 0:
                 self._file_storage.store_file(resource_id, path)
