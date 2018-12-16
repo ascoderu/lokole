@@ -197,8 +197,8 @@ class AzureObjectsStorage(LogMixin):
         try:
             self._file_storage.fetch_file(resource_id)
         except ObjectDoesNotExistError:
+            resource_id = self._to_resource_id(resource_id)
             try:
-                resource_id = self._to_resource_id(resource_id)
                 self._file_storage.fetch_file(resource_id)
             except ObjectDoesNotExistError:
                 return False
