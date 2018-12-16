@@ -90,7 +90,7 @@ class AzureFileStorageTests(TestCase):
 
 class AzureObjectsStorageTests(TestCase):
     def test_fetches_jsonl_objects(self):
-        resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671.tar.gz'
         name = 'file'
         lines = b'{"foo":"bar"}\n{"baz":[1,2,3]}'
         self._given_resource(resource_id, name, lines)

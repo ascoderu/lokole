@@ -1,5 +1,6 @@
 from collections import namedtuple
 from io import BytesIO
+from os.path import splitext
 from tarfile import TarFile
 from tarfile import TarInfo
 from tarfile import open as tarfile_open
@@ -75,7 +76,8 @@ class AzureFileStorage(_BaseAzureStorage):
 
     def fetch_file(self, resource_id: str) -> str:
         resource = self._client.get_object(resource_id)
-        path = create_tempfilename()
+        extension = splitext(resource_id)[1]
+        path = create_tempfilename() + extension
         resource.download(path)
         self.log_debug('fetched file %s from %s', path, resource_id)
         return path
@@ -125,9 +127,9 @@ class AzureObjectsStorage(LogMixin):
 
     @classmethod
     def _open_archive(cls, path: str, mode: str) -> TarFile:
-        path_parts = path.split('.')
-        if len(path_parts) > 1:
-            compression = path_parts[-1]
+        extension_index = path.rfind('.')
+        if extension_index > -1:
+            compression = path[extension_index + 1:]
         else:
             compression = cls._compression
         mode = '{}|{}'.format(mode, compression)
