@@ -100,13 +100,17 @@ class AzureObjectsStorageTests(TestCase):
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_fetches_missing_file(self):
+        with self.assertRaises(ObjectDoesNotExistError):
+            list(self._storage.fetch_objects('missing', 'file'))
+
+    def test_fetches_missing_archive_member(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
         name = 'file'
         lines = b'{"foo":"bar"}\n{"baz":[1,2,3]}'
         self._given_resource(resource_id, name, lines)
 
         with self.assertRaises(ObjectDoesNotExistError):
-            list(self._storage.fetch_objects(resource_id, 'missing'))
+            list(self._storage.fetch_objects(resource_id, 'missing-tar'))
 
     def test_fetches_json_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
