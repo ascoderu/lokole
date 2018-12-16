@@ -1,10 +1,11 @@
-from gzip import GzipFile
 from io import BytesIO
 from os import listdir
 from os import mkdir
 from os import remove
 from os.path import join
 from shutil import rmtree
+from tarfile import TarInfo
+from tarfile import open as tarfile_open
 from tempfile import NamedTemporaryFile
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -90,53 +91,59 @@ class AzureFileStorageTests(TestCase):
 class AzureObjectsStorageTests(TestCase):
     def test_fetches_jsonl_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        name = 'file'
         lines = b'{"foo":"bar"}\n{"baz":[1,2,3]}'
-        self._given_resource(resource_id, lines)
+        self._given_resource(resource_id, name, lines)
 
-        objs = list(self._storage.fetch_objects(resource_id))
+        objs = list(self._storage.fetch_objects(resource_id, name))
 
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_fetches_json_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        name = 'file'
         lines = b'{"emails":[\n{"foo":"bar"},\n{"baz":[1,2,3]}\n]}'
-        self._given_resource(resource_id, lines)
+        self._given_resource(resource_id, name, lines)
 
-        objs = list(self._storage.fetch_objects(resource_id))
+        objs = list(self._storage.fetch_objects(resource_id, name))
 
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_handles_corrupted_jsonl_entries(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        name = 'file'
         lines = b'{"foo":"bar"}\n{"corrupted":1,]}\n{"baz":[1,2,3]}'
-        self._given_resource(resource_id, lines)
+        self._given_resource(resource_id, name, lines)
 
-        objs = list(self._storage.fetch_objects(resource_id))
+        objs = list(self._storage.fetch_objects(resource_id, name))
 
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_stores_objects(self):
+        name = 'file'
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
 
-        resource_id = self._storage.store_objects(objs)
+        resource_id = self._storage.store_objects((name, objs))
 
         self.assertIsNotNone(resource_id)
         self.assertContainerHasNumFiles(1)
 
     def test_exists(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671'
+        name = 'file'
         objs = [{'foo': 'bar'}]
 
         self.assertFalse(self._storage.exists(resource_id))
 
-        self._storage.store_objects(objs, resource_id)
+        self._storage.store_objects((name, objs), resource_id)
 
         self.assertTrue(self._storage.exists(resource_id))
 
     def test_does_not_create_file_without_objects(self):
+        name = 'file'
         objs = []
 
-        resource_id = self._storage.store_objects(objs)
+        resource_id = self._storage.store_objects((name, objs))
 
         self.assertIsNone(resource_id)
         self.assertContainerHasNumFiles(0)
@@ -145,11 +152,13 @@ class AzureObjectsStorageTests(TestCase):
         path = join(self._folder, self._container)
         self.assertEqual(len(listdir(path)), count)
 
-    def _given_resource(self, resource_id: str, lines: bytes):
+    def _given_resource(self, resource_id: str, name: str, lines: bytes):
         client = self._storage._file_storage._client
         buffer = BytesIO()
-        with GzipFile(mode='wb', fileobj=buffer) as fobj:
-            fobj.write(lines)
+        with tarfile_open(mode='w:gz', fileobj=buffer) as archive:
+            tarinfo = TarInfo(name)
+            tarinfo.size = len(lines)
+            archive.addfile(tarinfo, BytesIO(lines))
         buffer.seek(0)
         client.upload_object_via_stream(buffer, resource_id)
 

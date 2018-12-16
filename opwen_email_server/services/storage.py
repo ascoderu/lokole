@@ -1,9 +1,12 @@
 from collections import namedtuple
-from gzip import open as gzip_open
 from io import BytesIO
+from tarfile import TarFile
+from tarfile import open as tarfile_open
+from tempfile import NamedTemporaryFile
 from typing import Iterable
 from typing import Iterator
 from typing import Optional
+from typing import Tuple
 from uuid import uuid4
 
 from cached_property import cached_property
@@ -95,28 +98,59 @@ class AzureTextStorage(_BaseAzureStorage):
 
 class AzureObjectsStorage(LogMixin):
     _encoding = 'utf-8'
+    _compression = 'gz'
 
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
 
+    @classmethod
+    def _open_archive_file(cls, archive: TarFile, name: str):
+        while True:
+            member = archive.next()
+            if member is None:
+                break
+            if member.name == name:
+                return archive.extractfile(member)
+        raise FileNotFoundError(name)
+
+    @classmethod
+    def _open_archive(cls, path: str, mode: str) -> TarFile:
+        path_parts = path.split('.')
+        if len(path_parts) > 1:
+            compression = path_parts[-1]
+        else:
+            compression = cls._compression
+        mode = '{}|{}'.format(mode, compression)
+        return tarfile_open(path, mode)
+
+    @classmethod
+    def _to_resource_id(cls, resource_id: Optional[str]) -> str:
+        resource_id = resource_id or str(uuid4())
+        resource_id = '{}.tar.{}'.format(resource_id, cls._compression)
+        return resource_id
+
     def access_info(self) -> AccessInfo:
         return self._file_storage.access_info()
 
-    def store_objects(self, objs: Iterable[dict],
+    def store_objects(self, upload: Tuple[str, Iterable[dict]],
                       resource_id: Optional[str] = None) -> Optional[str]:
 
-        resource_id = resource_id or str(uuid4())
+        resource_id = self._to_resource_id(resource_id)
+        name, objs = upload
 
         num_stored = 0
         with removing(create_tempfilename()) as path:
-            with gzip_open(path, 'wb') as fobj:
-                for obj in objs:
-                    serialized = to_json(obj)
-                    encoded = serialized.encode(self._encoding)
-                    fobj.write(encoded)
-                    fobj.write(b'\n')
-                    num_stored += 1
-                    self.log_debug('stored object %s', obj.get('_uid', ''))
+            with self._open_archive(path, 'w') as archive:
+                with NamedTemporaryFile() as fobj:
+                    for obj in objs:
+                        serialized = to_json(obj)
+                        encoded = serialized.encode(self._encoding)
+                        fobj.write(encoded)
+                        fobj.write(b'\n')
+                        num_stored += 1
+                        self.log_debug('stored obj %s', obj.get('_uid', ''))
+                    fobj.seek(0)
+                    archive.add(fobj.name, name)
 
             if num_stored > 0:
                 self._file_storage.store_file(resource_id, path)
@@ -144,10 +178,11 @@ class AzureObjectsStorage(LogMixin):
             self.log_debug('Skipping non-JSONL line %s', line)
             return None
 
-    def fetch_objects(self, resource_id: str) -> Iterable[dict]:
+    def fetch_objects(self, resource_id: str, name: str) -> Iterable[dict]:
         num_fetched = 0
         with removing(self._file_storage.fetch_file(resource_id)) as path:
-            with gzip_open(path, 'rb') as fobj:
+            with self._open_archive(path, 'r') as archive:
+                fobj = self._open_archive_file(archive, name)
                 for encoded in fobj:
                     serialized = encoded.decode(self._encoding)
                     obj = self._parse_jsonl(serialized)
@@ -162,9 +197,12 @@ class AzureObjectsStorage(LogMixin):
         try:
             self._file_storage.fetch_file(resource_id)
         except ObjectDoesNotExistError:
-            return False
-        else:
-            return True
+            try:
+                resource_id = self._to_resource_id(resource_id)
+                self._file_storage.fetch_file(resource_id)
+            except ObjectDoesNotExistError:
+                return False
+        return True
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
