@@ -11,7 +11,7 @@ from uuid import uuid4
 
 from cached_property import cached_property
 from libcloud.storage.base import Container
-from libcloud.storage.base import StorageDriver  # noqa
+from libcloud.storage.base import StorageDriver
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
@@ -37,13 +37,16 @@ class _BaseAzureStorage(LogMixin):
         self._provider = getattr(Provider, provider)
 
     @cached_property
-    def _client(self) -> Container:
+    def _driver(self) -> StorageDriver:
         driver = get_driver(self._provider)
-        client = driver(self._account, self._key)  # type: StorageDriver
+        return driver(self._account, self._key)
+
+    @cached_property
+    def _client(self) -> Container:
         try:
-            container = client.get_container(self._container)
+            container = self._driver.get_container(self._container)
         except ContainerDoesNotExistError:
-            container = client.create_container(self._container)
+            container = self._driver.create_container(self._container)
         return container
 
     def access_info(self) -> AccessInfo:
@@ -103,15 +106,18 @@ class AzureObjectsStorage(LogMixin):
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
 
-    @classmethod
-    def _open_archive_file(cls, archive: TarFile, name: str):
+    def _open_archive_file(self, archive: TarFile, name: str):
         while True:
             member = archive.next()
             if member is None:
                 break
             if member.name == name:
                 return archive.extractfile(member)
-        raise FileNotFoundError(name)
+
+        raise ObjectDoesNotExistError(
+            'File {} is missing in archive'.format(name),
+            self._file_storage._driver,
+            archive.name)
 
     @classmethod
     def _open_archive(cls, path: str, mode: str) -> TarFile:
