@@ -3,6 +3,7 @@ from io import BytesIO
 from tarfile import TarFile
 from tarfile import TarInfo
 from tarfile import open as tarfile_open
+from typing import IO
 from typing import Iterable
 from typing import Iterator
 from typing import Optional
@@ -106,13 +107,16 @@ class AzureObjectsStorage(LogMixin):
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
 
-    def _open_archive_file(self, archive: TarFile, name: str):
+    def _open_archive_file(self, archive: TarFile, name: str) -> IO[bytes]:
         while True:
             member = archive.next()
             if member is None:
                 break
             if member.name == name:
-                return archive.extractfile(member)
+                fobj = archive.extractfile(member)
+                if fobj is None:
+                    break
+                return fobj
 
         raise ObjectDoesNotExistError(
             'File {} is missing in archive'.format(name),
