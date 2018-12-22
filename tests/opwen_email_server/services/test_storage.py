@@ -33,11 +33,13 @@ class AzureTextStorageTests(TestCase):
 
     def test_list(self):
         self._storage.store_text('resource1', 'a')
-        self._storage.store_text('resource2', 'b')
-        self.assertEqual(list(self._storage.iter()), ['resource1', 'resource2'])
+        self._storage.store_text('resource2.txt.gz', 'b')
+        self.assertEqual(sorted(self._storage.iter()),
+                         sorted(['resource1.txt.gz', 'resource2.txt.gz']))
 
         self._storage.delete('resource2')
-        self.assertEqual(list(self._storage.iter()), ['resource1'])
+        self.assertEqual(sorted(self._storage.iter()),
+                         sorted(['resource1.txt.gz']))
 
     def setUp(self):
         self._folder = mkdtemp()

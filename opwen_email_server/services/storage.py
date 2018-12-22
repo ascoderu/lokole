@@ -84,22 +84,36 @@ class AzureFileStorage(_BaseAzureStorage):
 
 
 class AzureTextStorage(_BaseAzureStorage):
+    _compression = 'gz'
+
     def store_text(self, resource_id: str, text: str):
-        self.log_debug('storing %d characters at %s', len(text), resource_id)
+        filename = self._to_filename(resource_id)
+        self.log_debug('storing %d characters at %s', len(text), filename)
         upload = BytesIO()
         upload.write(gzip_string(text))
         upload.seek(0)
-        self._client.upload_object_via_stream(upload, resource_id)
+        self._client.upload_object_via_stream(upload, filename)
 
     def fetch_text(self, resource_id: str) -> str:
+        filename = self._to_filename(resource_id)
         download = BytesIO()
-        resource = self._client.get_object(resource_id)
+        resource = self._client.get_object(filename)
         for chunk in resource.as_stream():
             download.write(chunk)
         download.seek(0)
         text = gunzip_string(download.read())
-        self.log_debug('fetched %d characters from %s', len(text), resource_id)
+        self.log_debug('fetched %d characters from %s', len(text), filename)
         return text
+
+    def delete(self, resource_id: str):
+        filename = self._to_filename(resource_id)
+        super().delete(filename)
+
+    def _to_filename(self, resource_id: str) -> str:
+        extension = '.txt.{}'.format(self._compression)
+        if resource_id.endswith(extension):
+            return resource_id
+        return '{}{}'.format(resource_id, extension)
 
 
 class AzureObjectsStorage(LogMixin):
