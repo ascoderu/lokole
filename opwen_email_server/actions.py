@@ -5,6 +5,7 @@ from typing import Union
 from uuid import uuid4
 
 from opwen_email_server.constants import events
+from opwen_email_server.constants import sync
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.storage import AzureObjectStorage
@@ -95,7 +96,8 @@ class StoreWrittenClientEmails(LogMixin):
         self._next_task = next_task
 
     def __call__(self, resource_id: str) -> Response:
-        emails = self._client_storage.fetch_objects(resource_id)
+        emails = self._client_storage.fetch_objects(
+            resource_id, sync.EMAILS_FILE)
 
         domain = ''
         num_stored = 0
@@ -175,7 +177,8 @@ class DownloadClientEmails(LogMixin):
         pending = self._fetch_pending_emails(pending_storage)
         pending = (mark_delivered(email) for email in pending)
 
-        resource_id = self._client_storage.store_objects(pending)
+        resource_id = self._client_storage.store_objects(
+            (sync.EMAILS_FILE, pending))
 
         self._mark_emails_as_delivered(pending_storage, delivered)
 
@@ -241,7 +244,8 @@ class RegisterClient(LogMixin):
 
         self._setup_mailbox(client_id, domain)
         self._setup_mx_records(domain)
-        self._client_storage.store_objects([{'client_id': client_id}], domain)
+        self._client_storage.store_objects(
+            ('client_id', [{'client_id': client_id}]), domain)
         self._auth.insert(client_id, domain)
 
         self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501

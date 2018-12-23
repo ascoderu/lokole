@@ -1,14 +1,19 @@
 from collections import namedtuple
-from gzip import open as gzip_open
 from io import BytesIO
+from os.path import splitext
+from tarfile import TarFile
+from tarfile import TarInfo
+from tarfile import open as tarfile_open
+from typing import IO
 from typing import Iterable
 from typing import Iterator
 from typing import Optional
+from typing import Tuple
 from uuid import uuid4
 
 from cached_property import cached_property
 from libcloud.storage.base import Container
-from libcloud.storage.base import StorageDriver  # noqa
+from libcloud.storage.base import StorageDriver
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
@@ -34,13 +39,16 @@ class _BaseAzureStorage(LogMixin):
         self._provider = getattr(Provider, provider)
 
     @cached_property
-    def _client(self) -> Container:
+    def _driver(self) -> StorageDriver:
         driver = get_driver(self._provider)
-        client = driver(self._account, self._key)  # type: StorageDriver
+        return driver(self._account, self._key)
+
+    @cached_property
+    def _client(self) -> Container:
         try:
-            container = client.get_container(self._container)
+            container = self._driver.get_container(self._container)
         except ContainerDoesNotExistError:
-            container = client.create_container(self._container)
+            container = self._driver.create_container(self._container)
         return container
 
     def access_info(self) -> AccessInfo:
@@ -68,55 +76,113 @@ class AzureFileStorage(_BaseAzureStorage):
 
     def fetch_file(self, resource_id: str) -> str:
         resource = self._client.get_object(resource_id)
-        path = create_tempfilename()
+        extension = splitext(resource_id)[1]
+        path = create_tempfilename() + extension
         resource.download(path)
         self.log_debug('fetched file %s from %s', path, resource_id)
         return path
 
 
 class AzureTextStorage(_BaseAzureStorage):
+    _compression = 'gz'
+
     def store_text(self, resource_id: str, text: str):
-        self.log_debug('storing %d characters at %s', len(text), resource_id)
+        filename = self._to_filename(resource_id)
+        self.log_debug('storing %d characters at %s', len(text), filename)
         upload = BytesIO()
         upload.write(gzip_string(text))
         upload.seek(0)
-        self._client.upload_object_via_stream(upload, resource_id)
+        self._client.upload_object_via_stream(upload, filename)
 
     def fetch_text(self, resource_id: str) -> str:
+        filename = self._to_filename(resource_id)
         download = BytesIO()
-        resource = self._client.get_object(resource_id)
+        resource = self._client.get_object(filename)
         for chunk in resource.as_stream():
             download.write(chunk)
         download.seek(0)
         text = gunzip_string(download.read())
-        self.log_debug('fetched %d characters from %s', len(text), resource_id)
+        self.log_debug('fetched %d characters from %s', len(text), filename)
         return text
+
+    def delete(self, resource_id: str):
+        filename = self._to_filename(resource_id)
+        super().delete(filename)
+
+    def _to_filename(self, resource_id: str) -> str:
+        extension = '.txt.{}'.format(self._compression)
+        if resource_id.endswith(extension):
+            return resource_id
+        return '{}{}'.format(resource_id, extension)
 
 
 class AzureObjectsStorage(LogMixin):
     _encoding = 'utf-8'
+    _compression = 'gz'
 
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
 
+    def _open_archive_file(self, archive: TarFile, name: str) -> IO[bytes]:
+        while True:
+            member = archive.next()
+            if member is None:
+                break
+            if member.name == name:
+                fobj = archive.extractfile(member)
+                if fobj is None:
+                    break
+                return fobj
+
+        raise ObjectDoesNotExistError(
+            'File {} is missing in archive'.format(name),
+            self._file_storage._driver,
+            archive.name)
+
+    @classmethod
+    def _open_archive(cls, path: str, mode: str) -> TarFile:
+        extension_index = path.rfind('.')
+        if extension_index > -1:
+            compression = path[extension_index + 1:]
+        else:
+            compression = cls._compression
+        mode = '{}|{}'.format(mode, compression)
+        return tarfile_open(path, mode)
+
+    @classmethod
+    def _to_resource_id(cls, resource_id: Optional[str]) -> str:
+        resource_id = resource_id or str(uuid4())
+        resource_id = '{}.tar.{}'.format(resource_id, cls._compression)
+        return resource_id
+
     def access_info(self) -> AccessInfo:
         return self._file_storage.access_info()
 
-    def store_objects(self, objs: Iterable[dict],
+    def store_objects(self, upload: Tuple[str, Iterable[dict]],
                       resource_id: Optional[str] = None) -> Optional[str]:
 
-        resource_id = resource_id or str(uuid4())
+        resource_id = self._to_resource_id(resource_id)
+        name, objs = upload
 
         num_stored = 0
         with removing(create_tempfilename()) as path:
-            with gzip_open(path, 'wb') as fobj:
+            with self._open_archive(path, 'w') as archive:
+                fobj = BytesIO()
+                num_bytes = 0
                 for obj in objs:
                     serialized = to_json(obj)
                     encoded = serialized.encode(self._encoding)
                     fobj.write(encoded)
                     fobj.write(b'\n')
+                    num_bytes += len(encoded) + 1
                     num_stored += 1
-                    self.log_debug('stored object %s', obj.get('_uid', ''))
+                    self.log_debug('stored obj %s', obj.get('_uid', ''))
+
+                if num_bytes > 0:
+                    fobj.seek(0)
+                    member = TarInfo(name)
+                    member.size = num_bytes
+                    archive.addfile(member, fobj)
 
             if num_stored > 0:
                 self._file_storage.store_file(resource_id, path)
@@ -144,10 +210,11 @@ class AzureObjectsStorage(LogMixin):
             self.log_debug('Skipping non-JSONL line %s', line)
             return None
 
-    def fetch_objects(self, resource_id: str) -> Iterable[dict]:
+    def fetch_objects(self, resource_id: str, name: str) -> Iterable[dict]:
         num_fetched = 0
         with removing(self._file_storage.fetch_file(resource_id)) as path:
-            with gzip_open(path, 'rb') as fobj:
+            with self._open_archive(path, 'r') as archive:
+                fobj = self._open_archive_file(archive, name)
                 for encoded in fobj:
                     serialized = encoded.decode(self._encoding)
                     obj = self._parse_jsonl(serialized)
@@ -162,9 +229,12 @@ class AzureObjectsStorage(LogMixin):
         try:
             self._file_storage.fetch_file(resource_id)
         except ObjectDoesNotExistError:
-            return False
-        else:
-            return True
+            resource_id = self._to_resource_id(resource_id)
+            try:
+                self._file_storage.fetch_file(resource_id)
+            except ObjectDoesNotExistError:
+                return False
+        return True
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)

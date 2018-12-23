@@ -1,7 +1,7 @@
 pwd=$(shell pwd)
 py_env=venv
 
-.PHONY: default
+.PHONY: default tests
 default: run
 
 venv: requirements.txt requirements-dev.txt requirements-prod.txt

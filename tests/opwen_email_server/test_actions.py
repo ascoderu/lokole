@@ -1,9 +1,11 @@
+from collections import defaultdict
 from unittest import TestCase
-from unittest.mock import Mock
 from unittest.mock import MagicMock
+from unittest.mock import Mock
 from uuid import uuid4
 
 from opwen_email_server import actions
+from opwen_email_server.constants import sync
 from opwen_email_server.services.storage import AccessInfo
 
 
@@ -110,7 +112,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
-        self.client_storage.fetch_objects.assert_called_once_with(resource_id)
+        self.client_storage.fetch_objects.assert_called_once_with(resource_id, sync.EMAILS_FILE)
         self.email_storage.store_object.assert_called_once_with(email_id, email)
         self.next_task.assert_called_once_with(email_id)
         self.client_storage.delete.assert_called_once_with(resource_id)
@@ -198,10 +200,11 @@ class DownloadClientEmailsTests(TestCase):
         domain = 'test.com'
         email = {'_uid': email_id}
 
-        _stored = []
+        _stored = defaultdict(list)
 
-        def store_objects_mock(emails):
-            _stored.extend(emails)
+        def store_objects_mock(upload):
+            name, emails = upload
+            _stored[name].extend(emails)
             return resource_id
 
         self.auth.domain_for.return_value = domain
@@ -218,7 +221,7 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_storage.iter.assert_called_once_with()
         self.pending_storage.delete.assert_called_once_with(email_id)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
-        self.assertEqual(_stored, [email])
+        self.assertEqual(_stored[sync.EMAILS_FILE], [email])
 
     def _execute_action(self, *args, **kwargs):
         action = actions.DownloadClientEmails(
