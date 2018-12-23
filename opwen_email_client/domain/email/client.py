@@ -81,7 +81,7 @@ class LocalEmailServerClient(EmailServerClient):
     def download(self) -> Tuple[str, str]:
         root = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
         container = 'downloads'
-        resource_id = 'emails.jsonl.gz'
+        resource_id = 'sync.tar.gz'
         local_file = path.join(root, container, resource_id)
         if not path.isfile(local_file):
             return '', ''

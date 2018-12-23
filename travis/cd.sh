@@ -2,15 +2,15 @@
 
 set -eo pipefail
 
-if [ -z "$TRAVIS_TAG" ]; then
+if [[ -z "$TRAVIS_TAG" ]]; then
   echo "Build is not a release, skipping CD" >&2; exit 0
 fi
 
-if [ -z "$PYPI_USERNAME" ] || [ -z "$PYPI_PASSWORD" ]; then
+if [[ -z "$PYPI_USERNAME" ]] || [[ -z "$PYPI_PASSWORD" ]]; then
   echo "No PyPI credentials configured, unable to publish builds" >&2; exit 1
 fi
 
-if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_PASSWORD" ]; then
+if [[ -z "$DOCKER_USERNAME" ]] || [[ -z "$DOCKER_PASSWORD" ]]; then
   echo "No docker credentials configured, unable to publish builds" >&2; exit 1
 fi
 

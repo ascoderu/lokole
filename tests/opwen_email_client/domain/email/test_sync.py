@@ -2,6 +2,7 @@ from glob import glob
 from os import mkdir
 from os.path import join
 from shutil import rmtree
+from tempfile import NamedTemporaryFile
 from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import Mock
@@ -35,7 +36,9 @@ class AzureSyncTests(TestCase):
         self.assertEqual(len(uploaded), 1, 'Expected exactly one upload')
 
         with open(uploaded[0], 'rb') as buffer:
-            with self.sync._open(buffer) as fobj:
+            with self.sync._open(buffer, 'r', 'archive') as archive:
+                fobj = self.sync._get_file_from_download(
+                    archive, self.sync._emails_file)
                 self.assertEqual(expected, fobj.read())
 
     def assertNoUpload(self):
@@ -43,14 +46,17 @@ class AzureSyncTests(TestCase):
         self.assertEqual(len(uploaded), 0, 'Expected no uploads')
 
     def given_download(self, payload: bytes):
-        resource_id = str(uuid4())
-        download_filename = join(
-            self._root_folder, self._download_folder, resource_id)
+        with NamedTemporaryFile() as fobj:
+            fobj.write(payload)
 
-        with open(download_filename, 'wb') as buffer:
-            with self.sync._open(buffer, 'wb') as fobj:
-                fobj.write(payload)
-            buffer.seek(0)
+            resource_id = str(uuid4())
+            download_filename = join(
+                self._root_folder, self._download_folder, resource_id)
+
+            with open(download_filename, 'wb') as buffer:
+                with self.sync._open(buffer, 'w', 'tar.gz') as archive:
+                    self.sync._add_file_to_upload(
+                        archive, self.sync._emails_file, fobj)
 
         self.email_server_client_mock.download.return_value = (
             resource_id,

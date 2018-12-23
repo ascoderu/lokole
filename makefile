@@ -1,11 +1,4 @@
 #
-# System configuration
-#
-PYTHON=/usr/bin/python3
-YARN=/usr/bin/yarn
-SHELLCHECK=/usr/bin/shellcheck
-
-#
 # You shouldn't need to touch anything below this line.
 #
 py_env=venv
@@ -17,13 +10,10 @@ app_runner=$(py_env)/bin/python ./manage.py devserver
 .PHONY: default
 default: server
 
-$(py_env)/bin/activate: requirements.txt
-	test -d $(py_env) || $(PYTHON) -m venv $(py_env)
-	$(py_env)/bin/pip install -U pip setuptools
+venv: requirements.txt requirements-dev.txt
+	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel; fi
 	$(py_env)/bin/pip install -r requirements.txt
-	test -f requirements-dev.txt && $(py_env)/bin/pip install -r requirements-dev.txt
-
-venv: $(py_env)/bin/activate
+	$(py_env)/bin/pip install -r requirements-dev.txt
 
 unit-tests: venv
 	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=$(py_packages)
@@ -33,8 +23,8 @@ tests: unit-tests
 lint-python: venv
 	$(py_env)/bin/flake8 $(py_packages)
 
-lint-shell: $(SHELLCHECK)
-	$(SHELLCHECK) --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
+lint-shell:
+	shellcheck --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
 
 lint: lint-python lint-shell
 
@@ -47,7 +37,7 @@ bandit: venv
 ci: lint bandit tests
 
 $(grunt): package.json
-	$(YARN) install
+	yarn install
 
 build-frontend: $(grunt) Gruntfile.js
 	$(grunt)
