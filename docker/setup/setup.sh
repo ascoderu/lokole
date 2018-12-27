@@ -128,7 +128,7 @@ log "Setting up helm chart in cluster ${k8sname}"
 
 helm init --wait
 
-k8simageregistry="${KUBERNETES_IMAGE_REGISTRY:-cwolff}"
+k8simageregistry="${KUBERNETES_IMAGE_REGISTRY:-ascoderu}"
 k8sdockertag="${KUBERNETES_DOCKER_TAG:-latest}"
 
 while :; do
