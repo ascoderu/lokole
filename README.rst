@@ -5,9 +5,6 @@ Opwen cloudserver
 .. image:: https://travis-ci.org/ascoderu/opwen-cloudserver.svg?branch=master
   :target: https://travis-ci.org/ascoderu/opwen-cloudserver
 
-.. image:: https://img.shields.io/pypi/v/opwen_email_server.svg
-  :target: https://pypi.python.org/pypi/opwen_email_server/
-
 .. image:: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/shield.svg
   :target: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/
 
