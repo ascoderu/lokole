@@ -4,8 +4,8 @@ metadata:
   creationTimestamp: null
   name: api
 spec:
-  maxReplicas: 3
-  minReplicas: 5
+  maxReplicas: 9
+  minReplicas: 3
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
