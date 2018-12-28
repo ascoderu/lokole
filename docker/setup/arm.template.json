@@ -34,9 +34,9 @@
     "serverTablesName": "[take(concat('opwenservertables', uniqueString(subscription().subscriptionId)), 22)]",
     "serverQueuesName": "[take(concat('opwenserverqueues', uniqueString(subscription().subscriptionId)), 22)]",
     "serverQueuesSasName": "worker",
-    "serverQueueClientPackage": "lokoleinboundemails",
-    "serverQueueEmailSend": "sengridoutboundemails",
-    "serverQueueSendgridMime": "sengridinboundemails",
+    "serverQueueSendgridMime": "inbound",
+    "serverQueueClientPackage": "written",
+    "serverQueueEmailSend": "send",
     "location": "[resourceGroup().location]"
   },
   "resources": [

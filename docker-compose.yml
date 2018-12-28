@@ -55,7 +55,7 @@ services:
     command: ["/app/run-celery.sh"]
     environment:
       << : *shared-app-environment
-      CELERY_QUEUE_NAMES: written_store,inbound_store,send
+      CELERY_QUEUE_NAMES: all
       QUEUE_WORKERS: ${QUEUE_WORKERS}
     depends_on:
       - rabbitmq
