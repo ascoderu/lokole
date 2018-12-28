@@ -18,4 +18,6 @@
 
   {{ render_button(form.submit, _('Save settings')) }}
 </form>
+
+<a class="btn btn-primary", href="{{ url_for('sync') }}">{{_('Sync Emails')}}</a>
 {% endblock %}

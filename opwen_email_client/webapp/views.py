@@ -20,6 +20,7 @@ from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.actions import SendWelcomeEmail
 from opwen_email_client.webapp.actions import SyncEmails
+from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm
@@ -206,7 +207,12 @@ def sync() -> Response:
         email_sync=app.ioc.email_sync,
         email_store=app.ioc.email_store)
 
-    sync_emails()
+    start_internet_connection = StartInternetConnection(
+        sim_type=app.config['SIM_TYPE'])
+
+    if app.config['SIM_TYPE'] != 'LocalOnly':
+        with start_internet_connection():
+            sync_emails()
 
     flash(i8n.SYNC_COMPLETE, category='success')
     return redirect(url_for('home'))

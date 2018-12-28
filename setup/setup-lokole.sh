@@ -347,6 +347,7 @@ export OPWEN_CLIENT_ID='${opwen_webapp_config_client_id}'
 export OPWEN_CLIENT_NAME='${opwen_webapp_config_client_name}'
 export OPWEN_EMAIL_SERVER_READ_API='${opwen_server_host}'
 export OPWEN_EMAIL_SERVER_WRITE_API='${opwen_server_host}'
+export OPWEN_SIM_TYPE='${sim_type}'
 EOF
 
 lokole_admin_name="${LOKOLE_ADMIN_NAME:-admin}"
@@ -532,98 +533,7 @@ fi
 
 write_file "${opwen_webapp_email_sync_script}" << EOF
 #!/usr/bin/env sh
-
-sync_secret='${opwen_webapp_admin_secret}'
-dialer_config='${internet_dialer_config}'
-sync_logfile='${opwen_webapp_run_directory}/sync_stdout.log'
-
-dialer_logfile="\$(mktemp /tmp/dialer.log.XXXXXX)"
-dialer_pidfile="\$(mktemp /tmp/dialer.pid.XXXXXX)"
-
-modem_target_mode='1506'
-
-modem_is_e303() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:14fe'; }
-modem_is_e353() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:1f01'; }
-modem_is_e3131() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:155b'; }
-modem_is_plugged() { /usr/bin/lsusb | grep 'Huawei' | grep -q '12d1:'; }
-modem_is_setup() { /usr/bin/lsusb | grep 'Huawei' | grep -q "12d1:\${modem_target_mode}"; }
-dialer_is_running() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidfile}" && ps -p "\${pid}" > /dev/null; }
-connect_to_internet() { /usr/bin/wvdial --config="\${dialer_config}" 2> "\${dialer_logfile}" & echo \$! > "\${dialer_pidfile}"; }
-dialer_is_connected() { test -f "\${dialer_logfile}" && grep -q 'secondary DNS address' "\${dialer_logfile}"; }
-kill_dialer() { test -f "\${dialer_pidfile}" && read pid < "\${dialer_pidfile}" && kill "\${pid}" && rm "\${dialer_pidfile}" && rm "\${dialer_logfile}"; }
-sync_emails() { /usr/bin/curl "http://localhost:${opwen_port}/admin/sync?secret=\${sync_secret}"; }
-
-setup_modem() {
-  if   modem_is_e353;  then modem_target_mode='1001'; /usr/sbin/usb_modeswitch --config-file '${internet_modem_config_e353}'
-  elif modem_is_e303;  then modem_target_mode='1506'; /usr/sbin/usb_modeswitch --config-file '${internet_modem_config_e303}'
-  elif modem_is_e3131; then modem_target_mode='1506'; /usr/sbin/usb_modeswitch --config-file '${internet_modem_config_e3131}'
-  else exit 1;         fi
-}
-
-main_modem() {
-  if ! modem_is_plugged; then
-    echo 'Modem not plugged in, exitting' >&2
-    exit 1
-  fi
-
-  if ! modem_is_setup; then
-    echo 'Setting up modem...'
-    setup_modem
-    while ! modem_is_setup; do sleep 1s; done
-    echo '...done, modem is now set up'
-  fi
-
-  if ! dialer_is_running; then
-    echo 'Dialing up...'
-    connect_to_internet
-    while ! dialer_is_connected; do sleep 1s; done
-    echo '...done, connection to internet is established'
-  fi
-
-  echo 'Syncing emails...'
-  sync_emails
-  echo '...done, emails are synced'
-
-  echo 'Killing dialer...'
-  kill_dialer
-  echo '...done, connection to internet is terminated'
-}
-
-main_ethernet() {
-  echo 'Syncing emails...'
-  sync_emails
-  echo '...done, emails are synced'
-}
-
-main() {
-  if [ "${sim_type}" = "Ethernet" ]; then
-    main_ethernet
-  else
-    main_modem
-  fi
-}
-
-main_with_retry() {
-  local attempts=0
-  local timeout=5
-
-  until [ "\${attempts}" -ge 5 ]; do
-    set -o pipefail
-    main 2>&1 | tee --append "\${sync_logfile}"
-    local exitcode="\$?"
-    set +o pipefail
-
-    if [ "\${exitcode}" -eq 0 ]; then
-      break
-    fi
-
-    attempts="\$((attempts+1))"
-    timeout="\$((timeout*2))"
-    sleep "\${timeout}"
-  done
-}
-
-main_with_retry
+/usr/bin/curl "http://localhost:${opwen_port}/admin/sync?secret=${opwen_webapp_admin_secret}"
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 

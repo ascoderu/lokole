@@ -84,6 +84,7 @@ class AppConfig(object):
 
     WVDIAL_PATH = '/etc/wvdial.conf'
     LOCAL_EMAIL_STORE = path.join(state_basedir, 'emails.sqlite3')
+    SIM_TYPE = getenv('OPWEN_SIM_TYPE')
 
     EMAIL_ADDRESS_DELIMITER = ','
     EMAILS_PER_PAGE = 30
