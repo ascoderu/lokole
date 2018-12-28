@@ -2,8 +2,8 @@ from collections import namedtuple
 from io import BytesIO
 from os.path import splitext
 from tarfile import TarFile
-from tarfile import TarInfo
 from tarfile import open as tarfile_open
+from tempfile import NamedTemporaryFile
 from typing import IO
 from typing import Iterable
 from typing import Iterator
@@ -61,16 +61,16 @@ class _BaseAzureStorage(LogMixin):
         # noinspection PyStatementEffect
         self._client
 
-    def extra_log_args(self):
-        yield 'container %s', self._container
-
     def delete(self, resource_id: str):
         resource = self._client.get_object(resource_id)
         resource.delete()
+        self.log_debug('deleted %s', resource_id)
 
     def iter(self) -> Iterator[str]:
         for resource in self._client.list_objects():
-            yield resource.name
+            resource_id = resource.name
+            yield resource_id
+            self.log_debug('listed %s', resource_id)
 
 
 class AzureFileStorage(_BaseAzureStorage):
@@ -174,22 +174,20 @@ class AzureObjectsStorage(LogMixin):
         num_stored = 0
         with removing(create_tempfilename()) as path:
             with self._open_archive(path, 'w') as archive:
-                fobj = BytesIO()
-                num_bytes = 0
-                for obj in objs:
-                    serialized = to_json(obj)
-                    encoded = serialized.encode(self._encoding)
-                    fobj.write(encoded)
-                    fobj.write(b'\n')
-                    num_bytes += len(encoded) + 1
-                    num_stored += 1
-                    self.log_debug('stored obj %s', obj.get('_uid', ''))
+                with NamedTemporaryFile() as fobj:
+                    num_bytes = 0
+                    for obj in objs:
+                        serialized = to_json(obj)
+                        encoded = serialized.encode(self._encoding)
+                        fobj.write(encoded)
+                        fobj.write(b'\n')
+                        num_bytes += len(encoded) + 1
+                        num_stored += 1
+                        self.log_debug('stored obj %s', obj.get('_uid', ''))
 
-                if num_bytes > 0:
-                    fobj.seek(0)
-                    member = TarInfo(name)
-                    member.size = num_bytes
-                    archive.addfile(member, fobj)
+                    if num_bytes > 0:
+                        fobj.seek(0)
+                        archive.add(fobj.name, name)
 
             if num_stored > 0:
                 self._file_storage.store_file(resource_id, path)
@@ -231,17 +229,6 @@ class AzureObjectsStorage(LogMixin):
                     self.log_debug('fetched email %s', obj.get('_uid'))
                     yield obj
         self.log_debug('fetched %d objects from %s', num_fetched, resource_id)
-
-    def exists(self, resource_id: str) -> bool:
-        try:
-            self._file_storage.fetch_file(resource_id)
-        except ObjectDoesNotExistError:
-            resource_id = self._to_resource_id(resource_id)
-            try:
-                self._file_storage.fetch_file(resource_id)
-            except ObjectDoesNotExistError:
-                return False
-        return True
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
