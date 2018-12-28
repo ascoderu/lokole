@@ -232,17 +232,6 @@ class AzureObjectsStorage(LogMixin):
                     yield obj
         self.log_debug('fetched %d objects from %s', num_fetched, resource_id)
 
-    def exists(self, resource_id: str) -> bool:
-        try:
-            self._file_storage.fetch_file(resource_id)
-        except ObjectDoesNotExistError:
-            resource_id = self._to_resource_id(resource_id)
-            try:
-                self._file_storage.fetch_file(resource_id)
-            except ObjectDoesNotExistError:
-                return False
-        return True
-
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
 
