@@ -33,7 +33,7 @@
     "serverBlobsName": "[take(concat('opwenserverblobs', uniqueString(subscription().subscriptionId)), 22)]",
     "serverTablesName": "[take(concat('opwenservertables', uniqueString(subscription().subscriptionId)), 22)]",
     "serverQueuesName": "[take(concat('opwenserverqueues', uniqueString(subscription().subscriptionId)), 22)]",
-    "serverQueuesSasName": "worker",
+    "serverQueuesSasName": "celery",
     "serverQueueSendgridMime": "inbound",
     "serverQueueClientPackage": "written",
     "serverQueueEmailSend": "send",
@@ -99,8 +99,9 @@
           "apiVersion": "2017-04-01",
           "properties": {
             "rights": [
-              "Listen",
-              "Send"
+              "Manage",
+              "Send",
+              "Listen"
             ]
           },
           "dependsOn": [
