@@ -61,16 +61,16 @@ class _BaseAzureStorage(LogMixin):
         # noinspection PyStatementEffect
         self._client
 
-    def extra_log_args(self):
-        yield 'container %s', self._container
-
     def delete(self, resource_id: str):
         resource = self._client.get_object(resource_id)
         resource.delete()
+        self.log_debug('deleted %s', resource_id)
 
     def iter(self) -> Iterator[str]:
         for resource in self._client.list_objects():
-            yield resource.name
+            resource_id = resource.name
+            yield resource_id
+            self.log_debug('listed %s', resource_id)
 
 
 class AzureFileStorage(_BaseAzureStorage):
