@@ -57,6 +57,10 @@ class _BaseAzureStorage(LogMixin):
             key=self._key,
             container=self._container)
 
+    def ensure_exists(self):
+        # noinspection PyStatementEffect
+        self._client
+
     def extra_log_args(self):
         yield 'container %s', self._container
 
@@ -157,6 +161,9 @@ class AzureObjectsStorage(LogMixin):
 
     def access_info(self) -> AccessInfo:
         return self._file_storage.access_info()
+
+    def ensure_exists(self):
+        return self._file_storage.ensure_exists()
 
     def store_objects(self, upload: Tuple[str, Iterable[dict]],
                       resource_id: Optional[str] = None) -> Optional[str]:

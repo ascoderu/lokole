@@ -14,7 +14,18 @@ class AzureAuth(LogMixin):
 
     def insert(self, client_id: str, domain: str):
         self._storage.store_text(client_id, domain)
+        self._storage.store_text(domain, client_id)
         self.log_debug('Registered client %s at domain %s', client_id, domain)
+
+    def client_id_for(self, domain: str) -> Optional[str]:
+        try:
+            client_id = self._storage.fetch_text(domain)
+        except ObjectDoesNotExistError:
+            self.log_debug('Unrecognized domain %s', domain)
+            return None
+        else:
+            self.log_debug('Domain %s has client %s', domain, client_id)
+            return client_id
 
     def domain_for(self, client_id: str) -> Optional[str]:
         try:

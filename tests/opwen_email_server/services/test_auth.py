@@ -22,4 +22,6 @@ class AzureAuthTests(TestCase):
     def test_inserts_and_retrieves_client(self):
         self._auth.insert('client', 'domain')
         self.assertEqual(self._auth.domain_for('client'), 'domain')
+        self.assertEqual(self._auth.client_id_for('domain'), 'client')
         self.assertIsNone(self._auth.domain_for('unknown-client'))
+        self.assertIsNone(self._auth.client_id_for('unknown-client'))
