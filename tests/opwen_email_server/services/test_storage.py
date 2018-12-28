@@ -2,6 +2,7 @@ from io import BytesIO
 from os import listdir
 from os import mkdir
 from os import remove
+from os.path import isdir
 from os.path import join
 from shutil import rmtree
 from tarfile import TarInfo
@@ -40,6 +41,11 @@ class AzureTextStorageTests(TestCase):
         self._storage.delete('resource2')
         self.assertEqual(sorted(self._storage.iter()),
                          sorted(['resource1.txt.gz']))
+
+    def test_ensure_exists(self):
+        self.assertFalse(isdir(join(self._folder, self._container)))
+        self._storage.ensure_exists()
+        self.assertTrue(isdir(join(self._folder, self._container)))
 
     def setUp(self):
         self._folder = mkdtemp()

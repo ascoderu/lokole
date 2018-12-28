@@ -285,12 +285,12 @@ class RegisterClientTests(TestCase):
     def test_409(self):
         domain = 'test.com'
 
-        self.client_storage.exists.return_value = True
+        self.auth.client_id_for.return_value = '123'
 
         _, status = self._execute_action({'domain': domain})
 
         self.assertEqual(status, 409)
-        self.client_storage.exists.assert_called_once_with(domain)
+        self.auth.client_id_for.assert_called_once_with(domain)
 
     def test_200(self):
         client_id = str(uuid4())
@@ -300,7 +300,7 @@ class RegisterClientTests(TestCase):
         domain = 'test.com'
 
         self.client_id_source.return_value = client_id
-        self.client_storage.exists.return_value = False
+        self.auth.client_id_for.return_value = None
         self.client_storage.access_info.return_value = AccessInfo(
             account=client_storage_account,
             key=client_storage_key,
@@ -312,9 +312,9 @@ class RegisterClientTests(TestCase):
         self.assertEqual(response['storage_account'], client_storage_account)
         self.assertEqual(response['storage_key'], client_storage_key)
         self.assertEqual(response['resource_container'], client_storage_container)
-        self.auth.insert.assert_called_once_with(client_id, domain)
-        self.assertEqual(self.client_storage.store_objects.call_count, 1)
-        self.client_storage.exists.assert_called_once_with(domain)
+        self.auth.client_id_for.assert_called_once_with(domain)
+        self.auth.insert.assert_called_with(client_id, domain)
+        self.assertEqual(self.client_storage.ensure_exists.call_count, 1)
         self.setup_mailbox.assert_called_once_with(client_id, domain)
         self.setup_mx_records.assert_called_once_with(domain)
 

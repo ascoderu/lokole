@@ -160,7 +160,7 @@ log "Backing up secrets"
 
 storage_account="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME')"
 storage_key="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY')"
-container_name="secrets_$(date +"%Y-%m-%d-%H-%M")"
+container_name="secrets-$(date +"%Y-%m-%d-%H-%M")"
 az storage container create --name "${container_name}" \
   --account-name="${storage_account}" --account-key="${storage_key}"
 az storage blob upload-batch --destination "${container_name}" --source "/secrets" \

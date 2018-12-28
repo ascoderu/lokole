@@ -75,8 +75,9 @@ def get_email_storage() -> AzureObjectStorage:
 
 @lru_cache(maxsize=PENDING_STORAGE_CACHE_SIZE)
 def get_pending_storage(domain: str) -> AzureTextStorage:
+    container = domain.replace('.', '-')
     return AzureTextStorage(
         account=config.TABLES_ACCOUNT,
         key=config.TABLES_KEY,
-        container=domain,
+        container=container,
         provider=config.STORAGE_PROVIDER)

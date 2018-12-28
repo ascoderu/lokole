@@ -236,7 +236,7 @@ class RegisterClient(LogMixin):
 
     def __call__(self, client: dict) -> Response:
         domain = client['domain']
-        if self._client_storage.exists(domain):
+        if self._auth.client_id_for(domain) is not None:
             return 'client already exists', 409
 
         client_id = self._client_id_source()
@@ -244,8 +244,7 @@ class RegisterClient(LogMixin):
 
         self._setup_mailbox(client_id, domain)
         self._setup_mx_records(domain)
-        self._client_storage.store_objects(
-            ('client_id', [{'client_id': client_id}]), domain)
+        self._client_storage.ensure_exists()
         self._auth.insert(client_id, domain)
 
         self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501
