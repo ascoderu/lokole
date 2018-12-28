@@ -11,9 +11,8 @@ RUN curl -sLfO "https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSI
   mv "linux-amd64/helm" /usr/local/bin/helm && \
   chmod +x /usr/local/bin/helm && \
   rm -rf "linux-amd64" "helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
-  az aks install-cli --client-version "${KUBECTL_VERSION}"
-
-RUN mkdir /secrets
+  az aks install-cli --client-version "${KUBECTL_VERSION}" && \
+  mkdir /secrets
 
 ADD helm /app/helm
 ADD docker/setup/* /app/
