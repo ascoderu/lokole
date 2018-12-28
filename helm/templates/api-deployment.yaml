@@ -26,7 +26,7 @@ spec:
           value: dir:/app/opwen_email_server/swagger
         - name: SERVER_WORKERS
           value: "{{.Values.server.serverWorkers}}"
-        {{ include "opwen.environment.shared" }}
+        {{ include "opwen.environment.shared" . }}
         - name: LOKOLE_CLOUDFLARE_USER
           valueFrom:
             secretKeyRef:

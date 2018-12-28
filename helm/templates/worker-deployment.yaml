@@ -26,7 +26,7 @@ spec:
           value: written_store,inbound_store,send
         - name: QUEUE_WORKERS
           value: "{{.Values.worker.queueWorkers}}"
-        {{ include "opwen.environment.shared" }}
+        {{ include "opwen.environment.shared" . }}
         ports:
         - containerPort: 80
         resources: {}
