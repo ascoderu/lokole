@@ -18,7 +18,7 @@ echo "$TRAVIS_TAG" > version.txt
 
 py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
 
-make prepare-server -e py_env="$py_env" -e YARN="$(which yarn)" -e SHELLCHECK="$(which shellcheck)"
+make prepare-server -e py_env="$py_env"
 
 "$py_env/bin/pip" install twine
 "$py_env/bin/python" setup.py sdist
