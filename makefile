@@ -56,4 +56,5 @@ worker: venv
 	PY_ENV="$(py_env)" \
     QUEUE_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
+    CELERY_QUEUE_NAMES="all" \
     $(pwd)/docker/app/run-celery.sh

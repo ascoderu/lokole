@@ -23,10 +23,10 @@ spec:
         command: ["/app/run-celery.sh"]
         env:
         - name: CELERY_QUEUE_NAMES
-          value: written_store,inbound_store,send
+          value: all
         - name: QUEUE_WORKERS
           value: "{{.Values.worker.queueWorkers}}"
-        {{ include "opwen.environment.shared" }}
+        {{ include "opwen.environment.shared" . }}
         ports:
         - containerPort: 80
         resources: {}
