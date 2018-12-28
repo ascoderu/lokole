@@ -1,4 +1,5 @@
 from os import environ
+from urllib.parse import quote
 
 STORAGE_PROVIDER = environ.get('LOKOLE_STORAGE_PROVIDER', 'AZURE_BLOBS')
 BLOBS_ACCOUNT = environ.get('LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME', '')
@@ -23,8 +24,11 @@ MAX_HEIGHT_IMAGES = int(environ.get('MAX_HEIGHT_EMAIL_IMAGES', '200'))
 
 if environ.get('QUEUE_BROKER_SCHEME') == 'azureservicebus':
     QUEUE_BROKER = 'azureservicebus://{username}:{password}@{host}'.format(
-        username=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME'),
-        password=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY'),
-        host=environ.get('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE'))
+        username=quote(
+            environ.get('LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME', ''), safe=''),
+        password=quote(
+            environ.get('LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY', ''), safe=''),
+        host=quote(
+            environ.get('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE', ''), safe=''))
 else:
     QUEUE_BROKER = environ.get('QUEUE_BROKER_URL', '')
