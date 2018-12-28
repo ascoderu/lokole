@@ -17,22 +17,21 @@ class AzureSyncTests(TestCase):
     def setUp(self):
         self._root_folder = mkdtemp()
         self.email_server_client_mock = Mock()
-        self._upload_folder = 'uploads'
-        self._download_folder = 'downloads'
+        self._container = 'compressedpackages'
         self.sync = AzureSync(
-            container=self._upload_folder,
+            container=self._container,
             email_server_client=self.email_server_client_mock,
             account_key='mock',
             account_name=self._root_folder,
             provider='LOCAL',
             serializer=JsonSerializer())
-        mkdir(join(self._root_folder, self._download_folder))
+        mkdir(join(self._root_folder, self._container))
 
     def tearDown(self):
         rmtree(self._root_folder)
 
     def assertUploadIs(self, expected: bytes):
-        uploaded = glob(join(self._root_folder, self._upload_folder, '*'))
+        uploaded = glob(join(self._root_folder, self._container, '*'))
         self.assertEqual(len(uploaded), 1, 'Expected exactly one upload')
 
         with open(uploaded[0], 'rb') as buffer:
@@ -42,7 +41,7 @@ class AzureSyncTests(TestCase):
                 self.assertEqual(expected, fobj.read())
 
     def assertNoUpload(self):
-        uploaded = glob(join(self._root_folder, self._upload_folder, '*'))
+        uploaded = glob(join(self._root_folder, self._container, '*'))
         self.assertEqual(len(uploaded), 0, 'Expected no uploads')
 
     def given_download(self, payload: bytes):
@@ -51,20 +50,17 @@ class AzureSyncTests(TestCase):
 
             resource_id = str(uuid4())
             download_filename = join(
-                self._root_folder, self._download_folder, resource_id)
+                self._root_folder, self._container, resource_id)
 
             with open(download_filename, 'wb') as buffer:
                 with self.sync._open(buffer, 'w', 'tar.gz') as archive:
                     self.sync._add_file_to_upload(
                         archive, self.sync._emails_file, fobj)
 
-        self.email_server_client_mock.download.return_value = (
-            resource_id,
-            self._download_folder)
+        self.email_server_client_mock.download.return_value = resource_id
 
     def given_download_exception(self):
-        self.email_server_client_mock.download.return_value = (
-            'unknown-resource', self._download_folder)
+        self.email_server_client_mock.download.return_value = 'unknown'
 
     def test_upload(self):
         self.sync.upload(items=[{'foo': 'bar', 'read': True}])

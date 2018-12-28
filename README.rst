@@ -119,6 +119,7 @@ variables:
   OPWEN_ENABLE_DEBUG="True"
   LOKOLE_STORAGE_PROVIDER="LOCAL"
   OPWEN_REMOTE_ACCOUNT_NAME="./tests/files/opwen_email_client"
+  OPWEN_REMOTE_RESOURCE_CONTAINER="downloads"
 
 With these environment variables set, when the Lokole exchanges data with the
 server, it will not make any calls to Azure and instead depend on the files

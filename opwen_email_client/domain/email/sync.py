@@ -1,6 +1,7 @@
 from abc import ABCMeta
 from abc import abstractmethod
-from io import TextIOBase
+from contextlib import contextmanager
+from os import remove
 from tarfile import open as tarfile_open
 from tempfile import NamedTemporaryFile
 from typing import IO
@@ -9,10 +10,9 @@ from typing import TypeVar
 from uuid import uuid4
 
 from cached_property import cached_property
-from libcloud.storage.base import StorageDriver
+from libcloud.storage.base import Container
 from libcloud.storage.providers import Provider
 from libcloud.storage.providers import get_driver
-from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
 
 from opwen_email_client.domain.email.client import EmailServerClient
@@ -52,18 +52,24 @@ class AzureSync(Sync):
         self._provider = getattr(Provider, provider)
 
     @cached_property
-    def _azure_client(self) -> StorageDriver:
+    def _azure_client(self) -> Container:
         driver = get_driver(self._provider)
         client = driver(self._account, self._key)
-        try:
-            client.get_container(self._container)
-        except ContainerDoesNotExistError:
-            client.create_container(self._container)
-        return client
+        return client.get_container(self._container)
 
     @classmethod
-    def _workspace(cls):
-        return NamedTemporaryFile()
+    @contextmanager
+    def _workspace(cls) -> IO:
+        temp = NamedTemporaryFile(delete=False)
+        try:
+            temp.close()
+            fobj = open(temp.name, mode=temp.mode)
+            try:
+                yield fobj
+            finally:
+                fobj.close()
+        finally:
+            remove(temp.name)
 
     @classmethod
     def _open(cls, fileobj, mode, name):
@@ -77,12 +83,10 @@ class AzureSync(Sync):
 
         return tarfile_open(fileobj=fileobj, mode=mode)
 
-    def _download_to_stream(self, blobname: str, container: str,
-                            stream: IO) -> bool:
+    def _download_to_stream(self, blobname: str, stream: IO) -> bool:
 
         try:
-            container = self._azure_client.get_container(container)
-            resource = container.get_object(blobname)
+            resource = self._azure_client.get_object(blobname)
         except ObjectDoesNotExistError:
             return False
         else:
@@ -90,9 +94,8 @@ class AzureSync(Sync):
                 stream.write(chunk)
             return True
 
-    def _upload_from_stream(self, blobname: str, stream: TextIOBase):
-        container = self._azure_client.get_container(self._container)
-        container.upload_object_via_stream(stream, blobname)
+    def _upload_from_stream(self, blobname: str, stream: IO):
+        self._azure_client.upload_object_via_stream(stream, blobname)
 
     @classmethod
     def _get_file_from_download(cls, archive, name):
@@ -105,12 +108,12 @@ class AzureSync(Sync):
         raise FileNotFoundError(name)
 
     def download(self):
-        resource_id, container = self._email_server_client.download()
-        if not resource_id or not container:
+        resource_id = self._email_server_client.download()
+        if not resource_id:
             return
 
         with self._workspace() as workspace:
-            if self._download_to_stream(resource_id, container, workspace):
+            if self._download_to_stream(resource_id, workspace):
                 workspace.seek(0)
                 with self._open(workspace, 'r', resource_id) as archive:
                     emails = self._get_file_from_download(
