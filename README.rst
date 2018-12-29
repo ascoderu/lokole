@@ -176,11 +176,9 @@ You can run the script on your client device like so:
 
 .. sourcecode :: sh
 
-  curl https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/setup-lokole.sh \
-  | bash -s \
-      <client-name> <sim-type> <local-password> \
-      <storage-account-name> <storage-account-key> <email-key> <server-tables-name> <server-tables-key> \
-      <cloudflare-user> <cloudflare-key> <cloudflare-zone> <sync-schedule>
+  curl -O https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/setup-lokole.sh && \
+  chmod +x setup-lokole.sh && \
+  ./setup-lokole.sh <client-name> <sim-type> <sync-schedule> <registration-credentials>
 
 
 Adding a new language
