@@ -128,13 +128,16 @@ kubectl create secret generic "sendgrid" --from-env-file "/secrets/sendgrid.env"
 log "Setting up helm chart in cluster ${k8sname}"
 
 helm init --wait
+helm dependency update "${scriptdir}/helm"
 
 k8simageregistry="${KUBERNETES_IMAGE_REGISTRY:-ascoderu}"
 k8sdockertag="${KUBERNETES_DOCKER_TAG:-latest}"
+lokole_dns_name="${LOKOLE_DNS_NAME:-mailserver.lokole.ca}"
 
 while :; do
   helm install \
     --name "${helmname}" \
+    --set domain="${lokole_dns_name}" \
     --set version.imageRegistry="${k8simageregistry}" \
     --set version.dockerTag="${k8sdockertag}" \
     "${scriptdir}/helm"
@@ -143,7 +146,7 @@ while :; do
 done
 
 while :; do
-  ingressip="$(kubectl get service --selector io.kompose.service=nginx --output jsonpath={..ip})"
+  ingressip="$(kubectl get service --selector app=nginx-ingress,component=controller --output jsonpath={..ip})"
   if [[ -z "${ingressip}" ]]; then log "Waiting for ${k8sname} public IP"; sleep 30s; else break; fi
 done
 
@@ -153,7 +156,6 @@ cp ~/.ssh/id_rsa /secrets/kube-id_rsa
 
 log "Setting up DNS for ${ingressip}"
 
-lokole_dns_name="${LOKOLE_DNS_NAME:-mailserver.lokole.ca}"
 cloudflare_zone="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_ZONE')"
 cloudflare_user="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_USER')"
 cloudflare_key="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_KEY')"

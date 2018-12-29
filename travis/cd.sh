@@ -28,8 +28,8 @@ done
 # production deploy
 #
 
-if [[ -z "$HELM_NAME" ]] || [[ -z "$KUBECONFIG_URL" ]]; then
-  echo "Skipping production deployment since no helm name or kubeconfig url is configured" >&2; exit 0
+if [[ -z "$HELM_NAME" ]] || [[ -z "$KUBECONFIG_URL" ]] || [[ -z "$LOKOLE_DNS_NAME" ]]; then
+  echo "Skipping production deployment since connection secrets are not defined" >&2; exit 0
 fi
 
 kubeconfig_path="$PWD/kube-config"
@@ -39,6 +39,7 @@ docker run \
   -e IMAGE_REGISTRY="$DOCKER_USERNAME" \
   -e DOCKER_TAG="$TRAVIS_TAG" \
   -e HELM_NAME="$HELM_NAME" \
+  -e LOKOLE_DNS_NAME="$LOKOLE_DNS_NAME" \
   -v "$kubeconfig_path:/secrets/kube-config" \
   "$DOCKER_USERNAME/opwenserver_setup:$TRAVIS_TAG" \
   /app/upgrade.sh

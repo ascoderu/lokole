@@ -8,6 +8,7 @@
 ##   DOCKER_TAG
 ##   HELM_NAME
 ##   IMAGE_REGISTRY
+##   LOKOLE_DNS_NAME
 ##
 
 scriptdir="$(dirname "$0")"
@@ -21,6 +22,7 @@ scriptname="${BASH_SOURCE[0]}"
 required_env "${scriptname}" "DOCKER_TAG"
 required_env "${scriptname}" "HELM_NAME"
 required_env "${scriptname}" "IMAGE_REGISTRY"
+required_env "${scriptname}" "LOKOLE_DNS_NAME"
 required_file "${scriptname}" "/secrets/kube-config"
 
 #
@@ -29,8 +31,14 @@ required_file "${scriptname}" "/secrets/kube-config"
 
 log "Upgrading helm deployment ${HELM_NAME}"
 
-KUBECONFIG="/secrets/kube-config" \
+export KUBECONFIG="/secrets/kube-config"
+
+helm init --client-only --wait
+
+helm dependency update "${scriptdir}/helm"
+
 helm upgrade "${HELM_NAME}" \
+  --set domain="${LOKOLE_DNS_NAME}" \
   --set version.imageRegistry="${IMAGE_REGISTRY}" \
   --set version.dockerTag="${DOCKER_TAG}" \
-  ./helm
+  "${scriptdir}/helm"
