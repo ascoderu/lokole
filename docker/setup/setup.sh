@@ -23,6 +23,7 @@
 ##   KUBERNETES_DOCKER_TAG
 ##   KUBERNETES_NODE_SKU
 ##   KUBERNETES_NODE_COUNT
+##   LOKOLE_DNS_NAME
 ##
 
 scriptdir="$(dirname "$0")"
@@ -150,10 +151,38 @@ cp ~/.kube/config /secrets/kube-config
 cp ~/.ssh/id_rsa.pub /secrets/kube-id_rsa.pub
 cp ~/.ssh/id_rsa /secrets/kube-id_rsa
 
+log "Setting up DNS for ${ingressip}"
+
+lokole_dns_name="${LOKOLE_DNS_NAME:-mailserver.lokole.ca}"
+cloudflare_zone="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_ZONE')"
+cloudflare_user="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_USER')"
+cloudflare_key="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_KEY')"
+cloudflare_dns_api="https://api.cloudflare.com/client/v4/zones/${cloudflare_zone}/dns_records"
+
+cloudflare_cname_id="$(curl -sX GET "${cloudflare_dns_api}?type=A&name=${lokole_dns_name}" \
+  -H "X-Auth-Email: ${cloudflare_user}" \
+  -H "X-Auth-Key: ${cloudflare_key}" \
+| jq -r '.result[0].id')"
+
+if [[ -n "${cloudflare_cname_id}" ]] && [[ ${cloudflare_cname_id} != "null" ]]; then
+  curl -sX PUT "${cloudflare_dns_api}/${cloudflare_cname_id}" \
+    -H "X-Auth-Email: ${cloudflare_user}" \
+    -H "X-Auth-Key: ${cloudflare_key}" \
+    -H "Content-Type: application/json" \
+    -d '{"type":"A","name":"'"${lokole_dns_name}"'","content":"'"${ingressip}"'","ttl":1,"proxied":false}'
+else
+  curl -sX POST "${cloudflare_dns_api}" \
+    -H "X-Auth-Email: ${cloudflare_user}" \
+    -H "X-Auth-Key: ${cloudflare_key}" \
+    -H "Content-Type: application/json" \
+    -d '{"type":"A","name":"'"${lokole_dns_name}"'","content":"'"${ingressip}"'","ttl":1,"proxied":false}'
+fi
+
 cat > /secrets/kubedeployment.env << EOF
 RESOURCE_GROUP=${KUBERNETES_RESOURCE_GROUP_NAME}
 HELM_NAME=${helmname}
 APP_IP=${ingressip}
+APP_DNS=${lokole_dns_name}
 EOF
 fi
 
