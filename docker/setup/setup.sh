@@ -50,14 +50,11 @@ az account set --subscription "${SUBSCRIPTION_ID}"
 az configure --defaults location="${LOCATION}"
 
 #
-# setup resource group
-#
-
-use_resource_group "${RESOURCE_GROUP_NAME}"
-
-#
 # setup azure resources
 #
+if [[ "${DEPLOY_SERVICES}" != "no" ]]; then
+
+use_resource_group "${RESOURCE_GROUP_NAME}"
 
 storageaccountsku="${STORAGE_ACCOUNT_SKU:-Standard_GRS}"
 servicebussku="${SERVICE_BUS_SKU:-Basic}"
@@ -86,9 +83,12 @@ LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME=$(jq -r .properties.outputs.serverQueuesSasN
 LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY=$(jq -r .properties.outputs.serverQueuesSasKey.value /tmp/deployment.json)
 EOF
 
+fi
+
 #
 # create production deployment
 #
+if [[ "${DEPLOY_COMPUTE}" != "no" ]]; then
 
 if [[ -z "${KUBERNETES_RESOURCE_GROUP_NAME}" ]] || [[ -z "${KUBERNETES_NODE_COUNT}" ]] || [[ -z "${KUBERNETES_NODE_SKU}" ]]; then
   log "Skipping production deployment to kubernetes since KUBERNETES_RESOURCE_GROUP_NAME, KUBERNETES_NODE_COUNT, or KUBERNETES_NODE_SKU are not set"
@@ -155,12 +155,18 @@ RESOURCE_GROUP=${KUBERNETES_RESOURCE_GROUP_NAME}
 HELM_NAME=${helmname}
 APP_IP=${ingressip}
 EOF
+fi
 
-log "Backing up secrets"
+#
+# backup secrets
+#
 
 storage_account="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME')"
 storage_key="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY')"
-container_name="secrets-$(date +"%Y-%m-%d-%H-%M")"
+container_name="secrets"
+
+log "Backing up secrets to ${storage_account}/${container_name}"
+
 az storage container create --name "${container_name}" \
   --account-name="${storage_account}" --account-key="${storage_key}"
 az storage blob upload-batch --destination "${container_name}" --source "/secrets" \
