@@ -49,7 +49,7 @@ get_dotenv() {
   local dotenvfile="$1"
   local variable="$2"
 
-  grep "${variable}" "${dotenvfile}" | cut -d'=' -f2-
+  grep "${variable}" "${dotenvfile}" | cut -d'=' -f2- | tr -d '\r'
 }
 
 use_resource_group() {
