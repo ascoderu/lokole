@@ -297,7 +297,10 @@ info '
 
 install_system_package 'python3' 'python3-pip' 'python3-venv' 'python3-dev' 'libffi-dev' 'libssl-dev' 'bcrypt'
 
-opwen_webapp_virtualenv="/home/${opwen_user}/python"
+opwen_base_directory="/home/${opwen_user}/lokole"
+create_directory "${opwen_base_directory}"
+
+opwen_webapp_virtualenv="${opwen_base_directory}/python"
 create_directory "${opwen_webapp_virtualenv}"
 
 opwen_webapp_service='opwen_email_client'
@@ -327,7 +330,7 @@ info '
 #                                                  setting up webapp environment
 ################################################################################'
 
-opwen_webapp_run_directory="/home/${opwen_user}/state"
+opwen_webapp_run_directory="${opwen_base_directory}/state"
 create_directory "${opwen_webapp_run_directory}"
 
 opwen_webapp_config_session_key="$(random_string 32)"
