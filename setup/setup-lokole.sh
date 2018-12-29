@@ -307,8 +307,8 @@ opwen_webapp_service='opwen_email_client'
 opwen_webapp_directory="${opwen_webapp_virtualenv}/lib/python$(python_version)/site-packages/${opwen_webapp_service}/webapp"
 
 create_virtualenv "${opwen_webapp_virtualenv}"
-while ! "${opwen_webapp_virtualenv}/bin/pip" install --upgrade pip setuptools wheel; do sleep_a_bit; done
-while ! "${opwen_webapp_virtualenv}/bin/pip" install "${opwen_webapp_service}"; do sleep_a_bit; done
+while ! "${opwen_webapp_virtualenv}/bin/pip" install --no-cache-dir --upgrade pip setuptools wheel; do sleep_a_bit; done
+while ! "${opwen_webapp_virtualenv}/bin/pip" install --no-cache-dir "${opwen_webapp_service}"; do sleep_a_bit; done
 "${opwen_webapp_virtualenv}/bin/pybabel" compile -d "${opwen_webapp_directory}/translations"
 
 
@@ -494,7 +494,7 @@ EOF
 
 if [[ "${sim_type}" = "mkwvconf" ]]; then
   install_system_package 'mobile-broadband-provider-info'
-  "${opwen_webapp_virtualenv}/bin/pip" install mkwvconf
+  "${opwen_webapp_virtualenv}/bin/pip" install --no-cache-dir mkwvconf
   "${opwen_webapp_virtualenv}/bin/mkwvconf.py" --configPath="${opwen_dialer_config_directory}/${sim_type}"
 fi
 

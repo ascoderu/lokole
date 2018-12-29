@@ -2,12 +2,8 @@ language:
   python
 
 python:
+  - "3.5"
   - "3.6"
-
-sudo: required
-
-services:
-  - docker
 
 script: travis/ci.sh
 
@@ -23,3 +19,4 @@ deploy:
     on:
       repo: ascoderu/opwen-webapp
       tags: true
+      python: "3.6"
