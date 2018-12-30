@@ -184,6 +184,14 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     return 'data:{};base64,{}'.format(image_type, image_content)
 
 
+def _is_valid_url(url: Optional[str]) -> bool:
+    if not url:
+        return False
+    has_http_prefix = url.startswith('http://')
+    has_https_prefix = url.startswith('https://')
+    return has_http_prefix or has_https_prefix
+
+
 def format_inline_images(email: dict) -> dict:
     email_body = email.get('body', '')
     if not email_body:
@@ -196,7 +204,8 @@ def format_inline_images(email: dict) -> dict:
 
     for image_tag in image_tags:
         image_url = image_tag.get('src')
-        if not image_url:
+
+        if not _is_valid_url(image_url):
             continue
 
         encoded_image = _fetch_image_to_base64(image_url)
