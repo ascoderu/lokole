@@ -318,7 +318,7 @@ info '
 ################################################################################'
 
 opwen_webapp_config_client_domain="${opwen_webapp_config_client_name}.lokole.ca"
-opwen_webapp_registration_response="$(http_post_json "http://${opwen_server_host}/api/email/register/" -u "${registration_credentials}" -d "{\"domain\":\"${opwen_webapp_config_client_domain}\"}")"
+opwen_webapp_registration_response="$(http_post_json "https://${opwen_server_host}/api/email/register/" -u "${registration_credentials}" -d "{\"domain\":\"${opwen_webapp_config_client_domain}\"}")"
 opwen_webapp_config_client_id="$(jq -r '.client_id' <<< "${opwen_webapp_registration_response}")"
 opwen_webapp_config_remote_account_name="$(jq -r '.storage_account' <<< "${opwen_webapp_registration_response}")"
 opwen_webapp_config_remote_account_key="$(jq -r '.storage_key' <<< "${opwen_webapp_registration_response}")"
