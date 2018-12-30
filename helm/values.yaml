@@ -1,3 +1,5 @@
+domain: mailserver.lokole.ca
+
 version:
   imageRegistry: ascoderu
   dockerTag: latest
@@ -10,3 +12,16 @@ worker:
 
 logging:
   level: INFO
+
+nginx-ingress:
+  rbac:
+    create: false
+    createRole: false
+    createClusterRole: false
+  controller:
+    replicaCount: 3
+
+kube-lego:
+  config:
+    LEGO_EMAIL: ascoderu.opwen@gmail.com
+    LEGO_URL: https://acme-v01.api.letsencrypt.org/directory
