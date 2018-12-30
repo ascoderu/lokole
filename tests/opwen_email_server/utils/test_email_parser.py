@@ -133,6 +133,14 @@ class ConvertImgUrlToBase64Tests(TestCase):
         self.assertEqual(output_email, input_email)
 
     @responses.activate
+    def test_format_inline_images_with_img_tag_and_invalid_src_attribute(self):
+        input_email = {'body': '<div><img src="foo:invalid"/></div>'}
+
+        output_email = email_parser.format_inline_images(input_email)
+
+        self.assertEqual(output_email, input_email)
+
+    @responses.activate
     def test_format_inline_images_with_bad_request(self):
         self.givenTestImage(status=404)
         input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
