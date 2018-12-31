@@ -2,7 +2,6 @@ from collections import namedtuple
 from io import BytesIO
 from os.path import splitext
 from tarfile import TarFile
-from tarfile import open as tarfile_open
 from tempfile import NamedTemporaryFile
 from typing import IO
 from typing import Iterable
@@ -18,6 +17,7 @@ from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
 from libcloud.storage.types import Provider
+from xtarfile import open as tarfile_open
 
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_json
