@@ -2,7 +2,6 @@ from abc import ABCMeta
 from abc import abstractmethod
 from contextlib import contextmanager
 from os import remove
-from tarfile import open as tarfile_open
 from tempfile import NamedTemporaryFile
 from typing import IO
 from typing import Iterable
@@ -14,6 +13,7 @@ from libcloud.storage.base import Container
 from libcloud.storage.providers import Provider
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ObjectDoesNotExistError
+from xtarfile import open as tarfile_open
 
 from opwen_email_client.domain.email.client import EmailServerClient
 from opwen_email_client.util.serialization import Serializer
@@ -81,7 +81,7 @@ class AzureSync(Sync):
 
         mode = '{}|{}'.format(mode, compression)
 
-        return tarfile_open(fileobj=fileobj, mode=mode)
+        return tarfile_open(fileobj.name, mode=mode)
 
     def _download_to_stream(self, blobname: str, stream: IO) -> bool:
 

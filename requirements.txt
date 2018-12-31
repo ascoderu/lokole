@@ -18,3 +18,4 @@ passlib==1.7.1
 requests==2.21.0
 typing==3.6.6
 tzlocal==1.5.1
+xtarfile[zstd]==0.0.1
