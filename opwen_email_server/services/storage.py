@@ -121,7 +121,7 @@ class AzureTextStorage(_BaseAzureStorage):
 
 class AzureObjectsStorage(LogMixin):
     _encoding = 'utf-8'
-    _compression = 'gz'
+    _compression = 'zstd'
 
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
@@ -155,7 +155,8 @@ class AzureObjectsStorage(LogMixin):
     @classmethod
     def _to_resource_id(cls, resource_id: Optional[str]) -> str:
         resource_id = resource_id or str(uuid4())
-        resource_id = '{}.tar.{}'.format(resource_id, cls._compression)
+        if '.tar' not in Path(resource_id).suffixes:
+            resource_id = '{}.tar.{}'.format(resource_id, cls._compression)
         return resource_id
 
     def access_info(self) -> AccessInfo:
