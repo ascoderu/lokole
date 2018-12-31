@@ -1,5 +1,4 @@
 from io import BytesIO
-from os import close
 from os import listdir
 from os import mkdir
 from os import remove
@@ -10,7 +9,6 @@ from shutil import rmtree
 from tarfile import TarInfo
 from tempfile import NamedTemporaryFile
 from tempfile import mkdtemp
-from tempfile import mkstemp
 from unittest import TestCase
 
 from libcloud.storage.types import ObjectDoesNotExistError
@@ -20,6 +18,8 @@ from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.utils.temporary import create_tempfilename
+from opwen_email_server.utils.temporary import removing
 
 
 class AzureTextStorageTests(TestCase):
@@ -187,16 +187,12 @@ class AzureObjectsStorageTests(TestCase):
     def _given_resource(self, resource_id: str, name: str, lines: bytes):
         client = self._storage._file_storage._client
         mode = 'w:{}'.format(Path(resource_id).suffix[1:])
-        fd, buffer_path = mkstemp(suffix=resource_id)
-        try:
-            close(fd)
+        with removing(create_tempfilename(resource_id)) as buffer_path:
             with tarfile_open(buffer_path, mode) as archive:
                 tarinfo = TarInfo(name)
                 tarinfo.size = len(lines)
                 archive.addfile(tarinfo, BytesIO(lines))
             client.upload_object(buffer_path, resource_id)
-        finally:
-            remove(buffer_path)
 
     def setUp(self):
         self._folder = mkdtemp()
