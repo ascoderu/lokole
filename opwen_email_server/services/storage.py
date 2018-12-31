@@ -1,6 +1,6 @@
 from collections import namedtuple
 from io import BytesIO
-from os.path import splitext
+from pathlib import Path
 from tarfile import TarFile
 from tempfile import NamedTemporaryFile
 from typing import IO
@@ -80,8 +80,7 @@ class AzureFileStorage(_BaseAzureStorage):
 
     def fetch_file(self, resource_id: str) -> str:
         resource = self._client.get_object(resource_id)
-        extension = splitext(resource_id)[1]
-        path = create_tempfilename() + extension
+        path = create_tempfilename(resource_id)
         resource.download(path)
         self.log_debug('fetched file %s from %s', path, resource_id)
         return path
@@ -172,7 +171,7 @@ class AzureObjectsStorage(LogMixin):
         name, objs = upload
 
         num_stored = 0
-        with removing(create_tempfilename()) as path:
+        with removing(create_tempfilename(resource_id)) as path:
             with self._open_archive(path, 'w') as archive:
                 with NamedTemporaryFile() as fobj:
                     num_bytes = 0

@@ -2,13 +2,16 @@ from contextlib import contextmanager
 from contextlib import suppress
 from os import remove
 from os.path import join
+from pathlib import Path
 from tempfile import gettempdir
 from typing import Generator
+from typing import Optional
 from uuid import uuid4
 
 
-def create_tempfilename() -> str:
-    return join(gettempdir(), str(uuid4()))
+def create_tempfilename(suffix: Optional[str] = None) -> str:
+    extension = ''.join(Path(suffix).suffixes) if suffix else ''
+    return join(gettempdir(), '{}{}'.format(uuid4(), extension))
 
 
 @contextmanager
