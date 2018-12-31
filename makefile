@@ -11,7 +11,7 @@ venv: requirements.txt requirements-dev.txt requirements-prod.txt
 	$(py_env)/bin/pip install -r requirements-prod.txt
 
 tests: venv
-	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=opwen_email_server --cover-html
+	$(py_env)/bin/coverage run -m nose2 && $(py_env)/bin/coverage report
 
 lint-swagger: venv
 	find opwen_email_server/swagger -type f -name '*.yaml' \
