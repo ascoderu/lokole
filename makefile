@@ -1,13 +1,7 @@
-#
-# You shouldn't need to touch anything below this line.
-#
 py_env=venv
-py_packages=opwen_email_client
 grunt=./node_modules/.bin/grunt
-env=./.env
-app_runner=$(py_env)/bin/python ./manage.py devserver
 
-.PHONY: default
+.PHONY: default tests
 default: server
 
 venv: requirements.txt requirements-dev.txt
@@ -15,13 +9,11 @@ venv: requirements.txt requirements-dev.txt
 	$(py_env)/bin/pip install -r requirements.txt
 	$(py_env)/bin/pip install -r requirements-dev.txt
 
-unit-tests: venv
-	$(py_env)/bin/nosetests --exe --with-coverage --cover-package=$(py_packages)
-
-tests: unit-tests
+tests: venv
+	$(py_env)/bin/coverage run -m nose2 && $(py_env)/bin/coverage report
 
 lint-python: venv
-	$(py_env)/bin/flake8 $(py_packages)
+	$(py_env)/bin/flake8 opwen_email_client
 
 lint-shell:
 	shellcheck --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
@@ -29,7 +21,7 @@ lint-shell:
 lint: lint-python lint-shell
 
 typecheck: venv
-	$(py_env)/bin/mypy --ignore-missing-imports $(py_packages)
+	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_client
 
 bandit: venv
 	$(py_env)/bin/bandit -r . -x $(py_env)
@@ -58,4 +50,4 @@ clean:
 	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 server: prepare-server
-	$(app_runner)
+	$(py_env)/bin/python ./manage.py devserver
