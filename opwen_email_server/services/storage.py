@@ -122,6 +122,7 @@ class AzureTextStorage(_BaseAzureStorage):
 class AzureObjectsStorage(LogMixin):
     _encoding = 'utf-8'
     _compression = 'zstd'
+    _compression_level = 20
 
     def __init__(self, file_storage: AzureFileStorage) -> None:
         self._file_storage = file_storage
@@ -149,8 +150,13 @@ class AzureObjectsStorage(LogMixin):
             compression = path[extension_index + 1:]
         else:
             compression = cls._compression
+
+        kwargs = {}
+        if compression == 'zstd' and mode == 'w':
+            kwargs['level'] = cls._compression_level
+
         mode = '{}|{}'.format(mode, compression)
-        return tarfile_open(path, mode)
+        return tarfile_open(path, mode, **kwargs)
 
     @classmethod
     def _to_resource_id(cls, resource_id: Optional[str]) -> str:
