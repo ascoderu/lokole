@@ -1,8 +1,8 @@
 from collections import namedtuple
 from io import BytesIO
-from os.path import splitext
 from tarfile import TarFile
 from tempfile import NamedTemporaryFile
+from typing import Callable
 from typing import IO
 from typing import Iterable
 from typing import Iterator
@@ -18,6 +18,7 @@ from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
 from libcloud.storage.types import Provider
 from xtarfile import open as tarfile_open
+from xtarfile.xtarfile import SUPPORTED_FORMATS
 
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_json
@@ -80,8 +81,7 @@ class AzureFileStorage(_BaseAzureStorage):
 
     def fetch_file(self, resource_id: str) -> str:
         resource = self._client.get_object(resource_id)
-        extension = splitext(resource_id)[1]
-        path = create_tempfilename() + extension
+        path = create_tempfilename(resource_id)
         resource.download(path)
         self.log_debug('fetched file %s from %s', path, resource_id)
         return path
@@ -122,10 +122,14 @@ class AzureTextStorage(_BaseAzureStorage):
 
 class AzureObjectsStorage(LogMixin):
     _encoding = 'utf-8'
-    _compression = 'gz'
+    _compression = 'zstd'
+    _compression_level = 20
 
-    def __init__(self, file_storage: AzureFileStorage) -> None:
+    def __init__(self, file_storage: AzureFileStorage,
+                 resource_id_source: Callable[[], str] = None):
+
         self._file_storage = file_storage
+        self._resource_id_source = resource_id_source or self._new_resource_id
 
     def _open_archive_file(self, archive: TarFile, name: str) -> IO[bytes]:
         while True:
@@ -138,6 +142,7 @@ class AzureObjectsStorage(LogMixin):
                     break
                 return fobj
 
+        # noinspection PyProtectedMember
         raise ObjectDoesNotExistError(
             'File {} is missing in archive'.format(name),
             self._file_storage._driver,
@@ -150,14 +155,13 @@ class AzureObjectsStorage(LogMixin):
             compression = path[extension_index + 1:]
         else:
             compression = cls._compression
-        mode = '{}|{}'.format(mode, compression)
-        return tarfile_open(path, mode)
 
-    @classmethod
-    def _to_resource_id(cls, resource_id: Optional[str]) -> str:
-        resource_id = resource_id or str(uuid4())
-        resource_id = '{}.tar.{}'.format(resource_id, cls._compression)
-        return resource_id
+        kwargs = {}
+        if compression == 'zstd' and mode == 'w':
+            kwargs['level'] = cls._compression_level
+
+        mode = '{}|{}'.format(mode, compression)
+        return tarfile_open(path, mode, **kwargs)
 
     def access_info(self) -> AccessInfo:
         return self._file_storage.access_info()
@@ -165,14 +169,21 @@ class AzureObjectsStorage(LogMixin):
     def ensure_exists(self):
         return self._file_storage.ensure_exists()
 
-    def store_objects(self, upload: Tuple[str, Iterable[dict]],
-                      resource_id: Optional[str] = None) -> Optional[str]:
+    @classmethod
+    def compression_formats(cls) -> Iterable[str]:
+        return SUPPORTED_FORMATS
 
-        resource_id = self._to_resource_id(resource_id)
+    def store_objects(self, upload: Tuple[str, Iterable[dict]],
+                      compression: Optional[str] = None) -> Optional[str]:
+
+        resource_id = '{resource_id}.tar.{compression}'.format(
+            resource_id=self._resource_id_source(),
+            compression=compression or self._compression)
+
         name, objs = upload
 
         num_stored = 0
-        with removing(create_tempfilename()) as path:
+        with removing(create_tempfilename(resource_id)) as path:
             with self._open_archive(path, 'w') as archive:
                 with NamedTemporaryFile() as fobj:
                     num_bytes = 0
@@ -232,6 +243,10 @@ class AzureObjectsStorage(LogMixin):
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
+
+    @classmethod
+    def _new_resource_id(cls) -> str:
+        return str(uuid4())
 
 
 class AzureObjectStorage(LogMixin):

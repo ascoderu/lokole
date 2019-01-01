@@ -182,16 +182,26 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_factory = MagicMock()
         self.pending_storage = Mock()
 
+    def test_400(self):
+        client_id = str(uuid4())
+        domain = 'test.com'
+
+        self.auth.domain_for.return_value = domain
+        self.client_storage.compression_formats.return_value = ['gz']
+
+        _, status = self._execute_action(client_id, 'xyz')
+
+        self.assertEqual(status, 400)
+
     def test_403(self):
         client_id = str(uuid4())
         domain = None
 
         self.auth.domain_for.return_value = domain
 
-        _, status = self._execute_action(client_id)
+        _, status = self._execute_action(client_id, 'gz')
 
         self.assertEqual(status, 403)
-        self.auth.domain_for.assert_called_once_with(client_id)
 
     def test_200(self):
         client_id = str(uuid4())
@@ -201,10 +211,12 @@ class DownloadClientEmailsTests(TestCase):
         email = {'_uid': email_id}
 
         _stored = defaultdict(list)
+        _compression = defaultdict(list)
 
-        def store_objects_mock(upload):
+        def store_objects_mock(upload, compression):
             name, emails = upload
             _stored[name].extend(emails)
+            _compression[name].append(compression)
             return resource_id
 
         self.auth.domain_for.return_value = domain
@@ -212,8 +224,9 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_storage.iter.return_value = [email_id]
         self.email_storage.fetch_object.return_value = email
         self.client_storage.store_objects.side_effect = store_objects_mock
+        self.client_storage.compression_formats.return_value = ['gz']
 
-        response = self._execute_action(client_id)
+        response = self._execute_action(client_id, 'gz')
 
         self.assertEqual(response.get('resource_id'), resource_id)
         self.auth.domain_for.assert_called_once_with(client_id)
@@ -222,6 +235,7 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_storage.delete.assert_called_once_with(email_id)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
         self.assertEqual(_stored[sync.EMAILS_FILE], [email])
+        self.assertEqual(_compression[sync.EMAILS_FILE], ['gz'])
 
     def _execute_action(self, *args, **kwargs):
         action = actions.DownloadClientEmails(

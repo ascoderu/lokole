@@ -4,19 +4,22 @@ from os import mkdir
 from os import remove
 from os.path import isdir
 from os.path import join
+from pathlib import Path
 from shutil import rmtree
 from tarfile import TarInfo
-from tarfile import open as tarfile_open
 from tempfile import NamedTemporaryFile
 from tempfile import mkdtemp
 from unittest import TestCase
 
 from libcloud.storage.types import ObjectDoesNotExistError
+from xtarfile import open as tarfile_open
 
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.utils.temporary import create_tempfilename
+from opwen_email_server.utils.temporary import removing
 
 
 class AzureTextStorageTests(TestCase):
@@ -141,38 +144,53 @@ class AzureObjectsStorageTests(TestCase):
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_stores_objects(self):
-        resource_id = 'file.tar.gz'
         name = 'file'
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
 
-        resource_id = self._storage.store_objects((name, objs), resource_id)
+        resource_id = self._storage.store_objects((name, objs))
 
         self.assertIsNotNone(resource_id)
-        self.assertContainerHasNumFiles(1)
+        self.assertContainerHasNumFiles(1, suffix='.tar.zstd')
+
+    def test_stores_objects_with_explicit_compression(self):
+        name = 'file'
+        objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
+
+        resource_id = self._storage.store_objects((name, objs), 'gz')
+
+        self.assertIsNotNone(resource_id)
+        self.assertContainerHasNumFiles(1, suffix='.tar.gz')
 
     def test_does_not_create_file_without_objects(self):
-        resource_id = 'file.tar.gz'
         name = 'file'
         objs = []
 
-        resource_id = self._storage.store_objects((name, objs), resource_id)
+        resource_id = self._storage.store_objects((name, objs), 'gz')
 
         self.assertIsNone(resource_id)
         self.assertContainerHasNumFiles(0)
 
-    def assertContainerHasNumFiles(self, count: int):
-        path = join(self._folder, self._container)
-        self.assertEqual(len(listdir(path)), count)
+    def assertContainerHasNumFiles(self, count: int, suffix: str = ''):
+        container_files = listdir(join(self._folder, self._container))
+        matches = [entry for entry in container_files
+                   if entry.endswith(suffix)]
+
+        self.assertEqual(
+            len(matches),
+            count,
+            'Container does not have {} files ending with "{}"; '
+            'all files in container are: {}'
+            .format(count, suffix, ', '.join(container_files)))
 
     def _given_resource(self, resource_id: str, name: str, lines: bytes):
         client = self._storage._file_storage._client
-        buffer = BytesIO()
-        with tarfile_open(mode='w:gz', fileobj=buffer) as archive:
-            tarinfo = TarInfo(name)
-            tarinfo.size = len(lines)
-            archive.addfile(tarinfo, BytesIO(lines))
-        buffer.seek(0)
-        client.upload_object_via_stream(buffer, resource_id)
+        mode = 'w:{}'.format(Path(resource_id).suffix[1:])
+        with removing(create_tempfilename(resource_id)) as buffer_path:
+            with tarfile_open(buffer_path, mode) as archive:
+                tarinfo = TarInfo(name)
+                tarinfo.size = len(lines)
+                archive.addfile(tarinfo, BytesIO(lines))
+            client.upload_object(buffer_path, resource_id)
 
     def setUp(self):
         self._folder = mkdtemp()

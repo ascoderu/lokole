@@ -17,11 +17,14 @@ paths:
         - application/json
       parameters:
         - $ref: '#/parameters/ClientId'
+        - $ref: '#/parameters/Compression'
       responses:
         200:
           description: The emails for the Lokole are ready to be downloaded.
           schema:
             $ref: '#/definitions/EmailPackage'
+        400:
+          description: Unknown compression.
         403:
           description: Request from unregistered client.
 
@@ -33,6 +36,13 @@ parameters:
     in: path
     type: string
     required: true
+
+  Compression:
+    name: compression
+    description: The requested compression format of the emails package.
+    in: query
+    default: gz
+    type: string
 
 definitions:
 

@@ -12,6 +12,22 @@ class CreateTempFilenameTests(TestCase):
 
         self.assertFileDoesNotExist(filename)
 
+    def test_creates_new_file_preserving_extension(self):
+        filename = temporary.create_tempfilename('foo.txt')
+
+        self.assertHasExtension(filename, '.txt')
+
+    def test_creates_new_file_preserving_multi_extension(self):
+        filename = temporary.create_tempfilename('foo.tar.gz')
+
+        self.assertHasExtension(filename, '.tar.gz')
+
+    def test_creates_new_file_handling_bad_extension(self):
+        filename = temporary.create_tempfilename('/foo/bar.gz')
+
+        self.assertHasExtension(filename, '.gz')
+        self.assertPathDoesNotContain(filename, '/foo/')
+
     def test_creates_different_files(self):
         filename1 = temporary.create_tempfilename()
         filename2 = temporary.create_tempfilename()
@@ -21,6 +37,16 @@ class CreateTempFilenameTests(TestCase):
     def assertFileDoesNotExist(self, filename):
         if isfile(filename):
             self.fail('file {0} exists'.format(filename))
+
+    def assertPathDoesNotContain(self, filename, part):
+        self.assertTrue(
+            part not in filename,
+            '{0} has path part {1}'.format(filename, part))
+
+    def assertHasExtension(self, filename, extension):
+        self.assertTrue(
+            filename.endswith(extension),
+            '{0} does not have extension {1}'.format(filename, extension))
 
 
 class RemovingTests(TestCase):
