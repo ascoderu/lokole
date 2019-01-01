@@ -1,22 +1,21 @@
 FROM python:3.6-slim
 
+ARG USE_DEVTOOLS="False"
 ENV PY_ENV="/venv"
 ADD requirements.txt /app/requirements.txt
 ADD requirements-prod.txt /app/requirements-prod.txt
+ADD requirements-dev.txt /app/requirements-dev.txt
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates \
   && python3 -m venv "${PY_ENV}" \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -U pip setuptools \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements.txt \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements-prod.txt \
-  && rm -rf /var/lib/apt/lists/*
-
-ADD requirements-dev.txt /app/requirements-dev.txt
-ARG USE_DEVTOOLS="False"
-RUN if [ "${USE_DEVTOOLS}" = "True" ]; then \
+  && if [ "${USE_DEVTOOLS}" = "True" ]; then \
       "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements-dev.txt; \
       mkdir -p /data/server-blobs /data/server-tables /data/client-blobs; \
-    fi
+    fi \
+  && rm -rf /var/lib/apt/lists/*
 
 ADD opwen_email_server /app/opwen_email_server
 ADD docker/app/run-gunicorn.sh /app/run-gunicorn.sh
