@@ -4,7 +4,7 @@ ENV PY_ENV="/venv"
 ADD requirements.txt /app/requirements.txt
 ADD requirements-prod.txt /app/requirements-prod.txt
 RUN apt-get update \
-  && apt-get install -y libffi-dev libssl-dev ca-certificates curl \
+  && apt-get install -y libffi-dev libssl-dev ca-certificates \
   && python3 -m venv "${PY_ENV}" \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -U pip setuptools \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements.txt \
