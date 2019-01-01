@@ -23,9 +23,7 @@ ARG OPWEN_CLIENT_NAME=
 ARG OPWEN_REMOTE_ACCOUNT_KEY=
 ARG OPWEN_REMOTE_ACCOUNT_NAME=
 ARG OPWEN_ROOT_DOMAIN=lokole.ca
-ARG OPWEN_EMAIL_SERVER_READ_API=api.mailserver.read.lokole.ca
-ARG OPWEN_EMAIL_SERVER_WRITE_API=api.mailserver.write.lokole.ca
-ARG OPWEN_EMAIL_SERVER_INBOX_API=api.mailserver.inbox.lokole.ca
+ARG OPWEN_EMAIL_SERVER_HOSTNAME=mailserver.lokole.ca
 
 ADD register.sh /app/register.sh
 RUN /app/register.sh \

@@ -2,6 +2,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from contextlib import contextmanager
 from os import remove
+from tarfile import TarFile
 from tempfile import NamedTemporaryFile
 from typing import IO
 from typing import Iterable
@@ -37,12 +38,11 @@ class Sync(metaclass=ABCMeta):
 
 class AzureSync(Sync):
     _emails_file = 'emails.jsonl'
-    _compression = 'gz'
 
     def __init__(self, container: str, serializer: Serializer,
                  account_name: str, account_key: str,
                  email_server_client: EmailServerClient,
-                 provider: str):
+                 provider: str, compression: str):
 
         self._container = container
         self._serializer = serializer
@@ -50,6 +50,7 @@ class AzureSync(Sync):
         self._key = account_key
         self._email_server_client = email_server_client
         self._provider = getattr(Provider, provider)
+        self._compression = compression
 
     @cached_property
     def _azure_client(self) -> Container:
@@ -59,8 +60,8 @@ class AzureSync(Sync):
 
     @classmethod
     @contextmanager
-    def _workspace(cls) -> IO:
-        temp = NamedTemporaryFile(delete=False)
+    def _workspace(cls, suffix: str) -> IO:
+        temp = NamedTemporaryFile(suffix=suffix, delete=False)
         try:
             temp.close()
             fobj = open(temp.name, mode=temp.mode)
@@ -71,17 +72,16 @@ class AzureSync(Sync):
         finally:
             remove(temp.name)
 
-    @classmethod
-    def _open(cls, fileobj, mode, name):
-        extension_index = name.rfind('.')
+    def _open(self, path: str, mode: str) -> TarFile:
+        extension_index = path.rfind('.')
         if extension_index > -1:
-            compression = name[extension_index + 1:]
+            compression = path[extension_index + 1:]
         else:
-            compression = cls._compression
+            compression = self._compression
 
         mode = '{}|{}'.format(mode, compression)
 
-        return tarfile_open(fileobj.name, mode=mode)
+        return tarfile_open(path, mode=mode)
 
     def _download_to_stream(self, blobname: str, stream: IO) -> bool:
 
@@ -112,24 +112,21 @@ class AzureSync(Sync):
         if not resource_id:
             return
 
-        with self._workspace() as workspace:
-            if self._download_to_stream(resource_id, workspace):
-                workspace.seek(0)
-                with self._open(workspace, 'r', resource_id) as archive:
-                    emails = self._get_file_from_download(
-                        archive, self._emails_file)
-                    for line in emails:
-                        yield self._serializer.deserialize(line)
+        with self._workspace(resource_id) as workspace:
+            if not self._download_to_stream(resource_id, workspace):
+                return
 
-    @classmethod
-    def _add_file_to_upload(cls, archive, name, fobj):
-        fobj.seek(0)
-        archive.add(fobj.name, name)
+            workspace.seek(0)
+            with self._open(workspace.name, 'r') as archive:
+                emails = self._get_file_from_download(
+                    archive, self._emails_file)
+                for line in emails:
+                    yield self._serializer.deserialize(line)
 
     def _upload_emails(self, items, archive):
         uploaded_ids = []
 
-        with self._workspace() as uploaded:
+        with self._workspace(self._emails_file) as uploaded:
             for item in items:
                 item = {key: value for (key, value) in item.items()
                         if value is not None
@@ -139,15 +136,16 @@ class AzureSync(Sync):
                 uploaded.write(b'\n')
                 uploaded_ids.append(item.get('_uid'))
 
-            self._add_file_to_upload(archive, self._emails_file, uploaded)
+            uploaded.seek(0)
+            archive.add(uploaded.name, self._emails_file)
 
         return uploaded_ids
 
     def upload(self, items):
         upload_location = '{}.tar.{}'.format(uuid4(), self._compression)
 
-        with self._workspace() as workspace:
-            with self._open(workspace, 'w', upload_location) as archive:
+        with self._workspace(upload_location) as workspace:
+            with self._open(workspace.name, 'w') as archive:
                 uploaded_ids = self._upload_emails(items, archive)
 
             if uploaded_ids:

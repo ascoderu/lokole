@@ -348,8 +348,7 @@ export OPWEN_REMOTE_ACCOUNT_KEY='${opwen_webapp_config_remote_account_key}'
 export OPWEN_REMOTE_RESOURCE_CONTAINER='${opwen_webapp_config_remote_resource_container}'
 export OPWEN_CLIENT_ID='${opwen_webapp_config_client_id}'
 export OPWEN_CLIENT_NAME='${opwen_webapp_config_client_name}'
-export OPWEN_EMAIL_SERVER_READ_API='${opwen_server_host}'
-export OPWEN_EMAIL_SERVER_WRITE_API='${opwen_server_host}'
+export OPWEN_EMAIL_SERVER_HOSTNAME='${opwen_server_host}'
 export OPWEN_SIM_TYPE='${sim_type}'
 EOF
 

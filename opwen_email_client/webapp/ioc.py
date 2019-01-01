@@ -18,8 +18,8 @@ class Ioc(object):
     serializer = Serializer()
 
     email_server_client = EmailServerClient(
-        read_api=AppConfig.EMAIL_SERVER_READ_API_HOSTNAME,
-        write_api=AppConfig.EMAIL_SERVER_WRITE_API_HOSTNAME,
+        compression=AppConfig.COMPRESSION,
+        hostname=AppConfig.EMAIL_SERVER_HOSTNAME,
         client_id=AppConfig.CLIENT_ID)
 
     email_store = EmailStore(
@@ -27,6 +27,7 @@ class Ioc(object):
         database_path=AppConfig.LOCAL_EMAIL_STORE)
 
     email_sync = Sync(
+        compression=AppConfig.COMPRESSION,
         account_name=AppConfig.STORAGE_ACCOUNT_NAME,
         account_key=AppConfig.STORAGE_ACCOUNT_KEY,
         email_server_client=email_server_client,
