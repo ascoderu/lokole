@@ -1,8 +1,8 @@
 from collections import namedtuple
 from io import BytesIO
-from pathlib import Path
 from tarfile import TarFile
 from tempfile import NamedTemporaryFile
+from typing import Callable
 from typing import IO
 from typing import Iterable
 from typing import Iterator
@@ -18,6 +18,7 @@ from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
 from libcloud.storage.types import Provider
 from xtarfile import open as tarfile_open
+from xtarfile.xtarfile import SUPPORTED_FORMATS
 
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_json
@@ -124,8 +125,11 @@ class AzureObjectsStorage(LogMixin):
     _compression = 'zstd'
     _compression_level = 20
 
-    def __init__(self, file_storage: AzureFileStorage) -> None:
+    def __init__(self, file_storage: AzureFileStorage,
+                 resource_id_source: Callable[[], str] = None):
+
         self._file_storage = file_storage
+        self._resource_id_source = resource_id_source or self._new_resource_id
 
     def _open_archive_file(self, archive: TarFile, name: str) -> IO[bytes]:
         while True:
@@ -138,6 +142,7 @@ class AzureObjectsStorage(LogMixin):
                     break
                 return fobj
 
+        # noinspection PyProtectedMember
         raise ObjectDoesNotExistError(
             'File {} is missing in archive'.format(name),
             self._file_storage._driver,
@@ -158,23 +163,23 @@ class AzureObjectsStorage(LogMixin):
         mode = '{}|{}'.format(mode, compression)
         return tarfile_open(path, mode, **kwargs)
 
-    @classmethod
-    def _to_resource_id(cls, resource_id: Optional[str]) -> str:
-        resource_id = resource_id or str(uuid4())
-        if '.tar' not in Path(resource_id).suffixes:
-            resource_id = '{}.tar.{}'.format(resource_id, cls._compression)
-        return resource_id
-
     def access_info(self) -> AccessInfo:
         return self._file_storage.access_info()
 
     def ensure_exists(self):
         return self._file_storage.ensure_exists()
 
-    def store_objects(self, upload: Tuple[str, Iterable[dict]],
-                      resource_id: Optional[str] = None) -> Optional[str]:
+    @classmethod
+    def compression_formats(cls) -> Iterable[str]:
+        return SUPPORTED_FORMATS
 
-        resource_id = self._to_resource_id(resource_id)
+    def store_objects(self, upload: Tuple[str, Iterable[dict]],
+                      compression: Optional[str] = None) -> Optional[str]:
+
+        resource_id = '{resource_id}.tar.{compression}'.format(
+            resource_id=self._resource_id_source(),
+            compression=compression or self._compression)
+
         name, objs = upload
 
         num_stored = 0
@@ -238,6 +243,10 @@ class AzureObjectsStorage(LogMixin):
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
+
+    @classmethod
+    def _new_resource_id(cls) -> str:
+        return str(uuid4())
 
 
 class AzureObjectStorage(LogMixin):

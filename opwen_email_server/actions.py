@@ -160,11 +160,15 @@ class DownloadClientEmails(LogMixin):
         self._email_storage = email_storage
         self._pending_factory = pending_factory
 
-    def __call__(self, client_id) -> Response:
+    def __call__(self, client_id: str, compression: str) -> Response:
         domain = self._auth.domain_for(client_id)
         if not domain:
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
             return 'client is not registered', 403
+
+        if compression not in self._client_storage.compression_formats():
+            self.log_event(events.UNKNOWN_COMPRESSION_FORMAT, {'client_id': client_id})  # noqa: E501
+            return 'unknown compression format "{}"'.format(compression), 400
 
         delivered = set()
 
@@ -178,7 +182,7 @@ class DownloadClientEmails(LogMixin):
         pending = (mark_delivered(email) for email in pending)
 
         resource_id = self._client_storage.store_objects(
-            (sync.EMAILS_FILE, pending))
+            (sync.EMAILS_FILE, pending), compression)
 
         self._mark_emails_as_delivered(pending_storage, delivered)
 

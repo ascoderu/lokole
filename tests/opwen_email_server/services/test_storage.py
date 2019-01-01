@@ -153,21 +153,19 @@ class AzureObjectsStorageTests(TestCase):
         self.assertContainerHasNumFiles(1, suffix='.tar.zstd')
 
     def test_stores_objects_with_explicit_compression(self):
-        resource_id = 'file.tar.gz'
         name = 'file'
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
 
-        resource_id = self._storage.store_objects((name, objs), resource_id)
+        resource_id = self._storage.store_objects((name, objs), 'gz')
 
         self.assertIsNotNone(resource_id)
         self.assertContainerHasNumFiles(1, suffix='.tar.gz')
 
     def test_does_not_create_file_without_objects(self):
-        resource_id = 'file.tar.gz'
         name = 'file'
         objs = []
 
-        resource_id = self._storage.store_objects((name, objs), resource_id)
+        resource_id = self._storage.store_objects((name, objs), 'gz')
 
         self.assertIsNone(resource_id)
         self.assertContainerHasNumFiles(0)
