@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.6-slim
 
 ENV PY_ENV="/venv"
 ADD requirements.txt /app/requirements.txt
