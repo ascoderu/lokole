@@ -6,13 +6,12 @@ RUN apt-get -qq update \
     apache2-utils \
   && curl -fsSL https://git.io/get-mo -o /usr/local/bin/mo \
   && chmod +x /usr/local/bin/mo \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && rm /etc/nginx/conf.d/default.conf
 
 ADD docker/nginx/static /static
 ADD docker/nginx/nginx.conf.mu /app/frontend.conf.mu
 ADD docker/nginx/run-nginx.sh /app/run-nginx.sh
-
-RUN rm /etc/nginx/conf.d/default.conf
 
 ENV DNS_RESOLVER=""
 ENV HOSTNAME_EMAIL_RECEIVE="SET_ME"
