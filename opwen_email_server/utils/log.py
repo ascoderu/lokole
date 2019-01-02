@@ -1,7 +1,11 @@
+from logging import CRITICAL
+from logging import DEBUG
 from logging import Formatter
 from logging import Handler
+from logging import INFO
 from logging import Logger
 from logging import StreamHandler
+from logging import WARNING
 from logging import getLogger
 from typing import Any
 from typing import Iterable
@@ -57,16 +61,16 @@ class LogMixin(object):
         return telemetry_client
 
     def log_debug(self, message: str, *args: Any):
-        self._log('debug', message, args)
+        self._log(DEBUG, message, args)
 
     def log_info(self, message: str, *args: Any):
-        self._log('info', message, args)
+        self._log(INFO, message, args)
 
     def log_warning(self, message: str, *args: Any):
-        self._log('warning', message, args)
+        self._log(WARNING, message, args)
 
     def log_exception(self, ex: Exception, message: str, *args: Any):
-        self._log('exception', message + ' (%r)', append(args, ex))
+        self._log(CRITICAL, message + ' (%r)', append(args, ex))
 
         if self._telemetry_client:
             # noinspection PyBroadException
@@ -75,14 +79,16 @@ class LogMixin(object):
             except Exception:
                 self._telemetry_client.track_exception()
 
-    def _log(self, level: str, log_message: str, log_args: Iterable[Any]):
+    def _log(self, level: int, log_message: str, log_args: Iterable[Any]):
+        if not self._logger.isEnabledFor(level):
+            return
+
         message_parts = ['%s']
         args = [self.__class__.__name__]
         message_parts.append(log_message)
         args.extend(log_args)
         message = SEPARATOR.join(message_parts)
-        log = getattr(self._logger, level)
-        log(message, *args)
+        self._logger.log(level, message, *args)
 
     def log_event(self, event_name: str, properties: Optional[dict] = None):
         self.log_info('%s%s%s', event_name, SEPARATOR, properties)
