@@ -2,11 +2,28 @@ from collections import defaultdict
 from unittest import TestCase
 from unittest.mock import MagicMock
 from unittest.mock import Mock
+from unittest.mock import patch
 from uuid import uuid4
 
 from opwen_email_server import actions
 from opwen_email_server.constants import sync
 from opwen_email_server.services.storage import AccessInfo
+
+
+class ActionTests(TestCase):
+    @patch.object(actions._Action, '_telemetry_client')
+    @patch.object(actions._Action, '_telemetry_channel')
+    def test_logs_exception(self, mock_channel, mock_client):
+        class TestAction(actions._Action):
+            def _action(self):
+                int('not-a-number')
+
+        with self.assertRaises(ValueError):
+            action = TestAction()
+            action()
+
+        mock_client.track_exception.assert_called_once_with()
+        mock_channel.flush.assert_called_once_with()
 
 
 class PingTests(TestCase):

@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Callable
 from typing import Iterable
 from typing import Tuple
@@ -21,12 +22,26 @@ from opwen_email_server.utils.log import LogMixin
 Response = Union[dict, Tuple[str, int]]
 
 
-class Ping(object):
-    def __call__(self) -> Response:
+class _Action(ABC, LogMixin):
+    def __call__(self, *args, **kwargs) -> Response:
+        try:
+            return self._action(*args, **kwargs)
+        except Exception as ex:
+            self.log_exception(ex, 'error in action %s',
+                               self.__class__.__name__)
+            raise ex
+
+    def _action(self, *args, **kwargs) -> Response:
+        raise NotImplementedError
+
+
+class Ping(_Action):
+    # noinspection PyMethodMayBeStatic
+    def _action(self):  # type: ignore
         return 'OK', 200
 
 
-class SendOutboundEmails(LogMixin):
+class SendOutboundEmails(_Action):
     def __init__(self,
                  email_storage: AzureObjectStorage,
                  send_email: SendSendgridEmail):
@@ -34,7 +49,7 @@ class SendOutboundEmails(LogMixin):
         self._email_storage = email_storage
         self._send_email = send_email
 
-    def __call__(self, resource_id: str) -> Response:
+    def _action(self, resource_id):  # type: ignore
         email = self._email_storage.fetch_object(resource_id)
 
         success = self._send_email(email)
@@ -45,7 +60,7 @@ class SendOutboundEmails(LogMixin):
         return 'OK', 200
 
 
-class StoreInboundEmails(LogMixin):
+class StoreInboundEmails(_Action):
     def __init__(self,
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
@@ -57,7 +72,7 @@ class StoreInboundEmails(LogMixin):
         self._pending_factory = pending_factory
         self._email_parser = email_parser or self._parse_mime_email
 
-    def __call__(self, resource_id: str) -> Response:
+    def _action(self, resource_id):  # type: ignore
         mime_email = self._raw_email_storage.fetch_text(resource_id)
 
         email = self._email_parser(mime_email)
@@ -85,7 +100,7 @@ class StoreInboundEmails(LogMixin):
         return email
 
 
-class StoreWrittenClientEmails(LogMixin):
+class StoreWrittenClientEmails(_Action):
     def __init__(self,
                  client_storage: AzureObjectsStorage,
                  email_storage: AzureObjectStorage,
@@ -95,7 +110,7 @@ class StoreWrittenClientEmails(LogMixin):
         self._email_storage = email_storage
         self._next_task = next_task
 
-    def __call__(self, resource_id: str) -> Response:
+    def _action(self, resource_id):  # type: ignore
         emails = self._client_storage.fetch_objects(
             resource_id, sync.EMAILS_FILE)
 
@@ -116,7 +131,7 @@ class StoreWrittenClientEmails(LogMixin):
         return 'OK', 200
 
 
-class ReceiveInboundEmail(LogMixin):
+class ReceiveInboundEmail(_Action):
     def __init__(self,
                  auth: AzureAuth,
                  raw_email_storage: AzureTextStorage,
@@ -128,7 +143,7 @@ class ReceiveInboundEmail(LogMixin):
         self._next_task = next_task
         self._email_id_source = email_id_source or self._new_email_id
 
-    def __call__(self, client_id: str, email: str) -> Response:
+    def _action(self, client_id, email):  # type: ignore
         domain = self._auth.domain_for(client_id)
         if not domain:
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
@@ -148,7 +163,7 @@ class ReceiveInboundEmail(LogMixin):
         return str(uuid4())
 
 
-class DownloadClientEmails(LogMixin):
+class DownloadClientEmails(_Action):
     def __init__(self,
                  auth: AzureAuth,
                  client_storage: AzureObjectsStorage,
@@ -160,7 +175,7 @@ class DownloadClientEmails(LogMixin):
         self._email_storage = email_storage
         self._pending_factory = pending_factory
 
-    def __call__(self, client_id: str, compression: str) -> Response:
+    def _action(self, client_id, compression):  # type: ignore
         domain = self._auth.domain_for(client_id)
         if not domain:
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
@@ -202,7 +217,7 @@ class DownloadClientEmails(LogMixin):
             pending_storage.delete(email_id)
 
 
-class UploadClientEmails(LogMixin):
+class UploadClientEmails(_Action):
     def __init__(self,
                  auth: AzureAuth,
                  next_task: Callable[[str], None]):
@@ -210,7 +225,7 @@ class UploadClientEmails(LogMixin):
         self._auth = auth
         self._next_task = next_task
 
-    def __call__(self, client_id: str, upload_info: dict) -> Response:
+    def _action(self, client_id, upload_info):  # type: ignore
         domain = self._auth.domain_for(client_id)
         if not domain:
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
@@ -224,7 +239,7 @@ class UploadClientEmails(LogMixin):
         return 'uploaded', 200
 
 
-class RegisterClient(LogMixin):
+class RegisterClient(_Action):
     def __init__(self,
                  auth: AzureAuth,
                  client_storage: AzureObjectsStorage,
@@ -238,7 +253,7 @@ class RegisterClient(LogMixin):
         self._setup_mx_records = setup_mx_records
         self._client_id_source = client_id_source or self._new_client_id
 
-    def __call__(self, client: dict) -> Response:
+    def _action(self, client):  # type: ignore
         domain = client['domain']
         if self._auth.client_id_for(domain) is not None:
             return 'client already exists', 409

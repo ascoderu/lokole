@@ -24,3 +24,9 @@ def chunks(iterable: Iterable[T], chunk_size: int) -> Iterable[Iterable[T]]:
 
 def singleton(func: Callable) -> Callable:
     return lru_cache(maxsize=1)(func)
+
+
+def append(iterable: Iterable[T], next_item: T) -> Iterable[T]:
+    for item in iterable:
+        yield item
+    yield next_item

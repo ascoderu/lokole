@@ -57,3 +57,10 @@ class SingletonTests(TestCase):
     def function2(self):
         self.call_counts['function2'] += 1
         return 'some-other-value'
+
+
+class AppendTests(TestCase):
+    def test_yields_item_after_items(self):
+        collection = collections.append([1, 2, 3], 4)
+
+        self.assertSequenceEqual(list(collection), [1, 2, 3, 4])
