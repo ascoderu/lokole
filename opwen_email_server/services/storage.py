@@ -30,6 +30,9 @@ from opwen_email_server.utils.temporary import removing
 
 AccessInfo = namedtuple('AccessInfo', ['account', 'key', 'container'])
 
+Upload = Tuple[str, Iterable[dict], Callable[[dict], bytes]]
+Download = Tuple[str, Callable[[bytes], dict]]
+
 
 class _BaseAzureStorage(LogMixin):
     def __init__(self, account: str, key: str, container: str,
@@ -121,7 +124,6 @@ class AzureTextStorage(_BaseAzureStorage):
 
 
 class AzureObjectsStorage(LogMixin):
-    _encoding = 'utf-8'
     _compression = 'zstd'
     _compression_level = 20
 
@@ -173,14 +175,14 @@ class AzureObjectsStorage(LogMixin):
     def compression_formats(cls) -> Iterable[str]:
         return SUPPORTED_FORMATS
 
-    def store_objects(self, upload: Tuple[str, Iterable[dict]],
+    def store_objects(self, upload: Upload,
                       compression: Optional[str] = None) -> Optional[str]:
 
         resource_id = '{resource_id}.tar.{compression}'.format(
             resource_id=self._resource_id_source(),
             compression=compression or self._compression)
 
-        name, objs = upload
+        name, objs, encoder = upload
 
         num_stored = 0
         with removing(create_tempfilename(resource_id)) as path:
@@ -188,13 +190,10 @@ class AzureObjectsStorage(LogMixin):
                 with NamedTemporaryFile() as fobj:
                     num_bytes = 0
                     for obj in objs:
-                        serialized = to_json(obj)
-                        encoded = serialized.encode(self._encoding)
+                        encoded = encoder(obj)
                         fobj.write(encoded)
-                        fobj.write(b'\n')
-                        num_bytes += len(encoded) + 1
+                        num_bytes += len(encoded)
                         num_stored += 1
-                        self.log_debug('stored obj %s', obj.get('_uid', ''))
 
                     if num_bytes > 0:
                         fobj.seek(0)
@@ -206,38 +205,20 @@ class AzureObjectsStorage(LogMixin):
         self.log_debug('stored %d objects at %s', num_stored, resource_id)
         return resource_id if num_stored > 0 else None
 
-    def _parse_jsonl(self, line: str) -> Optional[dict]:
-        serialized = line.strip()
+    def fetch_objects(self, resource_id: str,
+                      download: Download) -> Iterable[dict]:
 
-        if not serialized.startswith('{'):
-            self.log_debug('Skipping non-JSONL line %s', line)
-            return None
+        name, decoder = download
 
-        if serialized[-1] != '}' and serialized[-1] != ',':
-            self.log_debug('Skipping non-JSONL line %s', line)
-            return None
-
-        if serialized.endswith(','):
-            serialized = serialized[:len(serialized) - 1]
-
-        try:
-            return from_json(serialized)
-        except ValueError:
-            self.log_debug('Skipping non-JSONL line %s', line)
-            return None
-
-    def fetch_objects(self, resource_id: str, name: str) -> Iterable[dict]:
         num_fetched = 0
         with removing(self._file_storage.fetch_file(resource_id)) as path:
             with self._open_archive(path, 'r') as archive:
                 fobj = self._open_archive_file(archive, name)
                 for encoded in fobj:
-                    serialized = encoded.decode(self._encoding)
-                    obj = self._parse_jsonl(serialized)
-                    if not obj:
+                    obj = decoder(encoded)
+                    if obj is None:
                         continue
                     num_fetched += 1
-                    self.log_debug('fetched email %s', obj.get('_uid'))
                     yield obj
         self.log_debug('fetched %d objects from %s', num_fetched, resource_id)
 

@@ -8,6 +8,8 @@ from uuid import uuid4
 from opwen_email_server import actions
 from opwen_email_server.constants import sync
 from opwen_email_server.services.storage import AccessInfo
+from opwen_email_server.utils.serialization import from_jsonl_bytes
+from opwen_email_server.utils.serialization import to_jsonl_bytes
 
 
 class ActionTests(TestCase):
@@ -129,7 +131,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
-        self.client_storage.fetch_objects.assert_called_once_with(resource_id, sync.EMAILS_FILE)
+        self.client_storage.fetch_objects.assert_called_once_with(resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
         self.email_storage.store_object.assert_called_once_with(email_id, email)
         self.next_task.assert_called_once_with(email_id)
         self.client_storage.delete.assert_called_once_with(resource_id)
@@ -229,11 +231,13 @@ class DownloadClientEmailsTests(TestCase):
 
         _stored = defaultdict(list)
         _compression = defaultdict(list)
+        _serializers = defaultdict(list)
 
         def store_objects_mock(upload, compression):
-            name, emails = upload
+            name, emails, serializer = upload
             _stored[name].extend(emails)
             _compression[name].append(compression)
+            _serializers[name].append(serializer)
             return resource_id
 
         self.auth.domain_for.return_value = domain
@@ -253,6 +257,7 @@ class DownloadClientEmailsTests(TestCase):
         self.email_storage.fetch_object.assert_called_once_with(email_id)
         self.assertEqual(_stored[sync.EMAILS_FILE], [email])
         self.assertEqual(_compression[sync.EMAILS_FILE], ['gz'])
+        self.assertEqual(_serializers[sync.EMAILS_FILE], [to_jsonl_bytes])
 
     def _execute_action(self, *args, **kwargs):
         action = actions.DownloadClientEmails(

@@ -19,6 +19,38 @@ class FromJsonTests(TestCase):
             serialization.to_json(obj)))
 
 
+class ToJsonlBytesTests(TestCase):
+    def test_creates_jsonl_bytes(self):
+        serialized = serialization.to_jsonl_bytes({'a': 1, 'b': '你好'})
+
+        self.assertTrue(serialized.endswith(b'\n'))
+        self.assertNotIn(b' ', serialized)
+
+
+class FromJsonlBytesTests(TestCase):
+    def test_parses_jsonl_lines(self):
+        lines = [
+            b'{"a":1}\n',
+            b'{"b":2}\n'
+        ]
+
+        deserialized = [serialization.from_jsonl_bytes(line) for line in lines]
+
+        self.assertEqual([{"a": 1}, {"b": 2}], deserialized)
+
+    def test_parses_json_lines(self):
+        lines = [
+            b'[\n',
+            b'{"a":1},\n',
+            b'{"b":2}\n',
+            b']',
+        ]
+
+        deserialized = [serialization.from_jsonl_bytes(line) for line in lines]
+
+        self.assertEqual([None, {"a": 1}, {"b": 2}, None], deserialized)
+
+
 class GzipTests(TestCase):
     sample_string = 'hello world\n'
 

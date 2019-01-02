@@ -18,6 +18,8 @@ from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.utils.serialization import from_jsonl_bytes
+from opwen_email_server.utils.serialization import to_jsonl_bytes
 from opwen_email_server.utils.temporary import create_tempfilename
 from opwen_email_server.utils.temporary import removing
 
@@ -106,13 +108,15 @@ class AzureObjectsStorageTests(TestCase):
         lines = b'{"foo":"bar"}\n{"baz":[1,2,3]}'
         self._given_resource(resource_id, name, lines)
 
-        objs = list(self._storage.fetch_objects(resource_id, name))
+        objs = list(self._storage.fetch_objects(
+            resource_id, (name, from_jsonl_bytes)))
 
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
     def test_fetches_missing_file(self):
         with self.assertRaises(ObjectDoesNotExistError):
-            list(self._storage.fetch_objects('missing', 'file'))
+            list(self._storage.fetch_objects(
+                'missing', ('file', from_jsonl_bytes)))
 
     def test_fetches_missing_archive_member(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671.tar.gz'
@@ -121,7 +125,8 @@ class AzureObjectsStorageTests(TestCase):
         self._given_resource(resource_id, name, lines)
 
         with self.assertRaises(ObjectDoesNotExistError):
-            list(self._storage.fetch_objects(resource_id, 'missing-tar'))
+            list(self._storage.fetch_objects(
+                resource_id, ('missing-tar', from_jsonl_bytes)))
 
     def test_fetches_json_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671.tar.gz'
@@ -129,7 +134,8 @@ class AzureObjectsStorageTests(TestCase):
         lines = b'{"emails":[\n{"foo":"bar"},\n{"baz":[1,2,3]}\n]}'
         self._given_resource(resource_id, name, lines)
 
-        objs = list(self._storage.fetch_objects(resource_id, name))
+        objs = list(self._storage.fetch_objects(
+            resource_id, (name, from_jsonl_bytes)))
 
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
@@ -139,7 +145,8 @@ class AzureObjectsStorageTests(TestCase):
         lines = b'{"foo":"bar"}\n{"corrupted":1,]}\n{"baz":[1,2,3]}'
         self._given_resource(resource_id, name, lines)
 
-        objs = list(self._storage.fetch_objects(resource_id, name))
+        objs = list(self._storage.fetch_objects(
+            resource_id, (name, from_jsonl_bytes)))
 
         self.assertEqual(objs, [{'foo': 'bar'}, {'baz': [1, 2, 3]}])
 
@@ -147,7 +154,8 @@ class AzureObjectsStorageTests(TestCase):
         name = 'file'
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
 
-        resource_id = self._storage.store_objects((name, objs))
+        resource_id = self._storage.store_objects(
+            (name, objs, to_jsonl_bytes))
 
         self.assertIsNotNone(resource_id)
         self.assertContainerHasNumFiles(1, suffix='.tar.zstd')
@@ -156,7 +164,8 @@ class AzureObjectsStorageTests(TestCase):
         name = 'file'
         objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
 
-        resource_id = self._storage.store_objects((name, objs), 'gz')
+        resource_id = self._storage.store_objects(
+            (name, objs, to_jsonl_bytes), 'gz')
 
         self.assertIsNotNone(resource_id)
         self.assertContainerHasNumFiles(1, suffix='.tar.gz')
@@ -165,7 +174,8 @@ class AzureObjectsStorageTests(TestCase):
         name = 'file'
         objs = []
 
-        resource_id = self._storage.store_objects((name, objs), 'gz')
+        resource_id = self._storage.store_objects(
+            (name, objs, to_jsonl_bytes), 'gz')
 
         self.assertIsNone(resource_id)
         self.assertContainerHasNumFiles(0)
