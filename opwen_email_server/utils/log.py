@@ -12,6 +12,10 @@ from typing import Iterable
 from typing import Optional
 
 from applicationinsights import TelemetryClient
+from applicationinsights.channel import AsynchronousQueue
+from applicationinsights.channel import AsynchronousSender
+from applicationinsights.channel import TelemetryChannel
+from applicationinsights.channel import TelemetryContext
 from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
 
@@ -19,41 +23,50 @@ from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
 from opwen_email_server.constants.logging import SEPARATOR
 from opwen_email_server.constants.logging import STDERR
-from opwen_email_server.constants.logging import TELEMETRY_QUEUE_ITEMS
-from opwen_email_server.constants.logging import TELEMETRY_QUEUE_SECONDS
 from opwen_email_server.utils.collections import append
 
 
 class LogMixin(object):
-    @classmethod
-    def _default_log_handlers(cls) -> Iterable[Handler]:
+    @cached_property
+    def _default_log_handlers(self) -> Iterable[Handler]:
+        handlers = []
+
         stderr = StreamHandler()
         stderr.setFormatter(Formatter(STDERR))
-        yield stderr
+        handlers.append(stderr)
 
-        if APPINSIGHTS_KEY:
-            yield LoggingHandler(APPINSIGHTS_KEY)
+        if self._telemetry_channel:
+            handlers.append(LoggingHandler(
+                APPINSIGHTS_KEY,
+                telemetry_channel=self._telemetry_channel))
+
+        return handlers
 
     @cached_property
     def _logger(self) -> Logger:
         log = getLogger()
-        for handler in self._default_log_handlers():
+        for handler in self._default_log_handlers:
             log.addHandler(handler)
         log.setLevel(LOG_LEVEL)
         return log
 
     @cached_property
-    def _telemetry_client(self) -> Optional[TelemetryClient]:
+    def _telemetry_channel(self) -> Optional[TelemetryChannel]:
         if not APPINSIGHTS_KEY:
             return None
 
-        telemetry_client = TelemetryClient(APPINSIGHTS_KEY)
-        telemetry_client.channel.sender.send_interval_in_milliseconds = \
-            TELEMETRY_QUEUE_SECONDS * 1000
-        telemetry_client.channel.sender.max_queue_item_count = \
-            TELEMETRY_QUEUE_ITEMS
+        sender = AsynchronousSender()
+        queue = AsynchronousQueue(sender)
+        context = TelemetryContext()
+        context.instrumentation_key = APPINSIGHTS_KEY
+        return TelemetryChannel(context, queue)
 
-        return telemetry_client
+    @cached_property
+    def _telemetry_client(self) -> Optional[TelemetryClient]:
+        if not self._telemetry_channel:
+            return None
+
+        return TelemetryClient(APPINSIGHTS_KEY, self._telemetry_channel)
 
     def log_debug(self, message: str, *args: Any):
         self._log(DEBUG, message, args)
