@@ -27,17 +27,12 @@ from opwen_email_server.utils.collections import append
 class LogMixin(object):
     @classmethod
     def _default_log_handlers(cls) -> Iterable[Handler]:
-        handlers = []
-
         stderr = StreamHandler()
         stderr.setFormatter(Formatter(STDERR))
-        handlers.append(stderr)
+        yield stderr
 
         if APPINSIGHTS_KEY:
-            appinsights = LoggingHandler(APPINSIGHTS_KEY)
-            handlers.append(appinsights)
-
-        return handlers
+            yield LoggingHandler(APPINSIGHTS_KEY)
 
     @cached_property
     def _logger(self) -> Logger:
