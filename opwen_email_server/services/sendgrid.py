@@ -47,14 +47,14 @@ class SendSendgridEmail(LogMixin):
         request = email.get()
         try:
             status = self._client(request)
-        except HTTPError as exception:
-            status = exception.code
-            self.log_exception('error sending email %s:%r:%r',
-                               email_id, exception, request)
-        except URLError as exception:
+        except HTTPError as ex:
+            status = ex.code
+            self.log_exception(ex, 'error sending email %s:%r',
+                               email_id, request)
+        except URLError as ex:
             status = -1
-            self.log_exception('error sending email %s:%r:%r',
-                               email_id, exception, request)
+            self.log_exception(ex, 'error sending email %s:%r',
+                               email_id, request)
         else:
             self.log_debug('sent email %s', email_id)
 
