@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 
+from applicationinsights.flask.ext import AppInsights
+from applicationinsights.flask.ext import CONF_KEY
 from connexion import App
+from connexion.apps.flask_app import flask
 
+from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.utils.imports import can_import
+from opwen_email_server.utils.log import LogMixin
 
 _servers = list(filter(can_import, ('tornado', 'gevent', 'flask')))
 _hosts = ['127.0.0.1', '0.0.0.0']  # nosec
@@ -13,9 +18,20 @@ _port = 8080
 _ui = False
 
 
+def _get_flask(app: App) -> flask.Flask:
+    return app.app
+
+
 def build_app(apis, host=_host, port=_port, server=_server, ui=_ui):
     app = App(__name__, host=host, port=port, server=server,
               options={'swagger_ui': ui})
+
+    flask_app = _get_flask(app)
+    flask_app.config[CONF_KEY] = APPINSIGHTS_KEY
+    appinsights = AppInsights(flask_app)
+
+    # noinspection PyProtectedMember
+    LogMixin.inject(flask_app.logger, appinsights._channel)
 
     for api in apis:
         app.add_api(api)
