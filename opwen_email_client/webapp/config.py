@@ -95,7 +95,7 @@ class AppConfig(object):
         [DEFAULT_LOCALE] +
         [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)])
 
-    COMPRESSION = getenv('OPWEN_COMPRESSION', 'gz')
+    COMPRESSION = getenv('OPWEN_COMPRESSION', 'zstd')
     EMAIL_SERVER_HOSTNAME = getenv('OPWEN_EMAIL_SERVER_HOSTNAME')
     EMAIL_HOST_FORMAT = '{}.' + root_domain
     STORAGE_PROVIDER = getenv('LOKOLE_STORAGE_PROVIDER', 'AZURE_BLOBS')
