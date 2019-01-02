@@ -12,7 +12,8 @@ from opwen_email_server.services.storage import AccessInfo
 
 class ActionTests(TestCase):
     @patch.object(actions._Action, '_telemetry_client')
-    def test_logs_exception(self, telemetry_mock):
+    @patch.object(actions._Action, '_telemetry_channel')
+    def test_logs_exception(self, mock_channel, mock_client):
         class TestAction(actions._Action):
             def _action(self):
                 int('not-a-number')
@@ -21,7 +22,8 @@ class ActionTests(TestCase):
             action = TestAction()
             action()
 
-        telemetry_mock.track_exception.assert_called_once_with()
+        mock_client.track_exception.assert_called_once_with()
+        mock_channel.flush.assert_called_once_with()
 
 
 class PingTests(TestCase):

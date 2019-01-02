@@ -24,9 +24,24 @@ from opwen_email_server.config import LOG_LEVEL
 from opwen_email_server.constants.logging import SEPARATOR
 from opwen_email_server.constants.logging import STDERR
 from opwen_email_server.utils.collections import append
+from opwen_email_server.utils.collections import singleton
+
+
+@singleton
+def _create_telemetry_channel() -> Optional[TelemetryChannel]:
+    if not APPINSIGHTS_KEY:
+        return None
+
+    sender = AsynchronousSender()
+    queue = AsynchronousQueue(sender)
+    context = TelemetryContext()
+    context.instrumentation_key = APPINSIGHTS_KEY
+    return TelemetryChannel(context, queue)
 
 
 class LogMixin(object):
+    _telemetry_channel = _create_telemetry_channel()
+
     @cached_property
     def _default_log_handlers(self) -> Iterable[Handler]:
         handlers = []
@@ -35,7 +50,7 @@ class LogMixin(object):
         stderr.setFormatter(Formatter(STDERR))
         handlers.append(stderr)
 
-        if self._telemetry_channel:
+        if APPINSIGHTS_KEY:
             handlers.append(LoggingHandler(
                 APPINSIGHTS_KEY,
                 telemetry_channel=self._telemetry_channel))
@@ -51,19 +66,8 @@ class LogMixin(object):
         return log
 
     @cached_property
-    def _telemetry_channel(self) -> Optional[TelemetryChannel]:
-        if not APPINSIGHTS_KEY:
-            return None
-
-        sender = AsynchronousSender()
-        queue = AsynchronousQueue(sender)
-        context = TelemetryContext()
-        context.instrumentation_key = APPINSIGHTS_KEY
-        return TelemetryChannel(context, queue)
-
-    @cached_property
     def _telemetry_client(self) -> Optional[TelemetryClient]:
-        if not self._telemetry_channel:
+        if not APPINSIGHTS_KEY:
             return None
 
         return TelemetryClient(APPINSIGHTS_KEY, self._telemetry_channel)
@@ -86,6 +90,7 @@ class LogMixin(object):
                 raise ex
             except Exception:
                 self._telemetry_client.track_exception()
+                self._telemetry_channel.flush()
 
     def _log(self, level: int, log_message: str, log_args: Iterable[Any]):
         if not self._logger.isEnabledFor(level):
@@ -103,4 +108,4 @@ class LogMixin(object):
 
         if self._telemetry_client:
             self._telemetry_client.track_event(event_name, properties)
-            self._telemetry_client.flush()
+            self._telemetry_channel.flush()
