@@ -18,6 +18,8 @@ from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
 from opwen_email_server.utils.email_parser import parse_mime_email
 from opwen_email_server.utils.log import LogMixin
+from opwen_email_server.utils.serialization import from_jsonl_bytes
+from opwen_email_server.utils.serialization import to_jsonl_bytes
 
 Response = Union[dict, Tuple[str, int]]
 
@@ -112,7 +114,7 @@ class StoreWrittenClientEmails(_Action):
 
     def _action(self, resource_id):  # type: ignore
         emails = self._client_storage.fetch_objects(
-            resource_id, sync.EMAILS_FILE)
+            resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
 
         domain = ''
         num_stored = 0
@@ -197,7 +199,8 @@ class DownloadClientEmails(_Action):
         pending = (mark_delivered(email) for email in pending)
 
         resource_id = self._client_storage.store_objects(
-            (sync.EMAILS_FILE, pending), compression)
+            (sync.EMAILS_FILE, pending, to_jsonl_bytes),
+            compression)
 
         self._mark_emails_as_delivered(pending_storage, delivered)
 

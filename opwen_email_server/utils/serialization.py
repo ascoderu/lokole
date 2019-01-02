@@ -1,15 +1,33 @@
 from gzip import GzipFile
 from io import BytesIO
+from json import JSONDecodeError
 from json import dumps
 from json import loads
+from typing import Optional
 
 
 def from_json(obj: str) -> dict:
     return loads(obj)
 
 
+def from_jsonl_bytes(obj: bytes) -> Optional[dict]:
+    try:
+        decoded = obj.decode('utf-8')
+    except UnicodeDecodeError:
+        return None
+    decoded = decoded.rstrip(',\n')
+    try:
+        return from_json(decoded)
+    except JSONDecodeError:
+        return None
+
+
 def to_json(obj: object) -> str:
     return dumps(obj, separators=(',', ':'))
+
+
+def to_jsonl_bytes(obj) -> bytes:
+    return to_json(obj).encode('utf-8') + b'\n'
 
 
 def gzip_string(uncompressed: str) -> bytes:
