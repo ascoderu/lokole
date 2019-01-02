@@ -39,7 +39,7 @@ def _create_telemetry_channel() -> Optional[TelemetryChannel]:
     return TelemetryChannel(context, queue)
 
 
-class LogMixin(object):
+class LogMixin:
     _telemetry_channel = _create_telemetry_channel()
 
     @cached_property
