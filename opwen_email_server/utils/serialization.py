@@ -11,8 +11,16 @@ from msgpack import packb as msgpack_dump
 from msgpack import unpackb as msgpack_load
 
 
+def to_json(obj: object) -> str:
+    return dumps(obj, separators=(',', ':'))
+
+
 def from_json(obj: str) -> dict:
     return loads(obj)
+
+
+def to_jsonl_bytes(obj) -> bytes:
+    return to_json(obj).encode('utf-8') + b'\n'
 
 
 def from_jsonl_bytes(obj: bytes) -> Optional[dict]:
@@ -27,22 +35,14 @@ def from_jsonl_bytes(obj: bytes) -> Optional[dict]:
         return None
 
 
-def from_msgpack_bytes(serialized: bytes) -> dict:
-    encoded = serialized.rstrip(b'\n')
-    return msgpack_load(encoded, raw=False)
-
-
-def to_json(obj: object) -> str:
-    return dumps(obj, separators=(',', ':'))
-
-
-def to_jsonl_bytes(obj) -> bytes:
-    return to_json(obj).encode('utf-8') + b'\n'
-
-
 def to_msgpack_bytes(obj) -> bytes:
     encoded = msgpack_dump(obj, use_bin_type=True)
     return encoded + b'\n'
+
+
+def from_msgpack_bytes(serialized: bytes) -> dict:
+    encoded = serialized.rstrip(b'\n')
+    return msgpack_load(encoded, raw=False)
 
 
 def to_base64(content: bytes) -> str:
