@@ -1,4 +1,6 @@
 from abc import ABC
+from base64 import b64decode
+from base64 import b64encode
 from typing import Callable
 from typing import Iterable
 from typing import Tuple
@@ -120,6 +122,7 @@ class StoreWrittenClientEmails(_Action):
         num_stored = 0
         for email in emails:
             email_id = email['_uid']
+            email = self._decode_attachments(email)
             self._email_storage.store_object(email_id, email)
 
             self._next_task(email_id)
@@ -131,6 +134,18 @@ class StoreWrittenClientEmails(_Action):
 
         self.log_event(events.EMAIL_STORED_FROM_CLIENT, {'domain': domain, 'num_emails': num_stored})  # noqa: E501
         return 'OK', 200
+
+    @classmethod
+    def _decode_attachments(cls, email: dict) -> dict:
+        if not email.get('attachments'):
+            return email
+
+        for attachment in email['attachments']:
+            content_base64 = attachment['content']
+            content_bytes = b64decode(content_base64)
+            attachment['content'] = content_bytes
+
+        return email
 
 
 class ReceiveInboundEmail(_Action):
@@ -197,6 +212,7 @@ class DownloadClientEmails(_Action):
 
         pending = self._fetch_pending_emails(pending_storage)
         pending = (mark_delivered(email) for email in pending)
+        pending = (self._encode_attachments(email) for email in pending)
 
         resource_id = self._client_storage.store_objects(
             (sync.EMAILS_FILE, pending, to_jsonl_bytes),
@@ -212,6 +228,18 @@ class DownloadClientEmails(_Action):
     def _fetch_pending_emails(self, pending_storage: AzureTextStorage):
         for email_id in pending_storage.iter():
             yield self._email_storage.fetch_object(email_id)
+
+    @classmethod
+    def _encode_attachments(cls, email: dict) -> dict:
+        if not email.get('attachments'):
+            return email
+
+        for attachment in email['attachments']:
+            content_bytes = attachment['content']
+            content_base64 = b64encode(content_bytes).decode('ascii')
+            attachment['content'] = content_base64
+
+        return email
 
     @classmethod
     def _mark_emails_as_delivered(cls, pending_storage: AzureTextStorage,

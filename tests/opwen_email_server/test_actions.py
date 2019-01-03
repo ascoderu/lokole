@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 from unittest import TestCase
 from unittest.mock import MagicMock
 from unittest.mock import Mock
@@ -122,17 +123,24 @@ class StoreWrittenClientEmailsTests(TestCase):
         self.next_task = MagicMock()
 
     def test_200(self):
+        attachment_content_bytes = b'some file content'
+        attachment_content_base64 = 'c29tZSBmaWxlIGNvbnRlbnQ='
         resource_id = str(uuid4())
         email_id = str(uuid4())
-        email = {'from': 'foo@test.com', '_uid': email_id}
 
-        self.client_storage.fetch_objects.return_value = [email]
+        client_email = {'from': 'foo@test.com', '_uid': email_id, 'attachments': [
+            {'filename': 'test.txt', 'content': attachment_content_base64}
+        ]}
+        server_email = deepcopy(client_email)
+        server_email['attachments'][0]['content'] = attachment_content_bytes
+
+        self.client_storage.fetch_objects.return_value = [client_email]
 
         _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
         self.client_storage.fetch_objects.assert_called_once_with(resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
-        self.email_storage.store_object.assert_called_once_with(email_id, email)
+        self.email_storage.store_object.assert_called_once_with(email_id, server_email)
         self.next_task.assert_called_once_with(email_id)
         self.client_storage.delete.assert_called_once_with(resource_id)
 
@@ -223,11 +231,18 @@ class DownloadClientEmailsTests(TestCase):
         self.assertEqual(status, 403)
 
     def test_200(self):
+        attachment_content_bytes = b'some file content'
+        attachment_content_base64 = 'c29tZSBmaWxlIGNvbnRlbnQ='
         client_id = str(uuid4())
         email_id = str(uuid4())
         resource_id = str(uuid4())
         domain = 'test.com'
-        email = {'_uid': email_id}
+
+        server_email = {'_uid': email_id, 'attachments': [
+            {'filename': 'test.txt', 'content': attachment_content_bytes}
+        ]}
+        client_email = deepcopy(server_email)
+        client_email['attachments'][0]['content'] = attachment_content_base64
 
         _stored = defaultdict(list)
         _compression = defaultdict(list)
@@ -243,7 +258,7 @@ class DownloadClientEmailsTests(TestCase):
         self.auth.domain_for.return_value = domain
         self.pending_factory.return_value = self.pending_storage
         self.pending_storage.iter.return_value = [email_id]
-        self.email_storage.fetch_object.return_value = email
+        self.email_storage.fetch_object.return_value = server_email
         self.client_storage.store_objects.side_effect = store_objects_mock
         self.client_storage.compression_formats.return_value = ['gz']
 
@@ -255,7 +270,7 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_storage.iter.assert_called_once_with()
         self.pending_storage.delete.assert_called_once_with(email_id)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
-        self.assertEqual(_stored[sync.EMAILS_FILE], [email])
+        self.assertEqual(_stored[sync.EMAILS_FILE], [client_email])
         self.assertEqual(_compression[sync.EMAILS_FILE], ['gz'])
         self.assertEqual(_serializers[sync.EMAILS_FILE], [to_jsonl_bytes])
 

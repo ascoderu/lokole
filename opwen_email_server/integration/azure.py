@@ -66,11 +66,10 @@ def get_mx_setup() -> SetupCloudflareMxRecords:
 @singleton
 def get_email_storage() -> AzureObjectStorage:
     return AzureObjectStorage(
-        text_storage=AzureTextStorage(
-            account=config.BLOBS_ACCOUNT,
-            key=config.BLOBS_KEY,
-            container=constants.CONTAINER_EMAILS,
-            provider=config.STORAGE_PROVIDER))
+        account=config.BLOBS_ACCOUNT,
+        key=config.BLOBS_KEY,
+        container=constants.CONTAINER_EMAILS,
+        provider=config.STORAGE_PROVIDER)
 
 
 @lru_cache(maxsize=PENDING_STORAGE_CACHE_SIZE)

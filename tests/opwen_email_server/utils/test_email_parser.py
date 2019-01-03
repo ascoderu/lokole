@@ -4,7 +4,6 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 from unittest import TestCase
-import json
 
 import responses
 
@@ -22,11 +21,10 @@ class ImageSize(Enum):
     small = 2
 
 
-def _given_test_image_base64(size: ImageSize):
-    b64_images_file = join(TEST_DATA_DIRECTORY, 'images_base64.json')
-    with open(b64_images_file, 'r', encoding='utf-8') as b64_images:
-        json_images = json.load(b64_images)
-        return json_images[size.name]
+def _given_test_image(size: ImageSize) -> bytes:
+    image_path = join(TEST_DATA_DIRECTORY, '{}.png'.format(size.name))
+    with open(image_path, 'rb') as fobj:
+        return fobj.read()
 
 
 class ParseMimeEmailTests(TestCase):
@@ -65,7 +63,7 @@ class ParseMimeEmailTests(TestCase):
         attachments = email.get('attachments', [])
 
         self.assertEqual(len(attachments), 1)
-        self.assertStartsWith(attachments[0].get('content'), 'iVBORw0')
+        self.assertGreater(len(attachments[0].get('content')), 0)
         self.assertEqual(attachments[0].get('filename'),
                          'cute-mouse-clipart-mouse4.png')
 
@@ -73,12 +71,6 @@ class ParseMimeEmailTests(TestCase):
     def _given_mime_email(cls, filename, directory=TEST_DATA_DIRECTORY):
         with open(join(directory, filename)) as fobj:
             return fobj.read()
-
-    def assertStartsWith(self, actual, prefix):
-        self.assertIsNotNone(actual)
-        if not actual.startswith(prefix):
-            self.fail('string "{actual}..." does not start with "{prefix}"'
-                      .format(actual=actual[:len(prefix)], prefix=prefix))
 
 
 class GetDomainsTests(TestCase):
@@ -104,14 +96,14 @@ class ResizeImageTests(TestCase):
                     'you may need to change the test base64 in "images_base64.json".'
 
     def test_change_image_size(self):
-        input_base64 = _given_test_image_base64(size=ImageSize.large)
-        output_base64 = email_parser._change_image_size(input_base64)
-        self.assertNotEqual(input_base64, output_base64, self.error_message)
+        input_bytes = _given_test_image(size=ImageSize.large)
+        output_bytes = email_parser._change_image_size(input_bytes)
+        self.assertNotEqual(input_bytes, output_bytes, self.error_message)
 
     def test_change_image_size_when_already_small(self):
-        input_base64 = _given_test_image_base64(size=ImageSize.small)
-        output_base64 = email_parser._change_image_size(input_base64)
-        self.assertEqual(input_base64, output_base64, self.error_message)
+        input_bytes = _given_test_image(size=ImageSize.small)
+        output_bytes = email_parser._change_image_size(input_bytes)
+        self.assertEqual(input_bytes, output_bytes, self.error_message)
 
 
 class ConvertImgUrlToBase64Tests(TestCase):
@@ -204,7 +196,7 @@ class FormatAttachedFilesTests(TestCase):
 
     def test_format_attachments_with_image(self):
         input_filename = 'test_image.png'
-        input_content = _given_test_image_base64(size=ImageSize.large)
+        input_content = _given_test_image(size=ImageSize.large)
         attachment = {'filename': input_filename, 'content': input_content}
         input_email = {'attachments': [attachment]}
 
