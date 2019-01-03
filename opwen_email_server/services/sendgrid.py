@@ -15,6 +15,7 @@ from sendgrid.helpers.mail import Personalization
 from opwen_email_server.constants.sendgrid import INBOX_URL
 from opwen_email_server.constants.sendgrid import MAILBOX_URL
 from opwen_email_server.utils.log import LogMixin
+from opwen_email_server.utils.serialization import to_base64
 
 
 class SendSendgridEmail(LogMixin):
@@ -99,14 +100,14 @@ class SendSendgridEmail(LogMixin):
     @classmethod
     def _create_attachment(cls, attachment: dict) -> Attachment:
         filename = attachment.get('filename', '')
-        content = attachment.get('content', '')
+        content = attachment.get('content', b'')
 
         mail_attachment = Attachment()
         mail_attachment.disposition = 'attachment'
         mail_attachment.filename = filename
         mail_attachment.content_id = filename
         mail_attachment.type = guess_type(filename)[0]
-        mail_attachment.content = content
+        mail_attachment.content = to_base64(content)
 
         return mail_attachment
 
