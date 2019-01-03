@@ -21,10 +21,11 @@ from xtarfile import open as tarfile_open
 from xtarfile.xtarfile import SUPPORTED_FORMATS
 
 from opwen_email_server.utils.log import LogMixin
-from opwen_email_server.utils.serialization import from_json
-from opwen_email_server.utils.serialization import gunzip_string
-from opwen_email_server.utils.serialization import gzip_string
-from opwen_email_server.utils.serialization import to_json
+from opwen_email_server.utils.path import get_extension
+from opwen_email_server.utils.serialization import from_msgpack_bytes
+from opwen_email_server.utils.serialization import gunzip_bytes
+from opwen_email_server.utils.serialization import gzip_bytes
+from opwen_email_server.utils.serialization import to_msgpack_bytes
 from opwen_email_server.utils.temporary import create_tempfilename
 from opwen_email_server.utils.temporary import removing
 
@@ -72,7 +73,8 @@ class _BaseAzureStorage(LogMixin):
 
     def iter(self) -> Iterator[str]:
         for resource in self._client.list_objects():
-            resource_id = resource.name
+            extension = get_extension(resource.name)
+            resource_id = resource.name.replace(extension, '')
             yield resource_id
             self.log_debug('listed %s', resource_id)
 
@@ -90,37 +92,54 @@ class AzureFileStorage(_BaseAzureStorage):
         return path
 
 
-class AzureTextStorage(_BaseAzureStorage):
+class _AzureBytesStorage(_BaseAzureStorage):
     _compression = 'gz'
 
-    def store_text(self, resource_id: str, text: str):
+    def store_bytes(self, resource_id: str, content: bytes):
         filename = self._to_filename(resource_id)
-        self.log_debug('storing %d characters at %s', len(text), filename)
+        self.log_debug('storing %d bytes at %s', len(content), filename)
         upload = BytesIO()
-        upload.write(gzip_string(text))
+        upload.write(gzip_bytes(content))
         upload.seek(0)
         self._client.upload_object_via_stream(upload, filename)
 
-    def fetch_text(self, resource_id: str) -> str:
+    def fetch_bytes(self, resource_id: str) -> bytes:
         filename = self._to_filename(resource_id)
         download = BytesIO()
         resource = self._client.get_object(filename)
         for chunk in resource.as_stream():
             download.write(chunk)
         download.seek(0)
-        text = gunzip_string(download.read())
-        self.log_debug('fetched %d characters from %s', len(text), filename)
-        return text
+        content = gunzip_bytes(download.read())
+        self.log_debug('fetched %d bytes from %s', len(content), filename)
+        return content
 
     def delete(self, resource_id: str):
         filename = self._to_filename(resource_id)
         super().delete(filename)
 
     def _to_filename(self, resource_id: str) -> str:
-        extension = '.txt.{}'.format(self._compression)
+        extension = '.{}.{}'.format(self._extension, self._compression)
         if resource_id.endswith(extension):
             return resource_id
         return '{}{}'.format(resource_id, extension)
+
+    @property
+    def _extension(self) -> str:
+        raise NotImplementedError
+
+
+class AzureTextStorage(_AzureBytesStorage):
+    _encoding = 'utf-8'
+    _extension = 'txt'
+
+    def store_text(self, resource_id: str, text: str):
+        content = text.encode(self._encoding)
+        self.store_bytes(resource_id, content)
+
+    def fetch_text(self, resource_id: str) -> str:
+        content = self.fetch_bytes(resource_id)
+        return content.decode(self._encoding)
 
 
 class AzureObjectsStorage(LogMixin):
@@ -230,14 +249,13 @@ class AzureObjectsStorage(LogMixin):
         return str(uuid4())
 
 
-class AzureObjectStorage(LogMixin):
-    def __init__(self, text_storage: AzureTextStorage):
-        self._text_storage = text_storage
+class AzureObjectStorage(_AzureBytesStorage):
+    _extension = 'msgpack'
 
     def fetch_object(self, resource_id: str) -> dict:
-        serialized = self._text_storage.fetch_text(resource_id)
-        return from_json(serialized)
+        serialized = self.fetch_bytes(resource_id)
+        return from_msgpack_bytes(serialized)
 
     def store_object(self, resource_id: str, obj: dict) -> None:
-        serialized = to_json(obj)
-        self._text_storage.store_text(resource_id, serialized)
+        serialized = to_msgpack_bytes(obj)
+        self.store_bytes(resource_id, serialized)

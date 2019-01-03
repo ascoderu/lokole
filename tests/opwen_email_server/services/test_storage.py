@@ -41,11 +41,11 @@ class AzureTextStorageTests(TestCase):
         self._storage.store_text('resource1', 'a')
         self._storage.store_text('resource2.txt.gz', 'b')
         self.assertEqual(sorted(self._storage.iter()),
-                         sorted(['resource1.txt.gz', 'resource2.txt.gz']))
+                         sorted(['resource1', 'resource2']))
 
         self._storage.delete('resource2')
         self.assertEqual(sorted(self._storage.iter()),
-                         sorted(['resource1.txt.gz']))
+                         sorted(['resource1']))
 
     def test_ensure_exists(self):
         self.assertFalse(isdir(join(self._folder, self._container)))
@@ -232,11 +232,10 @@ class AzureObjectStorageTests(TestCase):
         self._container = 'container'
         mkdir(join(self._folder, self._container))
         self._storage = AzureObjectStorage(
-            text_storage=AzureTextStorage(
-                account=self._folder,
-                key='unused',
-                container=self._container,
-                provider='LOCAL'))
+            account=self._folder,
+            key='unused',
+            container=self._container,
+            provider='LOCAL')
 
     def tearDown(self):
         rmtree(self._folder)

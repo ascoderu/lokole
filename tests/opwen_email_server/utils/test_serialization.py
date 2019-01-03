@@ -3,15 +3,13 @@ from unittest import TestCase
 from opwen_email_server.utils import serialization
 
 
-class ToJsonTests(TestCase):
+class JsonTests(TestCase):
     def test_creates_slim_json(self):
         serialized = serialization.to_json({'a': 1, 'b': 2})
 
         self.assertNotIn('\n', serialized)
         self.assertNotIn(' ', serialized)
 
-
-class FromJsonTests(TestCase):
     def test_roundtrip(self):
         obj = {'a': 1, 'b': [2]}
 
@@ -19,15 +17,32 @@ class FromJsonTests(TestCase):
             serialization.to_json(obj)))
 
 
-class ToJsonlBytesTests(TestCase):
-    def test_creates_jsonl_bytes(self):
-        serialized = serialization.to_jsonl_bytes({'a': 1, 'b': '你好'})
+class Base64Tests(TestCase):
+    def test_roundtrip(self):
+        original = b'some bytes'
+        serialized = serialization.to_base64(original)
+        deserialized = serialization.from_base64(serialized)
 
-        self.assertTrue(serialized.endswith(b'\n'))
-        self.assertNotIn(b' ', serialized)
+        self.assertEqual(original, deserialized)
 
 
-class FromJsonlBytesTests(TestCase):
+class MsgpackTests(TestCase):
+    def test_roundtrip(self):
+        original = {'a': 1, 'b': '你好'}
+        serialized = serialization.to_msgpack_bytes(original)
+        deserialized = serialization.from_msgpack_bytes(serialized)
+
+        self.assertEqual(original, deserialized)
+
+
+class JsonlTests(TestCase):
+    def test_roundtrip(self):
+        original = {'a': 1, 'b': '你好'}
+        serialized = serialization.to_jsonl_bytes(original)
+        deserialized = serialization.from_jsonl_bytes(serialized)
+
+        self.assertEqual(original, deserialized)
+
     def test_parses_jsonl_lines(self):
         lines = [
             b'{"a":1}\n',
@@ -52,20 +67,19 @@ class FromJsonlBytesTests(TestCase):
 
 
 class GzipTests(TestCase):
-    sample_string = 'hello world\n'
+    sample_string = b'hello world\n'
 
     sample_compressed = (
         b'\x1f\x8b\x08\x08;\n\xfdX\x00\x03foo.txt\x00\xcbH\xcd\xc9\xc9W('
         b'\xcf/\xcaI\xe1\x02\x00-;\x08\xaf\x0c\x00\x00\x00')
 
     def test_roundtrip(self):
-        compressed = serialization.gzip_string(self.sample_string)
-        print(compressed)
-        decompressed = serialization.gunzip_string(compressed)
+        compressed = serialization.gzip_bytes(self.sample_string)
+        decompressed = serialization.gunzip_bytes(compressed)
 
         self.assertEqual(self.sample_string, decompressed)
 
     def test_gunzip(self):
-        decompressed = serialization.gunzip_string(self.sample_compressed)
+        decompressed = serialization.gunzip_bytes(self.sample_compressed)
 
         self.assertEqual(decompressed, self.sample_string)

@@ -1,5 +1,3 @@
-from base64 import b64decode
-from base64 import b64encode
 from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
@@ -22,6 +20,7 @@ from requests import get as http_get
 
 from opwen_email_server.config import MAX_HEIGHT_IMAGES
 from opwen_email_server.config import MAX_WIDTH_IMAGES
+from opwen_email_server.utils.serialization import to_base64
 
 
 def _parse_body(message: PyzMessage, default_charset: str = 'ascii') -> str:
@@ -43,8 +42,7 @@ def _parse_attachments(mailparts: Iterable[MailPart]) -> Iterable[dict]:
         filename = part.sanitized_filename
         payload = part.get_payload()
         if filename and payload:
-            content = b64encode(payload).decode('ascii')
-            yield {'filename': filename, 'content': content}
+            yield {'filename': filename, 'content': payload}
 
 
 def _parse_addresses(message: PyzMessage, address_type: str) -> List[str]:
@@ -94,7 +92,7 @@ def format_attachments(email: dict) -> dict:
 
     for i, attachment in enumerate(attachments):
         filename = attachment.get('filename', '')
-        content = attachment.get('content', '')
+        content = attachment.get('content', b'')
         formatted_content = _format_attachment(filename, content)
 
         if content != formatted_content:
@@ -109,7 +107,7 @@ def format_attachments(email: dict) -> dict:
     return new_email
 
 
-def _format_attachment(filename: str, content: str) -> str:
+def _format_attachment(filename: str, content: bytes) -> bytes:
     attachment_type = guess_type(filename)[0]
 
     if not attachment_type:
@@ -148,14 +146,13 @@ def _is_already_small(size: Tuple[int, int]) -> bool:
     return width <= MAX_WIDTH_IMAGES and height <= MAX_HEIGHT_IMAGES
 
 
-def _change_image_size(image_content_b64: str) -> str:
-    image_content_bytes = b64decode(image_content_b64)
+def _change_image_size(image_content_bytes: bytes) -> bytes:
     image_bytes = BytesIO(image_content_bytes)
     image_bytes.seek(0)
     image = Image.open(image_bytes)
 
     if _is_already_small(image.size):
-        return image_content_b64
+        return image_content_bytes
 
     new_size = (MAX_WIDTH_IMAGES, MAX_HEIGHT_IMAGES)
     image.thumbnail(new_size, Image.ANTIALIAS)
@@ -163,8 +160,7 @@ def _change_image_size(image_content_b64: str) -> str:
     image.save(new_image, image.format)
     new_image.seek(0)
     new_image_bytes = new_image.read()
-    new_b64 = b64encode(new_image_bytes).decode('ascii')
-    return new_b64
+    return new_image_bytes
 
 
 def _fetch_image_to_base64(image_url: str) -> Optional[str]:
@@ -179,9 +175,9 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
     if not response.content:
         return None
 
-    image_content = b64encode(response.content).decode('ascii')
-    image_content = _change_image_size(image_content)
-    return 'data:{};base64,{}'.format(image_type, image_content)
+    small_image_bytes = _change_image_size(response.content)
+    small_image_base64 = to_base64(small_image_bytes)
+    return 'data:{};base64,{}'.format(image_type, small_image_base64)
 
 
 def _is_valid_url(url: Optional[str]) -> bool:
