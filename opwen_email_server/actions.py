@@ -1,6 +1,4 @@
 from abc import ABC
-from base64 import b64decode
-from base64 import b64encode
 from typing import Callable
 from typing import Iterable
 from typing import Tuple
@@ -20,7 +18,9 @@ from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
 from opwen_email_server.utils.email_parser import parse_mime_email
 from opwen_email_server.utils.log import LogMixin
+from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes
+from opwen_email_server.utils.serialization import to_base64
 from opwen_email_server.utils.serialization import to_jsonl_bytes
 
 Response = Union[dict, Tuple[str, int]]
@@ -141,9 +141,7 @@ class StoreWrittenClientEmails(_Action):
             return email
 
         for attachment in email['attachments']:
-            content_base64 = attachment['content']
-            content_bytes = b64decode(content_base64)
-            attachment['content'] = content_bytes
+            attachment['content'] = from_base64(attachment['content'])
 
         return email
 
@@ -236,8 +234,7 @@ class DownloadClientEmails(_Action):
 
         for attachment in email['attachments']:
             content_bytes = attachment['content']
-            content_base64 = b64encode(content_bytes).decode('ascii')
-            attachment['content'] = content_base64
+            attachment['content'] = to_base64(content_bytes)
 
         return email
 

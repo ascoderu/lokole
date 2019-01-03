@@ -17,6 +17,15 @@ class JsonTests(TestCase):
             serialization.to_json(obj)))
 
 
+class Base64Tests(TestCase):
+    def test_roundtrip(self):
+        original = b'some bytes'
+        serialized = serialization.to_base64(original)
+        deserialized = serialization.from_base64(serialized)
+
+        self.assertEqual(original, deserialized)
+
+
 class MsgpackTests(TestCase):
     def test_roundtrip(self):
         original = {'a': 1, 'b': '你好'}

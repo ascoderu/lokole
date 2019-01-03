@@ -1,3 +1,5 @@
+from base64 import b64decode
+from base64 import b64encode
 from gzip import GzipFile
 from io import BytesIO
 from json import JSONDecodeError
@@ -41,6 +43,14 @@ def to_jsonl_bytes(obj) -> bytes:
 def to_msgpack_bytes(obj) -> bytes:
     encoded = msgpack_dump(obj, use_bin_type=True)
     return encoded + b'\n'
+
+
+def to_base64(content: bytes) -> str:
+    return b64encode(content).decode('ascii')
+
+
+def from_base64(encoded: str) -> bytes:
+    return b64decode(encoded)
 
 
 def gzip_bytes(uncompressed_bytes: bytes) -> bytes:

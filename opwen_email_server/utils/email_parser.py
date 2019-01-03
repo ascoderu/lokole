@@ -1,4 +1,3 @@
-from base64 import b64encode
 from copy import deepcopy
 from datetime import datetime
 from datetime import timezone
@@ -21,6 +20,7 @@ from requests import get as http_get
 
 from opwen_email_server.config import MAX_HEIGHT_IMAGES
 from opwen_email_server.config import MAX_WIDTH_IMAGES
+from opwen_email_server.utils.serialization import to_base64
 
 
 def _parse_body(message: PyzMessage, default_charset: str = 'ascii') -> str:
@@ -176,7 +176,7 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
         return None
 
     small_image_bytes = _change_image_size(response.content)
-    small_image_base64 = b64encode(small_image_bytes).decode('ascii')
+    small_image_base64 = to_base64(small_image_bytes)
     return 'data:{};base64,{}'.format(image_type, small_image_base64)
 
 
