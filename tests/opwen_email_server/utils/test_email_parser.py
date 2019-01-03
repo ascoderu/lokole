@@ -79,7 +79,7 @@ class GetDomainsTests(TestCase):
 
         domains = email_parser.get_domains(email)
 
-        self.assertSetEqual(domains, {'bar.com', 'com'})
+        self.assertSetEqual(set(domains), {'bar.com', 'com'})
 
     def test_gets_domains_with_cc_and_bcc(self):
         email = {'to': ['foo@bar.com'],
@@ -88,7 +88,7 @@ class GetDomainsTests(TestCase):
 
         domains = email_parser.get_domains(email)
 
-        self.assertSetEqual(domains, {'bar.com', 'com'})
+        self.assertSetEqual(set(domains), {'bar.com', 'com'})
 
 
 class ResizeImageTests(TestCase):
