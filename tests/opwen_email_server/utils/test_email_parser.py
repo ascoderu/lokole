@@ -5,7 +5,7 @@ from os.path import dirname
 from os.path import join
 from unittest import TestCase
 
-import responses
+from responses import mock
 
 from opwen_email_server.utils import email_parser
 
@@ -107,7 +107,7 @@ class ResizeImageTests(TestCase):
 
 
 class ConvertImgUrlToBase64Tests(TestCase):
-    @responses.activate
+    @mock.activate
     def test_format_inline_images_with_img_tag(self):
         self.givenTestImage()
         input_email = {'body': '<div><h3>test image</h3><img src="http://test-url.png"/></div>'}
@@ -116,7 +116,6 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/png;')
 
-    @responses.activate
     def test_format_inline_images_with_img_tag_without_src_attribute(self):
         input_email = {'body': '<div><img/></div>'}
 
@@ -124,7 +123,6 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @responses.activate
     def test_format_inline_images_with_img_tag_and_invalid_src_attribute(self):
         input_email = {'body': '<div><img src="foo:invalid"/></div>'}
 
@@ -132,7 +130,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @responses.activate
+    @mock.activate
     def test_format_inline_images_with_bad_request(self):
         self.givenTestImage(status=404)
         input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
@@ -141,7 +139,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @responses.activate
+    @mock.activate
     def test_format_inline_images_with_many_img_tags(self):
         self.givenTestImage()
         input_email = {'body': '<div><img src="http://test-url.png"/><img src="http://test-url.png"/></div>'}
@@ -150,7 +148,6 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertHasCount(output_email['body'], 'src="data:', 2)
 
-    @responses.activate
     def test_format_inline_images_without_img_tags(self):
         input_email = {'body': '<div></div>'}
 
@@ -158,7 +155,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @responses.activate
+    @mock.activate
     def test_format_inline_images_without_content_type(self):
         self.givenTestImage(content_type='')
         input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
@@ -180,10 +177,10 @@ class ConvertImgUrlToBase64Tests(TestCase):
         with open(join(TEST_DATA_DIRECTORY, 'test_image.png'), 'rb') as image:
             image_bytes = image.read()
 
-        responses.add(responses.GET, 'http://test-url.png',
-                      headers={'Content-Type': content_type},
-                      body=image_bytes,
-                      status=status)
+        mock.add(mock.GET, 'http://test-url.png',
+                 headers={'Content-Type': content_type},
+                 body=image_bytes,
+                 status=status)
 
 
 class FormatAttachedFilesTests(TestCase):
