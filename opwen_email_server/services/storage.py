@@ -92,9 +92,8 @@ class AzureFileStorage(_BaseAzureStorage):
         return path
 
 
-class AzureBytesStorage(_BaseAzureStorage):
+class _AzureBytesStorage(_BaseAzureStorage):
     _compression = 'gz'
-    _extension = 'raw'
 
     def store_bytes(self, resource_id: str, content: bytes):
         filename = self._to_filename(resource_id)
@@ -125,8 +124,12 @@ class AzureBytesStorage(_BaseAzureStorage):
             return resource_id
         return '{}{}'.format(resource_id, extension)
 
+    @property
+    def _extension(self) -> str:
+        raise NotImplementedError
 
-class AzureTextStorage(AzureBytesStorage):
+
+class AzureTextStorage(_AzureBytesStorage):
     _encoding = 'utf-8'
     _extension = 'txt'
 
@@ -246,7 +249,7 @@ class AzureObjectsStorage(LogMixin):
         return str(uuid4())
 
 
-class AzureObjectStorage(AzureBytesStorage):
+class AzureObjectStorage(_AzureBytesStorage):
     _extension = 'msgpack'
 
     def fetch_object(self, resource_id: str) -> dict:
