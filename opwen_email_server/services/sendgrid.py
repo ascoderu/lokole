@@ -24,7 +24,7 @@ class SendSendgridEmail(LogMixin):
 
     @cached_property
     def _client(self) -> Callable[[dict], int]:
-        if not self._key:
+        if not self._key:  # pragma: no cover
             def send_email_fake(email: dict) -> int:
                 self.log_warning('No key, not sending email %r', email)
                 return 202
