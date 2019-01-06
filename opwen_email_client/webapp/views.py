@@ -368,8 +368,8 @@ def _localeselector() -> str:
 def _emails_view(emails: Iterable[dict], page: int,
                  template: str = 'email.html') -> Response:
     attachments_session = app.ioc.attachments_session
-    offset_minutse = getattr(current_user, 'timezone_offset_minutes', 0)
-    timezone_offset = timedelta(minutes=offset_minutse)
+    offset_minutes = getattr(current_user, 'timezone_offset_minutes', 0)
+    timezone_offset = timedelta(minutes=offset_minutes)
 
     if page < 1:
         return abort(404)
