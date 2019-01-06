@@ -41,8 +41,12 @@ def _parse_attachments(mailparts: Iterable[MailPart]) -> Iterable[dict]:
     for part in attachment_parts:
         filename = part.sanitized_filename
         payload = part.get_payload()
+        attachment_id = part.content_id
         if filename and payload:
-            yield {'filename': filename, 'content': payload}
+            attachment = {'filename': filename, 'content': payload}
+            if attachment_id:
+                attachment['id'] = attachment_id
+            yield attachment
 
 
 def _parse_addresses(message: PyzMessage, address_type: str) -> List[str]:
