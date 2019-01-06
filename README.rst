@@ -58,7 +58,7 @@ describes an email, using the following schema:
     "from": "email",
     "subject": "string",
     "body": "html",
-    "attachments": [{"filename": "string", "content": "base64", "id": "string"}]
+    "attachments": [{"filename": "string", "content": "base64", "cid": "string"}]
   }
 
 -----------------

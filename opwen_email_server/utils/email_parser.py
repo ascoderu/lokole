@@ -45,7 +45,7 @@ def _parse_attachments(mailparts: Iterable[MailPart]) -> Iterable[dict]:
         if filename and payload:
             attachment = {'filename': filename, 'content': payload}
             if attachment_id:
-                attachment['id'] = attachment_id
+                attachment['cid'] = attachment_id
             yield attachment
 
 
