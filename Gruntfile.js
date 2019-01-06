@@ -91,6 +91,9 @@ module.exports = function(grunt) {
         files: {
           'opwen_email_client/webapp/static/js/printThis.min.js': [
             'node_modules/@bower_components/printThis/printThis.js',
+          ],
+          'opwen_email_client/webapp/static/js/jquery.lazyload.min.js': [
+            'node_modules/jquery-lazyload/jquery.lazyload.js'
           ]
         }
       },

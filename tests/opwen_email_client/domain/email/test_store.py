@@ -239,7 +239,9 @@ class Base(object):
         def test_get(self):
             given = self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo',
-                 'attachments': [{'filename': 'foo.txt', 'content': 'Zm9vLnR4dA=='}]},
+                 'attachments': [{'filename': 'foo.txt',
+                                  'content': 'Zm9vLnR4dA==',
+                                  'cid': None}]},
                 {'to': ['baz@bar.com'], 'subject': 'bar'})
 
             actual = self.email_store.get(given[0]['_uid'])

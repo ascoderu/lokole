@@ -1,6 +1,10 @@
 (function($) {
 $(document).ready(function() {
 
+(function activateLazyload() {
+  $(".email-body img").lazyload();
+}());
+
 (function markEmailsAsReadOnOpen() {
   $(".panel-info").click(function() {
     var $el = $(this);

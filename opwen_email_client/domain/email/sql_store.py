@@ -71,6 +71,7 @@ class _Attachment(_Base):
 
     filename = Column(Text)
     content = Column(Text)
+    cid = Column(Text)
 
 
 class _Email(_Base):
@@ -92,7 +93,8 @@ class _Email(_Base):
     def to_dict(self):
         attachments = self.attachments
         attachments = ([{'filename': attachment.filename,
-                         'content': attachment.content}
+                         'content': attachment.content,
+                         'cid': attachment.cid}
                         for attachment in attachments]
                        if attachments else None)
 
