@@ -75,9 +75,9 @@ class ParseMimeEmailTests(TestCase):
         attachments = email.get('attachments', [])
 
         self.assertEqual(len(attachments), 2)
-        self.assertIsNotNone(attachments[0].get('id'))
-        self.assertIsNotNone(attachments[1].get('id'))
-        self.assertNotEqual(attachments[0]['id'], attachments[1]['id'])
+        self.assertIsNotNone(attachments[0].get('cid'))
+        self.assertIsNotNone(attachments[1].get('cid'))
+        self.assertNotEqual(attachments[0]['cid'], attachments[1]['cid'])
 
     @classmethod
     def _given_mime_email(cls, filename, directory=TEST_DATA_DIRECTORY):
