@@ -139,22 +139,21 @@ except IntegrityError:
 
 
 def login_required(func):
-    if app.config.get('TESTING'):
+    if AppConfig.TESTING:
         return func
 
     return _login_required(func)
 
 
 def admin_required(func):
-    if app.config.get('TESTING'):
+    if AppConfig.TESTING:
         return func
 
-    preshared_secret = app.config.get('ADMIN_SECRET')
-    if preshared_secret:
+    if AppConfig.ADMIN_SECRET:
         @wraps(func)
         def decorated_view(*args, **kwargs):
             secret = request.args.get('secret')
-            if secret == preshared_secret:
+            if secret == AppConfig.ADMIN_SECRET:
                 return func(*args, **kwargs)
             return roles_required(admin_role)(func)(*args, **kwargs)
         return decorated_view

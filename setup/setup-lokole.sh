@@ -57,6 +57,7 @@ write_file() { mkdir -p "$(dirname "$1")"; sudo tee "$1" > /dev/null; }
 replace_file() { sudo sed -i "$1" "$2"; }
 create_directory() { mkdir -p "$1"; }
 create_temp_directory() { mktemp -d "$1"; }
+create_file() { sudo touch "$1"; }
 create_link() { sudo ln -s "$1" "$2" || true; }
 copy_file() { sudo cp -f "$1" "$2" || echo "$1 does not exist, skipping copy to $2"; }
 delete() { if [[ ! -L "$1" ]]; then sudo rm -rf "$1"; else sudo unlink "$1"; fi }
@@ -336,26 +337,28 @@ create_directory "${opwen_webapp_run_directory}"
 opwen_webapp_config_session_key="$(random_string 32)"
 opwen_webapp_config_password_salt="$(random_string 16)"
 opwen_webapp_admin_secret="$(random_string 32)"
-opwen_webapp_envs="${opwen_webapp_run_directory}/webapp_secrets.sh"
+opwen_webapp_envs="${opwen_webapp_run_directory}/webapp_settings.env"
+restart_path="${opwen_webapp_run_directory}/webapp_restart"
 
 write_file "${opwen_webapp_envs}" << EOF
-export OPWEN_STATE_DIRECTORY='${opwen_webapp_run_directory}'
-export OPWEN_SESSION_KEY='${opwen_webapp_config_session_key}'
-export OPWEN_PASSWORD_SALT='${opwen_webapp_config_password_salt}'
-export OPWEN_ADMIN_SECRET='${opwen_webapp_admin_secret}'
-export OPWEN_REMOTE_ACCOUNT_NAME='${opwen_webapp_config_remote_account_name}'
-export OPWEN_REMOTE_ACCOUNT_KEY='${opwen_webapp_config_remote_account_key}'
-export OPWEN_REMOTE_RESOURCE_CONTAINER='${opwen_webapp_config_remote_resource_container}'
-export OPWEN_CLIENT_ID='${opwen_webapp_config_client_id}'
-export OPWEN_CLIENT_NAME='${opwen_webapp_config_client_name}'
-export OPWEN_EMAIL_SERVER_HOSTNAME='${opwen_server_host}'
-export OPWEN_SIM_TYPE='${sim_type}'
+OPWEN_STATE_DIRECTORY=${opwen_webapp_run_directory}
+OPWEN_SESSION_KEY=${opwen_webapp_config_session_key}
+OPWEN_PASSWORD_SALT=${opwen_webapp_config_password_salt}
+OPWEN_ADMIN_SECRET=${opwen_webapp_admin_secret}
+OPWEN_REMOTE_ACCOUNT_NAME=${opwen_webapp_config_remote_account_name}
+OPWEN_REMOTE_ACCOUNT_KEY=${opwen_webapp_config_remote_account_key}
+OPWEN_REMOTE_RESOURCE_CONTAINER=${opwen_webapp_config_remote_resource_container}
+OPWEN_CLIENT_ID=${opwen_webapp_config_client_id}
+OPWEN_CLIENT_NAME=${opwen_webapp_config_client_name}
+OPWEN_EMAIL_SERVER_HOSTNAME=${opwen_server_host}
+OPWEN_SIM_TYPE=${sim_type}
+OPWEN_RESTART_PATH=${restart_path}
 EOF
 
 lokole_admin_name="${LOKOLE_ADMIN_NAME:-admin}"
 lokole_admin_password="${LOKOLE_ADMIN_PASSWORD:-lokole1admin}"
 
-. "${opwen_webapp_envs}"
+OPWEN_SETTINGS="${opwen_webapp_envs}" \
 "${opwen_webapp_virtualenv}/bin/manage.py" createadmin \
   --name="${lokole_admin_name}" \
   --password="${lokole_admin_password}"
@@ -377,19 +380,31 @@ opwen_webapp_log_level="error"
 nginx_access_log="${opwen_webapp_run_directory}/nginx_access.log"
 nginx_error_log="${opwen_webapp_run_directory}/nginx_error.log"
 
-opwen_webapp_script="${opwen_webapp_run_directory}/webapp.sh"
+opwen_webapp_script="${opwen_webapp_run_directory}/webapp_run.sh"
 write_file "${opwen_webapp_script}" << EOF
 #!/usr/bin/env sh
-. '${opwen_webapp_envs}'
-
 '${opwen_webapp_virtualenv}/bin/gunicorn' \\
   --timeout='${opwen_webapp_timeout_seconds}' \\
   --workers='${opwen_webapp_workers}' \\
   --bind='unix:${opwen_webapp_socket}' \\
   --log-level='${opwen_webapp_log_level}' \\
+  --env 'OPWEN_SETTINGS=${opwen_webapp_envs}' \\
   '${opwen_webapp_service}.webapp:app'
 EOF
 make_executable "${opwen_webapp_script}"
+
+opwen_restart_script="${opwen_webapp_run_directory}/webapp_restart.sh"
+write_file "${opwen_restart_script}" << EOF
+#!/usr/bin/env sh
+if [ -f "${restart_path}" ]; then
+  supervisorctl restart ${opwen_webapp_service} >/dev/null
+  rm -f "${restart_path}"
+fi
+EOF
+make_executable "${opwen_restart_script}"
+
+restart_schedule='*/5 * * * *'
+create_root_cron "${restart_schedule}" "${opwen_restart_script}"
 
 create_daemon \
   "${opwen_webapp_service}" \
@@ -452,22 +467,15 @@ http {
 }
 EOF
 
-if [[ "${sim_type}" == "LocalOnly" ]]; then
-  finished
-fi
-
 
 info '
 ################################################################################
 #                                                       installing network stick
 ################################################################################'
 
-install_system_package 'cron'
+install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
 
-opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/sync.sh"
-
-if [[ "${sim_type}" != "Ethernet" ]]; then
-install_system_package 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
+opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/webapp_sync.sh"
 
 opwen_dialer_config_directory="/home/${opwen_user}/wvdial"
 create_directory "${opwen_dialer_config_directory}"
@@ -497,7 +505,11 @@ if [[ "${sim_type}" = "mkwvconf" ]]; then
   "${opwen_webapp_virtualenv}/bin/mkwvconf.py" --configPath="${opwen_dialer_config_directory}/${sim_type}"
 fi
 
-copy_file "${opwen_dialer_config_directory}/${sim_type}" "${internet_dialer_config}"
+if [[ "${sim_type}" != "Ethernet" ]]; then
+  copy_file "${opwen_dialer_config_directory}/${sim_type}" "${internet_dialer_config}"
+else
+  create_file "${internet_dialer_config}"
+fi
 make_writable "${internet_dialer_config}"
 
 write_file "${internet_modem_config_e303}" << EOF
@@ -531,7 +543,6 @@ usepeerdns
 defaultroute
 replacedefaultroute
 EOF
-fi
 
 write_file "${opwen_webapp_email_sync_script}" << EOF
 #!/usr/bin/env sh

@@ -58,9 +58,9 @@ def about() -> Response:
 @track_history
 def news(page: int) -> Response:
     email_store = app.ioc.email_store
-    news_inbox = app.config['NEWS_INBOX']
 
-    return _emails_view(email_store.inbox(news_inbox), page, 'news.html')
+    return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX),
+                        page, 'news.html')
 
 
 @app.route('/email')
@@ -208,9 +208,9 @@ def sync() -> Response:
         email_store=app.ioc.email_store)
 
     start_internet_connection = StartInternetConnection(
-        sim_type=app.config['SIM_TYPE'])
+        sim_type=AppConfig.SIM_TYPE)
 
-    if app.config['SIM_TYPE'] != 'LocalOnly':
+    if AppConfig.SIM_TYPE != 'LocalOnly':
         with start_internet_connection():
             sync_emails()
 
@@ -241,12 +241,11 @@ def users() -> Response:
 def settings() -> Response:
     form = SettingsForm()
     if form.validate_on_submit():
-        form.update_wvdial(AppConfig.WVDIAL_PATH)
+        form.update()
         flash(i8n.SETTINGS_UPDATED, category='success')
         return redirect(url_for('settings'))
 
-    return _view('settings.html', form=SettingsForm.with_defaults(
-        wvdial_path=AppConfig.WVDIAL_PATH))
+    return _view('settings.html', form=SettingsForm.from_config())
 
 
 @app.route('/admin/suspend/<userid>')

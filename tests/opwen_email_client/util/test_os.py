@@ -1,9 +1,30 @@
-from os import environ
+from os import environ, remove
+from tempfile import NamedTemporaryFile
 from typing import Iterable
 from unittest import TestCase
 
 from opwen_email_client.util.os import getenv
 from opwen_email_client.util.os import subdirectories
+from opwen_email_client.util.os import replace_line
+
+
+class ReplaceLinetests(TestCase):
+    def test_replaces_line(self):
+        fobj = NamedTemporaryFile('w+', delete=False)
+        try:
+            fobj.write('foo\nbar\nbaz')
+            fobj.close()
+
+            replace_line(
+                fobj.name,
+                lambda line: line.startswith('ba'),
+                'changed')
+
+            with open(fobj.name) as changed:
+                content = changed.read()
+            self.assertEqual(content, 'foo\nchanged\nchanged')
+        finally:
+            remove(fobj.name)
 
 
 class SubdirectoriesTests(TestCase):

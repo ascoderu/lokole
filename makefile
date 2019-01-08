@@ -1,5 +1,6 @@
 py_env=venv
 grunt=./node_modules/.bin/grunt
+settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
 
 .PHONY: default tests
 default: server
@@ -50,4 +51,12 @@ clean:
 	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 server: prepare-server
-	$(py_env)/bin/python ./manage.py devserver
+	OPWEN_SETTINGS=$(settings) \
+    $(py_env)/bin/python ./manage.py devserver
+
+gunicorn: prepare-server
+	$(py_env)/bin/gunicorn \
+    --workers=2 \
+    --bind=127.0.0.1:5000 \
+    --env OPWEN_SETTINGS=$(settings) \
+    opwen_email_client.webapp:app

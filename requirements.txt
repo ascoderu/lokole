@@ -16,6 +16,7 @@ beautifulsoup4==4.7.1
 cached-property==1.5.1
 gunicorn==19.9.0
 passlib==1.7.1
+python-dotenv==0.10.1
 requests==2.21.0
 typing==3.6.6
 tzlocal==1.5.1
