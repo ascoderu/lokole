@@ -15,7 +15,6 @@ from wtforms import SubmitField
 from wtforms.validators import DataRequired
 from wtforms.validators import Optional as DataOptional
 
-from opwen_email_client.domain.email.attachment import AttachmentEncoder
 from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.util.wtforms import Emails
 from opwen_email_client.util.wtforms import HtmlTextAreaField
@@ -51,7 +50,7 @@ class NewEmailForm(FlaskForm):
 
     submit = SubmitField()
 
-    def as_dict(self, attachment_encoder: AttachmentEncoder) -> dict:
+    def as_dict(self) -> dict:
         form = {key: value for (key, value) in self.data.items() if value}
         form.pop('submit', None)
 
@@ -72,8 +71,7 @@ class NewEmailForm(FlaskForm):
         form['bcc'] = bcc
         form['body'] = form.get('body')
         form['subject'] = form.get('subject', i8n.EMAIL_NO_SUBJECT)
-        form['attachments'] = list(_attachments_as_dict(attachments,
-                                                        attachment_encoder))
+        form['attachments'] = list(_attachments_as_dict(attachments))
         return form
 
     def _populate(self, email: Optional[dict], to: Optional[str]):
@@ -157,13 +155,12 @@ class ForwardEmailForm(NewEmailForm):
         self.body.data = render_template('emails/forward.html', email=email)
 
 
-def _attachments_as_dict(
-        filestorages: Iterable[FileStorage],
-        attachment_encoder: AttachmentEncoder) -> Iterable[dict]:
+def _attachments_as_dict(filestorages: Iterable[FileStorage]) \
+        -> Iterable[dict]:
 
     for filestorage in filestorages:
         filename = filestorage.filename
-        content = attachment_encoder.encode(filestorage.stream.read())
+        content = filestorage.stream.read()
         if filename and content:
             yield {'filename': filename, 'content': content}
 

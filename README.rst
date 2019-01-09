@@ -111,23 +111,13 @@ any of the Flask code or Jinja templates are changed.
 The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
 so take a look there for an overview of the entrypoints into the code.
 
-For local development, you can set the following additional environment
-variables:
-
-.. sourcecode :: sh
-
-  OPWEN_ENABLE_DEBUG="True"
-  LOKOLE_STORAGE_PROVIDER="LOCAL"
-  OPWEN_REMOTE_ACCOUNT_NAME="./tests/files/opwen_email_client"
-  OPWEN_REMOTE_RESOURCE_CONTAINER="downloads"
-
-With these environment variables set, when the Lokole exchanges data with the
-server, it will not make any calls to Azure and instead depend on the files
-in the `./tests/files/opwen_email_client` directory. Any files uploaded to the
-server will be written to the `compressedpackages` subdirectory so that they
-can be inspected. To test sending emails from the server to the Lokole, a
-sample email batch file is included in the `downloads` directory. This file
-will be ingested by the client when the `/sync` endpoint is called.
+When the Lokole exchanges data with the server, it will not make any calls to Azure
+and instead depend on the files in the `./tests/files/opwen_email_client` directory.
+Any files uploaded to the server will be written to the `compressedpackages`
+subdirectory so that they can be inspected. To test sending emails from the server
+to the Lokole, a sample email batch file is included in the `compressedpackages`
+directory. This file will be ingested by the client when the `/admin/sync` endpoint
+is called.
 
 Production setup
 ----------------

@@ -240,7 +240,7 @@ class Base(object):
             given = self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo',
                  'attachments': [{'filename': 'foo.txt',
-                                  'content': 'Zm9vLnR4dA==',
+                                  'content': b'foo.txt',
                                   'cid': None}]},
                 {'to': ['baz@bar.com'], 'subject': 'bar'})
 

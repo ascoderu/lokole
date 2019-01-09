@@ -137,14 +137,13 @@ def email_delete(email_uid: str) -> Response:
 @track_history
 def email_new() -> Response:
     email_store = app.ioc.email_store
-    attachment_encoder = app.ioc.attachment_encoder
 
     form = NewEmailForm.from_request(email_store)
     if form is None:
         return abort(404)
 
     if form.validate_on_submit():
-        email_store.create([form.as_dict(attachment_encoder)])
+        email_store.create([form.as_dict()])
         flash(i8n.EMAIL_SENT, category='success')
         return redirect(url_for('email_inbox'))
 

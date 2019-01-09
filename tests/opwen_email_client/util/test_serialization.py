@@ -16,10 +16,8 @@ class Base(object):
 
         @property
         def serializable_objects(self) -> Iterable:
-            yield 'some string'
-            yield 123.4
-            yield [1, "two"]
             yield {'key1': 1, 'key2': ["value2"]}
+            yield {'attachments': [{'content': b'content'}]}
 
         def setUp(self):
             self.serializer = self.create_serializer()

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy import BLOB
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -70,7 +71,7 @@ class _Attachment(_Base):
     id = Column(Integer, primary_key=True)
 
     filename = Column(Text)
-    content = Column(Text)
+    content = Column(BLOB)
     cid = Column(Text)
 
 

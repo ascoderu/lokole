@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_babelex import Babel
 
-from opwen_email_client.domain.email.attachment import Base64AttachmentEncoder as AttachmentEncoder  # noqa
 from opwen_email_client.domain.email.client import HttpEmailServerClient as EmailServerClient  # noqa
 from opwen_email_client.domain.email.sql_store import SqliteEmailStore as EmailStore  # noqa
 from opwen_email_client.domain.email.sync import AzureSync as Sync  # noqa
@@ -35,11 +34,8 @@ class Ioc(object):
         provider=AppConfig.STORAGE_PROVIDER,
         serializer=serializer)
 
-    attachment_encoder = AttachmentEncoder()
-
     attachments_session = AttachmentsStore(
-        email_store=email_store,
-        attachment_encoder=attachment_encoder)
+        email_store=email_store)
 
 
 def create_app() -> Flask:

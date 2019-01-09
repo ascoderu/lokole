@@ -7,7 +7,6 @@ from typing import Optional
 from flask import request
 from flask import session
 
-from opwen_email_client.domain.email.attachment import AttachmentEncoder
 from opwen_email_client.domain.email.store import EmailStore
 
 
@@ -17,9 +16,7 @@ class FileInfo(namedtuple('FileInfo', 'name content')):
 
 
 class AttachmentsStore(object):
-    def __init__(self, attachment_encoder: AttachmentEncoder,
-                 email_store: EmailStore):
-        self._attachment_encoder = attachment_encoder
+    def __init__(self, email_store: EmailStore):
         self._email_store = email_store
 
     @property
@@ -54,13 +51,13 @@ class AttachmentsStore(object):
         if attachment_idx >= len(attachments):
             return None
 
-        attachment = attachments[attachment_idx]  # type: Dict
-        filename = attachment.get('filename')
-        content = attachment.get('content')
+        attachment = attachments[attachment_idx]  # type: dict
+        filename = attachment.get('filename')  # type: str
+        content = attachment.get('content')  # type: bytes
         if not filename or not content:
             return None
 
-        return FileInfo(filename, self._attachment_encoder.decode(content))
+        return FileInfo(filename, content)
 
 
 class Session(object):
