@@ -138,7 +138,7 @@ class StartInternetConnection(object):
     @contextmanager
     def __call__(self):
         connection = None
-        retry_count = 30
+        retry_count = 90
 
         if self._sim_type != 'Ethernet':
             if not self._modem_is_plugged():
