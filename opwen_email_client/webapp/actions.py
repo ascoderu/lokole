@@ -165,7 +165,7 @@ class StartInternetConnection(object):
                 while not self._dialer_is_connected(wvdial_log):
                     if retry_count <= 0:
                         connection.terminate()
-                        raise Exception('Modem taking to long to connect, '
+                        raise Exception('Modem taking too long to connect, '
                                         'exiting...')
                     sleep(self._sleep_time)
                     retry_count -= 1
