@@ -1,5 +1,5 @@
 flake8==3.6.0
 lockfile==0.12.2
-mypy==0.650
+mypy==0.660
 nose2[coverage_plugin]==0.8.0
 bandit==1.5.1
