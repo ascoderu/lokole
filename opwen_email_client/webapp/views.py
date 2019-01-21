@@ -207,6 +207,8 @@ def sync() -> Response:
         email_store=app.ioc.email_store)
 
     start_internet_connection = StartInternetConnection(
+        modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
+        sim_config_dir=AppConfig.SIM_CONFIG_DIR,
         sim_type=AppConfig.SIM_TYPE)
 
     if AppConfig.SIM_TYPE != 'LocalOnly':

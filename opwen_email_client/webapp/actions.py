@@ -1,16 +1,21 @@
-from logging import Logger
 from contextlib import contextmanager
-from subprocess import check_call  # nosec
-from subprocess import check_output  # nosec
-from subprocess import Popen  # nosec
-from subprocess import CalledProcessError  # nosec
-from tempfile import NamedTemporaryFile
+from logging import Logger
+from pathlib import Path
 from time import sleep
 
+from cached_property import cached_property
 from flask import render_template
 
 from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.domain.email.sync import Sync
+from opwen_email_client.domain.modem import e303
+from opwen_email_client.domain.modem import e3131
+from opwen_email_client.domain.modem import e353
+from opwen_email_client.domain.modem import modem_is_plugged
+from opwen_email_client.domain.modem import modem_is_setup
+from opwen_email_client.domain.modem import setup_modem
+from opwen_email_client.domain.sim import dialup
+from opwen_email_client.domain.sim import hologram
 from opwen_email_client.webapp.config import i8n
 
 
@@ -68,107 +73,69 @@ class SendWelcomeEmail(object):
 
 
 class StartInternetConnection(object):
-    _internet_modem_config_e3131 = '/etc/usb_modeswitch.d/12d1:155b'
-    _internet_modem_config_e303 = '/etc/usb_modeswitch.d/12d1:14fe'
-    _internet_modem_config_e353 = '/etc/usb_modeswitch.d/12d1:1f01'
-    _internet_dialer_config = '/etc/wvdial.conf'
-    _modem_target_mode = '1506'
-    _sleep_time = 1
+    _supported_modems = (e303, e353, e3131)
 
-    def __init__(self, sim_type):
+    def __init__(self, modem_config_dir: str, sim_config_dir: str,
+                 sim_type: str):
+        self._modem_config_dir = Path(modem_config_dir)
+        self._sim_config_dir = Path(sim_config_dir)
         self._sim_type = sim_type
+        self._modem_target_mode = '1506'
 
-    @classmethod
-    def _check_process(cls, command):
-        try:
-            check_call(command, shell=True)  # nosec
-        except CalledProcessError:
-            return False
-        return True
+    @cached_property
+    def _wvdial_config(self) -> Path:
+        wvdial_config = self._sim_config_dir / self._sim_type
+        if wvdial_config.is_file():
+            return wvdial_config
 
-    @classmethod
-    def _check_process_output(cls, command):
-        return check_output(command, shell=True)  # nosec
+        if self._sim_type == 'Hologram_World':
+            wvdial_config.parent.mkdir(parents=True)
+            with wvdial_config.open('w', encoding='utf-8') as fobj:
+                fobj.write(hologram.wvdial)
+        else:
+            raise Exception('SIM config {} does not exist'
+                            .format(wvdial_config))
 
-    @classmethod
-    def _open_connection(cls, log_file):
-        return Popen(['/usr/bin/wvdial',
-                      '--config', cls._internet_dialer_config],
-                     stderr=log_file)
+        return wvdial_config
 
-    @classmethod
-    def _find_device(cls, stdout, uid):
-        for line in stdout.splitlines():
-            if 'Huawei' not in line.decode('utf-8'):
-                continue
-            if uid in line.decode('utf-8'):
-                return True
-        return False
+    def _modem_config_for(self, modem) -> Path:
+        modem_config = self._modem_config_dir / modem.uid
+        if modem_config.is_file():
+            return modem_config
 
-    def _modem_is_e303(self):
-        result = self._check_process_output(['/usr/bin/lsusb'])
-        return self._find_device(result, '12d1:14fe')
+        modem_config.parent.mkdir(parents=True)
+        with modem_config.open('w', encoding='utf-8') as fobj:
+            fobj.write(modem.modeswitch)
 
-    def _modem_is_e353(self):
-        result = self._check_process_output(['/usr/bin/lsusb'])
-        return self._find_device(result, '12d1:1f01')
+        return modem_config
 
-    def _modem_is_e3131(self):
-        result = self._check_process_output(['/usr/bin/lsusb'])
-        return self._find_device(result, '12d1:155b')
+    def _setup_modem(self, poll_seconds: int):
+        if not modem_is_plugged():
+            raise Exception('No modem plugged in')
 
-    def _modem_is_plugged(self):
-        result = self._check_process_output(['/usr/bin/lsusb'])
-        return self._find_device(result, '12d1:')
+        if not modem_is_setup(self._modem_target_mode):
+            for modem in self._supported_modems:
+                if modem_is_plugged(modem):
+                    self._modem_target_mode = modem.target
+                    setup_modem(self._modem_config_for(modem))
+                    break
+            else:
+                raise Exception('Unknown modem')
 
-    def _modem_is_setup(self):
-        result = self._check_process_output(['/usr/bin/lsusb'])
-        return self._find_device(
-            result,
-            '12d1:{0}'.format(self._modem_target_mode))
-
-    def _dialer_is_connected(self, log):
-        return self._check_process(
-            "grep 'secondary DNS address' {0}".format(log.name))
-
-    def _setup_modem(self, config):
-        self._check_process(['/usr/sbin/usb_modeswitch',
-                             '--config-file', config])
+            while not modem_is_setup(self._modem_target_mode):
+                sleep(poll_seconds)
 
     @contextmanager
     def __call__(self):
         connection = None
-        retry_count = 90
 
         if self._sim_type != 'Ethernet':
-            if not self._modem_is_plugged():
-                raise Exception('No modem plugged in')
+            self._setup_modem(poll_seconds=2)
 
-            if not self._modem_is_setup():
-                if self._modem_is_e303():
-                    self._modem_target_mode = '1506'
-                    self._setup_modem(self._internet_modem_config_e303)
-                elif self._modem_is_e353():
-                    self._modem_target_mode = '1001'
-                    self._setup_modem(self._internet_modem_config_e353)
-                elif self._modem_is_e3131():
-                    self._modem_target_mode = '1506'
-                    self._setup_modem(self._internet_modem_config_e3131)
-                else:
-                    raise Exception('Unexpected error')
-
-                while not self._modem_is_setup():
-                    sleep(self._sleep_time)
-
-            with NamedTemporaryFile() as wvdial_log:
-                connection = self._open_connection(wvdial_log)
-                while not self._dialer_is_connected(wvdial_log):
-                    if retry_count <= 0:
-                        connection.terminate()
-                        raise Exception('Modem taking too long to connect, '
-                                        'exiting...')
-                    sleep(self._sleep_time)
-                    retry_count -= 1
+            connection = dialup(
+                self._wvdial_config,
+                max_retries=90,
+                poll_seconds=1)
 
         try:
             yield

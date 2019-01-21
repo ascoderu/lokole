@@ -20,25 +20,28 @@ class SettingsForm(FlaskForm):
 
     def update(self):
         restart_required = False
-        restart_required |= self._update_wvdial()
         restart_required |= self._update_sim_type()
+        restart_required |= self._update_wvdial()
 
         if restart_required:
             self._restart_app()
 
     def _update_wvdial(self) -> bool:
         wvdial = self.wvdial.data.strip()
-        if not wvdial:
+        if not wvdial or wvdial == self._read_wvdial():
             return False
 
-        with open(AppConfig.WVDIAL_PATH, 'w') as fobj:
+        path = self._wvdial_config_path()
+        path.parent.mkdir(parents=True)
+
+        with path.open('w', encoding='utf-8') as fobj:
             fobj.write('\n'.join(line.strip()
                                  for line in wvdial.splitlines()))
         return False
 
     def _update_sim_type(self) -> bool:
         sim_type = self.sim_type.data.strip()
-        if sim_type == AppConfig.SIM_TYPE:
+        if not sim_type or sim_type == AppConfig.SIM_TYPE:
             return False
 
         self._update_config('OPWEN_SIM_TYPE', sim_type)
@@ -63,14 +66,21 @@ class SettingsForm(FlaskForm):
             Path(AppConfig.RESTART_PATH).touch()
 
     @classmethod
-    def from_config(cls):
-        try:
-            with open(AppConfig.WVDIAL_PATH) as fobj:
-                wvdial = fobj.read()
-        except OSError:
-            wvdial = ''
+    def _wvdial_config_path(cls) -> Path:
+        return Path(AppConfig.SIM_CONFIG_DIR) / AppConfig.SIM_TYPE
 
+    @classmethod
+    def _read_wvdial(cls) -> str:
+        path = cls._wvdial_config_path()
+        if not path.is_file():
+            return ''
+
+        with path.open(encoding='utf-8') as fobj:
+            return fobj.read().strip()
+
+    @classmethod
+    def from_config(cls):
         return cls(
-            wvdial=wvdial,
+            wvdial=cls._read_wvdial(),
             sim_type=AppConfig.SIM_TYPE
         )

@@ -11,7 +11,6 @@ from opwen_email_client.util.os import subdirectories
 settings_path = getenv('OPWEN_SETTINGS')
 load_dotenv(settings_path)
 
-state_basedir = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
 app_basedir = path.abspath(path.dirname(__file__))
 root_domain = getenv('OPWEN_ROOT_DOMAIN', 'lokole.ca')
 
@@ -54,9 +53,10 @@ class i8n(object):
 
 
 class AppConfig(object):
-    SQLITE_PATH = path.join(state_basedir, 'users.sqlite3')
+    STATE_BASEDIR = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
+    SQLITE_PATH = path.join(STATE_BASEDIR, 'users.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH
-    SQLALCHEMY_MIGRATE_REPO = path.join(state_basedir, 'app.migrate')
+    SQLALCHEMY_MIGRATE_REPO = path.join(STATE_BASEDIR, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     ADMIN_SECRET = getenv('OPWEN_ADMIN_SECRET')
@@ -85,8 +85,9 @@ class AppConfig(object):
 
     TESTING = getenv('OPWEN_ENABLE_DEBUG', False)
 
-    WVDIAL_PATH = '/etc/wvdial.conf'
-    LOCAL_EMAIL_STORE = path.join(state_basedir, 'emails.sqlite3')
+    MODEM_CONFIG_DIR = path.join(STATE_BASEDIR, 'usb_modeswitch')
+    SIM_CONFIG_DIR = path.join(STATE_BASEDIR, 'wvdial')
+    LOCAL_EMAIL_STORE = path.join(STATE_BASEDIR, 'emails.sqlite3')
     SIM_TYPE = getenv('OPWEN_SIM_TYPE')
     RESTART_PATH = getenv('OPWEN_RESTART_PATH')
 

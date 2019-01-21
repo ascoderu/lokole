@@ -64,6 +64,7 @@ delete() { if [[ ! -L "$1" ]]; then sudo rm -rf "$1"; else sudo unlink "$1"; fi 
 make_executable() { sudo chmod a+x "$1"; }
 make_writable() { sudo chmod a+rw "$1"; }
 create_virtualenv() { python3 -m venv "$1"; }
+add_user_to_group() { sudo usermod -a -G "$2" "$1"; }
 change_password() { echo "$1:$2" | sudo chpasswd; }
 required_param() { [[ -z "$1" ]] && echo "Missing required parameter: $2" && (echo "$3" | head -1) && exit 1; }
 random_string() { head /dev/urandom | tr -dc '_A-Z-a-z-0-9' | head -c"${1:-16}"; echo; }
@@ -477,64 +478,17 @@ install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdi
 
 opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/webapp_sync.sh"
 
-opwen_dialer_config_directory="/home/${opwen_user}/wvdial"
+opwen_dialer_config_directory="${opwen_webapp_run_directory}/wvdial"
 create_directory "${opwen_dialer_config_directory}"
 
-internet_modem_config_e303='/etc/usb_modeswitch.d/12d1:14fe'
-internet_modem_config_e353='/etc/usb_modeswitch.d/12d1:1f01'
-internet_modem_config_e3131='/etc/usb_modeswitch.d/12d1:155b'
-internet_dialer_config='/etc/wvdial.conf'
-
-write_file "${opwen_dialer_config_directory}/Hologram_World" << EOF
-[Dialer Defaults]
-Init1 = ATZ
-Init2 = ATQ0
-Init3 = AT+CGDCONT=1,"IP","apn.konekt.io"
-Phone = *99***1#
-Stupid Mode = 1
-Username = { }
-Password = { }
-Modem Type = Analog Modem
-Modem = /dev/ttyUSB0
-IDSN = 0
-EOF
+add_user_to_group "${opwen_user}" "dialout"
+add_user_to_group "${opwen_user}" "dip"
 
 if [[ "${sim_type}" = "mkwvconf" ]]; then
   install_system_package 'mobile-broadband-provider-info'
   "${opwen_webapp_virtualenv}/bin/pip" install --no-cache-dir mkwvconf
   "${opwen_webapp_virtualenv}/bin/mkwvconf.py" --configPath="${opwen_dialer_config_directory}/${sim_type}"
 fi
-
-if [[ "${sim_type}" != "Ethernet" ]]; then
-  copy_file "${opwen_dialer_config_directory}/${sim_type}" "${internet_dialer_config}"
-else
-  create_file "${internet_dialer_config}"
-fi
-make_writable "${internet_dialer_config}"
-
-write_file "${internet_modem_config_e303}" << EOF
-DefaultVendor = 0x12d1
-DefaultProduct = 0x14fe
-TargetVendor = 0x12d1
-TargetProduct = 0x1506
-MessageContent = "55534243123456780000000000000011062000000101000100000000000000"
-EOF
-
-write_file "${internet_modem_config_e353}" << EOF
-DefaultVendor = 0x12d1
-DefaultProduct = 0x1f01
-TargetVendor = 0x12d1
-TargetProduct = 0x1001
-MessageContent = "55534243123456780000000000000011060000000000000000000000000000"
-EOF
-
-write_file "${internet_modem_config_e3131}" << EOF
-DefaultVendor = 0x12d1
-DefaultProduct = 0x155b
-TargetVendor = 0x12d1
-TargetProduct = 0x1506
-MessageContent = "55534243123456780000000000000011062000000100000000000000000000"
-EOF
 
 write_file '/etc/ppp/peers/wvdial' << EOF
 noauth
