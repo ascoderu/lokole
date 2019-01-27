@@ -13,7 +13,7 @@ client-name:              The name that should be assigned to the Opwen device
                           a bunch of things.
 
 sim-type:                 The mobile network to which to connect to upload data
-                          to the cloud, e.g. Hologram_World, LocalOnly,
+                          to the cloud, e.g. hologram, LocalOnly,
                           Ethernet, or mkwvconf.
 
 sync-schedule:            How often the Lokole should sync with the server. In
@@ -163,7 +163,7 @@ update_system_packages
 install_system_package 'curl' 'jq'
 
 case "${sim_type}" in
-  Hologram_World) ;;
+  hologram) ;;
   Ethernet) ;;
   LocalOnly) ;;
   mkwvconf) ;;
@@ -381,18 +381,13 @@ opwen_webapp_log_level="error"
 nginx_access_log="${opwen_webapp_run_directory}/nginx_access.log"
 nginx_error_log="${opwen_webapp_run_directory}/nginx_error.log"
 
-opwen_webapp_script="${opwen_webapp_run_directory}/webapp_run.sh"
-write_file "${opwen_webapp_script}" << EOF
-#!/usr/bin/env sh
-'${opwen_webapp_virtualenv}/bin/gunicorn' \\
-  --timeout='${opwen_webapp_timeout_seconds}' \\
-  --workers='${opwen_webapp_workers}' \\
-  --bind='unix:${opwen_webapp_socket}' \\
-  --log-level='${opwen_webapp_log_level}' \\
-  --env 'OPWEN_SETTINGS=${opwen_webapp_envs}' \\
-  '${opwen_webapp_service}.webapp:app'
-EOF
-make_executable "${opwen_webapp_script}"
+opwen_webapp_script="'${opwen_webapp_virtualenv}/bin/gunicorn' \
+--timeout='${opwen_webapp_timeout_seconds}' \
+--workers='${opwen_webapp_workers}' \
+--bind='unix:${opwen_webapp_socket}' \
+--log-level='${opwen_webapp_log_level}' \
+--env 'OPWEN_SETTINGS=${opwen_webapp_envs}' \
+'${opwen_webapp_service}.webapp:app'"
 
 opwen_restart_script="${opwen_webapp_run_directory}/webapp_restart.sh"
 write_file "${opwen_restart_script}" << EOF

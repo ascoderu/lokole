@@ -1,5 +1,6 @@
 from os import environ
 from pathlib import Path
+from typing import Optional
 
 from flask_wtf import FlaskForm
 from wtforms import StringField
@@ -28,11 +29,11 @@ class SettingsForm(FlaskForm):
 
     def _update_wvdial(self) -> bool:
         wvdial = self.wvdial.data.strip()
-        if not wvdial or wvdial == self._read_wvdial():
+        path = _get_wvdial_path(self.sim_type.data.strip())
+        if not wvdial or wvdial == _read_wvdial(path):
             return False
 
-        path = self._wvdial_config_path()
-        path.parent.mkdir(parents=True)
+        path.parent.mkdir(parents=True, exist_ok=True)
 
         with path.open('w', encoding='utf-8') as fobj:
             fobj.write('\n'.join(line.strip()
@@ -66,21 +67,20 @@ class SettingsForm(FlaskForm):
             Path(AppConfig.RESTART_PATH).touch()
 
     @classmethod
-    def _wvdial_config_path(cls) -> Path:
-        return Path(AppConfig.SIM_CONFIG_DIR) / AppConfig.SIM_TYPE
-
-    @classmethod
-    def _read_wvdial(cls) -> str:
-        path = cls._wvdial_config_path()
-        if not path.is_file():
-            return ''
-
-        with path.open(encoding='utf-8') as fobj:
-            return fobj.read().strip()
-
-    @classmethod
     def from_config(cls):
         return cls(
-            wvdial=cls._read_wvdial(),
+            wvdial=_read_wvdial(_get_wvdial_path()),
             sim_type=AppConfig.SIM_TYPE
         )
+
+
+def _get_wvdial_path(sim_type: Optional[str] = AppConfig.SIM_TYPE) -> Path:
+    return Path(AppConfig.SIM_CONFIG_DIR) / sim_type
+
+
+def _read_wvdial(path: Path) -> str:
+    if not path.is_file():
+        return ''
+
+    with path.open(encoding='utf-8') as fobj:
+        return fobj.read().strip()

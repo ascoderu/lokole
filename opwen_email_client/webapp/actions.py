@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from importlib import import_module
 from logging import Logger
 from pathlib import Path
 from time import sleep
@@ -6,6 +7,7 @@ from time import sleep
 from cached_property import cached_property
 from flask import render_template
 
+from opwen_email_client.domain import sim
 from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.domain.email.sync import Sync
 from opwen_email_client.domain.modem import e303
@@ -15,7 +17,6 @@ from opwen_email_client.domain.modem import modem_is_plugged
 from opwen_email_client.domain.modem import modem_is_setup
 from opwen_email_client.domain.modem import setup_modem
 from opwen_email_client.domain.sim import dialup
-from opwen_email_client.domain.sim import hologram
 from opwen_email_client.webapp.config import i8n
 
 
@@ -88,13 +89,16 @@ class StartInternetConnection(object):
         if wvdial_config.is_file():
             return wvdial_config
 
-        if self._sim_type == 'Hologram_World':
-            wvdial_config.parent.mkdir(parents=True)
-            with wvdial_config.open('w', encoding='utf-8') as fobj:
-                fobj.write(hologram.wvdial)
-        else:
+        sim_config_module = '{}.{}'.format(sim.__name__, self._sim_type)
+        try:
+            sim_config = import_module(sim_config_module)
+        except ImportError:
             raise Exception('SIM config {} does not exist'
                             .format(wvdial_config))
+        else:
+            wvdial_config.parent.mkdir(parents=True, exist_ok=True)
+            with wvdial_config.open('w', encoding='utf-8') as fobj:
+                fobj.write(sim_config.wvdial)
 
         return wvdial_config
 
@@ -103,7 +107,7 @@ class StartInternetConnection(object):
         if modem_config.is_file():
             return modem_config
 
-        modem_config.parent.mkdir(parents=True)
+        modem_config.parent.mkdir(parents=True, exist_ok=True)
         with modem_config.open('w', encoding='utf-8') as fobj:
             fobj.write(modem.modeswitch)
 
