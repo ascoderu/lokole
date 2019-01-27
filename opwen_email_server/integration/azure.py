@@ -8,8 +8,8 @@ from opwen_email_server.services.cloudflare import SetupCloudflareMxRecords
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 from opwen_email_server.services.storage import AzureFileStorage
-from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
+from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import singleton
 

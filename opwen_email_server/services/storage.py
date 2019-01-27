@@ -2,8 +2,8 @@ from collections import namedtuple
 from io import BytesIO
 from tarfile import TarFile
 from tempfile import NamedTemporaryFile
-from typing import Callable
 from typing import IO
+from typing import Callable
 from typing import Iterable
 from typing import Iterator
 from typing import Optional

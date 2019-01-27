@@ -11,8 +11,8 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from PIL import Image
 from bs4 import BeautifulSoup
+from PIL import Image
 from pyzmail import PyzMessage
 from pyzmail.parse import MailPart
 from requests import Response
