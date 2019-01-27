@@ -19,6 +19,7 @@ lint-swagger: venv
 
 lint-python: venv
 	$(py_env)/bin/flake8 opwen_email_server
+	$(py_env)/bin/isort --check-only --recursive opwen_email_server/**/*.py
 
 lint-shell:
 	shellcheck --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh' -not -path './venv*/*')
