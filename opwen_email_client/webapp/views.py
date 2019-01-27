@@ -19,8 +19,8 @@ from flask_login import current_user
 from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.actions import SendWelcomeEmail
-from opwen_email_client.webapp.actions import SyncEmails
 from opwen_email_client.webapp.actions import StartInternetConnection
+from opwen_email_client.webapp.actions import SyncEmails
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm

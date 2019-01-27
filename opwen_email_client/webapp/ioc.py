@@ -8,7 +8,6 @@ from opwen_email_client.util.serialization import JsonSerializer as Serializer  
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.session import AttachmentsStore
 
-
 if AppConfig.TESTING:
     from opwen_email_client.domain.email.client import LocalEmailServerClient as EmailServerClient  # noqa
 

@@ -9,8 +9,8 @@ from flask import render_template
 from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.domain.email.sync import Sync
 from opwen_email_client.domain.modem import e303
-from opwen_email_client.domain.modem import e3131
 from opwen_email_client.domain.modem import e353
+from opwen_email_client.domain.modem import e3131
 from opwen_email_client.domain.modem import modem_is_plugged
 from opwen_email_client.domain.modem import modem_is_setup
 from opwen_email_client.domain.modem import setup_modem

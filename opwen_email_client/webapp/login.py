@@ -7,8 +7,8 @@ from flask_migrate import Migrate
 from flask_security import LoginForm as _LoginForm
 from flask_security import RegisterForm as _RegisterForm
 from flask_security import RoleMixin
-from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
+from flask_security import SQLAlchemyUserDatastore
 from flask_security import UserMixin
 from flask_security import login_required as _login_required
 from flask_security import roles_required
@@ -28,7 +28,6 @@ from opwen_email_client.util.wtforms import SuffixedStringField
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
-
 
 _db = SQLAlchemy(app)
 

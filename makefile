@@ -15,6 +15,7 @@ tests: venv
 
 lint-python: venv
 	$(py_env)/bin/flake8 opwen_email_client
+	$(py_env)/bin/isort --check-only --recursive opwen_email_client/**/*.py
 
 lint-shell:
 	shellcheck --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
