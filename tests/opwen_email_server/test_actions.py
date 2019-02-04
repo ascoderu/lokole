@@ -333,6 +333,13 @@ class RegisterClientTests(TestCase):
         self.setup_mx_records = MagicMock()
         self.client_id_source = MagicMock()
 
+    def test_400(self):
+        domain = 'TEST.com'
+
+        _, status = self._execute_action({'domain': domain})
+
+        self.assertEqual(status, 400)
+
     def test_409(self):
         domain = 'test.com'
 
