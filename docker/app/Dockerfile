@@ -1,13 +1,12 @@
 FROM python:3.6-slim
 
 ARG USE_DEVTOOLS="False"
-ENV PY_ENV="/venv"
+ENV PY_ENV="/usr/local"
 ADD requirements.txt /app/requirements.txt
 ADD requirements-prod.txt /app/requirements-prod.txt
 ADD requirements-dev.txt /app/requirements-dev.txt
 RUN apt-get update \
   && apt-get install -y libffi-dev libssl-dev ca-certificates \
-  && python3 -m venv "${PY_ENV}" \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -U pip setuptools \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements.txt \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements-prod.txt \
