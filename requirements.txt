@@ -10,6 +10,6 @@ requests==2.21.0
 sendgrid==5.6.0
 typing-extensions==3.7.2
 typing==3.6.6
-https://github.com/celery/kombu/archive/b3dc9208837566193deda824bc67dc900c7ed9a6.zip
+https://github.com/celery/kombu/archive/483cadced77d82a6ecd0be553b91ce92f04f9617.zip
 celery==4.2.1
 xtarfile[zstd]==0.0.2
