@@ -24,6 +24,10 @@ paths:
           description: The client was successfully registered.
           schema:
             $ref: '#/definitions/RegisteredClient'
+        400:
+          description: The supplied client is malformed.
+        409:
+          description: The supplied client already exists.
 
 parameters:
 
