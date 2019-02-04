@@ -22,6 +22,7 @@ from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_base64
 from opwen_email_server.utils.serialization import to_jsonl_bytes
+from opwen_email_server.utils.string import is_lowercase
 
 Response = Union[dict, Tuple[str, int]]
 
@@ -283,6 +284,8 @@ class RegisterClient(_Action):
 
     def _action(self, client):  # type: ignore
         domain = client['domain']
+        if not is_lowercase(domain):
+            return 'domain must be lowercase', 400
         if self._auth.client_id_for(domain) is not None:
             return 'client already exists', 409
 
