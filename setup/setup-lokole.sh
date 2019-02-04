@@ -129,7 +129,7 @@ exit 0
 
 case $1 in -h|--help) fail "${usage}";; esac
 
-readonly opwen_webapp_config_client_name="$1"
+readonly opwen_webapp_config_client_name="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
 readonly sim_type="$2"
 readonly sync_schedule="$3"
 readonly registration_credentials="$4"
