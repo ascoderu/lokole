@@ -1,6 +1,11 @@
 language:
   python
 
+addons:
+  apt:
+    packages:
+      - mobile-broadband-provider-info
+
 python:
   - "3.5"
   - "3.6"

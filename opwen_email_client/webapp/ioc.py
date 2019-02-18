@@ -6,6 +6,7 @@ from opwen_email_client.domain.email.sql_store import SqliteEmailStore as EmailS
 from opwen_email_client.domain.email.sync import AzureSync as Sync  # noqa
 from opwen_email_client.util.serialization import JsonSerializer as Serializer  # noqa
 from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.mkwvconf import blueprint as mkwvconf
 from opwen_email_client.webapp.session import AttachmentsStore
 
 if AppConfig.TESTING:
@@ -43,5 +44,7 @@ def create_app() -> Flask:
     app.ioc = Ioc()
 
     app.babel = Babel(app)
+
+    app.register_blueprint(mkwvconf, url_prefix='/api/mkwvconf')
 
     return app

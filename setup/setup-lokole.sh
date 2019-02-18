@@ -469,7 +469,7 @@ info '
 #                                                       installing network stick
 ################################################################################'
 
-install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial'
+install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial' 'mobile-broadband-provider-info'
 
 opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/webapp_sync.sh"
 
@@ -480,9 +480,7 @@ add_user_to_group "${opwen_user}" "dialout"
 add_user_to_group "${opwen_user}" "dip"
 
 if [[ "${sim_type}" = "mkwvconf" ]]; then
-  install_system_package 'mobile-broadband-provider-info'
-  "${opwen_webapp_virtualenv}/bin/pip" install --no-cache-dir mkwvconf
-  "${opwen_webapp_virtualenv}/bin/mkwvconf.py" --configPath="${opwen_dialer_config_directory}/${sim_type}"
+  "${opwen_webapp_virtualenv}/bin/mkwvconf" --configPath="${opwen_dialer_config_directory}/${sim_type}"
 fi
 
 write_file '/etc/ppp/peers/wvdial' << EOF
