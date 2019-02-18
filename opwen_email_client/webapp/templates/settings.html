@@ -7,6 +7,10 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/settings.min.css') }}">
 {% endblock %}
 
+{% block scripts %}{{ super() }}
+<script type="text/javascript" src="{{ url_for('static', filename='js/settings.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}{{ super() }}
 <form action="{{ url_for('settings') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
@@ -15,7 +19,11 @@
     <legend>{{ _('Configure SIM type') }}</legend>
     {{ render_field(form.sim_type) }}
 
-    <legend>{{ _('Configure dial-up information') }}</legend>
+    <legend>{{ _('Configure dial-up information') }}
+      <a class="btn btn-link" title="{{ _('Launch wizard') }}" data-toggle="modal" data-target="#wvdial-modal">
+        <i class="fa fa-external-link"></i>
+      </a>
+    </legend>
     {{ render_field(form.wvdial) }}
   </fieldset>
 
@@ -23,4 +31,39 @@
 </form>
 
 <a class="btn btn-primary" href="{{ url_for('sync') }}">{{_('Sync Emails')}}</a>
+
+<div class="modal fade" id="wvdial-modal" tabindex="-1" role="dialog" aria-labelledby="wvdial-title">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}">
+          <i class="fa fa-times"></i>
+        </button>
+        <h4 class="modal-title" id="wvdial-title">{{_('Dial-up configuration wizard')}}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="wvdial-country">{{_('Select country')}}</label>
+          <select id="wvdial-country" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="wvdial-provider">{{_('Select provider')}}</label>
+          <select id="wvdial-provider" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="wvdial-apn">{{_('Select APN')}}</label>
+          <select id="wvdial-apn" class="form-control"></select>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
+        <button type="button" class="btn btn-primary" id="generate-wvdial-config">{{ _('Generate configuration') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

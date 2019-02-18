@@ -111,6 +111,9 @@ module.exports = function(grunt) {
           ],
           'opwen_email_client/webapp/static/js/register.min.js': [
             'opwen_email_client/webapp/static/js/register.js',
+          ],
+          'opwen_email_client/webapp/static/js/settings.min.js': [
+            'opwen_email_client/webapp/static/js/settings.js',
           ]
         }
       }
