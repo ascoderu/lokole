@@ -53,6 +53,7 @@ class i8n(object):
 
 
 class AppConfig(object):
+    CACHE_TYPE = 'simple'
     STATE_BASEDIR = path.abspath(getenv('OPWEN_STATE_DIRECTORY', gettempdir()))
     SQLITE_PATH = path.join(STATE_BASEDIR, 'users.sqlite3')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLITE_PATH

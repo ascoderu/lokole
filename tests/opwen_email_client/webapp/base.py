@@ -8,6 +8,7 @@ from opwen_email_client.webapp.ioc import create_app
 
 
 class TestConfig(AppConfig):
+    CACHE_TYPE = 'null'
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     SECURITY_PASSWORD_SALT = 'UnSalted'
@@ -32,6 +33,5 @@ class Base(object):
             super()._post_teardown()
 
         def create_app(self):
-            app = create_app()
-            app.config.from_object(self.app_config)
+            app = create_app(self.app_config)
             return app

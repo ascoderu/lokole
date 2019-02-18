@@ -5,6 +5,7 @@ from opwen_email_client.domain.email.client import HttpEmailServerClient as Emai
 from opwen_email_client.domain.email.sql_store import SqliteEmailStore as EmailStore  # noqa
 from opwen_email_client.domain.email.sync import AzureSync as Sync  # noqa
 from opwen_email_client.util.serialization import JsonSerializer as Serializer  # noqa
+from opwen_email_client.webapp.cache import cache
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.mkwvconf import blueprint as mkwvconf
 from opwen_email_client.webapp.session import AttachmentsStore
@@ -38,12 +39,14 @@ class Ioc(object):
         email_store=email_store)
 
 
-def create_app() -> Flask:
+def create_app(config=AppConfig) -> Flask:
     app = Flask(__name__)
-    app.config.from_object(AppConfig)
+    app.config.from_object(config)
     app.ioc = Ioc()
 
     app.babel = Babel(app)
+
+    cache.init_app(app)
 
     app.register_blueprint(mkwvconf, url_prefix='/api/mkwvconf')
 

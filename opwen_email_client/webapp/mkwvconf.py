@@ -6,6 +6,8 @@ from mkwvconf import Mkwvconf
 from mkwvconf.mkwvconf import DEFAULT_MODEM_DEVICE
 from mkwvconf.mkwvconf import DEFAULT_PROFILE_NAME
 
+from opwen_email_client.webapp.cache import cache
+
 blueprint = Blueprint('mkwvconf', __name__)
 
 
@@ -20,6 +22,7 @@ def create_mkwvconf() -> Mkwvconf:
 
 
 @blueprint.route('/<country>/<provider>/<apn>')
+@cache.memoize(timeout=600)
 def get_config(country: str, provider: str, apn: str) -> Response:
     mkwvconf = create_mkwvconf()
     parameters = mkwvconf.getConfigParameters(country, provider, apn)
@@ -28,6 +31,7 @@ def get_config(country: str, provider: str, apn: str) -> Response:
 
 
 @blueprint.route('/<country>/<provider>')
+@cache.memoize(timeout=600)
 def list_apns(country: str, provider: str) -> Response:
     mkwvconf = create_mkwvconf()
     apns = mkwvconf.getApns(country, provider)
@@ -35,6 +39,7 @@ def list_apns(country: str, provider: str) -> Response:
 
 
 @blueprint.route('/<country>')
+@cache.memoize(timeout=600)
 def list_providers(country: str) -> Response:
     mkwvconf = create_mkwvconf()
     providers = mkwvconf.getProviders(country)
@@ -42,6 +47,7 @@ def list_providers(country: str) -> Response:
 
 
 @blueprint.route('/')
+@cache.memoize(timeout=600)
 def list_countries() -> Response:
     mkwvconf = create_mkwvconf()
     countries = mkwvconf.getCountryCodes()
