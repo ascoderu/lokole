@@ -30,7 +30,7 @@ $(document).ready(function() {
       "fa": true,
     },
     customTemplates: {
-      emphasis: function(context) {
+      emphasis: function() {
         return '<li><div class="btn-group">'
                 + '<a title="' + ctx.i8n.bold + '" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">'
                 + '  <span class="fa fa-bold" aria-hidden="true"></span></a>'
@@ -40,7 +40,7 @@ $(document).ready(function() {
                 + '  <span class="fa fa-underline" aria-hidden="true"></span></a>'
                 + '</div></li>';
       },
-      lists: function(context) {
+      lists: function() {
         return '<li><div class="btn-group">'
                 + '<a title="' + ctx.i8n.unorderedList + '" class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">'
                 + '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>'

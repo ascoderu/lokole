@@ -87,7 +87,7 @@ $apnSelect.on('change', function() {
   updateModalState();
 });
 
-$submitButton.on('click', function(event) {
+$submitButton.on('click', function() {
   var country = $countrySelect.val();
   var provider = $providerSelect.val();
   var apn = $apnSelect.val();

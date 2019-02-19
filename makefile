@@ -1,5 +1,6 @@
 py_env=venv
 grunt=./node_modules/.bin/grunt
+eslint=./node_modules/.bin/eslint
 settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
 
 .PHONY: default tests
@@ -20,7 +21,10 @@ lint-python: venv
 lint-shell:
 	shellcheck --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
 
-lint: lint-python lint-shell
+lint-js: $(eslint)
+	$(eslint) opwen_email_client/webapp/static/js/**/*.js
+
+lint: lint-python lint-shell lint-js
 
 typecheck: venv
 	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_client
@@ -29,6 +33,9 @@ bandit: venv
 	$(py_env)/bin/bandit -r . -x $(py_env)
 
 ci: lint bandit tests
+
+$(eslint): package.json
+	yarn install
 
 $(grunt): package.json
 	yarn install
