@@ -58,6 +58,12 @@ clean:
 	find opwen_email_client -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
+release: prepare-server
+	echo "$(VERSION)" > version.txt
+	$(py_env)/bin/pip install twine
+	$(py_env)/bin/python setup.py sdist
+	$(py_env)/bin/twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" dist/*
+
 server: prepare-server
 	OPWEN_SETTINGS=$(settings) \
     $(py_env)/bin/python ./manage.py devserver
