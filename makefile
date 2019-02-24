@@ -1,13 +1,15 @@
 py_env=venv
 settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
 
-.PHONY: default tests
+.PHONY: default venv tests
 default: server
 
-venv: requirements.txt requirements-dev.txt
-	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel; fi
-	$(py_env)/bin/pip install -r requirements.txt
-	$(py_env)/bin/pip install -r requirements-dev.txt
+requirements.txt.out: requirements.txt requirements-dev.txt
+	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel | tee requirements.txt.out; fi
+	$(py_env)/bin/pip install -r requirements.txt | tee requirements.txt.out
+	$(py_env)/bin/pip install -r requirements-dev.txt | tee requirements.txt.out
+
+venv: requirements.txt.out
 
 tests: venv
 	$(py_env)/bin/coverage run -m nose2 && $(py_env)/bin/coverage report

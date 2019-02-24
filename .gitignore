@@ -14,6 +14,7 @@ __pycache__/
 /build/
 /dist/
 /*.egg-info/
+requirements.txt.out
 
 .coverage
 *.mo
