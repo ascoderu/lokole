@@ -72,6 +72,7 @@ disable_system_power_management() { sudo systemctl mask sleep.target suspend.tar
 get_system_ram_kb() { grep 'MemTotal' '/proc/meminfo' | cut -d':' -f2 | sed 's/^ *//g' | cut -d' ' -f1; }
 min() { if [[ "$1" -lt "$2" ]]; then echo "$1"; else echo "$2"; fi; }
 create_root_cron() { (sudo crontab -l || true; echo "$1 $2") 2>&1 | grep -v 'no crontab for' | sort -u | sudo crontab -; }
+create_cron() { (crontab -l || true; echo "$1 $2") 2>&1 | grep -v 'no crontab for' | sort -u | crontab -; }
 http_get() { /usr/bin/curl --request 'GET' --fail "$@"; }
 http_post_json() { /usr/bin/curl --header 'Content-Type: application/json' --request 'POST' --fail "$@"; }
 reload_daemons() { sudo service supervisor start; sudo supervisorctl reread; sudo supervisorctl update; }
@@ -340,6 +341,7 @@ opwen_webapp_config_password_salt="$(random_string 16)"
 opwen_webapp_admin_secret="$(random_string 32)"
 opwen_webapp_envs="${opwen_webapp_run_directory}/webapp_settings.env"
 restart_path="${opwen_webapp_run_directory}/webapp_restart"
+opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/webapp_sync.sh"
 
 write_file "${opwen_webapp_envs}" << EOF
 OPWEN_STATE_DIRECTORY=${opwen_webapp_run_directory}
@@ -354,6 +356,7 @@ OPWEN_CLIENT_NAME=${opwen_webapp_config_client_name}
 OPWEN_EMAIL_SERVER_HOSTNAME=${opwen_server_host}
 OPWEN_SIM_TYPE=${sim_type}
 OPWEN_RESTART_PATH=${restart_path}
+OPWEN_SYNC_SCRIPT=${opwen_webapp_email_sync_script}
 EOF
 
 lokole_admin_name="${LOKOLE_ADMIN_NAME:-admin}"
@@ -471,8 +474,6 @@ info '
 
 install_system_package 'cron' 'usb-modeswitch' 'usb-modeswitch-data' 'ppp' 'wvdial' 'mobile-broadband-provider-info'
 
-opwen_webapp_email_sync_script="${opwen_webapp_run_directory}/webapp_sync.sh"
-
 opwen_dialer_config_directory="${opwen_webapp_run_directory}/wvdial"
 create_directory "${opwen_dialer_config_directory}"
 
@@ -497,7 +498,9 @@ write_file "${opwen_webapp_email_sync_script}" << EOF
 EOF
 make_executable "${opwen_webapp_email_sync_script}"
 
-create_root_cron "${sync_schedule}" "${opwen_webapp_email_sync_script}"
+add_user_to_group "${opwen_user}" "crontab"
+
+create_cron "${sync_schedule}" "${opwen_webapp_email_sync_script}"
 
 
 finished

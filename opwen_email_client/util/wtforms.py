@@ -8,11 +8,28 @@ from re import IGNORECASE
 from re import compile as re_compile
 from typing import Optional
 
+from crontab import CronItem
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.validators import HostnameValidation
 from wtforms.validators import Regexp
 from wtforms.validators import ValidationError
+
+
+class CronSchedule:
+    def __init__(self, message=None):
+        self.message = message
+
+    def __call__(self, form, field, message=None):
+        schedule = (field.data or '').strip()
+        if not schedule:
+            return
+
+        try:
+            CronItem().setall(schedule)
+        except (KeyError, ValueError):
+            message = message or self.message or field.gettext('Invalid cron')
+            raise ValidationError(message)
 
 
 class Emails(Regexp):

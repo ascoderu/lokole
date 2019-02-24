@@ -18,6 +18,7 @@ cached-property==1.5.1
 gunicorn==19.9.0
 mkwvconf==0.1.1
 passlib==1.7.1
+python-crontab==2.3.6
 python-dotenv==0.10.1
 requests==2.21.0
 typing==3.6.6

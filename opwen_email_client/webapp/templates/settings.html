@@ -19,6 +19,13 @@
     <legend>{{ _('Configure SIM type') }}</legend>
     {{ render_field(form.sim_type) }}
 
+    <legend>{{ _('Configure sync schedule') }}
+      <a class="btn btn-link" title="{{ _('Sync emails now') }}" href="{{ url_for('sync') }}">
+        <i class="fa fa-cloud-upload"></i>
+      </a>
+    </legend>
+    {{ render_field(form.sync_schedule) }}
+
     <legend>{{ _('Configure dial-up information') }}
       <a class="btn btn-link" title="{{ _('Launch wizard') }}" data-toggle="modal" data-target="#wvdial-modal">
         <i class="fa fa-external-link"></i>
@@ -29,8 +36,6 @@
 
   {{ render_button(form.submit, _('Save settings')) }}
 </form>
-
-<a class="btn btn-primary" href="{{ url_for('sync') }}">{{_('Sync Emails')}}</a>
 
 <div class="modal fade" id="wvdial-modal" tabindex="-1" role="dialog" aria-labelledby="wvdial-title">
   <div class="modal-dialog" role="document">

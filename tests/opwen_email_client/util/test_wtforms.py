@@ -9,6 +9,7 @@ from wtforms import Field
 from wtforms import Form
 from wtforms import ValidationError
 
+from opwen_email_client.util.wtforms import CronSchedule
 from opwen_email_client.util.wtforms import Emails
 from opwen_email_client.util.wtforms import HtmlTextAreaField
 from opwen_email_client.util.wtforms import SuffixedStringField
@@ -100,6 +101,27 @@ class EmailsTests(TestCase):
     @classmethod
     def verify(cls, delimiter, field_value):
         validator = Emails(delimiter)
+        validator(form=None, field=DummyField(field_value))
+
+
+class CronScheduleTests(TestCase):
+    def test_valid_schedule(self):
+        self.verify('* * * * *')
+
+    def test_invalid_schedule_length(self):
+        with self.assertRaises(ValidationError):
+            self.verify('* * * * * *')
+
+        with self.assertRaises(ValidationError):
+            self.verify('* * * *')
+
+    def test_invalid_schedule_entry(self):
+        with self.assertRaises(ValidationError):
+            self.verify('* * * * x')
+
+    @classmethod
+    def verify(cls, field_value):
+        validator = CronSchedule()
         validator(form=None, field=DummyField(field_value))
 
 

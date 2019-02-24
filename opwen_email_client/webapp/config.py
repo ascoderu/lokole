@@ -36,6 +36,10 @@ class i8n(object):
     ACCOUNT_SUSPENDED = _('Your account has been suspended. '
                           'Please contact your administrator.')
     SYNC_COMPLETE = _('Email synchronization completed.')
+    SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _(
+        'The syntax is: "minute hour day-of-month month day-of-week". '
+        'Use "*" for any value or "," to separate multiple values '
+        'or "-" to define a range of values or "/" for step values.')
     UNEXPECTED_ERROR = _('Unexpected error. Please contact your '
                          'administrator.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
@@ -91,6 +95,9 @@ class AppConfig(object):
     LOCAL_EMAIL_STORE = path.join(STATE_BASEDIR, 'emails.sqlite3')
     SIM_TYPE = getenv('OPWEN_SIM_TYPE')
     RESTART_PATH = getenv('OPWEN_RESTART_PATH')
+    SYNC_SCRIPT = getenv(
+        'OPWEN_SYNC_SCRIPT',
+        'echo "synced" >> "{}"'.format(path.join(STATE_BASEDIR, 'sync.log')))
 
     EMAIL_ADDRESS_DELIMITER = ','
     EMAILS_PER_PAGE = 30
