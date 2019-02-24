@@ -1,14 +1,16 @@
 pwd=$(shell pwd)
 py_env=venv
 
-.PHONY: default tests
+.PHONY: default venv tests
 default: run
 
-venv: requirements.txt requirements-dev.txt requirements-prod.txt
-	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel; fi
-	$(py_env)/bin/pip install -r requirements.txt
-	$(py_env)/bin/pip install -r requirements-dev.txt
-	$(py_env)/bin/pip install -r requirements-prod.txt
+requirements.txt.out: requirements.txt requirements-dev.txt requirements-prod.txt
+	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel | tee requirements.txt.out; fi
+	$(py_env)/bin/pip install -r requirements.txt | tee requirements.txt.out
+	$(py_env)/bin/pip install -r requirements-dev.txt | tee requirements.txt.out
+	$(py_env)/bin/pip install -r requirements-prod.txt | tee requirements.txt.out
+
+venv: requirements.txt.out
 
 tests: venv
 	$(py_env)/bin/coverage run -m nose2 && $(py_env)/bin/coverage report
