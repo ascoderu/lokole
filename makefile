@@ -1,6 +1,4 @@
 py_env=venv
-grunt=./node_modules/.bin/grunt
-eslint=./node_modules/.bin/eslint
 settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
 
 .PHONY: default tests
@@ -21,8 +19,8 @@ lint-python: venv
 lint-shell:
 	shellcheck --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
 
-lint-js: $(eslint)
-	$(eslint) opwen_email_client/webapp/static/js/**/*.js
+lint-js: node_modules
+	yarn run eslint opwen_email_client/webapp/static/js/**/*.js
 
 lint: lint-python lint-shell lint-js
 
@@ -34,14 +32,11 @@ bandit: venv
 
 ci: lint bandit tests
 
-$(eslint): package.json
+node_modules: package.json
 	yarn install
 
-$(grunt): package.json
-	yarn install
-
-build-frontend: $(grunt) Gruntfile.js
-	$(grunt)
+build-frontend: node_modules Gruntfile.js
+	yarn run grunt
 
 babel.pot: babel.cfg venv
 	$(py_env)/bin/pybabel extract -F babel.cfg -k lazy_gettext -o babel.pot opwen_email_client/webapp
