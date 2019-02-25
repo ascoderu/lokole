@@ -1,2 +1,0 @@
-APScheduler==3.5.3
-envdir==1.0.1
