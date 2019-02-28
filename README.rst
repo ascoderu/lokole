@@ -121,10 +121,10 @@ below.
 
   # workflow 1:
   # simulate delivering emails from client to online email provider
-  emails_to_send="./tests/files/end_to_end/client-emails.jsonl.gz"
+  emails_to_send="./tests/files/end_to_end/client-emails.tar.gz"
   client_id="$(jq -r '.client_id' < register.json)"
   resource_container="$(jq -r '.resource_container' < register.json)"
-  resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))')"
+  resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))').tar.gz"
   cp "${emails_to_send}" "./volumes/data/client-blobs/${resource_container}/${resource_id}"
   curl "http://localhost:8080/api/email/upload/${client_id}" \
     -H "Content-Type: application/json" \
