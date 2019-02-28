@@ -13,7 +13,3 @@ cover/
 requirements.txt.out
 
 serviceprincipal.json
-volumes/
-downloaded.tar.gz
-register.json
-download.json
