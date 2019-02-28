@@ -10,7 +10,14 @@ services:
 
 cache: pip
 
+before_script:
+  - docker-compose build
+  - docker-compose pull || true
+  - docker-compose up -d
+
 script: travis/ci.sh
+
+after_script: docker-compose down --volumes
 
 install:
   - pip install codecov

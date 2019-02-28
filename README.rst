@@ -110,50 +110,18 @@ application and provide references to the entry points into the code
 (look for the yaml files in the swagger directory). The various
 APIs can also be easily called via the testing console that is available
 by adding /ui to the end of the API's URL. Sample workflows are shown
-below.
+in the integration tests folder and can be run via:
 
 .. sourcecode :: sh
 
-  # precondition:
-  # register a new client
-  curl "http://localhost:8080/api/email/register/" \
-    -H "Content-Type: application/json" \
-    -u "admin:password" \
-    -d '{"domain":"developer.lokole.ca"}' \
-  | tee register.json
+  # run the services, wait for them to start
+  docker-compose up --build
 
-  # precondition:
-  # enable azure cli to talk to azurite
-  export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+  # in another terminal, run the integration tests
+  make integration-tests
 
-  # workflow 1:
-  # simulate delivering emails from client to online email provider
-  emails_to_send="./tests/files/end_to_end/client-emails.tar.gz"
-  client_id="$(jq -r '.client_id' < register.json)"
-  resource_container="$(jq -r '.resource_container' < register.json)"
-  resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))').tar.gz"
-  az storage blob upload --name "${resource_id}" --container-name "${resource_container}" --file "${emails_to_send}"
-  curl "http://localhost:8080/api/email/upload/${client_id}" \
-    -H "Content-Type: application/json" \
-    -d '{"resource_id":"'"${resource_id}"'"}'
-
-  # workflow 2a:
-  # simulate receiving email sent from online email provider to client
-  email_to_receive="./tests/files/end_to_end/inbound-email.mime"
-  client_id="$(jq -r '.client_id' < register.json)"
-  curl "http://localhost:8080/api/email/sendgrid/${client_id}" \
-    -H "Content-Type: multipart/form-data" \
-    -F "email=$(cat "${email_to_receive}")"
-
-  # workflow 2b:
-  # simulate delivering emails sent from online email provider to client
-  client_id="$(jq -r '.client_id' < register.json)"
-  resource_container="$(jq -r '.resource_container' < register.json)"
-  curl "http://localhost:8080/api/email/download/${client_id}" \
-    -H "Accept: application/json" \
-  | tee download.json
-  resource_id="$(jq -r '.resource_id' < download.json)"
-  az storage blob download --name "${resource_id}" --container-name "${resource_container}" --file "downloaded.tar.gz"
+  # finally, tear down the services
+  docker-compose down --volumes
 
 Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine
