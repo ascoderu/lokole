@@ -100,7 +100,7 @@ After installing Docker, you can run the application stack with one command:
 
 .. sourcecode :: sh
 
-  make run
+  make start
 
 Finding your way around the project
 ===================================
@@ -115,13 +115,13 @@ in the integration tests folder and can be run via:
 .. sourcecode :: sh
 
   # run the services, wait for them to start
-  docker-compose up --build
+  make start
 
   # in another terminal, run the integration tests
   make integration-tests
 
   # finally, tear down the services
-  docker-compose down --volumes
+  make stop
 
 Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine

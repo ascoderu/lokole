@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-data_dir="$(dirname "$0")/../files/end_to_end"
+in_dir="$(dirname "$0")/../files/end_to_end"
+out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+mkdir -p "${out_dir}"
 
-emails_to_send="${data_dir}/client-emails.tar.gz"
-client_id="$(jq -r '.client_id' < "${data_dir}/register.json")"
-resource_container="$(jq -r '.resource_container' < "${data_dir}/register.json")"
+emails_to_send="${in_dir}/client-emails.tar.gz"
+client_id="$(jq -r '.client_id' < "${out_dir}/register.json")"
+resource_container="$(jq -r '.resource_container' < "${out_dir}/register.json")"
 resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))').tar.gz"
 
 # workflow 1: send emails written on the client to the world
