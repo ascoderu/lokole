@@ -36,17 +36,20 @@ Download = Tuple[str, Callable[[bytes], dict]]
 
 
 class _BaseAzureStorage(LogMixin):
-    def __init__(self, account: str, key: str, container: str,
-                 provider: str) -> None:
+    def __init__(self, account: str, key: str, container: str, provider: str,
+                 host: Optional[str] = None, secure: bool = True) -> None:
         self._account = account
         self._key = key
         self._container = container
         self._provider = getattr(Provider, provider)
+        self._host = host or None
+        self._secure = secure
 
     @cached_property
     def _driver(self) -> StorageDriver:
         driver = get_driver(self._provider)
-        return driver(self._account, self._key)
+        return driver(self._account, self._key,
+                      host=self._host, secure=self._secure)
 
     @cached_property
     def _client(self) -> Container:

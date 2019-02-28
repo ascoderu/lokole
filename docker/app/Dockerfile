@@ -12,7 +12,6 @@ RUN apt-get update \
   && "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements-prod.txt \
   && if [ "${USE_DEVTOOLS}" = "True" ]; then \
       "${PY_ENV}/bin/pip" --no-cache-dir -q install -r /app/requirements-dev.txt; \
-      mkdir -p /data/server-blobs /data/server-tables /data/client-blobs; \
     fi \
   && rm -rf /var/lib/apt/lists/*
 

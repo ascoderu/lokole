@@ -79,6 +79,9 @@ e.g. on Ubuntu:
 
   sudo apt-get install -y make python3 python3-venv shellcheck jq curl
 
+Also follow the `Azure CLI setup instructions <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest>`_
+to install the `az` tool.
+
 You can use the makefile to verify your checkout by running the tests and
 other CI steps such as linting. The makefile will automatically install all
 required dependencies into a virtual environment.
@@ -119,13 +122,17 @@ below.
     -d '{"domain":"developer.lokole.ca"}' \
   | tee register.json
 
+  # precondition:
+  # enable azure cli to talk to azurite
+  export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+
   # workflow 1:
   # simulate delivering emails from client to online email provider
   emails_to_send="./tests/files/end_to_end/client-emails.tar.gz"
   client_id="$(jq -r '.client_id' < register.json)"
   resource_container="$(jq -r '.resource_container' < register.json)"
   resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))').tar.gz"
-  cp "${emails_to_send}" "./volumes/data/client-blobs/${resource_container}/${resource_id}"
+  az storage blob upload --name "${resource_id}" --container-name "${resource_container}" --file "${emails_to_send}"
   curl "http://localhost:8080/api/email/upload/${client_id}" \
     -H "Content-Type: application/json" \
     -d '{"resource_id":"'"${resource_id}"'"}'
@@ -146,7 +153,7 @@ below.
     -H "Accept: application/json" \
   | tee download.json
   resource_id="$(jq -r '.resource_id' < download.json)"
-  echo "./volumes/data/client-blobs/${resource_container}/${resource_id}"
+  az storage blob download --name "${resource_id}" --container-name "${resource_container}" --file "downloaded.tar.gz"
 
 Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine

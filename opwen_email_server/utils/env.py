@@ -14,5 +14,8 @@ class Env(object):
     def integer(self, name: str, default: int = 0) -> int:
         return int(self(name, str(default)))
 
+    def boolean(self, name, default: bool = False) -> bool:
+        return self(name, str(default)) == str(True)
+
     def urlpart(self, name: str, default: str = '') -> str:
         return quote(self(name, default), safe='')

@@ -4,10 +4,23 @@ x-shared-app-environment:
   &shared-app-environment
   QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
   LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
-  LOKOLE_STORAGE_PROVIDER: "LOCAL"
-  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME: "/data/server-blobs"
-  LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME: "/data/server-tables"
-  LOKOLE_CLIENT_AZURE_STORAGE_NAME: "/data/client-blobs"
+
+  LOKOLE_STORAGE_PROVIDER: AZURE_BLOBS
+
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME: ${AZURITE_ACCOUNT}
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY: ${AZURITE_KEY}
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_HOST: ${AZURITE_HOST}
+  LOKOLE_EMAIL_SERVER_AZURE_BLOBS_SECURE: ${AZURITE_SECURE}
+
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME: ${AZURITE_ACCOUNT}
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY: ${AZURITE_KEY}
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_HOST: ${AZURITE_HOST}
+  LOKOLE_EMAIL_SERVER_AZURE_TABLES_SECURE: ${AZURITE_SECURE}
+
+  LOKOLE_CLIENT_AZURE_STORAGE_NAME: ${AZURITE_ACCOUNT}
+  LOKOLE_CLIENT_AZURE_STORAGE_KEY: ${AZURITE_KEY}
+  LOKOLE_CLIENT_AZURE_STORAGE_HOST: ${AZURITE_HOST}
+  LOKOLE_CLIENT_AZURE_STORAGE_SECURE: ${AZURITE_SECURE}
 
 x-shared-app-build:
   &shared-app-build
@@ -47,8 +60,8 @@ services:
       CONNEXION_SERVER: flask
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
-    volumes:
-      - ./volumes/data:/data
+    depends_on:
+      - azurite
 
   worker:
     << : *shared-app-build
@@ -58,9 +71,15 @@ services:
       CELERY_QUEUE_NAMES: all
       QUEUE_WORKERS: ${QUEUE_WORKERS}
     depends_on:
+      - azurite
       - rabbitmq
-    volumes:
-      - ./volumes/data:/data
 
   rabbitmq:
     image: rabbitmq:3.7.8-management
+
+  azurite:
+    image: arafato/azurite:2.6.5
+    environment:
+      executable: blob
+    ports:
+      - ${AZURITE_PORT}:10000

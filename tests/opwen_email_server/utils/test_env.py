@@ -14,6 +14,11 @@ class EnvTests(TestCase):
         self.assertEqual(env.integer('foo'), 123)
         self.assertEqual(env.integer('missing'), 0)
 
+    def test_get_boolean(self):
+        env = Env({'foo': 'True'})
+        self.assertEqual(env.boolean('foo'), True)
+        self.assertEqual(env.boolean('missing'), False)
+
     def test_get_urlpart(self):
         env = Env({'foo': 'ba/r'})
         self.assertEqual(env.urlpart('foo'), 'ba%2Fr')
