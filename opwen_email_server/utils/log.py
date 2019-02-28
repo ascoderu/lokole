@@ -19,6 +19,7 @@ from applicationinsights.channel import TelemetryContext
 from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
 
+from opwen_email_server.config import APPINSIGHTS_HOST
 from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import LOG_LEVEL
 from opwen_email_server.constants.logging import SEPARATOR
@@ -32,7 +33,10 @@ def _create_telemetry_channel() -> Optional[TelemetryChannel]:
     if not APPINSIGHTS_KEY:
         return None
 
-    sender = AsynchronousSender()
+    if APPINSIGHTS_HOST:
+        sender = AsynchronousSender(APPINSIGHTS_HOST)
+    else:
+        sender = AsynchronousSender()
     queue = AsynchronousQueue(sender)
     context = TelemetryContext()
     context.instrumentation_key = APPINSIGHTS_KEY
