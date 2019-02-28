@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-data_dir="$(dirname "$0")/../files/end_to_end"
+out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+mkdir -p "${out_dir}"
 
 # workflow 3: register a new client called "developer"
 # normally this endpoint would be called during a new lokole device setup
@@ -10,4 +11,4 @@ curl -fs \
   -u "admin:password" \
   -d '{"domain":"developer.lokole.ca"}' \
   "http://localhost:8080/api/email/register/" \
-| tee "${data_dir}/register.json"
+| tee "${out_dir}/register.json"

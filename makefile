@@ -40,16 +40,16 @@ integration-tests:
 	./tests/integration/0-register-client.sh && \
   ./tests/integration/1-client-uploads-emails.sh && sleep 10s && \
   ./tests/integration/2-receive-email-for-client.sh && sleep 10s && \
-  ./tests/integration/3-client-downloads-emails.sh
+  ./tests/integration/3-client-downloads-emails.sh && \
+  rm -rf tests/files/end_to_end/test.out
 
-clean:
-	rm -rf $$(find opwen_email_server -name '__pycache__' -type d)
-	rm -rf $$(find tests -name '__pycache__' -type d)
-	rm -rf $(py_env) .mypy_cache cover .coverage
-	docker-compose down && rm -rf volumes register.json download.json
+stop:
+	docker-compose down --volumes
 
-run:
-	docker-compose up --build
+start:
+	docker-compose build
+	docker-compose pull || true
+	docker-compose up -d
 
 server: venv
 	PY_ENV="$(py_env)" \

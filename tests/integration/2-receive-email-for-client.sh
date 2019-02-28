@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-data_dir="$(dirname "$0")/../files/end_to_end"
+in_dir="$(dirname "$0")/../files/end_to_end"
+out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+mkdir -p "${out_dir}"
 
-email_to_receive="${data_dir}/inbound-email.mime"
+email_to_receive="${in_dir}/inbound-email.mime"
 
-client_id="$(jq -r '.client_id' < "${data_dir}/register.json")"
+client_id="$(jq -r '.client_id' < "${out_dir}/register.json")"
 
 # workflow 2a: receive an email directed at one of the clients
 # this simulates sendgrid delivering an email to the service
