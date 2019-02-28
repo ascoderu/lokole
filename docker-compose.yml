@@ -4,6 +4,8 @@ x-shared-app-environment:
   &shared-app-environment
   QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
   LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
+  LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
+  LOKOLE_EMAIL_SERVER_APPINSIGHTS_HOST: http://appinsights
 
   LOKOLE_STORAGE_PROVIDER: AZURE_BLOBS
 
@@ -61,6 +63,7 @@ services:
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
     depends_on:
+      - appinsights
       - azurite
 
   worker:
@@ -71,11 +74,27 @@ services:
       CELERY_QUEUE_NAMES: all
       QUEUE_WORKERS: ${QUEUE_WORKERS}
     depends_on:
+      - appinsights
       - azurite
       - rabbitmq
 
   rabbitmq:
     image: rabbitmq:3.7.8-management
+
+  appinsights:
+    image: cwolff/appinsights-on-premises:0.0.9
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      APPINSIGHTS_INSTRUMENTATIONKEY: "${APPINSIGHTS_INSTRUMENTATIONKEY}"
+
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_DB: "${POSTGRES_DB}"
 
   azurite:
     image: arafato/azurite:2.6.5
