@@ -1,8 +1,8 @@
 pwd=$(shell pwd)
 py_env=venv
 
-.PHONY: default venv tests
-default: run
+.PHONY: venv tests
+default: ci
 
 requirements.txt.out: requirements.txt requirements-dev.txt requirements-prod.txt
 	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel | tee requirements.txt.out; fi
@@ -22,19 +22,15 @@ lint-swagger: venv
 lint-python: venv
 	$(py_env)/bin/flake8 opwen_email_server
 	$(py_env)/bin/isort --check-only --recursive opwen_email_server/**/*.py
+	$(py_env)/bin/bandit -r . -x $(py_env)
+	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_server
 
 lint-shell:
 	shellcheck --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh' -not -path './venv*/*')
 
 lint: lint-python lint-shell lint-swagger
 
-typecheck: venv
-	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_server
-
-bandit: venv
-	$(py_env)/bin/bandit -r . -x $(py_env)
-
-ci: tests lint typecheck bandit
+ci: tests lint
 
 integration-tests:
 	./tests/integration/0-register-client.sh && \
