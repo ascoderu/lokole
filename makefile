@@ -49,7 +49,7 @@ stop:
 
 start:
 	docker-compose build
-	docker-compose pull || true
+	docker-compose pull --ignore-pull-failures
 	docker-compose up -d
 
 server: venv
