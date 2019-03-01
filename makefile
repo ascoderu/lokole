@@ -2,7 +2,7 @@ pwd=$(shell pwd)
 py_env=venv
 
 .PHONY: default venv tests
-default: run
+default: ci
 
 requirements.txt.out: requirements.txt requirements-dev.txt requirements-prod.txt
 	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel | tee requirements.txt.out; fi
