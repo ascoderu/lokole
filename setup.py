@@ -1,22 +1,17 @@
 from setuptools import find_packages
 from setuptools import setup
 
-
-with open('requirements.txt') as fobj:
+with open('requirements.txt', encoding='utf-8') as fobj:
     install_requires = [line.strip() for line in fobj]
 
-
-with open('README.rst') as fobj:
+with open('README.rst', encoding='utf-8') as fobj:
     long_description = fobj.read()
 
-
-with open('version.txt') as fobj:
+with open('version.txt', encoding='utf-8') as fobj:
     version = fobj.read().strip()
-
 
 packages = find_packages(exclude=['tests*'])
 scripts = ['manage.py']
-
 
 setup(
     name='opwen_email_client',

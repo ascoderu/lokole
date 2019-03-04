@@ -95,7 +95,7 @@ e.g. on Ubuntu:
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
   sudo apt-get update
-  sudo apt-get install -y yarn make python3 python3-venv shellcheck
+  sudo apt-get install -y yarn make python3 python3-venv
 
 Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
@@ -122,7 +122,7 @@ is called.
 Production setup
 ----------------
 
-There is a `script <https://github.com/ascoderu/opwen-webapp/blob/master/setup/setup-lokole.sh>`_
+There is a `script <https://github.com/ascoderu/opwen-webapp/blob/master/install.py>`_
 to set up a new Lokole device. The script will install the email app in this
 repository as well as standard infrastructure like nginx and gunicorn.
 The script will also make ready peripherals like the USB modem used for data
@@ -166,9 +166,8 @@ You can run the script on your client device like so:
 
 .. sourcecode :: sh
 
-  curl -O https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/setup/setup-lokole.sh && \
-  chmod +x setup-lokole.sh && \
-  ./setup-lokole.sh <client-name> <sim-type> <sync-schedule> <registration-credentials>
+  curl -fsO https://raw.githubusercontent.com/ascoderu/opwen-webapp/master/install.py && \
+  sudo python3 install.py <client-name> <sim-type> <sync-schedule> <registration-credentials>
 
 
 Adding a new language

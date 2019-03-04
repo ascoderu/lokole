@@ -16,23 +16,21 @@ tests: venv
 
 lint-python: venv
 	$(py_env)/bin/flake8 opwen_email_client
-	$(py_env)/bin/isort --check-only --recursive opwen_email_client/**/*.py
-
-lint-shell:
-	shellcheck --exclude=SC1090,SC1091,SC2103 $$(find . -name '*.sh' | grep -v 'node_modules/')
+	$(py_env)/bin/flake8 *.py
+	$(py_env)/bin/isort --check-only --recursive opwen_email_client
+	$(py_env)/bin/isort --check-only *.py
+	$(py_env)/bin/bandit -x $(py_env) -r opwen_email_client
+	$(py_env)/bin/bandit -x $(py_env) *.py
 
 lint-js: node_modules
 	yarn run eslint opwen_email_client/webapp/static/js/**/*.js
 
-lint: lint-python lint-shell lint-js
+lint: lint-python lint-js
 
 typecheck: venv
 	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_client
 
-bandit: venv
-	$(py_env)/bin/bandit -r . -x $(py_env)
-
-ci: lint bandit tests
+ci: lint tests
 
 node_modules: package.json
 	yarn install

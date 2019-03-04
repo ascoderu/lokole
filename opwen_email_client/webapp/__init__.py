@@ -9,6 +9,6 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-from opwen_email_client.webapp import jinja  # noqa: F401,E402
-from opwen_email_client.webapp import login  # noqa: F401,E402
-from opwen_email_client.webapp import views  # noqa: F401,E402
+from opwen_email_client.webapp import jinja  # noqa: F401,E402  # isort:skip
+from opwen_email_client.webapp import login  # noqa: F401,E402  # isort:skip
+from opwen_email_client.webapp import views  # noqa: F401,E402  # isort:skip
