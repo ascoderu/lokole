@@ -53,6 +53,10 @@ class Setup:
     groups = tuple()
     packages = tuple()
 
+    def __init__(self, args, abort):
+        self.args = args
+        self.abort = abort
+
     @property
     def is_enabled(self):
         return True
@@ -90,7 +94,6 @@ class Setup:
                .format(group=group, user=self.user))
 
     def _install_dependencies(self):
-        sh('apt-get update')
         sh('apt-get install -y {}'.format(' '.join(self.packages)))
 
     def _run(self):
@@ -129,28 +132,34 @@ class Setup:
             mode = stat(path).st_mode
             chmod(path, mode | S_IEXEC)
 
-    def create_daemon(self, program_name, command, stderr, stdout):
+    def create_daemon(self, program_name, command, user=None):
+        stderr = self.abspath(Path(self.args.log_directory) / '{}.stderr.log'.format(program_name))
+        stdout = self.abspath(Path(self.args.log_directory) / '{}.stdout.log'.format(program_name))
+
+        script_path = self.abspath(Path(self.args.scripts_directory) / '{}.sh'.format(program_name))
+        self.write_file(script_path, '#!/usr/bin/env sh\n\n{}'.format(command), executable=True)
+
         self.write_file('/etc/supervisor/conf.d/{}.conf'.format(program_name), (
             '[program:{}]'.format(program_name),
-            'command={}'.format(command),
+            'command={}'.format(script_path),
             'autostart=true',
             'autorestart=true',
             'startretries=3',
             'stderr_logfile={}'.format(stderr),
             'stdout_logfile={}'.format(stdout),
-            'user={}'.format(self.user),
+            'user={}'.format(user or self.user),
         ))
 
         sh('service supervisor start; '
            'supervisorctl reread; '
            'supervisorctl update;')
 
-    def create_cronjob(self, schedule, command, user=None):
+    def create_cronjob(self, schedule, command):
         sh('(crontab -l -u {user} || true; echo "{schedule} {command}") 2>&1 '
            '| grep -v "no crontab for" '
            '| sort -u '
            '| crontab -u {user} -'
-           .format(schedule=schedule, command=command, user=user or self.user))
+           .format(schedule=schedule, command=command, user=self.user))
 
     def abspath(self, file_path):
         file_path = Path(file_path).absolute()
@@ -169,13 +178,14 @@ class Setup:
 
 
 class SystemSetup(Setup):
-    def __init__(self, args):
-        self.args = args
-
     def _run(self):
+        self._update_apt()
         self._set_locale()
         self._set_timezone()
         self._set_password()
+
+    def _update_apt(self):
+        sh('apt-get update')
 
     def _set_locale(self):
         locale_command = (
@@ -210,11 +220,7 @@ class WifiSetup(Setup):
         'dnsmasq',
     )
 
-    def __init__(self, args, abort):
-        self.args = args
-        self.abort = abort
-        self.device = gethostname()
-        self.ip_base = '10.0.0'
+    ip_base = '10.0.0'
 
     def _run(self):
         if not self.ht_capab:
@@ -303,6 +309,10 @@ class WifiSetup(Setup):
         return '{}.1'.format(self.ip_base)
 
     @property
+    def device(self):
+        return gethostname()
+
+    @property
     def ht_capab(self):
         if self.device in ['OrangePI', 'orangepizero']:
             return '[HT40][DSS_CCK-40]'
@@ -333,11 +343,6 @@ class SyncSetup(Setup):
         'dip',
     )
 
-    def __init__(self, args, abort):
-        self.args = args
-        self.abort = abort
-        self.admin_secret = generate_secret(32)
-
     def _run(self):
         self._configure_wvdial()
         self._configure_webapp_sync()
@@ -360,9 +365,31 @@ class SyncSetup(Setup):
         self.create_cronjob(self.args.sync_schedule, self.sync_script)
 
     @property
+    def admin_secret(self):
+        try:
+            return getattr(self, '__admin_secret')
+        except AttributeError:
+            admin_secret = generate_secret(32)
+            setattr(self, '__admin_secret', admin_secret)
+            return admin_secret
+
+    @property
     def sync_script(self):
-        return ('curl "http://localhost:{port}/admin/sync?secret={secret}"'
-                .format(port=self.args.port, secret=self.admin_secret))
+        try:
+            return getattr(self, '__sync_script')
+        except AttributeError:
+            sync_script_path = self.abspath(Path(self.args.scripts_directory) / 'sync.sh')
+            stderr = self.abspath(Path(self.args.log_directory) / 'sync.stderr.log')
+
+            sync_command = (
+                '#!/usr/bin/env sh\n\n'
+                'curl -LfsS "http://localhost:{port}/admin/sync?secret={secret}" 2>>"{stderr}" >/dev/null'
+            ).format(port=self.args.port, secret=self.admin_secret, stderr=stderr)
+
+            self.write_file(sync_script_path, sync_command, executable=True)
+
+            setattr(self, '__sync_script', sync_script_path)
+            return sync_script_path
 
     @property
     def is_enabled(self):
@@ -379,10 +406,6 @@ class SyncSetup(Setup):
 
 
 class ClientSetup(Setup):
-    def __init__(self, args, abort):
-        self.args = args
-        self.abort = abort
-
     def _run(self):
         request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
         request_auth = b64encode(self.args.registration_credentials.encode('ascii')).decode('ascii')
@@ -421,30 +444,34 @@ class ClientSetup(Setup):
 
 class RestartSetup(Setup):
     packages = (
-        'cron',
+        'inotify-tools',
     )
 
-    def __init__(self, args):
-        self.args = args
-
     def _run(self):
-        self.create_cronjob(self.args.restart_schedule, self.restart_script, user='root')
+        daemon_name = 'restarter'
+
+        restart_path = self.abspath(Path(self.args.state_directory)
+                                    / daemon_name
+                                    / self.args.service_name)
+
+        restart_daemon = (
+            'inotifywait --format "%f" --event create --monitor "{restart_directory}" '
+            '| while read -r service; do '
+            'test -n "$service" && '
+            'test -f "{restart_directory}/$service" && '
+            'supervisorctl restart "$service" >/dev/null && '
+            'rm -f "{restart_directory}/$service" '
+            '; done'
+        ).format(restart_directory=Path(restart_path).parent)
+
+        self.create_daemon(
+            program_name=daemon_name,
+            command=restart_daemon,
+            user='root')
 
         return {
-            'OPWEN_RESTART_PATH': self.restart_path,
+            'OPWEN_RESTART_PATH': restart_path,
         }
-
-    @property
-    def restart_path(self):
-        return self.abspath(Path(self.args.state_directory) / 'webapp_restart')
-
-    @property
-    def restart_script(self):
-        return ('test -f "{restart_path}" && '
-                'supervisorctl restart {service} >/dev/null && '
-                'rm -f "{restart_path}"').format(
-                    restart_path=self.restart_path,
-                    service=self.args.service_name)
 
 
 class WebappSetup(Setup):
@@ -461,8 +488,8 @@ class WebappSetup(Setup):
 
     client_package = 'opwen_email_client'
 
-    def __init__(self, args, app_config):
-        self.args = args
+    def __init__(self, args, abort, app_config):
+        super().__init__(args, abort)
         self.app_config = app_config
 
     def _run(self):
@@ -573,8 +600,8 @@ class WebappSetup(Setup):
               fastcgi_send_timeout {timeout_seconds};
               fastcgi_read_timeout {timeout_seconds};
             }}'''.format(
-            access_log=self.abspath(self.log_root / 'nginx_access.log'),
-            error_log=self.abspath(self.log_root / 'nginx_error.log'),
+            access_log=self.abspath(Path(self.args.log_directory) / 'nginx_access.log'),
+            error_log=self.abspath(Path(self.args.log_directory) / 'nginx_error.log'),
             timeout_seconds=self.args.timeout))
 
         sh('systemctl restart nginx')
@@ -602,12 +629,10 @@ class WebappSetup(Setup):
 
         self.create_daemon(
             program_name=self.args.service_name,
-            command=gunicorn_script,
-            stdout=self.abspath(self.log_root / 'webapp_stdout.log'),
-            stderr=self.abspath(self.log_root / 'webapp_stderr.log'))
+            command=gunicorn_script)
 
     def _pip_install(self, *packages):
-        sh('while ! "{pip}" install --upgrade {packages}; do sleep 2s; done'.format(
+        sh('while ! "{pip}" install --no-cache-dir --upgrade {packages}; do sleep 2s; done'.format(
             pip='{}/bin/pip'.format(self.venv_path),
             packages=' '.join(packages)),
            user=self.user)
@@ -622,10 +647,6 @@ class WebappSetup(Setup):
                 'webapp')
 
     @property
-    def log_root(self):
-        return Path(self.args.state_directory) / 'logs'
-
-    @property
     def socket_path(self):
         return self.abspath(Path(self.args.state_directory) / 'gunicorn.sock')
 
@@ -635,7 +656,7 @@ class WebappSetup(Setup):
 
     @property
     def venv_path(self):
-        return self.abspath(Path(self.args.install_directory) / 'venv')
+        return self.abspath(Path(self.args.venv_directory))
 
 
 def generate_secret(length, chars=frozenset(ascii_letters + digits)):
@@ -661,7 +682,7 @@ def sh(command, user=None):
 def main(args, abort):
     app_config = {}
 
-    system_setup = SystemSetup(args)
+    system_setup = SystemSetup(args, abort)
     system_setup()
 
     wifi_setup = WifiSetup(args, abort)
@@ -673,10 +694,10 @@ def main(args, abort):
     client_setup = ClientSetup(args, abort)
     app_config.update(client_setup() or {})
 
-    restart_setup = RestartSetup(args)
+    restart_setup = RestartSetup(args, abort)
     app_config.update(restart_setup() or {})
 
-    webapp_setup = WebappSetup(args, app_config)
+    webapp_setup = WebappSetup(args, abort, app_config)
     webapp_setup()
 
 
@@ -740,17 +761,20 @@ def cli():
     parser.add_argument('--state_directory', default=getenv('LOKOLE_STATE_DIRECTORY', 'lokole/state'), help=(
         'The location where to store the Lokole email app state.'
     ))
-    parser.add_argument('--install_directory', default=getenv('LOKOLE_INSTALL_DIRECTORY', 'lokole/python'), help=(
-        'The location where to store the Lokole email app files.'
+    parser.add_argument('--log_directory', default=getenv('LOKOLE_LOG_DIRECTORY', 'lokole/logs'), help=(
+        'The location where to store the Lokole email app logs.'
+    ))
+    parser.add_argument('--venv_directory', default=getenv('LOKOLE_VENV_DIRECTORY', 'lokole/venv'), help=(
+        'The location where to store the Lokole email app Python environment.'
+    ))
+    parser.add_argument('--scripts_directory', default=getenv('LOKOLE_SCRIPTS_DIRECTORY', 'lokole/scripts'), help=(
+        'The location where to store the Lokole email app scripts.'
     ))
     parser.add_argument('--service_name', default=getenv('LOKOLE_SERVICE_NAME', 'opwen_email_client'), help=(
         'The location where to store the Lokole email app state.'
     ))
     parser.add_argument('--log_level', default=getenv('LOKOLE_LOG_LEVEL', 'error'), help=(
         'The log level for the Lokole email app.'
-    ))
-    parser.add_argument('--restart_schedule', default=getenv('LOKOLE_RESTART_SCHEDULE', '*/5 * * * *'), help=(
-        'The interval when to check if a restart of the Lokole email app is required. In cron syntax.'
     ))
     parser.add_argument('--timeout', type=int, default=300, help=(
         'Timeout for the Lokole email app. In seconds.'
