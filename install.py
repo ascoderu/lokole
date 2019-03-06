@@ -23,10 +23,14 @@ from subprocess import check_call  # nosec
 from sys import executable as current_python_binary
 from sys import version_info
 from tempfile import gettempdir
+from time import time
 from urllib.request import Request
 from urllib.request import urlopen
 
 LOG = getLogger(__name__)
+
+TEMP_ROOT = Path(gettempdir()) / Path(__file__).name
+TEMP_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 class SimType(Enum):
@@ -105,9 +109,8 @@ class Setup:
 
     @property
     def __guard_path(self):
-        script_name = Path(__file__).name
         guard_name = '{}.done'.format(self._step_name)
-        return self.abspath(Path(gettempdir()) / script_name / guard_name)
+        return self.abspath(TEMP_ROOT / guard_name)
 
     @property
     def __is_complete(self):
@@ -679,7 +682,22 @@ def sh(command, user=None):
     check_call(command, shell=True)  # nosec
 
 
+def _dump_state(args):
+    with Path(__file__).open('r', encoding='utf-8') as fobj:
+        version = hash(fobj.read())
+
+    state_path = TEMP_ROOT / 'state_{:.0f}.json'.format(time())
+
+    with state_path.open('w', encoding='utf-8') as fobj:
+        fobj.write(dumps({
+            'version': version,
+            'args': args.__dict__,
+        }))
+
+
 def main(args, abort):
+    _dump_state(args)
+
     app_config = {}
 
     system_setup = SystemSetup(args, abort)
