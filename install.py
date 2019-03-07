@@ -22,6 +22,7 @@ from sys import executable as current_python_binary
 from sys import version_info
 from tempfile import gettempdir
 from time import time
+from urllib.error import HTTPError
 from urllib.request import Request
 from urllib.request import urlopen
 
@@ -398,23 +399,22 @@ class ClientSetup(Setup):
         request.add_header('Content-Length', len(request_payload))
         request.add_header('Authorization', 'Basic {}'.format(request_auth))
 
-        with urlopen(request, request_payload) as response:  # nosec
-            status_code = response.getcode()
-            response_body = response.read().decode('utf-8')
-
-        if status_code != 200:
+        try:
+            with urlopen(request, request_payload) as response:  # nosec
+                response_body = response.read().decode('utf-8')
+        except HTTPError as ex:
             self.abort('Unable to register client {client_name}: [{status_code}] {message}'.format(
                 client_name=self.args.client_name,
-                status_code=status_code,
-                message=response_body))
-
-        client_info = loads(response_body)
-        return {
-            'OPWEN_CLIENT_ID': client_info['client_id'],
-            'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
-            'OPWEN_REMOTE_ACCOUNT_KEY': client_info['storage_key'],
-            'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
-        }
+                status_code=ex.code,
+                message=ex.read().decode('utf-8').strip()))
+        else:
+            client_info = loads(response_body)
+            return {
+                'OPWEN_CLIENT_ID': client_info['client_id'],
+                'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
+                'OPWEN_REMOTE_ACCOUNT_KEY': client_info['storage_key'],
+                'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
+            }
 
     @property
     def client_domain(self):
