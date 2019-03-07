@@ -428,6 +428,7 @@ class ClientSetup(Setup):
 class RestartSetup(Setup):
     packages = (
         'inotify-tools',
+        'supervisor',
     )
 
     def _run(self):
