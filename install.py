@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Script to set up a Debian Linux based system as a Lokole client."""
 from argparse import ArgumentParser
-from argparse import ArgumentTypeError
 from base64 import b64encode
 from datetime import datetime
-from enum import Enum
 from json import dumps
 from json import loads
 from logging import getLogger
@@ -32,25 +30,7 @@ LOG = getLogger(__name__)
 TEMP_ROOT = Path(gettempdir()) / Path(__file__).name
 TEMP_ROOT.mkdir(parents=True, exist_ok=True)
 
-
-class SimType(Enum):
-    hologram = 1
-    Ethernet = 2
-    LocalOnly = 3
-    mkwvconf = 4
-
-
-class EnumArg:
-    def __init__(self, enum_type):
-        self.enum_type = enum_type
-
-    def __call__(self, value):
-        try:
-            return getattr(self.enum_type, value)
-        except AttributeError:
-            raise ArgumentTypeError('{value} must be one of: {valid_values}'.format(
-                value=value,
-                valid_values=', '.join(entry.name for entry in self.enum_type)))
+SIM_TYPES = ('hologram', 'Ethernet', 'LocalOnly', 'mkwvconf')
 
 
 class Setup:
@@ -399,7 +379,7 @@ class SyncSetup(Setup):
         if not super().is_enabled:
             return False
 
-        if self.args.sim_type == SimType.LocalOnly:
+        if self.args.sim_type == 'LocalOnly':
             return False
 
         if not self.args.sync_schedule or not self.args.registration_credentials:
@@ -730,7 +710,7 @@ def cli():
         'should be globally unique as it is used as the key for '
         'a bunch of things.'
     ))
-    parser.add_argument('sim_type', type=EnumArg(SimType), help=(
+    parser.add_argument('sim_type', choices=SIM_TYPES, help=(
         'The mobile network to which to connect to upload data.'
     ))
     parser.add_argument('sync_schedule', nargs='?', help=(
