@@ -225,8 +225,8 @@ class WifiSetup(Setup):
         ]
 
         for prefix in ['www.', '']:
-            for tld in ['.com', '.org', '.ca', 'cd']:
-                for host in ['lokole', 'opwen', 'ascoderu']:
+            for tld in ['.com', '.org', '.ca', '.cd', '']:
+                for host in ['lokole', 'opwen', 'ascoderu', 'email']:
                     hosts.append((self.ip, prefix + host + tld))
 
         self.write_file('/etc/hosts', ('{}\t{}'.format(ip, host) for (ip, host) in hosts))
@@ -284,6 +284,9 @@ class WifiSetup(Setup):
             'auto ppp0',
             'iface ppp0 inet wvdial',
         ))
+
+        sh('systemctl unmask hostapd.service')
+        sh('systemctl start hostapd.service')
 
     def _disable_system_power_management(self):
         sh('systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target')
