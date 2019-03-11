@@ -18,6 +18,10 @@ after_script: make stop
 
 install:
   - pip install codecov
+  - mkdir -p ~/.local/bin
+    && curl -sfL -o ~/.local/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v1.16.0/hadolint-$(uname -s)-$(uname -m)"
+    && chmod 700 ~/.local/bin/hadolint
+    && export PATH="~/.local/bin:$PATH"
 
 after_success:
   - codecov
