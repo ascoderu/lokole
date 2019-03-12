@@ -21,7 +21,13 @@ RUN apt-get update \
 COPY opwen_email_server /app/opwen_email_server
 COPY docker/app/run-gunicorn.sh /app/run-gunicorn.sh
 COPY docker/app/run-celery.sh /app/run-celery.sh
-COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker/docker-entrypoint.sh /app/docker-entrypoint.sh
+
+RUN groupadd -r opwen \
+  && useradd -r -s /bin/false -g opwen opwen \
+  && chown -R opwen:opwen /app
+
+USER opwen
 
 ENV TESTING_UI="False"
 ENV CONNEXION_SERVER="tornado"
@@ -29,9 +35,9 @@ ENV CONNEXION_SPEC="SET_ME"
 ENV SERVER_WORKERS="1"
 ENV QUEUE_WORKERS="1"
 ENV LOKOLE_LOG_LEVEL="INFO"
-ENV PORT=80
+ENV PORT=8080
 
 EXPOSE ${PORT}
 WORKDIR /app
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["bash"]
