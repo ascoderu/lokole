@@ -24,13 +24,13 @@ spec:
         - name: DNS_RESOLVER
           value: 127.0.0.1:53 ipv6=off
         - name: HOSTNAME_CLIENT_READ
-          value: api
+          value: api:8080
         - name: HOSTNAME_CLIENT_WRITE
-          value: api
+          value: api:8080
         - name: HOSTNAME_EMAIL_RECEIVE
-          value: api
+          value: api:8080
         - name: HOSTNAME_CLIENT_REGISTER
-          value: api
+          value: api:8080
         - name: REGISTRATION_USERNAME
           valueFrom:
             secretKeyRef:

@@ -43,7 +43,7 @@ spec:
               name: cloudflare
               key: LOKOLE_CLOUDFLARE_KEY
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         resources: {}
       restartPolicy: Always
 status: {}
