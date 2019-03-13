@@ -42,7 +42,7 @@ spec:
               name: nginx
               key: REGISTRATION_PASSWORD
         ports:
-        - containerPort: 80
+        - containerPort: 8888
         resources: {}
       - name: dnsmasq
         image: "janeczku/go-dnsmasq:release-1.0.7"

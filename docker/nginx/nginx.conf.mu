@@ -1,33 +1,58 @@
-server {
-  listen 80;
+worker_processes 1;
 
-  resolver {{DNS_RESOLVER}};
+error_log /var/log/nginx/error.log warn;
+pid /app/nginx.pid;
 
-  client_max_body_size 50M;
+events {
+  worker_connections 1024;
+}
 
-  location = /favicon.ico {
-    root /static;
-  }
+http {
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
 
-  location = /robots.txt {
-    root /static;
-  }
+  log_format main
+    '$remote_addr - $remote_user [$time_local] "$request" '
+    '$status $body_bytes_sent "$http_referer" '
+    '"$http_user_agent" "$http_x_forwarded_for"';
 
-  location /api/email/sendgrid {
-    proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
-  }
+  access_log /var/log/nginx/access.log main;
 
-  location /api/email/upload {
-    proxy_pass http://{{HOSTNAME_CLIENT_WRITE}};
-  }
+  sendfile on;
 
-  location /api/email/download {
-    proxy_pass http://{{HOSTNAME_CLIENT_READ}};
-  }
+  keepalive_timeout 65;
 
-  location /api/email/register {
-    auth_basic "Authorized requests only";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-    proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
+  server {
+    listen {{PORT}};
+
+    resolver {{DNS_RESOLVER}};
+
+    client_max_body_size 50M;
+
+    location = /favicon.ico {
+      root /static;
+    }
+
+    location = /robots.txt {
+      root /static;
+    }
+
+    location /api/email/sendgrid {
+      proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
+    }
+
+    location /api/email/upload {
+      proxy_pass http://{{HOSTNAME_CLIENT_WRITE}};
+    }
+
+    location /api/email/download {
+      proxy_pass http://{{HOSTNAME_CLIENT_READ}};
+    }
+
+    location /api/email/register {
+      auth_basic "Authorized requests only";
+      auth_basic_user_file /app/.htpasswd;
+      proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
+    }
   }
 }
