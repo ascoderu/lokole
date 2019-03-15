@@ -37,7 +37,7 @@ class _Action(ABC, LogMixin):
             raise ex
 
     def _action(self, *args, **kwargs) -> Response:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class Ping(_Action):
