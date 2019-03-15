@@ -4,7 +4,10 @@ from unittest.mock import Mock
 from unittest.mock import patch
 from urllib.error import URLError
 
+from responses import mock as mock_responses
+
 from opwen_email_server.services.sendgrid import SendSendgridEmail
+from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 
 
 class SendgridEmailSenderTests(TestCase):
@@ -97,3 +100,27 @@ class SendgridEmailSenderTests(TestCase):
         else:
             mock_opener.open.return_value = mock_response
             mock_response.getcode.return_value = status
+
+
+class SetupSendgridMailboxTests(TestCase):
+    def test_does_not_make_request_when_key_is_missing(self):
+        action = SetupSendgridMailbox(key='')
+
+        with patch.object(action, 'log_warning') as mock_log_warning:
+            action(client_id='', domain='')
+
+        self.assertEqual(mock_log_warning.call_count, 1)
+
+    @mock_responses.activate
+    def test_makes_request_when_key_is_set(self):
+        mock_responses.add(
+            mock_responses.POST,
+            'https://api.sendgrid.com/v3/user/webhooks/parse/settings')
+
+        action = SetupSendgridMailbox('my-key')
+
+        action('my-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 1)
+        self.assertIn(b'"hostname": "my-domain"',
+                      mock_responses.calls[0].request.body)
