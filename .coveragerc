@@ -4,3 +4,6 @@ source =
 
 omit =
     opwen_email_server/integration/*
+
+[report]
+fail_under = 90
