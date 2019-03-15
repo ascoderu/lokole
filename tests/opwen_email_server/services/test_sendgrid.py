@@ -2,7 +2,6 @@ from typing import Optional
 from unittest import TestCase
 from unittest.mock import Mock
 from unittest.mock import patch
-from urllib.error import HTTPError
 from urllib.error import URLError
 
 from opwen_email_server.services.sendgrid import SendSendgridEmail
