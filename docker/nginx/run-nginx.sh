@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-mo /app/frontend.conf.mu > /etc/nginx/conf.d/frontend.conf
+mo /app/nginx.conf.mu > /app/nginx.conf
 
-htpasswd -bc "/etc/nginx/.htpasswd" "${REGISTRATION_USERNAME}" "${REGISTRATION_PASSWORD}"
+htpasswd -bc "/app/.htpasswd" "${REGISTRATION_USERNAME}" "${REGISTRATION_PASSWORD}"
 
-nginx -g "daemon off;"
+nginx -c "/app/nginx.conf" -p "${PWD}" -g "daemon off;"
