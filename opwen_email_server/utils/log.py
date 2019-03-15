@@ -14,8 +14,9 @@ from typing import Optional
 from applicationinsights import TelemetryClient
 from applicationinsights.channel import AsynchronousQueue
 from applicationinsights.channel import AsynchronousSender
+from applicationinsights.channel import NullSender
+from applicationinsights.channel import SynchronousQueue
 from applicationinsights.channel import TelemetryChannel
-from applicationinsights.channel import TelemetryContext
 from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
 
@@ -29,22 +30,27 @@ from opwen_email_server.utils.collections import singleton
 
 
 @singleton
-def _create_telemetry_channel() -> Optional[TelemetryChannel]:
+def _create_telemetry_channel() -> TelemetryChannel:
     if not APPINSIGHTS_KEY:
-        return None
-
-    if APPINSIGHTS_HOST:
+        sender = NullSender()
+    elif APPINSIGHTS_HOST:
         sender = AsynchronousSender(APPINSIGHTS_HOST)
     else:
         sender = AsynchronousSender()
-    queue = AsynchronousQueue(sender)
-    context = TelemetryContext()
-    context.instrumentation_key = APPINSIGHTS_KEY
-    return TelemetryChannel(context, queue)
+
+    # TODO: remove when Microsoft/ApplicationInsights-Python#155 is released
+    if not APPINSIGHTS_KEY:
+        queue_type = SynchronousQueue
+    else:
+        queue_type = AsynchronousQueue
+
+    queue = queue_type(sender)
+    return TelemetryChannel(queue=queue)
 
 
 class LogMixin:
     _telemetry_channel = _create_telemetry_channel()
+    _telemetry_key = APPINSIGHTS_KEY or '00000000-0000-0000-0000-000000000000'
 
     @cached_property
     def _default_log_handlers(self) -> Iterable[Handler]:
@@ -54,10 +60,9 @@ class LogMixin:
         stderr.setFormatter(Formatter(STDERR))
         handlers.append(stderr)
 
-        if APPINSIGHTS_KEY:
-            handlers.append(LoggingHandler(
-                APPINSIGHTS_KEY,
-                telemetry_channel=self._telemetry_channel))
+        handlers.append(LoggingHandler(
+            self._telemetry_key,
+            telemetry_channel=self._telemetry_channel))
 
         return handlers
 
@@ -70,11 +75,8 @@ class LogMixin:
         return log
 
     @cached_property
-    def _telemetry_client(self) -> Optional[TelemetryClient]:
-        if not APPINSIGHTS_KEY:
-            return None
-
-        return TelemetryClient(APPINSIGHTS_KEY, self._telemetry_channel)
+    def _telemetry_client(self) -> TelemetryClient:
+        return TelemetryClient(self._telemetry_key, self._telemetry_channel)
 
     def log_debug(self, message: str, *args: Any):
         self._log(DEBUG, message, args)
@@ -88,13 +90,12 @@ class LogMixin:
     def log_exception(self, ex: Exception, message: str, *args: Any):
         self._log(CRITICAL, message + ' (%r)', append(args, ex))
 
-        if self._telemetry_client:
-            # noinspection PyBroadException
-            try:
-                raise ex
-            except Exception:
-                self._telemetry_client.track_exception()
-                self._telemetry_channel.flush()
+        # noinspection PyBroadException
+        try:
+            raise ex
+        except Exception:
+            self._telemetry_client.track_exception()
+            self._telemetry_channel.flush()
 
     def _log(self, level: int, log_message: str, log_args: Iterable[Any]):
         if not self._logger.isEnabledFor(level):
@@ -110,6 +111,5 @@ class LogMixin:
     def log_event(self, event_name: str, properties: Optional[dict] = None):
         self.log_info('%s%s%s', event_name, SEPARATOR, properties)
 
-        if self._telemetry_client:
-            self._telemetry_client.track_event(event_name, properties)
-            self._telemetry_channel.flush()
+        self._telemetry_client.track_event(event_name, properties)
+        self._telemetry_channel.flush()
