@@ -26,8 +26,10 @@ lint-python: venv
 	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_server
 
 lint-docker:
-	command -v hadolint >/dev/null && find docker -type f -name Dockerfile \
-    | while read dockerfile; do hadolint "$$dockerfile" || exit 1; done \
+	if command -v hadolint >/dev/null; then \
+    find docker -type f -name Dockerfile \
+      | while read dockerfile; do hadolint "$$dockerfile" || exit 1; done \
+  fi
 
 lint-shell:
 	shellcheck --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh' -not -path './venv*/*')
