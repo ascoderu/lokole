@@ -74,6 +74,14 @@ class SendgridEmailSenderTests(TestCase):
             success=False,
             exception=URLError('sendgrid error'))
 
+    def test_does_not_send_email_without_key(self):
+        action = SendSendgridEmail(key='')
+
+        with patch.object(action, 'log_warning') as mock_log_warning:
+            action({'message': 'message'})
+
+        self.assertEqual(mock_log_warning.call_count, 1)
+
     def assertSendsEmail(self, email: dict, success: bool = True,
                          status: int = 200,
                          exception: Optional[Exception] = None):
