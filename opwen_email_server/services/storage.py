@@ -129,7 +129,7 @@ class _AzureBytesStorage(_BaseAzureStorage):
 
     @property
     def _extension(self) -> str:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class AzureTextStorage(_AzureBytesStorage):
