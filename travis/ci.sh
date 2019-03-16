@@ -6,4 +6,4 @@ if [[ -z "$TRAVIS_PYTHON_VERSION" ]]; then
   echo "Build is not targetting a Python version, can't run CI" >&2; exit 1
 fi
 
-make ci integration-tests -e py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
+make ci integration-tests -e PY_ENV="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
