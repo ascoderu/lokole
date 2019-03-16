@@ -20,7 +20,7 @@ lint-swagger: venv
 
 lint-python: venv
 	$(PY_ENV)/bin/flake8 opwen_email_server
-	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server
+	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server --virtual-env $(PY_ENV)
 	$(PY_ENV)/bin/bandit --recursive opwen_email_server
 	$(PY_ENV)/bin/mypy opwen_email_server
 
