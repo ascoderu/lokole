@@ -1,29 +1,28 @@
-pwd=$(shell pwd)
-py_env=venv
+PY_ENV ?= venv
 
 .PHONY: venv tests
 default: ci
 
-$(py_env)/requirements.txt.out: requirements.txt requirements-dev.txt requirements-prod.txt
-	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel | tee $(py_env)/requirements.txt.out; fi
-	$(py_env)/bin/pip install -r requirements.txt | tee $(py_env)/requirements.txt.out
-	$(py_env)/bin/pip install -r requirements-dev.txt | tee $(py_env)/requirements.txt.out
-	$(py_env)/bin/pip install -r requirements-prod.txt | tee $(py_env)/requirements.txt.out
+$(PY_ENV)/requirements.txt.out: requirements.txt requirements-dev.txt requirements-prod.txt
+	if [ ! -d $(PY_ENV) ]; then python3 -m venv $(PY_ENV) && $(PY_ENV)/bin/pip install -U pip wheel | tee $(PY_ENV)/requirements.txt.out; fi
+	$(PY_ENV)/bin/pip install -r requirements.txt | tee $(PY_ENV)/requirements.txt.out
+	$(PY_ENV)/bin/pip install -r requirements-dev.txt | tee $(PY_ENV)/requirements.txt.out
+	$(PY_ENV)/bin/pip install -r requirements-prod.txt | tee $(PY_ENV)/requirements.txt.out
 
-venv: $(py_env)/requirements.txt.out
+venv: $(PY_ENV)/requirements.txt.out
 
 tests: venv
-	$(py_env)/bin/coverage run -m nose2 && $(py_env)/bin/coverage report
+	$(PY_ENV)/bin/coverage run -m nose2 && $(PY_ENV)/bin/coverage report
 
 lint-swagger: venv
 	find opwen_email_server/swagger -type f -name '*.yaml' \
-    | while read swagger; do $(py_env)/bin/swagger-flex --source="$$swagger" || exit 1; done
+    | while read swagger; do $(PY_ENV)/bin/swagger-flex --source="$$swagger" || exit 1; done
 
 lint-python: venv
-	$(py_env)/bin/flake8 opwen_email_server
-	$(py_env)/bin/isort --check-only --recursive opwen_email_server
-	$(py_env)/bin/bandit -r . -x $(py_env)
-	$(py_env)/bin/mypy opwen_email_server
+	$(PY_ENV)/bin/flake8 opwen_email_server
+	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server
+	$(PY_ENV)/bin/bandit -r . -x $(PY_ENV)
+	$(PY_ENV)/bin/mypy opwen_email_server
 
 lint-docker:
 	if command -v hadolint >/dev/null; then \
@@ -55,18 +54,18 @@ start:
 	docker-compose up -d
 
 server: venv
-	PY_ENV="$(py_env)" \
+	PY_ENV="$(PY_ENV)" \
     SERVER_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
     TESTING_UI="True" \
     PORT="8080" \
     CONNEXION_SERVER="flask" \
-    CONNEXION_SPEC="dir:$(pwd)/opwen_email_server/swagger" \
-    $(pwd)/docker/app/run-gunicorn.sh
+    CONNEXION_SPEC="dir:$(PWD)/opwen_email_server/swagger" \
+    $(PWD)/docker/app/run-gunicorn.sh
 
 worker: venv
-	PY_ENV="$(py_env)" \
+	PY_ENV="$(PY_ENV)" \
     QUEUE_WORKERS=1 \
     LOKOLE_LOG_LEVEL=DEBUG \
     CELERY_QUEUE_NAMES="all" \
-    $(pwd)/docker/app/run-celery.sh
+    $(PWD)/docker/app/run-celery.sh
