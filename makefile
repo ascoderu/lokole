@@ -21,9 +21,9 @@ lint-swagger: venv
 
 lint-python: venv
 	$(py_env)/bin/flake8 opwen_email_server
-	$(py_env)/bin/isort --check-only --recursive opwen_email_server/**/*.py
+	$(py_env)/bin/isort --check-only --recursive opwen_email_server
 	$(py_env)/bin/bandit -r . -x $(py_env)
-	$(py_env)/bin/mypy --ignore-missing-imports opwen_email_server
+	$(py_env)/bin/mypy opwen_email_server
 
 lint-docker:
 	if command -v hadolint >/dev/null; then \

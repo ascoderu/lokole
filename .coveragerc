@@ -1,9 +1,0 @@
-[run]
-source =
-    opwen_email_server/
-
-omit =
-    opwen_email_server/integration/*
-
-[report]
-fail_under = 90
