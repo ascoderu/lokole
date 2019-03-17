@@ -17,7 +17,7 @@ fi
 docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 
 for tag in "latest" "$TRAVIS_TAG"; do
-  BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" USE_DEVTOOLS="False" docker-compose build
+  BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose build
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose push
 
   docker build -t "$DOCKER_USERNAME/opwenserver_setup:$tag" -f "./docker/setup/Dockerfile" "."

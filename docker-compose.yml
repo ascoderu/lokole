@@ -30,8 +30,6 @@ x-shared-app-build:
   build:
     context: .
     dockerfile: docker/app/Dockerfile
-    args:
-      USE_DEVTOOLS: "${USE_DEVTOOLS}"
 
 services:
 

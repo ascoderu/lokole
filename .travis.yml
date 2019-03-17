@@ -1,30 +1,15 @@
-language: python
-
-python:
-  - "3.6"
-
-sudo: required
+language: minimal
 
 services:
   - docker
 
-cache: pip
-
 before_script: make start
 
-script: travis/ci.sh
+script: make integration-tests
 
 after_script: make stop
 
-install:
-  - pip install codecov
-  - mkdir -p ~/.local/bin
-    && curl -sfL -o ~/.local/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v1.16.0/hadolint-$(uname -s)-$(uname -m)"
-    && chmod 700 ~/.local/bin/hadolint
-    && export PATH="~/.local/bin:$PATH"
-
-after_success:
-  - codecov
+install: make build
 
 deploy:
   - provider: script

@@ -1,4 +1,4 @@
-PY_ENV ?= venv
+PY_ENV ?= ./venv
 
 .PHONY: venv tests
 default: ci
@@ -26,12 +26,17 @@ lint-python: venv
 
 lint-docker:
 	if command -v hadolint >/dev/null; then \
-    find docker -type f -name Dockerfile \
-      | while read dockerfile; do hadolint "$$dockerfile" || exit 1; done \
+    find . -type f -name Dockerfile -not -path '$(PY_ENV)/*' | while read file; do \
+      hadolint "$$file" \
+    || exit 1; done \
   fi
 
 lint-shell:
-	shellcheck --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 $$(find . -name '*.sh' -not -path './venv*/*')
+	if command -v shellcheck >/dev/null; then \
+    find . -type f -name '*.sh' -not -path '$(PY_ENV)/*' | while read file; do \
+      shellcheck --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 "$$file" \
+    || exit 1; done \
+  fi
 
 lint: lint-python lint-shell lint-swagger lint-docker
 
@@ -48,24 +53,9 @@ integration-tests:
 stop:
 	docker-compose down --volumes
 
-start:
-	docker-compose build
+build:
 	docker-compose pull --ignore-pull-failures
+	docker-compose build
+
+start:
 	docker-compose up -d
-
-server: venv
-	PY_ENV="$(PY_ENV)" \
-    SERVER_WORKERS=1 \
-    LOKOLE_LOG_LEVEL=DEBUG \
-    TESTING_UI="True" \
-    PORT="8080" \
-    CONNEXION_SERVER="flask" \
-    CONNEXION_SPEC="dir:$(PWD)/opwen_email_server/swagger" \
-    $(PWD)/docker/app/run-gunicorn.sh
-
-worker: venv
-	PY_ENV="$(PY_ENV)" \
-    QUEUE_WORKERS=1 \
-    LOKOLE_LOG_LEVEL=DEBUG \
-    CELERY_QUEUE_NAMES="all" \
-    $(PWD)/docker/app/run-celery.sh
