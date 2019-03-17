@@ -1,5 +1,10 @@
 language: minimal
 
+env:
+  matrix:
+    - LOKOLE_QUEUE_BROKER_SCHEME=azureservicebus
+    - LOKOLE_QUEUE_BROKER_SCHEME=pyamqp
+
 services:
   - docker
 
