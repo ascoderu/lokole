@@ -12,6 +12,9 @@ before_script:
 script:
   - make integration-tests
 
+after_failure:
+  - docker-compose logs
+
 after_script:
   - make stop
 
