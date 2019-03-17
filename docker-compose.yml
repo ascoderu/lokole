@@ -80,7 +80,7 @@ services:
     image: rabbitmq:3.7.8-management
 
   appinsights:
-    image: cwolff/appinsights-on-premises:0.0.12-postgres
+    image: cwolff/appinsights-on-premises:0.0.14-postgres
     depends_on:
       - postgres
     environment:
