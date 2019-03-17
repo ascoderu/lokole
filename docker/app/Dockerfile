@@ -18,7 +18,6 @@ COPY requirements*.txt ./
 COPY makefile .
 RUN make venv
 RUN pip wheel -r requirements.txt -w /deps
-RUN pip wheel -r requirements-prod.txt -w /deps
 
 COPY . .
 
