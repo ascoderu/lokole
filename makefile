@@ -43,7 +43,8 @@ lint: lint-python lint-shell lint-swagger lint-docker
 ci: tests lint
 
 integration-tests:
-	./tests/integration/0-register-client.sh && \
+	./tests/integration/wait.sh && \
+  ./tests/integration/0-register-client.sh && \
   ./tests/integration/1-client-uploads-emails.sh && sleep 10s && \
   ./tests/integration/2-receive-email-for-client.sh && sleep 10s && \
   ./tests/integration/3-client-downloads-emails.sh && \
