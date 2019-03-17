@@ -2,7 +2,7 @@ version: '3.4'
 
 x-shared-app-environment:
   &shared-app-environment
-  QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
+  LOKOLE_QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
   LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
   LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
   LOKOLE_EMAIL_SERVER_APPINSIGHTS_HOST: http://appinsights

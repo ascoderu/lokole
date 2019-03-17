@@ -31,13 +31,13 @@ LOG_LEVEL = env('LOKOLE_LOG_LEVEL', 'INFO')
 APPINSIGHTS_KEY = env('LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY', '')
 APPINSIGHTS_HOST = env('LOKOLE_EMAIL_SERVER_APPINSIGHTS_HOST', '')
 
-MAX_WIDTH_IMAGES = env.int('MAX_WIDTH_EMAIL_IMAGES', 200)
-MAX_HEIGHT_IMAGES = env.int('MAX_HEIGHT_EMAIL_IMAGES', 200)
+MAX_WIDTH_IMAGES = env.int('LOKOLE_MAX_WIDTH_EMAIL_IMAGES', 200)
+MAX_HEIGHT_IMAGES = env.int('LOKOLE_MAX_HEIGHT_EMAIL_IMAGES', 200)
 
-if env('QUEUE_BROKER_SCHEME', '') == 'azureservicebus':
+if env('LOKOLE_QUEUE_BROKER_SCHEME', '') == 'azureservicebus':
     QUEUE_BROKER = 'azureservicebus://{username}:{password}@{host}'.format(
         username=urlsafe(env('LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME')),
         password=urlsafe(env('LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY')),
         host=urlsafe(env('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE')))
 else:
-    QUEUE_BROKER = env('QUEUE_BROKER_URL', '')
+    QUEUE_BROKER = env('LOKOLE_QUEUE_BROKER_URL', '')
