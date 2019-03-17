@@ -7,7 +7,7 @@ install:
   - make build
 
 before_script:
-  - make start
+  - docker-compose up -d
 
 script:
   - make integration-tests
@@ -16,7 +16,7 @@ after_failure:
   - docker-compose logs
 
 after_script:
-  - make stop
+  - docker-compose down --volumes
 
 deploy:
   - provider: script

@@ -50,12 +50,6 @@ integration-tests:
   ./tests/integration/assert.sh && \
   rm -rf tests/files/end_to_end/test.out
 
-stop:
-	docker-compose down --volumes
-
 build:
 	docker-compose pull --ignore-pull-failures
 	docker-compose build
-
-start:
-	docker-compose up -d
