@@ -3,13 +3,13 @@ language: minimal
 services:
   - docker
 
+install: make build
+
 before_script: make start
 
 script: make integration-tests
 
 after_script: make stop
-
-install: make build
 
 deploy:
   - provider: script
