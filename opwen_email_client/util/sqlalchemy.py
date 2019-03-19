@@ -18,15 +18,13 @@ def create_database(uri: str, base):
     return engine
 
 
-def get_or_create(db, model, create_method: str = '',
-                  create_method_kwargs=None, **kwargs):
+def get_or_create(db, model, **model_args):
     try:
-        return db.query(model).filter_by(**kwargs).one()
+        return db.query(model).filter_by(**model_args).one()
     except NoResultFound:
         pass
 
-    kwargs.update(create_method_kwargs or {})
-    created = getattr(model, create_method, model)(**kwargs)
+    created = model(**model_args)
     try:
         db.add(created)
         db.flush()
@@ -35,7 +33,7 @@ def get_or_create(db, model, create_method: str = '',
         pass
 
     db.rollback()
-    return db.query(model).filter_by(**kwargs).one()
+    return db.query(model).filter_by(**model_args).one()
 
 
 @contextmanager

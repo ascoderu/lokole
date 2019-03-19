@@ -1,11 +1,13 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from collections import namedtuple
 from contextlib import contextmanager
 from os import remove
 from tarfile import TarFile
 from tempfile import NamedTemporaryFile
 from typing import IO
 from typing import Iterable
+from typing import Tuple
 from typing import TypeVar
 from uuid import uuid4
 
@@ -21,9 +23,7 @@ from opwen_email_client.util.serialization import Serializer
 
 T = TypeVar('T')
 
-EXCLUDED_FIELDS = frozenset([
-    'read',
-])
+Download = namedtuple('Download', ('name', 'optional', 'type_'))
 
 
 class Sync(metaclass=ABCMeta):
@@ -38,6 +38,12 @@ class Sync(metaclass=ABCMeta):
 
 class AzureSync(Sync):
     _emails_file = 'emails.jsonl'
+    _attachments_file = 'zattachments.jsonl'
+
+    _download_files = (
+        Download(name=_emails_file, optional=False, type_='email'),
+        Download(name=_attachments_file, optional=True, type_='attachment'),
+    )
 
     def __init__(self, container: str, serializer: Serializer,
                  account_name: str, account_key: str,
@@ -98,14 +104,32 @@ class AzureSync(Sync):
         self._azure_client.upload_object_via_stream(stream, blobname)
 
     @classmethod
-    def _get_file_from_download(cls, archive, name):
+    def _get_file_from_download(cls, archive, downloads: Iterable[Download]) \
+            -> Iterable[Tuple[Download, IO[bytes]]]:
+
+        downloads = {download.name: download for download in downloads}
+
         while True:
             member = archive.next()
             if member is None:
                 break
-            if member.name == name:
-                return archive.extractfile(member)
-        raise FileNotFoundError(name)
+
+            filename = member.name
+            try:
+                download = downloads[filename]
+            except KeyError:
+                pass
+            else:
+                yield download, archive.extractfile(member)
+                del downloads[filename]
+
+        missing_downloads = [
+            filename for filename, download in downloads.items()
+            if not download.optional
+        ]
+
+        if missing_downloads:
+            raise FileNotFoundError(','.join(missing_downloads))
 
     def download(self):
         resource_id = self._email_server_client.download()
@@ -118,10 +142,13 @@ class AzureSync(Sync):
 
             workspace.seek(0)
             with self._open(workspace.name, 'r') as archive:
-                emails = self._get_file_from_download(
-                    archive, self._emails_file)
-                for line in emails:
-                    yield self._serializer.deserialize(line)
+                for download, fobj in self._get_file_from_download(
+                        archive, self._download_files):
+                    for line in fobj:
+                        obj = self._serializer.deserialize(
+                            line, download.type_)
+                        obj['_type'] = download.type_
+                        yield obj
 
     def _upload_emails(self, items, archive):
         uploaded_ids = []
@@ -129,8 +156,10 @@ class AzureSync(Sync):
         with self._workspace(self._emails_file) as uploaded:
             for item in items:
                 item = {key: value for (key, value) in item.items()
-                        if value is not None
-                        and key not in EXCLUDED_FIELDS}
+                        if value is not None}
+                item.pop('read', False)
+                for attachment in item.get('attachments', []):
+                    attachment.pop('_uid', '')
                 serialized = self._serializer.serialize(item)
                 uploaded.write(serialized)
                 uploaded.write(b'\n')

@@ -8,7 +8,6 @@ from opwen_email_client.util.serialization import JsonSerializer as Serializer  
 from opwen_email_client.webapp.cache import cache
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.mkwvconf import blueprint as mkwvconf
-from opwen_email_client.webapp.session import AttachmentsStore
 
 if AppConfig.TESTING:
     from opwen_email_client.domain.email.client import LocalEmailServerClient as EmailServerClient  # noqa
@@ -34,9 +33,6 @@ class Ioc(object):
         container=AppConfig.STORAGE_CONTAINER,
         provider=AppConfig.STORAGE_PROVIDER,
         serializer=serializer)
-
-    attachments_session = AttachmentsStore(
-        email_store=email_store)
 
 
 def create_app(config=AppConfig) -> Flask:

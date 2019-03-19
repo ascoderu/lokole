@@ -150,17 +150,17 @@ def email_new() -> Response:
     return _view('email_new.html', form=form)
 
 
-@app.route('/attachment/<attachment_id>', methods=['GET'])
+@app.route('/attachment/<uid>', methods=['GET'])
 @login_required
-def download_attachment(attachment_id: str) -> Response:
-    attachments_session = app.ioc.attachments_session
+def download_attachment(uid: str) -> Response:
+    email_store = app.ioc.email_store
 
-    attachment = attachments_session.lookup(attachment_id)
+    attachment = email_store.get_attachment(uid)
     if attachment is None:
         return abort(404)
 
-    return send_file(BytesIO(attachment.content),
-                     attachment_filename=attachment.name,
+    return send_file(BytesIO(attachment['content']),
+                     attachment_filename=attachment['filename'],
                      as_attachment=True)
 
 
@@ -367,7 +367,6 @@ def _localeselector() -> str:
 
 def _emails_view(emails: Iterable[dict], page: int,
                  template: str = 'email.html') -> Response:
-    attachments_session = app.ioc.attachments_session
     offset_minutes = getattr(current_user, 'timezone_offset_minutes', 0)
     timezone_offset = timedelta(minutes=offset_minutes)
 
@@ -383,7 +382,6 @@ def _emails_view(emails: Iterable[dict], page: int,
             sent_at_local = sent_at_utc - timezone_offset
             email['sent_at'] = sent_at_local.strftime('%Y-%m-%d %H:%M')
 
-    attachments_session.store(emails)
     return _view(template, emails=emails, page=page)
 
 

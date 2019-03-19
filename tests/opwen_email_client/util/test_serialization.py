@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from abc import abstractmethod
+from copy import deepcopy
 from unittest import TestCase
 
 from typing import Iterable
@@ -16,16 +17,17 @@ class Base(object):
 
         @property
         def serializable_objects(self) -> Iterable:
-            yield {'key1': 1, 'key2': ["value2"]}
-            yield {'attachments': [{'content': b'content'}]}
+            yield {'key1': 1, 'key2': ["value2"]}, ''
+            yield {'attachments': [{'content': b'content'}]}, 'email'
+            yield {'content': b'content'}, 'attachment'
 
         def setUp(self):
             self.serializer = self.create_serializer()
 
         def test_serialization_roundtrip(self):
-            for original in self.serializable_objects:
-                serialized = self.serializer.serialize(original)
-                deserialized = self.serializer.deserialize(serialized)
+            for original, type_ in self.serializable_objects:
+                serialized = self.serializer.serialize(deepcopy(original), type_)
+                deserialized = self.serializer.deserialize(serialized, type_)
                 self.assertEqual(original, deserialized)
 
 

@@ -12,16 +12,23 @@ class EmailStore(metaclass=ABCMeta):
     def __init__(self, restricted: Optional[Dict[str, Set[str]]] = None):
         self._restricted = restricted or {}
 
-    def create(self, emails: Iterable[dict]):
-        self._create((_add_uid(email) for email in emails
-                      if not _is_restricted(email, self._restricted)))
+    def create(self, emails_or_attachments: Iterable[dict]):
+        self._create((
+            _add_uid(email_or_attachment)
+            for email_or_attachment in emails_or_attachments
+            if not _is_restricted(email_or_attachment, self._restricted)
+        ))
 
     @abstractmethod
-    def _create(self, emails: Iterable[dict]):
+    def _create(self, emails_or_attachments: Iterable[dict]):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def get(self, uid: str) -> Optional[dict]:
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def get_attachment(self, uid: str) -> Optional[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
@@ -73,6 +80,10 @@ class EmailStore(metaclass=ABCMeta):
 
 
 def _is_restricted(email: dict, restricted: Dict[str, Set[str]]) -> bool:
+    type_ = email.get('_type')
+    if type_ and type_ != 'email':
+        return False
+
     sender = email.get('from', '')
     recipients = _get_recipients(email)
 
@@ -97,4 +108,6 @@ def _get_recipients(email: dict) -> Set[str]:
 
 def _add_uid(email: dict) -> dict:
     email.setdefault('_uid', str(uuid4()))
+    for attachment in email.get('attachments', []):
+        attachment.setdefault('_uid', str(uuid4()))
     return email

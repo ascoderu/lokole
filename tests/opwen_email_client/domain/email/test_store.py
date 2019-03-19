@@ -248,11 +248,70 @@ class Base(object):
 
             self.assertEqual(actual, given[0])
 
+        def test_get_with_separate_attachments(self):
+            self.given_emails(
+                {'_type': 'email', '_uid': 'e1',
+                 'to': ['foo@bar.com'], 'subject': 'foo'},
+                {'_type': 'email', '_uid': 'e2',
+                 'to': ['baz@bar.com'], 'subject': 'bar'},
+                {'_type': 'email', '_uid': 'e3',
+                 'to': ['buz@buz.com'], 'subject': 'buz'},
+                {'_type': 'email', '_uid': 'e4',
+                 'to': ['buz@foo.com'], 'subject': 'foobuz'},
+                {'_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'],
+                 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None},
+                {'_type': 'attachment', '_uid': 'a2', 'emails': ['e3'],
+                 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None})
+
+            actual1 = self.email_store.get('e1')
+            actual4 = self.email_store.get('e4')
+
+            self.assertEqual(actual1.get('attachments'),
+                             [{'_uid': 'a1', 'filename': 'foo.txt',
+                               'content': b'foo.txt', 'cid': None}])
+
+            self.assertEqual(actual1.get('attachments'),
+                             actual4.get('attachments'))
+
+            actual3 = self.email_store.get('e3')
+
+            self.assertEqual(actual3.get('attachments'),
+                             [{'_uid': 'a2', 'filename': 'bar.txt',
+                               'content': b'bar.txt', 'cid': None}])
+
+            actual2 = self.email_store.get('e2')
+
+            self.assertIsNone(actual2.get('attachments'))
+
         def test_get_without_match(self):
             self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo'},
                 {'to': ['baz@bar.com'], 'subject': 'bar'})
 
             actual = self.email_store.get('uid-does-not-exist')
+
+            self.assertIsNone(actual)
+
+        def test_get_attachment(self):
+            self.given_emails(
+                {'_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'],
+                 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None},
+                {'_type': 'attachment', '_uid': 'a2', 'emails': ['e3'],
+                 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None})
+
+            actual = self.email_store.get_attachment('a1')
+            self.assertEqual(actual['_uid'], 'a1')
+
+            actual = self.email_store.get_attachment('a2')
+            self.assertEqual(actual['_uid'], 'a2')
+
+        def test_get_attachment_without_match(self):
+            self.given_emails(
+                {'_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'],
+                 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None},
+                {'_type': 'attachment', '_uid': 'a2', 'emails': ['e3'],
+                 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None})
+
+            actual = self.email_store.get_attachment('uid-does-not-exist')
 
             self.assertIsNone(actual)

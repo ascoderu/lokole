@@ -25,24 +25,24 @@ _Base = declarative_base()
 
 _EmailTo = Table('emailto',
                  _Base.metadata,
-                 Column('email_id', Integer, ForeignKey('email.id')),
+                 Column('email_id', Integer, ForeignKey('email.uid')),
                  Column('to_id', Integer, ForeignKey('to.id')))
 
 _EmailCc = Table('emailcc',
                  _Base.metadata,
-                 Column('email_id', Integer, ForeignKey('email.id')),
+                 Column('email_id', Integer, ForeignKey('email.uid')),
                  Column('cc_id', Integer, ForeignKey('cc.id')))
 
 _EmailBcc = Table('emailbcc',
                   _Base.metadata,
-                  Column('email_id', Integer, ForeignKey('email.id')),
+                  Column('email_id', Integer, ForeignKey('email.uid')),
                   Column('bcc_id', Integer, ForeignKey('bcc.id')))
 
 _EmailAttachment = Table(
     'emailattachment',
     _Base.metadata,
-    Column('email_id', Integer, ForeignKey('email.id')),
-    Column('attachment_id', Integer, ForeignKey('attachment.id')))
+    Column('email_id', Integer, ForeignKey('email.uid')),
+    Column('attachment_id', Integer, ForeignKey('attachment.uid')))
 
 
 class _To(_Base):
@@ -68,35 +68,62 @@ class _Bcc(_Base):
 
 class _Attachment(_Base):
     __tablename__ = 'attachment'
-    id = Column(Integer, primary_key=True)
 
+    uid = Column(String(length=64), primary_key=True)
     filename = Column(Text)
     content = Column(BLOB)
     cid = Column(Text)
 
+    def to_dict(self):
+        return {
+            '_uid': self.uid,
+            'filename': self.filename,
+            'content': self.content,
+            'cid': self.cid,
+        }
+
+    @classmethod
+    def from_dict(cls, db, attachment):
+        self = _Attachment(
+            uid=attachment.get('_uid'),
+            filename=attachment.get('filename'),
+            content=attachment.get('content'),
+            cid=attachment.get('cid'))
+
+        for pointer in attachment.pop('emails', []):
+            if isinstance(pointer, _Email):
+                email = pointer
+                add_to_session = False
+            else:
+                email = db.query(_Email).get(pointer)
+                add_to_session = True
+
+            if email:
+                email.attachments.append(self)
+                if add_to_session:
+                    db.add(email)
+
+        return self
+
 
 class _Email(_Base):
     __tablename__ = 'email'
-    id = Column(Integer, primary_key=True)
 
-    uid = Column(String(length=64), unique=True, index=True)
+    uid = Column(String(length=64), primary_key=True)
     subject = Column(Text)
     body = Column(Text)
     sent_at = Column(DateTime())
     read = Column(Boolean, default=False, nullable=False)
     sender = Column(String(length=128), index=True)
     attachments = relationship(_Attachment, secondary=_EmailAttachment,
-                               backref='emails')
-    to = relationship(_To, secondary=_EmailTo)
-    cc = relationship(_Cc, secondary=_EmailCc)
-    bcc = relationship(_Bcc, secondary=_EmailBcc)
+                               backref='emails', lazy='joined')
+    to = relationship(_To, secondary=_EmailTo, lazy='joined')
+    cc = relationship(_Cc, secondary=_EmailCc, lazy='joined')
+    bcc = relationship(_Bcc, secondary=_EmailBcc, lazy='joined')
 
     def to_dict(self):
         attachments = self.attachments
-        attachments = ([{'filename': attachment.filename,
-                         'content': attachment.content,
-                         'cid': attachment.cid}
-                        for attachment in attachments]
+        attachments = ([attachment.to_dict() for attachment in attachments]
                        if attachments else None)
 
         sent_at = self.sent_at
@@ -122,7 +149,7 @@ class _Email(_Base):
         sent_at = (datetime.strptime(sent_at, '%Y-%m-%d %H:%M')
                    if sent_at else None)
 
-        return _Email(
+        self = _Email(
             uid=email['_uid'],
             to=[get_or_create(db, _To, address=_.lower())
                 for _ in email.get('to', [])],
@@ -130,13 +157,17 @@ class _Email(_Base):
                 for _ in email.get('cc', [])],
             bcc=[get_or_create(db, _Bcc, address=_.lower())
                  for _ in email.get('bcc', [])],
-            attachments=[get_or_create(db, _Attachment, **_)
-                         for _ in email.get('attachments', [])],
             subject=email.get('subject'),
             body=email.get('body'),
             sent_at=sent_at,
             read=email.get('read', False),
             sender=email.get('from', '').lower() or None)
+
+        for attachment in email.get('attachments', []):
+            attachment['emails'] = [self]
+            db.add(_Attachment.from_dict(db, attachment))
+
+        return self
 
     @classmethod
     def is_sent_by(cls, email_address):
@@ -165,12 +196,32 @@ class _SqlalchemyEmailStore(EmailStore):
     def _dbwrite(self):
         return session(self._sesion_maker, commit=True)
 
-    def _create(self, emails):
+    def _create(self, emails_or_attachments):
+        last_type = ''
+
         with self._dbwrite() as db:
-            for email in emails:
-                uid_exists = exists().where(_Email.uid == email['_uid'])
-                if not db.query(uid_exists).scalar():
-                    db.add(_Email.from_dict(db, email))
+            for email_or_attachment in emails_or_attachments:
+                type_ = email_or_attachment.get('_type', '')
+                if type_ != last_type:
+                    db.commit()
+                    last_type = type_
+
+                if not type_ or type_ == 'email':
+                    self._create_email(db, email_or_attachment)
+                elif type_ == 'attachment':
+                    self._create_attachment(db, email_or_attachment)
+
+    @classmethod
+    def _create_email(cls, db, email):
+        uid_exists = exists().where(_Email.uid == email['_uid'])
+        if not db.query(uid_exists).scalar():
+            db.add(_Email.from_dict(db, email))
+
+    @classmethod
+    def _create_attachment(cls, db, attachment):
+        uid_exists = exists().where(_Attachment.uid == attachment['_uid'])
+        if not db.query(uid_exists).scalar():
+            db.add(_Attachment.from_dict(db, attachment))
 
     def _mark_sent(self, uids):
         now = datetime.utcnow()
@@ -205,17 +256,18 @@ class _SqlalchemyEmailStore(EmailStore):
                 .filter(~_Attachment.emails.any())\
                 .delete(synchronize_session='fetch')
 
-    def _find(self, query):
+    def _find(self, query, table=_Email):
         with self._dbread() as db:
-            results = db.query(_Email).filter(query)
-            email = results.first()
-            return email.to_dict() if email else None
+            results = db.query(table).filter(query)
+            result = results.first()
+        return result.to_dict() if result else None
 
     def _query(self, query):
         with self._dbread() as db:
             results = db.query(_Email).filter(query)
-            for email in results.order_by(_Email.sent_at.desc()).all():
-                yield email.to_dict()
+            results = results.order_by(_Email.sent_at.desc()).all()
+        for email in results:
+            yield email.to_dict()
 
     def inbox(self, email_address):
         return self._query(_Email.is_received_by(email_address))
@@ -239,6 +291,9 @@ class _SqlalchemyEmailStore(EmailStore):
 
     def get(self, uid):
         return self._find(_Email.uid == uid)
+
+    def get_attachment(self, uid):
+        return self._find(_Attachment.uid == uid, table=_Attachment)
 
     def sent(self, email_address):
         return self._query(_Email.is_sent_by(email_address)

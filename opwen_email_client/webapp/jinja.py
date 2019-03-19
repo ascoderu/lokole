@@ -14,7 +14,10 @@ def render_body(email: dict) -> str:
 
     soup = BeautifulSoup(body, 'html.parser')
     images = soup.find_all('img')
-    attachments = {attachment['cid']: attachment['id']
+    if not images:
+        return body
+
+    attachments = {attachment['cid']: attachment['_uid']
                    for attachment in email.get('attachments', [])}
     for img in images:
         src = img.get('src')

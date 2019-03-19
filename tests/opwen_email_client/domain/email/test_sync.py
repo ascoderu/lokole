@@ -5,11 +5,13 @@ from os.path import join
 from shutil import rmtree
 from tarfile import TarInfo
 from tempfile import mkdtemp
+from typing import Dict
 from unittest import TestCase
 from unittest.mock import Mock
 from uuid import uuid4
 
 from opwen_email_client.domain.email.sync import AzureSync
+from opwen_email_client.domain.email.sync import Download
 from opwen_email_client.util.serialization import JsonSerializer
 
 
@@ -35,31 +37,36 @@ class AzureSyncTests(TestCase):
     def tearDown(self):
         rmtree(self._root_folder)
 
-    def assertUploadIs(self, expected: bytes, compression: str = ''):
+    def assertUploadIs(self, expected: Dict[str, bytes],
+                       compression: str = ''):
         uploaded = glob(join(
             self._content_root,
             '*.{}'.format(compression or self.sync._compression)))
 
         self.assertEqual(len(uploaded), 1, 'Expected exactly one upload')
 
+        infos = (Download(name=name, optional=False, type_='')
+                 for name in expected)
+
         with open(uploaded[0], 'rb') as buffer:
             with self.sync._open(buffer.name, 'r') as archive:
-                fobj = self.sync._get_file_from_download(
-                    archive, self.sync._emails_file)
-                self.assertEqual(expected, fobj.read())
+                for download, fobj in self.sync._get_file_from_download(
+                        archive, infos):
+                    self.assertEqual(expected[download.name], fobj.read())
 
     def assertNoUpload(self):
         uploaded = glob(join(self._content_root, '*'))
         self.assertEqual(len(uploaded), 0, 'Expected no uploads')
 
-    def given_download(self, payload: bytes, compression: str):
+    def given_download(self, payload: Dict[str, bytes], compression: str):
         resource_id = '{}.tar.{}'.format(uuid4(), compression)
         download_filename = join(self._content_root, resource_id)
 
         with self.sync._open(download_filename, 'w') as archive:
-            tarinfo = TarInfo(self.sync._emails_file)
-            tarinfo.size = len(payload)
-            archive.addfile(tarinfo, BytesIO(payload))
+            for filename, content in payload.items():
+                tarinfo = TarInfo(filename)
+                tarinfo.size = len(content)
+                archive.addfile(tarinfo, BytesIO(content))
 
         self.email_server_client_mock.download.return_value = resource_id
 
@@ -70,15 +77,26 @@ class AzureSyncTests(TestCase):
         for compression in self._test_compressions:
             with self.subTest(compression=compression):
                 self.sync._compression = compression
-                self.sync.upload(items=[{'foo': 'bar', 'read': True}])
+                self.sync.upload(items=[{'foo': 'bar'}])
 
-                self.assertUploadIs(b'{"foo":"bar"}\n', compression)
+                self.assertUploadIs(
+                    {self.sync._emails_file: b'{"foo":"bar"}\n'},
+                    compression)
                 self.assertTrue(self.email_server_client_mock.upload.called)
 
     def test_upload_excludes_null_values(self):
         self.sync.upload(items=[{'foo': 0, 'bar': None}])
 
-        self.assertUploadIs(b'{"foo":0}\n')
+        self.assertUploadIs({self.sync._emails_file: b'{"foo":0}\n'})
+
+    def test_upload_excludes_internal_values(self):
+        self.sync.upload(items=[{'foo': 0, 'read': True, 'attachments': [
+            {'_uid': '1', 'filename': 'foo.txt'}
+        ]}])
+
+        self.assertUploadIs(
+            {self.sync._emails_file: b'{"attachments":[{"filename":"foo.txt"}]'
+                                     b',"foo":0}\n'})
 
     def test_upload_with_no_content_does_not_hit_network(self):
         self.sync.upload(items=[])
@@ -89,14 +107,33 @@ class AzureSyncTests(TestCase):
     def test_download(self):
         for compression in self._test_compressions:
             with self.subTest(compression=compression):
-                self.given_download(b'{"foo":"bar"}\n{"baz":1}', compression)
+                self.given_download(
+                    {self.sync._emails_file: b'{"foo":"bar"}\n{"baz":1}'},
+                    compression)
 
                 downloaded = list(self.sync.download())
 
                 self.assertTrue(self.email_server_client_mock.download.called)
                 self.assertEqual(len(downloaded), 2)
-                self.assertIn({'foo': 'bar'}, downloaded)
-                self.assertIn({'baz': 1}, downloaded)
+                self.assertIn({'foo': 'bar', '_type': 'email'}, downloaded)
+                self.assertIn({'baz': 1, '_type': 'email'}, downloaded)
+
+    def test_download_with_attachments(self):
+        for compression in self._test_compressions:
+            with self.subTest(compression=compression):
+                self.given_download(
+                    {self.sync._emails_file: b'{"foo":"bar"}\n{"baz":1}',
+                     self.sync._attachments_file: b'{"x":"y"}\n{"z":1}'},
+                    compression)
+
+                downloaded = list(self.sync.download())
+
+                self.assertTrue(self.email_server_client_mock.download.called)
+                self.assertEqual(len(downloaded), 4)
+                self.assertIn({'foo': 'bar', '_type': 'email'}, downloaded)
+                self.assertIn({'baz': 1, '_type': 'email'}, downloaded)
+                self.assertIn({'x': 'y', '_type': 'attachment'}, downloaded)
+                self.assertIn({'z': 1, '_type': 'attachment'}, downloaded)
 
     def test_download_missing_resource(self):
         self.given_download_exception()
