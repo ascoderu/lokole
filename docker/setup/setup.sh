@@ -28,6 +28,7 @@
 
 scriptdir="$(dirname "$0")"
 scriptname="${BASH_SOURCE[0]}"
+# shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
 #
@@ -148,6 +149,7 @@ while :; do
     --set version.dockerTag="${k8sdockertag}" \
     "${scriptdir}/helm"
 
+  # shellcheck disable=SC2181
   if [[ "$?" -ne 0 ]]; then log "Intermittent error for ${helmname}"; sleep 30s; else break; fi
 done
 

@@ -33,7 +33,7 @@ lint-docker:
 lint-shell:
 	if command -v shellcheck >/dev/null; then \
     find . -type f -name '*.sh' -not -path '$(PY_ENV)/*' | while read file; do \
-      shellcheck --exclude=SC2181,SC1090,SC1091,SC2103,SC2154 "$$file" \
+      shellcheck "$$file" \
     || exit 1; done \
   fi
 
