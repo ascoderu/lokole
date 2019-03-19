@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
+
 in_dir="$(dirname "$0")/../files/end_to_end"
 out_dir="$(dirname "$0")/../files/end_to_end/test.out"
 mkdir -p "${out_dir}"

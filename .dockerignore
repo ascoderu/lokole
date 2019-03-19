@@ -2,4 +2,7 @@
 !docker/
 !helm/
 !opwen_email_server/
+!tests/
+!makefile
 !requirements*.txt
+!setup.cfg

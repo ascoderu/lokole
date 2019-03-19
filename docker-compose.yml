@@ -2,7 +2,11 @@ version: '3.4'
 
 x-shared-app-environment:
   &shared-app-environment
-  QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
+  LOKOLE_QUEUE_BROKER_URL: pyamqp://guest:guest@rabbitmq
+  LOKOLE_QUEUE_BROKER_SCHEME: ${LOKOLE_QUEUE_BROKER_SCHEME}
+  LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME: ${LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME}
+  LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY: ${LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY}
+  LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE: ${LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE}
   LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
   LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
   LOKOLE_EMAIL_SERVER_APPINSIGHTS_HOST: http://appinsights
@@ -30,8 +34,6 @@ x-shared-app-build:
   build:
     context: .
     dockerfile: docker/app/Dockerfile
-    args:
-      USE_DEVTOOLS: "${USE_DEVTOOLS}"
 
 services:
 
@@ -82,12 +84,14 @@ services:
     image: rabbitmq:3.7.8-management
 
   appinsights:
-    image: cwolff/appinsights-on-premises:0.0.12-postgres
+    image: cwolff/appinsights-on-premises:0.0.14-postgres
     depends_on:
       - postgres
     environment:
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       APPINSIGHTS_INSTRUMENTATIONKEY: "${APPINSIGHTS_INSTRUMENTATIONKEY}"
+    ports:
+      - ${APPINSIGHTS_PORT}:80
 
   postgres:
     image: postgres:11-alpine

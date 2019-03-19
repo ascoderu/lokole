@@ -41,7 +41,7 @@
             secretKeyRef:
               name: sendgrid
               key: LOKOLE_SENDGRID_KEY
-        - name: QUEUE_BROKER_SCHEME
+        - name: LOKOLE_QUEUE_BROKER_SCHEME
           value: azureservicebus
         - name: LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME
           valueFrom:

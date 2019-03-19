@@ -13,6 +13,7 @@
 
 scriptdir="$(dirname "$0")"
 scriptname="${BASH_SOURCE[0]}"
+# shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
 #

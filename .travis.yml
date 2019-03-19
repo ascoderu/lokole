@@ -1,30 +1,27 @@
-language: python
+language: minimal
 
-python:
-  - "3.6"
-
-sudo: required
+env:
+  matrix:
+    - LOKOLE_QUEUE_BROKER_SCHEME=azureservicebus
+    - LOKOLE_QUEUE_BROKER_SCHEME=pyamqp
 
 services:
   - docker
 
-cache: pip
-
-before_script: make start
-
-script: travis/ci.sh
-
-after_script: make stop
-
 install:
-  - pip install codecov
-  - mkdir -p ~/.local/bin
-    && curl -sfL -o ~/.local/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/v1.16.0/hadolint-$(uname -s)-$(uname -m)"
-    && chmod 700 ~/.local/bin/hadolint
-    && export PATH="~/.local/bin:$PATH"
+  - make build
 
-after_success:
-  - codecov
+before_script:
+  - docker-compose up -d
+
+script:
+  - make integration-tests
+
+after_failure:
+  - docker-compose logs
+
+after_script:
+  - docker-compose down --volumes
 
 deploy:
   - provider: script
