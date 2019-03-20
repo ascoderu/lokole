@@ -15,7 +15,6 @@ from applicationinsights import TelemetryClient
 from applicationinsights.channel import AsynchronousQueue
 from applicationinsights.channel import AsynchronousSender
 from applicationinsights.channel import NullSender
-from applicationinsights.channel import SynchronousQueue
 from applicationinsights.channel import TelemetryChannel
 from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
@@ -33,18 +32,10 @@ from opwen_email_server.utils.collections import singleton
 def _create_telemetry_channel() -> TelemetryChannel:
     if not APPINSIGHTS_KEY:
         sender = NullSender()
-    elif APPINSIGHTS_HOST:
+    else:
         sender = AsynchronousSender(APPINSIGHTS_HOST)
-    else:
-        sender = AsynchronousSender()
 
-    # TODO: remove when Microsoft/ApplicationInsights-Python#155 is released
-    if not APPINSIGHTS_KEY:
-        queue_type = SynchronousQueue
-    else:
-        queue_type = AsynchronousQueue
-
-    queue = queue_type(sender)
+    queue = AsynchronousQueue(sender)
     return TelemetryChannel(queue=queue)
 
 
