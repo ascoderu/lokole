@@ -42,6 +42,16 @@ spec:
             secretKeyRef:
               name: cloudflare
               key: LOKOLE_CLOUDFLARE_KEY
+        - name: REGISTRATION_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: users
+              key: REGISTRATION_USERNAME
+        - name: REGISTRATION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: users
+              key: REGISTRATION_PASSWORD
         ports:
         - containerPort: 8080
         resources: {}

@@ -154,7 +154,7 @@ to initialize the required cloud resources.
   LOKOLE_CLOUDFLARE_ZONE={the cloudflare zone you created earlier}
   EOM
 
-  cat > ${PWD}/secrets/nginx.env << EOM
+  cat > ${PWD}/secrets/users.env << EOM
   REGISTRATION_USERNAME={some username for the registration endpoint}
   REGISTRATION_PASSWORD={some password for the registration endpoint}
   EOM

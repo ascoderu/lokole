@@ -129,7 +129,7 @@ log "Setting up kubernetes secrets for ${k8sname}"
 
 kubectl create secret generic "azure" --from-env-file "/secrets/azure.env"
 kubectl create secret generic "cloudflare" --from-env-file "/secrets/cloudflare.env"
-kubectl create secret generic "nginx" --from-env-file "/secrets/nginx.env"
+kubectl create secret generic "users" --from-env-file "/secrets/users.env"
 kubectl create secret generic "sendgrid" --from-env-file "/secrets/sendgrid.env"
 
 log "Setting up helm chart in cluster ${k8sname}"
