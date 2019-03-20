@@ -50,8 +50,6 @@ http {
     }
 
     location /api/email/register {
-      auth_basic "Authorized requests only";
-      auth_basic_user_file /app/.htpasswd;
       proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
     }
   }

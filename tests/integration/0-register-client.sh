@@ -12,3 +12,11 @@ curl -fs \
   -d '{"domain":"developer.lokole.ca"}' \
   "http://localhost:8080/api/email/register/" \
 | tee "${out_dir}/register.json"
+
+# registering a client with bad credentials should fail
+if curl -fs \
+  -H "Content-Type: application/json" \
+  -u "baduser:badpassword" \
+  -d '{"domain":"hacker.lokole.ca"}' \
+  "http://localhost:8080/api/email/register/" \
+; then echo "Was able to register a client with bad credentials" >&2; exit 4; fi

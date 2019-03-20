@@ -282,7 +282,7 @@ class RegisterClient(_Action):
         self._setup_mx_records = setup_mx_records
         self._client_id_source = client_id_source or self._new_client_id
 
-    def _action(self, client):  # type: ignore
+    def _action(self, client, **auth_args):  # type: ignore
         domain = client['domain']
         if not is_lowercase(domain):
             return 'domain must be lowercase', 400

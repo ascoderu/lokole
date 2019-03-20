@@ -28,6 +28,13 @@ paths:
           description: The supplied client is malformed.
         409:
           description: The supplied client already exists.
+      security:
+        - basic: []
+
+securityDefinitions:
+  basic:
+    type: basic
+    x-basicInfoFunc: opwen_email_server.integration.connexion.basic_auth
 
 parameters:
 

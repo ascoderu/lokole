@@ -31,16 +31,6 @@ spec:
           value: api:8080
         - name: HOSTNAME_CLIENT_REGISTER
           value: api:8080
-        - name: REGISTRATION_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: nginx
-              key: REGISTRATION_USERNAME
-        - name: REGISTRATION_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: nginx
-              key: REGISTRATION_PASSWORD
         ports:
         - containerPort: 8888
         resources: {}

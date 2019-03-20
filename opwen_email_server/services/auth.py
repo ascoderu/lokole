@@ -3,9 +3,42 @@ from typing import Optional
 
 from libcloud.storage.types import ObjectDoesNotExistError
 
+from opwen_email_server.constants import events
 from opwen_email_server.constants.cache import AUTH_DOMAIN_CACHE_SIZE
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
+
+
+class BasicAuth(LogMixin):
+    def __init__(self, users: dict):
+        self._users = dict(users)
+
+    def __call__(self, username, password, required_scopes=None):
+        if not username or not password:
+            return None
+
+        try:
+            user = self._users[username]
+        except KeyError:
+            self.log_event(events.UNKNOWN_USER, {'username': username})  # noqa: E501
+            return None
+
+        if user['password'] != password:
+            self.log_event(events.BAD_PASSWORD, {'username': username})  # noqa: E501
+            return None
+
+        if not self._has_scopes(user, required_scopes):
+            self.log_event(events.MISSING_SCOPES, {'username': username})  # noqa: E501
+            return None
+
+        return {'sub': username}
+
+    @classmethod
+    def _has_scopes(cls, user, required_scopes) -> bool:
+        if not required_scopes:
+            return True
+
+        return set(required_scopes).issubset(user.get('scopes', []))
 
 
 class AzureAuth(LogMixin):
