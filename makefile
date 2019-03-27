@@ -14,8 +14,10 @@ tests: venv
 	$(PY_ENV)/bin/coverage run -m nose2 && $(PY_ENV)/bin/coverage report
 
 lint-swagger: venv
-	find opwen_email_server/swagger -type f -name '*.yaml' \
-    | while read swagger; do $(PY_ENV)/bin/swagger-flex --source="$$swagger" || exit 1; done
+	find opwen_email_server/swagger -type f -name '*.yaml' | while read file; do \
+    echo "====================  $$file ===================="; \
+    $(PY_ENV)/bin/swagger-flex --source="$$file" \
+  || exit 1; done
 
 lint-python: venv
 	$(PY_ENV)/bin/flake8 opwen_email_server
@@ -26,6 +28,7 @@ lint-python: venv
 lint-docker:
 	if command -v hadolint >/dev/null; then \
     find . -type f -name Dockerfile -not -path '$(PY_ENV)/*' | while read file; do \
+      echo "====================  $$file ===================="; \
       hadolint "$$file" \
     || exit 1; done \
   fi
@@ -33,6 +36,7 @@ lint-docker:
 lint-shell:
 	if command -v shellcheck >/dev/null; then \
     find . -type f -name '*.sh' -not -path '$(PY_ENV)/*' | while read file; do \
+      echo "====================  $$file ===================="; \
       shellcheck "$$file" \
     || exit 1; done \
   fi
@@ -57,6 +61,7 @@ build:
 verify-build:
 	docker pull wagoodman/dive
 	docker-compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \
+    echo "====================  $$image ===================="; \
     docker run --rm \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $(PWD)/.dive-ci:/.dive-ci \
