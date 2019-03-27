@@ -9,7 +9,7 @@ services:
   - docker
 
 install:
-  - make build
+  - make build verify-build
 
 before_script:
   - docker-compose up -d

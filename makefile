@@ -53,3 +53,14 @@ integration-tests:
 build:
 	docker-compose pull --ignore-pull-failures
 	docker-compose build
+
+verify-build:
+	docker pull wagoodman/dive
+	docker-compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \
+    docker run --rm \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(PWD)/.dive-ci:/.dive-ci \
+      -e DOCKER_API_VERSION="$(shell docker version -f '{{.Client.APIVersion}}')" \
+      -e CI="true" \
+      wagoodman/dive "$$image" \
+    || exit 1; done

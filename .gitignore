@@ -10,5 +10,6 @@ venv*/
 .coverage
 cover/
 .mypy_cache/
+dive.log
 
 serviceprincipal.json
