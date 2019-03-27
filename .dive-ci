@@ -1,4 +1,4 @@
 rules:
-  lowestEfficiency: 0.95
+  lowestEfficiency: 0.98
   highestWastedBytes: "disabled"
   highestUserWastedPercent: "disabled"
