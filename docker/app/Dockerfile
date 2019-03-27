@@ -21,7 +21,7 @@ RUN pip wheel -r requirements.txt -w /deps
 
 COPY . .
 
-RUN make ci
+RUN make ci clean
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
 

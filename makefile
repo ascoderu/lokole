@@ -54,6 +54,9 @@ integration-tests:
     ./tests/integration/assert.sh && \
     rm -rf tests/files/end_to_end/test.out
 
+clean:
+	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
+
 build:
 	docker-compose pull --ignore-pull-failures
 	docker-compose build
