@@ -30,6 +30,4 @@ EXPOSE ${PORT}
 USER nginx
 WORKDIR /static
 
-COPY docker/nginx/healthcheck.sh /app/healthcheck.sh
-HEALTHCHECK --interval=89s --timeout=17s CMD /app/healthcheck.sh
 CMD ["/app/run-nginx.sh"]
