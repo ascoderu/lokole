@@ -19,9 +19,6 @@ docker login --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD"
 for tag in "latest" "$TRAVIS_TAG"; do
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose build
   BUILD_TAG="$tag" DOCKER_REPO="$DOCKER_USERNAME" docker-compose push
-
-  docker build -t "$DOCKER_USERNAME/opwenserver_setup:$tag" -f "./docker/setup/Dockerfile" "."
-  docker push "$DOCKER_USERNAME/opwenserver_setup:$tag"
 done
 
 #
@@ -35,13 +32,13 @@ fi
 kubeconfig_path="$PWD/kube-config"
 curl -sfL "$KUBECONFIG_URL" -o "$kubeconfig_path"
 
-docker run \
+docker-compose run \
   -e IMAGE_REGISTRY="$DOCKER_USERNAME" \
   -e DOCKER_TAG="$TRAVIS_TAG" \
   -e HELM_NAME="$HELM_NAME" \
   -e LOKOLE_DNS_NAME="$LOKOLE_DNS_NAME" \
   -v "$kubeconfig_path:/secrets/kube-config" \
-  "$DOCKER_USERNAME/opwenserver_setup:$TRAVIS_TAG" \
+  setup \
   /app/upgrade.sh
 
 rm "$kubeconfig_path"
