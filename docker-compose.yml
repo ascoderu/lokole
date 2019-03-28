@@ -80,6 +80,13 @@ services:
       - azurite
       - rabbitmq
 
+  setup:
+    image: ${DOCKER_REPO}/opwenserver_setup:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/setup/Dockerfile
+    command: /app/setup.sh --help
+
   rabbitmq:
     image: rabbitmq:3.7.8-management
 

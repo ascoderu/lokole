@@ -31,6 +31,11 @@ scriptname="${BASH_SOURCE[0]}"
 # shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
+if [[ "$1" = "--help" ]]; then
+  usage "${scriptname}"
+  exit 0
+fi
+
 #
 # verify inputs
 #
