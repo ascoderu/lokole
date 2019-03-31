@@ -72,3 +72,28 @@ verify-build:
       -e CI="true" \
       wagoodman/dive "$$image" \
     || exit 1; done
+
+release:
+	for tag in "latest" "$(DOCKER_TAG)"; do ( \
+    export BUILD_TAG="$$tag"; \
+    export DOCKER_REPO="$(DOCKER_USERNAME)"; \
+    docker-compose build && \
+    docker-compose push; \
+  ) done
+
+deploy:
+	if [ -f "$(PWD)/secrets/kube-config" ]; then \
+    cp "$(PWD)/secrets/kube-config" "$(PWD)/kube-config"; \
+  fi && \
+  if [ ! -f "$(PWD)/kube-config" ]; then \
+    curl -sSfL "$(KUBECONFIG_URL)" -o "$(PWD)/kube-config"; \
+  fi && \
+  docker-compose run \
+    -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
+    -e DOCKER_TAG="$(DOCKER_TAG)" \
+    -e HELM_NAME="$(HELM_NAME)" \
+    -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
+    -v "$(PWD)/kube-config:/secrets/kube-config" \
+    setup \
+    /app/upgrade.sh; \
+  rm -f "$(PWD)/kube-config"

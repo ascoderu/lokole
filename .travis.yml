@@ -23,9 +23,12 @@ after_failure:
 after_script:
   - docker-compose down --volumes
 
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+
 deploy:
   - provider: script
-    script: travis/cd.sh
+    script: DOCKER_TAG="$TRAVIS_TAG" make release deploy
     on:
       repo: ascoderu/opwen-cloudserver
       tags: true
