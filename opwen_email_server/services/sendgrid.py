@@ -29,10 +29,10 @@ class SendSendgridEmail(LogMixin):
                 return 202
             return send_email_fake
 
-        client = SendGridAPIClient(apikey=self._key)
+        client = SendGridAPIClient(api_key=self._key)
 
         def send_email(email: dict) -> int:
-            response = client.client.mail.send.post(request_body=email)
+            response = client.send(email)
             return response.status_code
 
         return send_email
