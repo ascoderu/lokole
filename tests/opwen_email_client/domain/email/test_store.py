@@ -77,6 +77,21 @@ class Base(object):
             ids2 = [_['_uid'] for _ in emails2[1:]]
             self.assertEqual(ids1, ids2)
 
+        def test_create_with_existing_attachment(self):
+            self.given_emails(
+                {'to': ['foo@bar.com'], 'attachments': [
+                    {'_uid': 'a1', 'filename': 'a1', 'content': b'a1'},
+                    {'_uid': 'a2', 'filename': 'a2', 'content': b'a2'},
+                ]})
+
+            self.given_emails(
+                {'to': ['foo@bar.com'], 'attachments': [
+                    {'_uid': 'a1', 'filename': 'a1', 'content': b'a1'},
+                    {'_uid': 'a3', 'filename': 'a3', 'content': b'a3'},
+                ]})
+
+            self.assertEqual(len(list(self.email_store.inbox('foo@bar.com'))), 2)
+
         def test_inbox(self):
             emails = self.given_emails(
                 {'to': ['Foo@bar.com'], 'sent_at': '2017-09-10 11:11'},

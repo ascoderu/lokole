@@ -10,6 +10,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.datastructures import FileStorage
 from wtforms import FileField
+from wtforms import SelectMultipleField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.validators import DataRequired
@@ -44,13 +45,17 @@ class NewEmailForm(FlaskForm):
     body = HtmlTextAreaField(
         validators=[DataOptional()])
 
+    forwarded_attachments = SelectMultipleField(
+        choices=[],
+        validators=[DataOptional()])
+
     attachments = FileField(
         validators=[DataOptional()],
         render_kw={'multiple': True})
 
     submit = SubmitField()
 
-    def as_dict(self) -> dict:
+    def as_dict(self, email_store: EmailStore) -> dict:
         form = {key: value for (key, value) in self.data.items() if value}
         form.pop('submit', None)
 
@@ -74,7 +79,7 @@ class NewEmailForm(FlaskForm):
         form['attachments'] = list(_attachments_as_dict(attachments))
         return form
 
-    def _populate(self, email: Optional[dict], to: Optional[str]):
+    def _populate(self, email_store: EmailStore):
         pass
 
     @classmethod
@@ -90,6 +95,17 @@ class NewEmailForm(FlaskForm):
         else:
             return clazz(request.form)
 
+    def _get_reference_email(self, email_store: EmailStore) -> Optional[dict]:
+        uid = request.args.get('uid', '')
+        if not uid:
+            return None
+
+        reference = email_store.get(uid)
+        if not current_user.can_access(reference):
+            return None
+
+        return reference
+
     @classmethod
     def from_request(cls, email_store: EmailStore):
         action_name = request.args.get('action')
@@ -97,14 +113,7 @@ class NewEmailForm(FlaskForm):
         if not form:
             return None
 
-        to = request.args.get('to')
-        uid = request.args.get('uid')
-        reference = None
-        if uid:
-            reference = email_store.get(uid)
-            if not current_user.can_access(reference):
-                reference = None
-        form._populate(reference, to)
+        form._populate(email_store)
 
         return form
 
@@ -113,46 +122,99 @@ class ToEmailForm(NewEmailForm):
     action_name = 'to'
 
     # noinspection PyUnusedLocal
-    def _populate(self, email: Optional[dict], to: Optional[str]):
-        self.to.data = to or ''
+    def _populate(self, email_store: EmailStore):
+        if not self.to.data:
+            self.to.data = request.args.get('to', '')
 
 
 class ReplyEmailForm(NewEmailForm):
     action_name = 'reply'
 
-    # noinspection PyUnusedLocal
-    def _populate(self, email: Optional[dict], to: Optional[str]):
+    def _populate(self, email_store: EmailStore):
+        email = self._get_reference_email(email_store)
         if not email:
             return
 
-        self.to.data = email.get('from', '')
-        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
-        self.body.data = render_template('emails/reply.html', email=email)
+        if not self.to.data:
+            self.to.data = email.get('from', '')
+
+        if not self.subject.data:
+            self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+
+        if not self.body.data:
+            self.body.data = render_template('emails/reply.html', email=email)
 
 
 class ReplyAllEmailForm(NewEmailForm):
     action_name = 'reply_all'
 
-    # noinspection PyUnusedLocal
-    def _populate(self, email: Optional[dict], to: Optional[str]):
+    def _populate(self, email_store: EmailStore):
+        email = self._get_reference_email(email_store)
         if not email:
             return
 
-        self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
-        self.subject.data = 'Re: {}'.format(email.get('subject', ''))
-        self.body.data = render_template('emails/reply.html', email=email)
+        if not self.to.data:
+            self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
+
+        if not self.subject.data:
+            self.subject.data = 'Re: {}'.format(email.get('subject', ''))
+
+        if not self.body.data:
+            self.body.data = render_template('emails/reply.html', email=email)
 
 
 class ForwardEmailForm(NewEmailForm):
     action_name = 'forward'
 
-    # noinspection PyUnusedLocal
-    def _populate(self, email: Optional[dict], to: Optional[str]):
+    def _populate(self, email_store: EmailStore):
+        email = self._get_reference_email(email_store)
         if not email:
             return
 
-        self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
-        self.body.data = render_template('emails/forward.html', email=email)
+        if not self.subject.data:
+            self.subject.data = 'Fwd: {}'.format(email.get('subject', ''))
+
+        if not self.body.data:
+            self.body.data = render_template('emails/forward.html', email=email)
+
+        self._set_forwarded_attachments(email)
+
+    def _set_forwarded_attachments(self, email):
+        attachment_filenames = [
+            attachment.get('filename')
+            for attachment in email.get('attachments', [])
+        ]
+
+        self.forwarded_attachments.choices = [
+            (filename, filename)
+            for filename in attachment_filenames
+        ]
+
+        self.forwarded_attachments.render_kw = {
+            'size': len(attachment_filenames),
+        }
+
+        if not self.forwarded_attachments.data:
+            self.forwarded_attachments.data = [
+                filename
+                for filename in attachment_filenames
+            ]
+
+    def as_dict(self, email_store: EmailStore):
+        form = super().as_dict(email_store)
+        new_attachments = form.get('attachments', [])
+
+        reference_email = self._get_reference_email(email_store)
+
+        forwarded_attachments = [
+            attachment
+            for attachment in reference_email.get('attachments', [])
+            if attachment.get('filename') in self.forwarded_attachments.data
+        ]
+
+        form['attachments'] = forwarded_attachments + new_attachments
+
+        return form
 
 
 def _attachments_as_dict(filestorages: Iterable[FileStorage]) \

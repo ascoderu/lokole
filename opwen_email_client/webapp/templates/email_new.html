@@ -15,7 +15,7 @@
 {% block content %}{{ super() }}
 {{ email_subnav() }}
 
-<form action="{{ url_for('email_new') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
+<form action="{{ url_for('email_new', **request.args) }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
   <div class="row">
@@ -25,6 +25,9 @@
   </div>
   {{ render_field(form.subject, _('Subject')) }}
   {{ render_field(form.body, _('Message')) }}
+  {% if form.forwarded_attachments.choices %}
+  {{ render_field(form.forwarded_attachments, _('Forwarded attachments')) }}
+  {% endif %}
   {{ render_field(form.attachments, _('Attachments')) }}
   {{ render_button(form.submit, _('Send')) }}
 </form>

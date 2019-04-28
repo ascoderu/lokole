@@ -143,7 +143,7 @@ def email_new() -> Response:
         return abort(404)
 
     if form.validate_on_submit():
-        email_store.create([form.as_dict()])
+        email_store.create([form.as_dict(email_store)])
         flash(i8n.EMAIL_SENT, category='success')
         return redirect(url_for('email_inbox'))
 

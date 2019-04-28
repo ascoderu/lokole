@@ -84,11 +84,13 @@ class _Attachment(_Base):
 
     @classmethod
     def from_dict(cls, db, attachment):
-        self = _Attachment(
-            uid=attachment.get('_uid'),
-            filename=attachment.get('filename'),
-            content=attachment.get('content'),
-            cid=attachment.get('cid'))
+        self = db.query(_Attachment).get(attachment.get('_uid'))
+        if not self:
+            self = _Attachment(
+                uid=attachment.get('_uid'),
+                filename=attachment.get('filename'),
+                content=attachment.get('content'),
+                cid=attachment.get('cid'))
 
         for pointer in attachment.pop('emails', []):
             if isinstance(pointer, _Email):
