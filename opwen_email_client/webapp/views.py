@@ -3,6 +3,7 @@ from datetime import timedelta
 from io import BytesIO
 from os import path
 from typing import Iterable
+from typing import Optional
 
 from babel import Locale
 from flask import Response
@@ -21,6 +22,7 @@ from opwen_email_client.webapp import app
 from opwen_email_client.webapp.actions import SendWelcomeEmail
 from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
+from opwen_email_client.webapp.actions import UpdateCode
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm
@@ -217,6 +219,28 @@ def sync() -> Response:
 
     flash(i8n.SYNC_COMPLETE, category='success')
     return redirect(url_for('home'))
+
+
+@app.route('/admin/update', defaults={'version': None})
+@app.route('/admin/update/<version>')
+@admin_required
+def update(version: Optional[str]) -> Response:
+    update_code = UpdateCode(
+        restart_path=AppConfig.RESTART_PATH,
+        version=version,
+        log=app.logger)
+
+    start_internet_connection = StartInternetConnection(
+        modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
+        sim_config_dir=AppConfig.SIM_CONFIG_DIR,
+        sim_type=AppConfig.SIM_TYPE)
+
+    if AppConfig.SIM_TYPE != 'LocalOnly':
+        with start_internet_connection():
+            update_code()
+
+    flash(i8n.UPDATE_COMPLETE, category='success')
+    return redirect(url_for('settings'))
 
 
 @app.route('/user/language/<locale>')

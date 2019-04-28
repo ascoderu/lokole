@@ -469,6 +469,7 @@ class WebappSetup(Setup):
         'nginx',
         'python3',
         'python3-dev',
+        'python3-pip',
         'python3-venv',
         'supervisor',
     )

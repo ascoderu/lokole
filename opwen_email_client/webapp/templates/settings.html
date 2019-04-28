@@ -23,6 +23,9 @@
       <a class="btn btn-link" title="{{ _('Sync emails now') }}" href="{{ url_for('sync') }}">
         <i class="fa fa-cloud-upload"></i>
       </a>
+      <a class="btn btn-link" title="{{ _('Update code now') }}" href="{{ url_for('update') }}">
+        <i class="fa fa-code"></i>
+      </a>
     </legend>
     {{ render_field(form.sync_schedule) }}
 

@@ -2,7 +2,10 @@ from contextlib import contextmanager
 from importlib import import_module
 from logging import Logger
 from pathlib import Path
+from subprocess import check_output  # nosec
+from sys import executable
 from time import sleep
+from typing import Optional
 
 from cached_property import cached_property
 from flask import render_template
@@ -53,6 +56,37 @@ class SyncEmails(object):
 
     def __call__(self):
         self._sync()
+
+
+class UpdateCode(object):
+    _package_name = 'opwen_email_client'
+
+    def __init__(self, version: Optional[str], restart_path: Optional[str],
+                 log: Logger):
+        self._version = version
+        self._restart_path = restart_path
+        self._log = log
+
+    def __call__(self):
+        self._update_code()
+        self._restart_app()
+
+    def _update_code(self):
+        if self._version:
+            package = '{}=={}'.format(self._package_name, self._version)
+            self._log.debug('Updating to version %s', self._version)
+        else:
+            package = self._package_name
+            self._log.debug('Updating to latest version')
+
+        stdout = check_output([executable, '-m', 'pip', 'install',
+                               '-U', package])
+
+        self._log.debug('Pip install log: %s', stdout)
+
+    def _restart_app(self):
+        if self._restart_path:
+            Path(self._restart_path).touch()
 
 
 class SendWelcomeEmail(object):

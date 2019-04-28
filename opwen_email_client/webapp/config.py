@@ -36,6 +36,8 @@ class i8n(object):
     ACCOUNT_SUSPENDED = _('Your account has been suspended. '
                           'Please contact your administrator.')
     SYNC_COMPLETE = _('Email synchronization completed.')
+    UPDATE_COMPLETE = _('Code update completed. The app will restart soon '
+                        'to reflect the updates.')
     SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _(
         'The syntax is: "minute hour day-of-month month day-of-week". '
         'Use "*" for any value or "," to separate multiple values '
