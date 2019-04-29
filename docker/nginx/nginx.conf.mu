@@ -37,6 +37,12 @@ http {
       root /static;
     }
 
+    location /flower/ {
+      rewrite ^/flower/(.*)$ /$1 break;
+      proxy_pass http://{{HOSTNAME_FLOWER}};
+      proxy_set_header Host $host;
+    }
+
     location /api/email/sendgrid {
       proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
     }

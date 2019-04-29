@@ -41,6 +41,7 @@ WORKDIR /app
 
 COPY --from=builder /src/docker/docker-entrypoint.sh .
 COPY --from=builder /src/docker/app/run-celery.sh .
+COPY --from=builder /src/docker/app/run-flower.sh .
 COPY --from=builder /src/docker/app/run-gunicorn.sh .
 COPY --from=builder /src/opwen_email_server ./opwen_email_server
 

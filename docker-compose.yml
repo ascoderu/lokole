@@ -46,12 +46,14 @@ services:
       - ${APP_PORT}:8888
     environment:
       DNS_RESOLVER: 127.0.0.11
+      HOSTNAME_FLOWER: flower:8080
       HOSTNAME_CLIENT_READ: api:8080
       HOSTNAME_CLIENT_WRITE: api:8080
       HOSTNAME_EMAIL_RECEIVE: api:8080
       HOSTNAME_CLIENT_REGISTER: api:8080
     depends_on:
       - api
+      - flower
 
   api:
     << : *shared-app-build
@@ -78,6 +80,14 @@ services:
       - appinsights
       - azurite
       - rabbitmq
+
+  flower:
+    << : *shared-app-build
+    command: ["/app/run-flower.sh"]
+    environment:
+      << : *shared-app-environment
+      FLOWER_USERNAME: flower
+      FLOWER_PASSWORD: 123456
 
   setup:
     image: ${DOCKER_REPO}/opwenserver_setup:${BUILD_TAG}

@@ -15,7 +15,12 @@ before_script:
   - docker-compose up -d
 
 script:
-  - make integration-tests
+  - |
+    if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
+      echo "Skipping live service test for branch build"
+    else
+      make integration-tests
+    fi
 
 after_failure:
   - docker-compose logs
