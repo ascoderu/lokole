@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file=compose.yml --chart
+    kompose.version: 1.13.0 (84fa826)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: flower
+  name: flower
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: flower
+    spec:
+      containers:
+      - name: flower
+        image: {{.Values.version.imageRegistry}}/opwenserver_app:{{.Values.version.dockerTag}}
+        command: ["/app/run-flower.sh"]
+        env:
+        {{ include "opwen.environment.shared" . }}
+        - name: FLOWER_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: users
+              key: FLOWER_USERNAME
+        - name: FLOWER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: users
+              key: FLOWER_PASSWORD
+        ports:
+        - containerPort: 8080
+        resources: {}
+      restartPolicy: Always
+status: {}
