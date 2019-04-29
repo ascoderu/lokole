@@ -2,7 +2,7 @@ Babel==2.6.0
 Flask-BabelEx==0.9.3
 Flask-Caching==1.7.1
 Flask-Migrate==2.4.0
-Flask-SQLAlchemy==2.3.2
+Flask-SQLAlchemy==2.4.0
 Flask-Script==2.0.6
 Flask-Security==3.0.0
 Flask-Testing==0.7.1
