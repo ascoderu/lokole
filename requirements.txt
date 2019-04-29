@@ -1,6 +1,6 @@
 Pillow==6.0.0
 https://github.com/CatalystCode/libcloud/archive/1037_fix-azurite.zip
-applicationinsights==0.11.8
+applicationinsights==0.11.9
 beautifulsoup4==4.7.1
 cached-property==1.5.1
 connexion[flask,swagger-ui]==2.2.0
