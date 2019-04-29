@@ -59,7 +59,6 @@ services:
     environment:
       << : *shared-app-environment
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
-      CONNEXION_SERVER: flask
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
       REGISTRATION_USERNAME: admin
