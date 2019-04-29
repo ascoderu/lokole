@@ -1,24 +1,29 @@
-from setuptools import find_packages
+import re
+from pathlib import Path
+
 from setuptools import setup
 
-with open('requirements.txt', encoding='utf-8') as fobj:
+package = 'opwen_email_client'
+here = Path(__file__).parent
+
+with (here / 'requirements.txt').open(encoding='utf-8') as fobj:
     install_requires = [line.strip() for line in fobj]
 
-with open('README.rst', encoding='utf-8') as fobj:
+with (here / 'README.rst').open(encoding='utf-8') as fobj:
     long_description = fobj.read()
 
-with open('version.txt', encoding='utf-8') as fobj:
-    version = fobj.read().strip()
+with (here / package / '__init__.py').open(encoding='utf-8') as fobj:
+    version = re.search(r"^__version__ = '([^']*)'",
+                        fobj.read(), re.MULTILINE).group(1)
 
-packages = find_packages(exclude=['tests*'])
 scripts = ['manage.py']
 
 setup(
-    name='opwen_email_client',
+    name=package,
     version=version,
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
-    packages=packages,
+    packages=[package],
     url='https://github.com/ascoderu/opwen-webapp',
     license='Apache Software License',
     description='Email client for the Lokole project: https://ascoderu.ca',

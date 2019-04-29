@@ -4,9 +4,9 @@ settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
 .PHONY: default venv tests
 default: server
 
-requirements.txt.out: requirements.txt requirements-dev.txt
+requirements.txt.out: setup.py requirements.txt requirements-dev.txt
 	if [ ! -d $(py_env) ]; then python3 -m venv $(py_env) && $(py_env)/bin/pip install -U pip wheel | tee requirements.txt.out; fi
-	$(py_env)/bin/pip install -r requirements.txt | tee requirements.txt.out
+	$(py_env)/bin/pip install -e . | tee requirements.txt.out
 	$(py_env)/bin/pip install -r requirements-dev.txt | tee requirements.txt.out
 
 venv: requirements.txt.out
@@ -52,16 +52,19 @@ prepare-server: venv compile-translations build-frontend
 clean:
 	find opwen_email_client -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 	find tests -name '__pycache__' -type d -print0 | xargs -0 rm -rf
+	rm -rf dist/ opwen_email_client.egg-info/
 
-release: prepare-server
-	echo "$(VERSION)" > version.txt
+bump-version:
+	sed -i "s|^__version__ = '[^']*'|__version__ = '$(VERSION)'|g" opwen_email_client/__init__.py
+
+release: prepare-server bump-version
 	$(py_env)/bin/pip install twine
 	$(py_env)/bin/python setup.py sdist
 	$(py_env)/bin/twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" dist/*
 
 server: prepare-server
 	OPWEN_SETTINGS=$(settings) \
-    $(py_env)/bin/python ./manage.py devserver
+    $(py_env)/bin/manage.py devserver
 
 gunicorn: prepare-server
 	$(py_env)/bin/gunicorn \
