@@ -46,7 +46,6 @@ COPY --from=builder /src/opwen_email_server ./opwen_email_server
 
 ENV PY_ENV="/usr/local"
 ENV TESTING_UI="False"
-ENV CONNEXION_SERVER="flask"
 ENV CONNEXION_SPEC="SET_ME"
 ENV SERVER_WORKERS="1"
 ENV QUEUE_WORKERS="1"

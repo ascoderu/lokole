@@ -59,7 +59,6 @@ services:
     environment:
       << : *shared-app-environment
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
-      CONNEXION_SERVER: flask
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
       REGISTRATION_USERNAME: admin
@@ -106,6 +105,8 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_DB: "${POSTGRES_DB}"
+    ports:
+      - ${POSTGRES_PORT}:5432
 
   azurite:
     image: arafato/azurite:2.6.5

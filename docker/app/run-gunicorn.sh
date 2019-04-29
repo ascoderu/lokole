@@ -33,4 +33,4 @@ fi
   --workers="${SERVER_WORKERS}" \
   --log-level="${LOKOLE_LOG_LEVEL}" \
   --bind="0.0.0.0:${PORT}" \
-  "opwen_email_server.integration.wsgi:build_app(apis=${apis}, server='${CONNEXION_SERVER}', ui=${TESTING_UI})"
+  "opwen_email_server.integration.wsgi:build_app(apis=${apis}, ui=${TESTING_UI})"

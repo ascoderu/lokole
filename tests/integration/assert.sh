@@ -26,7 +26,7 @@ if [[ "${num_exceptions}" -ne "${num_exceptions_expected}" ]]; then
 fi
 
 num_error_requests="$(sql_query 'select count(*) from requests where status_code != 200;')"
-num_error_requests_expected=0
+num_error_requests_expected=1
 
 if [[ "${num_error_requests}" -ne "${num_error_requests_expected}" ]]; then
   echo "Got ${num_error_requests} error requests but expected ${num_error_requests_expected}" >&2
