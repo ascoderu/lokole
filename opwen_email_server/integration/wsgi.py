@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
+from applicationinsights.flask.ext import AppInsights
 from connexion import App
+
+from opwen_email_server import config
 
 _hosts = ['127.0.0.1', '0.0.0.0']  # nosec
 
@@ -15,6 +18,10 @@ def build_app(apis, host=_host, port=_port, ui=_ui):
 
     for api in apis:
         app.add_api(api)
+
+    app.app.config['APPINSIGHTS_INSTRUMENTATIONKEY'] = config.APPINSIGHTS_KEY
+    app.app.config['APPINSIGHTS_ENDPOINT_URI'] = config.APPINSIGHTS_HOST
+    AppInsights(app.app)
 
     return app
 
