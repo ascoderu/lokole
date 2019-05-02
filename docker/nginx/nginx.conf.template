@@ -23,9 +23,9 @@ http {
   keepalive_timeout 65;
 
   server {
-    listen {{PORT}};
+    listen ${PORT};
 
-    resolver {{DNS_RESOLVER}};
+    resolver ${DNS_RESOLVER};
 
     client_max_body_size 50M;
 
@@ -39,24 +39,24 @@ http {
 
     location /flower/ {
       rewrite ^/flower/(.*)$ /$1 break;
-      proxy_pass http://{{HOSTNAME_FLOWER}};
+      proxy_pass http://${HOSTNAME_FLOWER};
       proxy_set_header Host $host;
     }
 
     location /api/email/sendgrid {
-      proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
+      proxy_pass http://${HOSTNAME_EMAIL_RECEIVE};
     }
 
     location /api/email/upload {
-      proxy_pass http://{{HOSTNAME_CLIENT_WRITE}};
+      proxy_pass http://${HOSTNAME_CLIENT_WRITE};
     }
 
     location /api/email/download {
-      proxy_pass http://{{HOSTNAME_CLIENT_READ}};
+      proxy_pass http://${HOSTNAME_CLIENT_READ};
     }
 
     location /api/email/register {
-      proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
+      proxy_pass http://${HOSTNAME_CLIENT_REGISTER};
     }
   }
 }
