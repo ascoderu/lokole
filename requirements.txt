@@ -9,7 +9,7 @@ flower==0.9.3
 msgpack==0.6.1
 pyzmail36==1.0.4
 requests==2.21.0
-sendgrid==6.0.4
+sendgrid==6.0.5
 typing-extensions==3.7.2
 typing==3.6.6
 kombu==4.5.0
