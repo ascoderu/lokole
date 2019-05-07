@@ -4,12 +4,12 @@ applicationinsights==0.11.9
 beautifulsoup4==4.7.1
 cached-property==1.5.1
 connexion[flask,swagger-ui]==2.2.0
-environs==4.1.0
+environs==4.1.2
 flower==0.9.3
 msgpack==0.6.1
 pyzmail36==1.0.4
 requests==2.21.0
-sendgrid==6.0.4
+sendgrid==6.0.5
 typing-extensions==3.7.2
 typing==3.6.6
 kombu==4.5.0
