@@ -264,13 +264,17 @@ def users() -> Response:
 @admin_required
 @track_history
 def settings() -> Response:
+    email_store = app.ioc.email_store
+
     form = SettingsForm()
     if form.validate_on_submit():
         form.update()
         flash(i8n.SETTINGS_UPDATED, category='success')
         return redirect(url_for('settings'))
 
-    return _view('settings.html', form=SettingsForm.from_config())
+    return _view('settings.html',
+                 form=SettingsForm.from_config(),
+                 num_pending=email_store.num_pending())
 
 
 @app.route('/admin/suspend/<userid>')

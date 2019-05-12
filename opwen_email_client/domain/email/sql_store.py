@@ -291,6 +291,13 @@ class _SqlalchemyEmailStore(EmailStore):
     def pending(self):
         return self._query(_Email.sent_at.is_(None))
 
+    def num_pending(self):
+        with self._dbread() as db:
+            count = db.query(_Email)\
+                .filter(_Email.sent_at.is_(None))\
+                .count()
+        return count
+
     def get(self, uid):
         return self._find(_Email.uid == uid)
 

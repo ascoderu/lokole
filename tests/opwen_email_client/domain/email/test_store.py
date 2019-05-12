@@ -142,6 +142,22 @@ class Base(object):
             self.assertContainsEmail(emails[2], results)
             self.assertContainsEmail(emails[3], results)
 
+        def test_num_pending(self):
+            count = self.email_store.num_pending()
+
+            self.assertEqual(count, 0)
+
+            self.given_emails(
+                {'from': 'foo@bar.com'},
+                {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
+                {'from': 'foo@bar.com', 'sent_at': None},
+                {'from': 'baz@bar.com'},
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
+
+            count = self.email_store.num_pending()
+
+            self.assertEqual(count, 3)
+
         def test_sent(self):
             emails = self.given_emails(
                 {'from': 'foo@bar.com'},

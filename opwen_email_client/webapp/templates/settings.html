@@ -20,7 +20,7 @@
     {{ render_field(form.sim_type) }}
 
     <legend>{{ _('Configure sync schedule') }}
-      <a class="btn btn-link" title="{{ _('Sync emails now') }}" href="{{ url_for('sync') }}">
+      <a class="btn btn-link" title="{{ _('Sync emails now (%(number)s pending)', number=num_pending) }}" href="{{ url_for('sync') }}">
         <i class="fa fa-cloud-upload"></i>
       </a>
       <a class="btn btn-link" title="{{ _('Update code now') }}" href="{{ url_for('update') }}">
