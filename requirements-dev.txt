@@ -7,4 +7,4 @@ mypy==0.701
 nose2[coverage_plugin]==0.9.1
 python-dotenv==0.10.2
 responses==0.10.6
-bandit==1.5.1
+bandit==1.6.0
