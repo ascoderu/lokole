@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 
+from setuptools import find_packages
 from setuptools import setup
 
 package = 'opwen_email_client'
@@ -23,7 +24,7 @@ setup(
     version=version,
     author='Clemens Wolff',
     author_email='clemens.wolff+pypi@gmail.com',
-    packages=[package],
+    packages=find_packages(exclude=['tests*']),
     url='https://github.com/ascoderu/opwen-webapp',
     license='Apache Software License',
     description='Email client for the Lokole project: https://ascoderu.ca',
