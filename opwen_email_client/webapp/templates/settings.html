@@ -21,17 +21,17 @@
 
     <legend>{{ _('Configure sync schedule') }}
       <a class="btn btn-link" title="{{ _('Sync emails now (%(number)s pending)', number=num_pending) }}" href="{{ url_for('sync') }}">
-        <i class="fa fa-cloud-upload"></i>
+        <span class="fa fa-cloud-upload" aria-hidden="true"></span>
       </a>
       <a class="btn btn-link" title="{{ _('Update code now') }}" href="{{ url_for('update') }}">
-        <i class="fa fa-code"></i>
+        <span class="fa fa-code" aria-hidden="true"></span>
       </a>
     </legend>
     {{ render_field(form.sync_schedule) }}
 
     <legend>{{ _('Configure dial-up information') }}
       <a class="btn btn-link" title="{{ _('Launch wizard') }}" data-toggle="modal" data-target="#wvdial-modal">
-        <i class="fa fa-external-link"></i>
+        <span class="fa fa-external-link" aria-hidden="true"></span>
       </a>
     </legend>
     {{ render_field(form.wvdial) }}
@@ -45,7 +45,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}">
-          <i class="fa fa-times"></i>
+          <span class="fa fa-times" aria-hidden="true"></span>
         </button>
         <h4 class="modal-title" id="wvdial-title">{{_('Dial-up configuration wizard')}}</h4>
       </div>
