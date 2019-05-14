@@ -6,6 +6,7 @@ from datetime import datetime
 from json import dumps
 from json import loads
 from logging import getLogger
+from multiprocessing import cpu_count
 from os import chmod
 from os import getenv
 from os import stat
@@ -807,7 +808,7 @@ def cli():
     parser.add_argument('--timeout', type=int, default=300, help=(
         'Timeout for the Lokole email app. In seconds.'
     ))
-    parser.add_argument('--max_workers', type=int, default=4, help=(
+    parser.add_argument('--max_workers', type=int, default=cpu_count() - 1, help=(
         'Number of web workers for the Lokole email app.'
     ))
     parser.add_argument('--memory_per_worker', type=int, default=20, help=(
