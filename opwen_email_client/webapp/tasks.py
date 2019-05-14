@@ -1,6 +1,7 @@
 from typing import Optional
 
 from celery import Celery
+from celery.utils.log import get_task_logger
 
 from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
@@ -9,12 +10,13 @@ from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.ioc import Ioc
 
 app = Celery(__name__, broker=AppConfig.CELERY_BROKER_URL)
+log = get_task_logger(__name__)
 
 
 @app.task(ignore_result=True)
 def sync():
     sync_emails = SyncEmails(
-        log=app.log,
+        log=log,
         email_sync=Ioc.email_sync,
         email_store=Ioc.email_store)
 
@@ -33,7 +35,7 @@ def update(version: Optional[str]):
     update_code = UpdateCode(
         restart_paths=AppConfig.RESTART_PATHS,
         version=version,
-        log=app.log)
+        log=log)
 
     start_internet_connection = StartInternetConnection(
         modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
