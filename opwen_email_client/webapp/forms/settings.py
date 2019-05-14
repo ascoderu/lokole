@@ -90,8 +90,8 @@ class SettingsForm(FlaskForm):
 
     @classmethod
     def _restart_app(cls):
-        if AppConfig.RESTART_PATH:
-            Path(AppConfig.RESTART_PATH).touch()
+        for path in AppConfig.RESTART_PATHS:
+            Path(path).touch()
 
     @classmethod
     def from_config(cls):

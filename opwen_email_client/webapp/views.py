@@ -19,14 +19,13 @@ from flask_login import current_user
 
 from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
+from opwen_email_client.webapp import tasks
 from opwen_email_client.webapp.actions import SendWelcomeEmail
-from opwen_email_client.webapp.actions import StartInternetConnection
-from opwen_email_client.webapp.actions import SyncEmails
-from opwen_email_client.webapp.actions import UpdateCode
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm
 from opwen_email_client.webapp.forms.settings import SettingsForm
+from opwen_email_client.webapp.ioc import Ioc
 from opwen_email_client.webapp.login import User
 from opwen_email_client.webapp.login import admin_required
 from opwen_email_client.webapp.login import login_required
@@ -59,7 +58,7 @@ def about() -> Response:
 @app.route('/news/<int:page>')
 @track_history
 def news(page: int) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
 
     return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX),
                         page, 'news.html')
@@ -71,7 +70,7 @@ def news(page: int) -> Response:
 @login_required
 @track_history
 def email_inbox(page: int) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
     user = current_user
 
     return _emails_view(email_store.inbox(user.email), page)
@@ -82,7 +81,7 @@ def email_inbox(page: int) -> Response:
 @login_required
 @track_history
 def email_outbox(page: int) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
     user = current_user
 
     return _emails_view(email_store.outbox(user.email), page)
@@ -93,7 +92,7 @@ def email_outbox(page: int) -> Response:
 @login_required
 @track_history
 def email_sent(page: int) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
     user = current_user
 
     return _emails_view(email_store.sent(user.email), page)
@@ -104,7 +103,7 @@ def email_sent(page: int) -> Response:
 @login_required
 @track_history
 def email_search(page: int) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
     user = current_user
     query = request.args.get('query')
 
@@ -115,7 +114,7 @@ def email_search(page: int) -> Response:
 @app.route('/email/read/<email_uid>')
 @login_required
 def email_read(email_uid: str) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
     user = current_user
 
     email_store.mark_read(user.email, [email_uid])
@@ -126,7 +125,7 @@ def email_read(email_uid: str) -> Response:
 @app.route('/email/delete/<email_uid>')
 @login_required
 def email_delete(email_uid: str) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
     user = current_user
 
     email_store.delete(user.email, [email_uid])
@@ -138,7 +137,7 @@ def email_delete(email_uid: str) -> Response:
 @login_required
 @track_history
 def email_new() -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
 
     form = NewEmailForm.from_request(email_store)
     if form is None:
@@ -155,7 +154,7 @@ def email_new() -> Response:
 @app.route('/attachment/<uid>', methods=['GET'])
 @login_required
 def download_attachment(uid: str) -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
 
     attachment = email_store.get_attachment(uid)
     if attachment is None:
@@ -172,7 +171,7 @@ def register_complete() -> Response:
     send_welcome_email = SendWelcomeEmail(
         time=datetime.utcnow(),
         to=current_user.email,
-        email_store=app.ioc.email_store)
+        email_store=Ioc.email_store)
 
     send_welcome_email()
 
@@ -203,43 +202,19 @@ def logout_complete() -> Response:
 @app.route('/admin/sync')
 @admin_required
 def sync() -> Response:
-    sync_emails = SyncEmails(
-        log=app.logger,
-        email_sync=app.ioc.email_sync,
-        email_store=app.ioc.email_store)
+    tasks.sync.delay()
 
-    start_internet_connection = StartInternetConnection(
-        modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
-        sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-        sim_type=AppConfig.SIM_TYPE)
-
-    if AppConfig.SIM_TYPE != 'LocalOnly':
-        with start_internet_connection():
-            sync_emails()
-
-    flash(i8n.SYNC_COMPLETE, category='success')
-    return redirect(url_for('home'))
+    flash(i8n.SYNC_RUNNING, category='success')
+    return redirect(url_for('settings'))
 
 
 @app.route('/admin/update', defaults={'version': None})
 @app.route('/admin/update/<version>')
 @admin_required
 def update(version: Optional[str]) -> Response:
-    update_code = UpdateCode(
-        restart_path=AppConfig.RESTART_PATH,
-        version=version,
-        log=app.logger)
+    tasks.update.delay(version)
 
-    start_internet_connection = StartInternetConnection(
-        modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
-        sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-        sim_type=AppConfig.SIM_TYPE)
-
-    if AppConfig.SIM_TYPE != 'LocalOnly':
-        with start_internet_connection():
-            update_code()
-
-    flash(i8n.UPDATE_COMPLETE, category='success')
+    flash(i8n.UPDATE_RUNNING, category='success')
     return redirect(url_for('settings'))
 
 
@@ -264,7 +239,7 @@ def users() -> Response:
 @admin_required
 @track_history
 def settings() -> Response:
-    email_store = app.ioc.email_store
+    email_store = Ioc.email_store
 
     form = SettingsForm()
     if form.validate_on_submit():

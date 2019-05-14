@@ -66,6 +66,13 @@ server: prepare-server
 	OPWEN_SETTINGS=$(settings) \
     $(py_env)/bin/manage.py devserver
 
+worker: prepare-server
+	OPWEN_SETTINGS=$(settings) \
+    $(py_env)/bin/celery \
+    --app=opwen_email_client.webapp.tasks \
+    worker \
+    --concurrency=1
+
 gunicorn: prepare-server
 	$(py_env)/bin/gunicorn \
     --workers=2 \

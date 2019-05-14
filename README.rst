@@ -107,6 +107,7 @@ any of the Flask code or Jinja templates are changed.
 
   make tests
   make server
+  make worker
 
 The routes of the app are defined in `views.py <https://github.com/ascoderu/opwen-webapp/blob/master/opwen_email_client/webapp/views.py>`_
 so take a look there for an overview of the entrypoints into the code.

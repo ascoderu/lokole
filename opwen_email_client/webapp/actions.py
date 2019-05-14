@@ -5,6 +5,7 @@ from pathlib import Path
 from subprocess import check_output  # nosec
 from sys import executable
 from time import sleep
+from typing import Iterable
 from typing import Optional
 
 from cached_property import cached_property
@@ -61,10 +62,10 @@ class SyncEmails(object):
 class UpdateCode(object):
     _package_name = 'opwen_email_client'
 
-    def __init__(self, version: Optional[str], restart_path: Optional[str],
+    def __init__(self, version: Optional[str], restart_paths: Iterable[str],
                  log: Logger):
         self._version = version
-        self._restart_path = restart_path
+        self._restart_paths = restart_paths
         self._log = log
 
     def __call__(self):
@@ -85,8 +86,8 @@ class UpdateCode(object):
         self._log.debug('Pip install log: %s', stdout)
 
     def _restart_app(self):
-        if self._restart_path:
-            Path(self._restart_path).touch()
+        for path in self._restart_paths:
+            Path(path).touch()
 
 
 class SendWelcomeEmail(object):

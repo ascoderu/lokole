@@ -38,7 +38,6 @@ class Ioc(object):
 def create_app(config=AppConfig) -> Flask:
     app = Flask(__name__)
     app.config.from_object(config)
-    app.ioc = Ioc()
 
     app.babel = Babel(app)
 

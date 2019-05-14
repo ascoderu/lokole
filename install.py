@@ -437,9 +437,7 @@ class RestartSetup(Setup):
     def _run(self):
         daemon_name = 'restarter'
 
-        restart_path = self.abspath(Path(self.args.state_directory)
-                                    / daemon_name
-                                    / self.args.service_name)
+        restart_directory = Path(self.args.state_directory) / daemon_name
 
         restart_daemon = (
             'inotifywait --format "%f" --event create --monitor "{restart_directory}" '
@@ -449,7 +447,7 @@ class RestartSetup(Setup):
             'supervisorctl restart "$service" >/dev/null && '
             'rm -f "{restart_directory}/$service" '
             '; done'
-        ).format(restart_directory=Path(restart_path).parent)
+        ).format(restart_directory=self.abspath(restart_directory))
 
         self.create_daemon(
             program_name=daemon_name,
@@ -457,7 +455,10 @@ class RestartSetup(Setup):
             user='root')
 
         return {
-            'OPWEN_RESTART_PATH': restart_path,
+            'OPWEN_RESTART_PATH': ','.join((
+                self.abspath(restart_directory / self.args.server_name),
+                self.abspath(restart_directory / self.args.worker_name),
+            )),
         }
 
 
@@ -474,8 +475,6 @@ class WebappSetup(Setup):
         'supervisor',
     )
 
-    client_package = 'opwen_email_client'
-
     def __init__(self, args, abort, app_config):
         super().__init__(args, abort)
         self.app_config = app_config
@@ -488,6 +487,7 @@ class WebappSetup(Setup):
         self._create_admin_user()
         self._install_nginx()
         self._setup_gunicorn()
+        self._setup_celery()
 
     def _create_virtualenv(self):
         sh('{python} -m venv "{venv_path}"'.format(
@@ -498,11 +498,14 @@ class WebappSetup(Setup):
         self._pip_install('pip', 'setuptools', 'wheel')
 
     def _install_client(self):
-        client_package = self.client_package
-        if self.args.client_version:
-            client_package += '=={}'.format(self.args.client_version)
+        if self.args.client_dist and Path(self.args.client_dist).is_file():
+            package = self.args.client_dist
+        elif self.args.client_version:
+            package = 'opwen_email_client=={}'.format(self.args.client_version)
+        else:
+            package = 'opwen_email_client'
 
-        self._pip_install(client_package)
+        self._pip_install(package)
 
     def _compile_translations(self):
         sh('"{pybabel}" compile -d "{translations}"'.format(
@@ -600,24 +603,40 @@ class WebappSetup(Setup):
         workers = min(possible_workers, self.args.max_workers)
 
         gunicorn_script = (
-            '"{gunicorn}" '
+            'exec "{gunicorn}" '
             '--bind="unix:{socket}" '
             '--timeout={timeout} '
             '--workers={workers} '
             '--log-level={loglevel} '
             '--env "OPWEN_SETTINGS={settings}" '
-            '{package}.webapp:app'.format(
+            'opwen_email_client.webapp:app'.format(
                 gunicorn='{}/bin/gunicorn'.format(self.venv_path),
                 socket=self.socket_path,
                 timeout=self.args.timeout,
                 workers=workers,
                 loglevel=self.args.log_level,
-                settings=self.settings_path,
-                package=self.client_package))
+                settings=self.settings_path))
 
         self.create_daemon(
-            program_name=self.args.service_name,
+            program_name=self.args.server_name,
             command=gunicorn_script)
+
+    def _setup_celery(self):
+        celery_command = (
+            'OPWEN_SETTINGS="{settings}" '
+            'exec "{celery}" '
+            '--app=opwen_email_client.webapp.tasks '
+            'worker '
+            '--loglevel={loglevel} '
+            '--concurrency={workers}'.format(
+                settings=self.settings_path,
+                celery='{}/bin/celery'.format(self.venv_path),
+                loglevel=self.args.log_level,
+                workers=1))
+
+        self.create_daemon(
+            program_name=self.args.worker_name,
+            command=celery_command)
 
     def _pip_install(self, *packages):
         sh('while ! "{pip}" install --no-cache-dir --upgrade {packages}; do sleep 2s; done'.format(
@@ -631,7 +650,7 @@ class WebappSetup(Setup):
                 'lib' /
                 'python{}.{}'.format(version_info.major, version_info.minor) /
                 'site-packages' /
-                self.client_package /
+                'opwen_email_client' /
                 'webapp')
 
     @property
@@ -758,6 +777,9 @@ def cli():
     parser.add_argument('--client_version', default=getenv('LOKOLE_CLIENT_VERSION', ''), help=(
         'The version of the Lokole email app to install.'
     ))
+    parser.add_argument('--client_dist', default=getenv('LOKOLE_CLIENT_DIST', ''), help=(
+        'The dist package of the Lokole email app to install.'
+    ))
     parser.add_argument('--port', default=getenv('LOKOLE_PORT', '80'), help=(
         'The port on which to run the Lokole email app.'
     ))
@@ -773,8 +795,11 @@ def cli():
     parser.add_argument('--scripts_directory', default=getenv('LOKOLE_SCRIPTS_DIRECTORY', 'lokole/scripts'), help=(
         'The location where to store the Lokole email app scripts.'
     ))
-    parser.add_argument('--service_name', default=getenv('LOKOLE_SERVICE_NAME', 'opwen_email_client'), help=(
-        'The location where to store the Lokole email app state.'
+    parser.add_argument('--server_name', default=getenv('LOKOLE_SERVER_NAME', 'gunicorn_server'), help=(
+        'Name of the Lokole webapp server.'
+    ))
+    parser.add_argument('--worker_name', default=getenv('LOKOLE_WORKER_NAME', 'celery_worker'), help=(
+        'Name of the Lokole webapp worker.'
     ))
     parser.add_argument('--log_level', default=getenv('LOKOLE_LOG_LEVEL', 'error'), help=(
         'The log level for the Lokole email app.'

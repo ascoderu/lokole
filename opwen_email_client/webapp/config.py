@@ -35,9 +35,9 @@ class i8n(object):
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
     ACCOUNT_SUSPENDED = _('Your account has been suspended. '
                           'Please contact your administrator.')
-    SYNC_COMPLETE = _('Email synchronization completed.')
-    UPDATE_COMPLETE = _('Code update completed. The app will restart soon '
-                        'to reflect the updates.')
+    SYNC_RUNNING = _('Email synchronization running and will complete soon.')
+    UPDATE_RUNNING = _('Code update is now running. The app will restart soon '
+                       'to reflect the updates.')
     SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _(
         'The syntax is: "minute hour day-of-month month day-of-week". '
         'Use "*" for any value or "," to separate multiple values '
@@ -68,6 +68,10 @@ class AppConfig(object):
 
     ADMIN_SECRET = env('OPWEN_ADMIN_SECRET', None)
     SECRET_KEY = env('OPWEN_SESSION_KEY', None)
+
+    CELERY_SQLITE_PATH = path.join(STATE_BASEDIR, 'celery.sqlite3')
+    CELERY_BROKER_URL = env('CELERY_BROKER_URL', 'sqlalchemy+sqlite:///' + CELERY_SQLITE_PATH)
+
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'  # nosec
     SECURITY_PASSWORD_SALT = env('OPWEN_PASSWORD_SALT', None)
@@ -96,7 +100,7 @@ class AppConfig(object):
     SIM_CONFIG_DIR = path.join(STATE_BASEDIR, 'wvdial')
     LOCAL_EMAIL_STORE = path.join(STATE_BASEDIR, 'emails.sqlite3')
     SIM_TYPE = env('OPWEN_SIM_TYPE', None)
-    RESTART_PATH = env('OPWEN_RESTART_PATH', None)
+    RESTART_PATHS = env.list('OPWEN_RESTART_PATH', [])
     SYNC_SCRIPT = env(
         'OPWEN_SYNC_SCRIPT',
         'echo "synced" >> "{}"'.format(path.join(STATE_BASEDIR, 'sync.log')))

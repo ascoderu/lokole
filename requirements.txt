@@ -15,6 +15,7 @@ apache-libcloud==2.4.0
 bcrypt==3.1.6
 beautifulsoup4==4.7.1
 cached-property==1.5.1
+celery[sqlalchemy]==4.3.0
 environs==4.1.2
 gunicorn==19.9.0
 mkwvconf==0.1.1
