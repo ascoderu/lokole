@@ -308,3 +308,25 @@ class RegisterClient(_Action):
     @classmethod
     def _new_client_id(cls) -> str:
         return str(uuid4())
+
+
+class CalculatePendingEmailsMetric(_Action):
+    def __init__(self,
+                 auth: AzureAuth,
+                 pending_factory: Callable[[str], AzureTextStorage]):
+
+        self._auth = auth
+        self._pending_factory = pending_factory
+
+    def _action(self, client_domain, **auth_args):  # type: ignore
+        client_id = self._auth.client_id_for(client_domain)
+        if not client_id:
+            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'client_domain': client_domain})  # noqa: E501
+            return 'unknown client domain', 404
+
+        pending_storage = self._pending_factory(client_domain)
+        pending_emails = sum(1 for _ in pending_storage.iter())
+
+        return {
+            'pending_emails': pending_emails,
+        }

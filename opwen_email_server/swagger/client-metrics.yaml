@@ -1,0 +1,52 @@
+swagger: '2.0'
+
+info:
+  title: Opwen Cloudserver Email API.
+  version: '0.1'
+
+basePath: '/api/email/metrics'
+
+paths:
+
+  '/pending/{client_domain}':
+
+    get:
+      operationId: opwen_email_server.integration.connexion.metrics_pending
+      summary: Check how many emails are pending for the client.
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/ClientDomain'
+      responses:
+        200:
+          description: The number of pending emails for the client.
+          schema:
+            $ref: '#/definitions/PendingEmailsMetric'
+        404:
+          description: No client exists for the provided domain.
+      security:
+        - basic: []
+
+securityDefinitions:
+  basic:
+    type: basic
+    x-basicInfoFunc: opwen_email_server.integration.connexion.basic_auth
+
+parameters:
+
+  ClientDomain:
+    name: client_domain
+    description: Domain of the Lokole client.
+    in: path
+    type: string
+    required: true
+
+definitions:
+
+  PendingEmailsMetric:
+    properties:
+      pending_emails:
+        description: The number of pending emails.
+        type: integer
+    required:
+      - pending_emails

@@ -25,6 +25,8 @@ spec:
           value: 127.0.0.1:53 ipv6=off
         - name: HOSTNAME_FLOWER
           value: flower:8080
+        - name: HOSTNAME_CLIENT_METRICS
+          value: api:8080
         - name: HOSTNAME_CLIENT_READ
           value: api:8080
         - name: HOSTNAME_CLIENT_WRITE

@@ -47,6 +47,7 @@ services:
     environment:
       DNS_RESOLVER: 127.0.0.11
       HOSTNAME_FLOWER: flower:8080
+      HOSTNAME_CLIENT_METRICS: api:8080
       HOSTNAME_CLIENT_READ: api:8080
       HOSTNAME_CLIENT_WRITE: api:8080
       HOSTNAME_EMAIL_RECEIVE: api:8080

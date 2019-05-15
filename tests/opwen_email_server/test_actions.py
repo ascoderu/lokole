@@ -385,3 +385,44 @@ class RegisterClientTests(TestCase):
             client_id_source=self.client_id_source)
 
         return action(*args, **kwargs)
+
+
+class CalculatePendingEmailsMetricTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.pending_storage = Mock()
+        self.pending_factory = MagicMock()
+
+    def test_404(self):
+        client_domain = 'does.not.exist'
+        client_id = None
+
+        self.auth.client_id_for.return_value = client_id
+
+        _, status = self._execute_action(client_domain)
+
+        self.assertEqual(status, 404)
+        self.auth.client_id_for.assert_called_once_with(client_domain)
+
+    def test_200(self):
+        client_domain = 'test.com'
+        client_id = str(uuid4())
+        pending_email_ids = [str(uuid4()), str(uuid4()), str(uuid4())]
+
+        self.auth.client_id_for.return_value = client_id
+        self.pending_factory.return_value = self.pending_storage
+        self.pending_storage.iter.return_value = pending_email_ids
+
+        response = self._execute_action(client_domain)
+
+        self.assertEqual(response['pending_emails'], len(pending_email_ids))
+        self.auth.client_id_for.assert_called_once_with(client_domain)
+        self.pending_factory.assert_called_once_with(client_domain)
+        self.pending_storage.iter.assert_called_once_with()
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.CalculatePendingEmailsMetric(
+            auth=self.auth,
+            pending_factory=self.pending_factory)
+
+        return action(*args, **kwargs)
