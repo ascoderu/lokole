@@ -1,8 +1,6 @@
 from datetime import timedelta
-from functools import wraps
 from typing import Optional
 
-from flask import request
 from flask_migrate import Migrate
 from flask_security import LoginForm as _LoginForm
 from flask_security import RegisterForm as _RegisterForm
@@ -147,14 +145,5 @@ def login_required(func):
 def admin_required(func):
     if AppConfig.TESTING:
         return func
-
-    if AppConfig.ADMIN_SECRET:
-        @wraps(func)
-        def decorated_view(*args, **kwargs):
-            secret = request.args.get('secret')
-            if secret == AppConfig.ADMIN_SECRET:
-                return func(*args, **kwargs)
-            return roles_required(admin_role)(func)(*args, **kwargs)
-        return decorated_view
 
     return roles_required(admin_role)(func)

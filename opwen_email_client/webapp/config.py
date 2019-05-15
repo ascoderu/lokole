@@ -66,11 +66,11 @@ class AppConfig(object):
     SQLALCHEMY_MIGRATE_REPO = path.join(STATE_BASEDIR, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    ADMIN_SECRET = env('OPWEN_ADMIN_SECRET', None)
     SECRET_KEY = env('OPWEN_SESSION_KEY', None)
 
     CELERY_SQLITE_PATH = path.join(STATE_BASEDIR, 'celery.sqlite3')
     CELERY_BROKER_URL = env('CELERY_BROKER_URL', 'sqlalchemy+sqlite:///' + CELERY_SQLITE_PATH)
+    CELERY_BEAT_SCHEDULE_FILENAME = path.join(STATE_BASEDIR, 'celery.cron')
 
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'  # nosec
@@ -101,9 +101,8 @@ class AppConfig(object):
     LOCAL_EMAIL_STORE = path.join(STATE_BASEDIR, 'emails.sqlite3')
     SIM_TYPE = env('OPWEN_SIM_TYPE', None)
     RESTART_PATHS = env.list('OPWEN_RESTART_PATH', [])
-    SYNC_SCRIPT = env(
-        'OPWEN_SYNC_SCRIPT',
-        'echo "synced" >> "{}"'.format(path.join(STATE_BASEDIR, 'sync.log')))
+
+    SYNC_SCHEDULE = env('OPWEN_SYNC_SCHEDULE', '').strip()
 
     EMAIL_ADDRESS_DELIMITER = ','
     EMAILS_PER_PAGE = 30

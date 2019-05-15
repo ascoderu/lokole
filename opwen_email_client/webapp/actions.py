@@ -62,17 +62,11 @@ class SyncEmails(object):
 class UpdateCode(object):
     _package_name = 'opwen_email_client'
 
-    def __init__(self, version: Optional[str], restart_paths: Iterable[str],
-                 log: Logger):
+    def __init__(self, version: Optional[str], log: Logger):
         self._version = version
-        self._restart_paths = restart_paths
         self._log = log
 
     def __call__(self):
-        self._update_code()
-        self._restart_app()
-
-    def _update_code(self):
         if self._version:
             package = '{}=={}'.format(self._package_name, self._version)
             self._log.debug('Updating to version %s', self._version)
@@ -85,7 +79,12 @@ class UpdateCode(object):
 
         self._log.debug('Pip install log: %s', stdout)
 
-    def _restart_app(self):
+
+class RestartApp(object):
+    def __init__(self, restart_paths: Iterable[str]):
+        self._restart_paths = restart_paths
+
+    def __call__(self):
         for path in self._restart_paths:
             Path(path).touch()
 

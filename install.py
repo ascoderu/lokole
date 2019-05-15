@@ -10,7 +10,6 @@ from multiprocessing import cpu_count
 from os import chmod
 from os import getenv
 from os import stat
-from os import sysconf
 from os import urandom
 from pathlib import Path
 from shutil import chown
@@ -117,34 +116,29 @@ class Setup:
             mode = stat(path).st_mode
             chmod(path, mode | S_IEXEC)
 
-    def create_daemon(self, program_name, command, user=None):
+    def create_daemon(self, program_name, command, user=None, env=None):
+        env = env or {}
+        user = user or self.user
+
         stderr = self.abspath(Path(self.args.log_directory) / '{}.stderr.log'.format(program_name))
         stdout = self.abspath(Path(self.args.log_directory) / '{}.stdout.log'.format(program_name))
 
-        script_path = self.abspath(Path(self.args.scripts_directory) / '{}.sh'.format(program_name))
-        self.write_file(script_path, '#!/usr/bin/env sh\n\n{}'.format(command), executable=True)
-
         self.write_file('/etc/supervisor/conf.d/{}.conf'.format(program_name), (
             '[program:{}]'.format(program_name),
-            'command={}'.format(script_path),
+            'command={}'.format(command),
             'autostart=true',
             'autorestart=true',
             'startretries=3',
+            'stopasgroup=true',
             'stderr_logfile={}'.format(stderr),
             'stdout_logfile={}'.format(stdout),
-            'user={}'.format(user or self.user),
+            'user={}'.format(user),
+            'environment={}'.format(','.join('{}={}'.format(*kv) for kv in env.items())),
         ))
 
+    def start_daemons(self):
         sh('service supervisor start; '
-           'supervisorctl reread; '
-           'supervisorctl update;')
-
-    def create_cronjob(self, schedule, command):
-        sh('(crontab -l -u {user} || true; echo "{schedule} {command}") 2>&1 '
-           '| grep -v "no crontab for" '
-           '| sort -u '
-           '| crontab -u {user} -'
-           .format(schedule=schedule, command=command, user=self.user))
+           'supervisorctl reload;')
 
     def abspath(self, file_path):
         file_path = Path(file_path).absolute()
@@ -315,9 +309,8 @@ class WifiSetup(Setup):
         return self.args.wifi != 'no'
 
 
-class SyncSetup(Setup):
+class ModemSetup(Setup):
     packages = (
-        'cron',
         'usb-modeswitch',
         'usb-modeswitch-data',
         'mobile-broadband-provider-info',
@@ -326,18 +319,15 @@ class SyncSetup(Setup):
     )
 
     groups = (
-        'crontab',
         'dialout',
         'dip',
     )
 
     def _run(self):
         self._configure_wvdial()
-        self._configure_webapp_sync()
 
         return {
-            'OPWEN_SYNC_SCRIPT': self.sync_script,
-            'OPWEN_ADMIN_SECRET': self.admin_secret,
+            'OPWEN_SYNC_SCHEDULE': self.args.sync_schedule,
         }
 
     def _configure_wvdial(self):
@@ -348,36 +338,6 @@ class SyncSetup(Setup):
             'defaultroute',
             'replacedefaultroute',
         ))
-
-    def _configure_webapp_sync(self):
-        self.create_cronjob(self.args.sync_schedule, self.sync_script)
-
-    @property
-    def admin_secret(self):
-        try:
-            return getattr(self, '__admin_secret')
-        except AttributeError:
-            admin_secret = generate_secret(32)
-            setattr(self, '__admin_secret', admin_secret)
-            return admin_secret
-
-    @property
-    def sync_script(self):
-        try:
-            return getattr(self, '__sync_script')
-        except AttributeError:
-            sync_script_path = self.abspath(Path(self.args.scripts_directory) / 'sync.sh')
-            stderr = self.abspath(Path(self.args.log_directory) / 'sync.stderr.log')
-
-            sync_command = (
-                '#!/usr/bin/env sh\n\n'
-                'curl -LfsS "http://localhost:{port}/admin/sync?secret={secret}" 2>>"{stderr}" >/dev/null'
-            ).format(port=self.args.port, secret=self.admin_secret, stderr=stderr)
-
-            self.write_file(sync_script_path, sync_command, executable=True)
-
-            setattr(self, '__sync_script', sync_script_path)
-            return sync_script_path
 
     @property
     def is_enabled(self):
@@ -440,7 +400,7 @@ class RestartSetup(Setup):
 
         restart_directory = Path(self.args.state_directory) / daemon_name
 
-        restart_daemon = (
+        restart_script = (
             'inotifywait --format "%f" --event create --monitor "{restart_directory}" '
             '| while read -r service; do '
             'test -n "$service" && '
@@ -452,13 +412,16 @@ class RestartSetup(Setup):
 
         self.create_daemon(
             program_name=daemon_name,
-            command=restart_daemon,
+            command="sh -c '{}'".format(restart_script.replace('%', '%%')),
             user='root')
+
+        self.start_daemons()
 
         return {
             'OPWEN_RESTART_PATH': ','.join((
                 self.abspath(restart_directory / self.args.server_name),
                 self.abspath(restart_directory / self.args.worker_name),
+                self.abspath(restart_directory / self.args.cron_name),
             )),
         }
 
@@ -489,6 +452,8 @@ class WebappSetup(Setup):
         self._install_nginx()
         self._setup_gunicorn()
         self._setup_celery()
+        self._setup_cron()
+        self.start_daemons()
 
     def _create_virtualenv(self):
         sh('{python} -m venv "{venv_path}"'.format(
@@ -599,45 +564,56 @@ class WebappSetup(Setup):
         sh('systemctl restart nginx')
 
     def _setup_gunicorn(self):
-        system_memory = sysconf('SC_PAGE_SIZE') * sysconf('SC_PHYS_PAGES')
-        possible_workers = system_memory / (self.args.memory_per_worker * (1024 ** 2))
-        workers = min(possible_workers, self.args.max_workers)
-
         gunicorn_script = (
-            'exec "{gunicorn}" '
+            '"{venv}/bin/gunicorn" '
             '--bind="unix:{socket}" '
             '--timeout={timeout} '
             '--workers={workers} '
             '--log-level={loglevel} '
-            '--env "OPWEN_SETTINGS={settings}" '
             'opwen_email_client.webapp:app'.format(
-                gunicorn='{}/bin/gunicorn'.format(self.venv_path),
+                venv=self.venv_path,
                 socket=self.socket_path,
                 timeout=self.args.timeout,
-                workers=workers,
-                loglevel=self.args.log_level,
-                settings=self.settings_path))
+                workers=self.args.num_gunicorn_workers,
+                loglevel=self.args.log_level))
 
         self.create_daemon(
             program_name=self.args.server_name,
-            command=gunicorn_script)
+            command=gunicorn_script,
+            env={'OPWEN_SETTINGS': self.settings_path})
 
     def _setup_celery(self):
         celery_command = (
-            'OPWEN_SETTINGS="{settings}" '
-            'exec "{celery}" '
+            '"{venv}/bin/celery" '
             '--app=opwen_email_client.webapp.tasks '
             'worker '
             '--loglevel={loglevel} '
             '--concurrency={workers}'.format(
-                settings=self.settings_path,
-                celery='{}/bin/celery'.format(self.venv_path),
+                venv=self.venv_path,
                 loglevel=self.args.log_level,
-                workers=1))
+                workers=self.args.num_celery_workers))
 
         self.create_daemon(
             program_name=self.args.worker_name,
-            command=celery_command)
+            command=celery_command,
+            env={'OPWEN_SETTINGS': self.settings_path})
+
+    def _setup_cron(self):
+        celery_command = (
+            '"{venv}/bin/celery" '
+            '--app=opwen_email_client.webapp.tasks '
+            'beat '
+            '--pidfile="{cronstate_pid}" '
+            '--loglevel={loglevel} '.format(
+                settings=self.settings_path,
+                cronstate_pid=self.cronstate_pid,
+                venv=self.venv_path,
+                loglevel=self.args.log_level))
+
+        self.create_daemon(
+            program_name=self.args.cron_name,
+            command=celery_command,
+            env={'OPWEN_SETTINGS': self.settings_path})
 
     def _pip_install(self, *packages):
         sh('while ! "{pip}" install --no-cache-dir --upgrade {packages}; do sleep 2s; done'.format(
@@ -656,11 +632,18 @@ class WebappSetup(Setup):
 
     @property
     def socket_path(self):
-        return self.abspath(Path(self.args.state_directory) / 'gunicorn.sock')
+        return self.abspath(Path(self.args.state_directory)
+                            / '{}.sock'.format(self.args.server_name))
 
     @property
     def settings_path(self):
-        return self.abspath(Path(self.args.state_directory) / 'webapp_settings.env')
+        return self.abspath(Path(self.args.state_directory)
+                            / 'settings.env')
+
+    @property
+    def cronstate_pid(self):
+        return self.abspath(Path(self.args.state_directory)
+                            / '{}.pid'.format(self.args.cron_name))
 
     @property
     def venv_path(self):
@@ -701,6 +684,9 @@ def _dump_state(args):
 
 
 def main(args, abort):
+    if getenv('USER') != 'root':
+        abort('Must run script via sudo')
+
     _dump_state(args)
 
     app_config = {}
@@ -711,8 +697,8 @@ def main(args, abort):
     wifi_setup = WifiSetup(args, abort)
     wifi_setup()
 
-    sync_setup = SyncSetup(args, abort)
-    app_config.update(sync_setup() or {})
+    modem_setup = ModemSetup(args, abort)
+    app_config.update(modem_setup() or {})
 
     client_setup = ClientSetup(args, abort)
     app_config.update(client_setup() or {})
@@ -793,14 +779,14 @@ def cli():
     parser.add_argument('--venv_directory', default=getenv('LOKOLE_VENV_DIRECTORY', 'lokole/venv'), help=(
         'The location where to store the Lokole email app Python environment.'
     ))
-    parser.add_argument('--scripts_directory', default=getenv('LOKOLE_SCRIPTS_DIRECTORY', 'lokole/scripts'), help=(
-        'The location where to store the Lokole email app scripts.'
-    ))
-    parser.add_argument('--server_name', default=getenv('LOKOLE_SERVER_NAME', 'gunicorn_server'), help=(
+    parser.add_argument('--server_name', default=getenv('LOKOLE_SERVER_NAME', 'lokole_gunicorn'), help=(
         'Name of the Lokole webapp server.'
     ))
-    parser.add_argument('--worker_name', default=getenv('LOKOLE_WORKER_NAME', 'celery_worker'), help=(
+    parser.add_argument('--worker_name', default=getenv('LOKOLE_WORKER_NAME', 'lokole_celery_worker'), help=(
         'Name of the Lokole webapp worker.'
+    ))
+    parser.add_argument('--cron_name', default=getenv('LOKOLE_CRON_NAME', 'lokole_celery_beat'), help=(
+        'Name of the Lokole cron worker.'
     ))
     parser.add_argument('--log_level', default=getenv('LOKOLE_LOG_LEVEL', 'error'), help=(
         'The log level for the Lokole email app.'
@@ -808,11 +794,11 @@ def cli():
     parser.add_argument('--timeout', type=int, default=300, help=(
         'Timeout for the Lokole email app. In seconds.'
     ))
-    parser.add_argument('--max_workers', type=int, default=cpu_count() - 1, help=(
-        'Number of web workers for the Lokole email app.'
+    parser.add_argument('--num_celery_workers', type=int, default=2, help=(
+        'Number of celery workers for the Lokole email app.'
     ))
-    parser.add_argument('--memory_per_worker', type=int, default=20, help=(
-        'Amount of memory usage estimated for each web worker. In megabytes.'
+    parser.add_argument('--num_gunicorn_workers', type=int, default=max(2, cpu_count() - 1), help=(
+        'Number of gunicorn workers for the Lokole email app.'
     ))
     parser.add_argument('--locale', default=getenv('LOKOLE_LOCALE', 'en_GB.UTF-8'), help=(
         'Locale to set up on the system.'

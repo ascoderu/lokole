@@ -212,7 +212,7 @@ def sync() -> Response:
 @app.route('/admin/update/<version>')
 @admin_required
 def update(version: Optional[str]) -> Response:
-    tasks.update.delay(version)
+    tasks.update.delay(version=version)
 
     flash(i8n.UPDATE_RUNNING, category='success')
     return redirect(url_for('settings'))

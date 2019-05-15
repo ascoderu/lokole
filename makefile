@@ -1,4 +1,5 @@
 py_env=venv
+log_level=INFO
 settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
 
 .PHONY: default venv tests
@@ -71,11 +72,20 @@ worker: prepare-server
     $(py_env)/bin/celery \
     --app=opwen_email_client.webapp.tasks \
     worker \
-    --concurrency=1
+    --concurrency=2 \
+    --loglevel=$(log_level)
+
+cron: prepare-server
+	OPWEN_SETTINGS=$(settings) \
+    $(py_env)/bin/celery \
+    --app=opwen_email_client.webapp.tasks \
+    beat \
+    --loglevel=$(log_level)
 
 gunicorn: prepare-server
 	$(py_env)/bin/gunicorn \
     --workers=2 \
     --bind=127.0.0.1:5000 \
     --env OPWEN_SETTINGS=$(settings) \
+    --log-level=$(log_level) \
     opwen_email_client.webapp:app
