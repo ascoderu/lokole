@@ -6,6 +6,7 @@ UNKNOWN_USER = 'unknown_user'  # type: Final
 BAD_PASSWORD = 'bad_password'  # type: Final  # nosec
 MISSING_SCOPES = 'missing_scopes'  # type: Final
 UNKNOWN_COMPRESSION_FORMAT = 'unknown_compression_format'  # type: Final
+UNKNOWN_CLIENT_DOMAIN = 'unknown_client_domain'  # type: Final
 EMAILS_DELIVERED_TO_CLIENT = 'emails_delivered_to_client'  # type: Final
 EMAILS_RECEIVED_FROM_CLIENT = 'emails_received_from_client'  # type: Final
 EMAIL_RECEIVED_FOR_CLIENT = 'email_received_for_client'  # type: Final

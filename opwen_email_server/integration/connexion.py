@@ -1,4 +1,5 @@
 from opwen_email_server import config
+from opwen_email_server.actions import CalculatePendingEmailsMetric
 from opwen_email_server.actions import DownloadClientEmails
 from opwen_email_server.actions import Ping
 from opwen_email_server.actions import ReceiveInboundEmail
@@ -35,6 +36,10 @@ client_register = RegisterClient(
     client_storage=get_client_storage(),
     setup_mailbox=get_mailbox_setup(),
     setup_mx_records=get_mx_setup())
+
+metrics_pending = CalculatePendingEmailsMetric(
+    auth=get_auth(),
+    pending_factory=get_pending_storage)
 
 basic_auth = BasicAuth(
     users={
