@@ -389,43 +389,6 @@ class ClientSetup(Setup):
         return 'https://{}/api/email/register/'.format(self.args.server_host)
 
 
-class RestartSetup(Setup):
-    packages = (
-        'inotify-tools',
-        'supervisor',
-    )
-
-    def _run(self):
-        daemon_name = 'restarter'
-
-        restart_directory = Path(self.args.state_directory) / daemon_name
-
-        restart_script = (
-            'inotifywait --format "%f" --event create --monitor "{restart_directory}" '
-            '| while read -r service; do '
-            'test -n "$service" && '
-            'test -f "{restart_directory}/$service" && '
-            'supervisorctl restart "$service" >/dev/null && '
-            'rm -f "{restart_directory}/$service" '
-            '; done'
-        ).format(restart_directory=self.abspath(restart_directory))
-
-        self.create_daemon(
-            program_name=daemon_name,
-            command="sh -c '{}'".format(restart_script.replace('%', '%%')),
-            user='root')
-
-        self.start_daemons()
-
-        return {
-            'OPWEN_RESTART_PATH': ','.join((
-                self.abspath(restart_directory / self.args.server_name),
-                self.abspath(restart_directory / self.args.worker_name),
-                self.abspath(restart_directory / self.args.cron_name),
-            )),
-        }
-
-
 class WebappSetup(Setup):
     packages = (
         'bcrypt',
@@ -453,6 +416,7 @@ class WebappSetup(Setup):
         self._setup_gunicorn()
         self._setup_celery()
         self._setup_cron()
+        self._setup_restarter()
         self.start_daemons()
 
     def _create_virtualenv(self):
@@ -488,6 +452,11 @@ class WebappSetup(Setup):
             'OPWEN_EMAIL_SERVER_HOSTNAME': self.args.server_host,
             'OPWEN_CLIENT_NAME': self.args.client_name,
             'OPWEN_ROOT_DOMAIN': self.args.client_domain,
+            'OPWEN_RESTART_PATH': ','.join((
+                '{}=HUP'.format(self.abspath(self.restarter_directory / self.args.server_name)),
+                '{}='.format(self.abspath(self.restarter_directory / self.args.worker_name)),
+                '{}='.format(self.abspath(self.restarter_directory / self.args.cron_name)),
+            )),
         }
 
         self.write_file(self.settings_path, (
@@ -615,6 +584,19 @@ class WebappSetup(Setup):
             command=celery_command,
             env={'OPWEN_SETTINGS': self.settings_path})
 
+    def _setup_restarter(self):
+        restarter_command = (
+            '"{venv}/bin/manage.py" '
+            'restarter '
+            '--directory="{directory}"'.format(
+                venv=self.venv_path,
+                directory=self.abspath(self.restarter_directory)))
+
+        self.create_daemon(
+            program_name=self.args.restarter_name,
+            command=restarter_command,
+            user='root')
+
     def _pip_install(self, *packages):
         sh('while ! "{pip}" install --no-cache-dir --upgrade {packages}; do sleep 2s; done'.format(
             pip='{}/bin/pip'.format(self.venv_path),
@@ -644,6 +626,10 @@ class WebappSetup(Setup):
     def cronstate_pid(self):
         return self.abspath(Path(self.args.state_directory)
                             / '{}.pid'.format(self.args.cron_name))
+
+    @property
+    def restarter_directory(self):
+        return Path(self.args.state_directory) / self.args.restarter_name
 
     @property
     def venv_path(self):
@@ -702,9 +688,6 @@ def main(args, abort):
 
     client_setup = ClientSetup(args, abort)
     app_config.update(client_setup() or {})
-
-    restart_setup = RestartSetup(args, abort)
-    app_config.update(restart_setup() or {})
 
     webapp_setup = WebappSetup(args, abort, app_config)
     webapp_setup()
@@ -787,6 +770,9 @@ def cli():
     ))
     parser.add_argument('--cron_name', default=getenv('LOKOLE_CRON_NAME', 'lokole_celery_beat'), help=(
         'Name of the Lokole cron worker.'
+    ))
+    parser.add_argument('--restarter_name', default=getenv('LOKOLE_RESTARTER_NAME', 'lokole_restarter'), help=(
+        'Name of the Lokole restarter.'
     ))
     parser.add_argument('--log_level', default=getenv('LOKOLE_LOG_LEVEL', 'error'), help=(
         'The log level for the Lokole email app.'

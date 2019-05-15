@@ -24,4 +24,5 @@ python-crontab==2.3.6
 requests==2.21.0
 typing==3.6.6
 tzlocal==1.5.1
+watchdog==0.9.0
 xtarfile[zstd]==0.0.2

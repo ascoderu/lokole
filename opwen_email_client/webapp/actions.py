@@ -2,10 +2,11 @@ from contextlib import contextmanager
 from importlib import import_module
 from logging import Logger
 from pathlib import Path
+from subprocess import check_call  # nosec
 from subprocess import check_output  # nosec
 from sys import executable
 from time import sleep
-from typing import Iterable
+from typing import Mapping
 from typing import Optional
 
 from cached_property import cached_property
@@ -81,12 +82,35 @@ class UpdateCode(object):
 
 
 class RestartApp(object):
-    def __init__(self, restart_paths: Iterable[str]):
+    def __init__(self, restart_paths: Mapping[str, str]):
         self._restart_paths = restart_paths
 
     def __call__(self):
-        for path in self._restart_paths:
-            Path(path).touch()
+        for path, signal in self._restart_paths.items():
+            path = Path(path)
+            path.parent.mkdir(exist_ok=True, parents=True)
+            path.write_text(signal, encoding='ascii')
+
+
+class RestartAppComponent(object):
+    def __init__(self, restart_path: str):
+        self._restart_path = restart_path
+
+    def __call__(self):
+        path = Path(self._restart_path)
+
+        if not path.is_file():
+            return
+
+        component_name = path.name
+        signal = path.read_text(encoding='ascii').strip()
+
+        if signal:
+            check_call(['supervisorctl', 'signal', signal, component_name])
+        else:
+            check_call(['supervisorctl', 'restart', component_name])
+
+        path.unlink()
 
 
 class SendWelcomeEmail(object):

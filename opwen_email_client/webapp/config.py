@@ -100,7 +100,7 @@ class AppConfig(object):
     SIM_CONFIG_DIR = path.join(STATE_BASEDIR, 'wvdial')
     LOCAL_EMAIL_STORE = path.join(STATE_BASEDIR, 'emails.sqlite3')
     SIM_TYPE = env('OPWEN_SIM_TYPE', None)
-    RESTART_PATHS = env.list('OPWEN_RESTART_PATH', [])
+    RESTART_PATHS = env.dict('OPWEN_RESTART_PATH', '')
 
     SYNC_SCHEDULE = env('OPWEN_SYNC_SCHEDULE', '').strip()
 
