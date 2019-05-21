@@ -9,6 +9,8 @@ from opwen_email_client.domain.email.store import EmailStore
 
 class Base(object):
     class EmailStoreTests(TestCase, metaclass=ABCMeta):
+        page_size = 10
+
         @abstractmethod
         def create_email_store(self, restricted=None) -> EmailStore:
             raise NotImplementedError
@@ -55,7 +57,9 @@ class Base(object):
                 {'cc': [restricted1], 'from': 'unknown2@baz.com'},
                 {'bcc': [restricted1], 'from': 'unknown3@baz.com'})
 
-            results = list(self.email_store.inbox(restricted1))
+            results = self.email_store.inbox(restricted1, page=1)
+            results = list(results)
+
             self.assertEqual(len(results), 4)
             self.assertContainsEmail(kept[0], results)
             self.assertContainsEmail(kept[1], results)
@@ -70,8 +74,11 @@ class Base(object):
                 {'to': ['bar@bar.com']},
                 *emails1)
 
-            self.assertEqual(len(list(self.email_store.inbox('foo@bar.com'))), 2)
-            self.assertEqual(len(list(self.email_store.inbox('bar@bar.com'))), 1)
+            results = self.email_store.inbox('foo@bar.com', page=1)
+            self.assertEqual(len(list(results)), 2)
+
+            results = self.email_store.inbox('bar@bar.com', page=1)
+            self.assertEqual(len(list(results)), 1)
 
             ids1 = [_['_uid'] for _ in emails1]
             ids2 = [_['_uid'] for _ in emails2[1:]]
@@ -90,7 +97,8 @@ class Base(object):
                     {'_uid': 'a3', 'filename': 'a3', 'content': b'a3'},
                 ]})
 
-            self.assertEqual(len(list(self.email_store.inbox('foo@bar.com'))), 2)
+            results = self.email_store.inbox('foo@bar.com', page=1)
+            self.assertEqual(len(list(results)), 2)
 
         def test_inbox(self):
             emails = self.given_emails(
@@ -101,13 +109,29 @@ class Base(object):
                 {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
                 {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
-            results = list(self.email_store.inbox('foo@bar.com'))
+            results = self.email_store.inbox('foo@bar.com', page=1)
+            results = list(results)
 
             self.assertEqual(len(results), 4)
             self.assertContainsEmail(emails[0], results)
             self.assertContainsEmail(emails[1], results)
             self.assertContainsEmail(emails[2], results)
             self.assertContainsEmail(emails[3], results)
+
+        def test_inbox_paginated(self):
+            self.given_emails(*[{
+                'to': ['Foo@bar.com'],
+                'subject': 'email{}'.format(i),
+                'sent_at': '2017-09-10 11:11',
+            } for i in range(self.page_size + 3)])
+
+            results = self.email_store.inbox('foo@bar.com', page=1)
+            results = list(results)
+            self.assertEqual(len(results), self.page_size)
+
+            results = self.email_store.inbox('foo@bar.com', page=2)
+            results = list(results)
+            self.assertEqual(len(results), 3)
 
         def test_outbox(self):
             emails = self.given_emails(
@@ -120,7 +144,8 @@ class Base(object):
                 {'bcc': ['foo@bar.com']},
                 {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
-            results = list(self.email_store.outbox('foo@bar.com'))
+            results = self.email_store.outbox('foo@bar.com', page=1)
+            results = list(results)
 
             self.assertEqual(len(results), 3)
             self.assertContainsEmail(emails[0], results)
@@ -135,7 +160,8 @@ class Base(object):
                 {'from': 'baz@bar.com'},
                 {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
-            results = list(self.email_store.pending())
+            results = self.email_store.pending(page=1)
+            results = list(results)
 
             self.assertEqual(len(results), 3)
             self.assertContainsEmail(emails[0], results)
@@ -168,7 +194,8 @@ class Base(object):
                 {'bcc': ['foo@bar.com']},
                 {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
 
-            results = list(self.email_store.sent('foo@bar.com'))
+            results = self.email_store.sent('foo@bar.com', page=1)
+            results = list(results)
 
             self.assertEqual(len(results), 1)
             self.assertContainsEmail(emails[1], results)
@@ -179,7 +206,9 @@ class Base(object):
                 {'to': ['foo@bar.com'], 'from': 'fuz@bar.com'},
                 {'to': ['baz@bar.com'], 'from': 'fuz@bar.com'})
 
-            results = list(self.email_store.search('foo@bar.com', query='fuz'))
+            results = self.email_store.search('foo@bar.com', page=1,
+                                              query='fuz')
+            results = list(results)
 
             self.assertEqual(len(results), 1)
             self.assertContainsEmail(emails[1], results)
@@ -193,7 +222,9 @@ class Base(object):
                 {'bcc': ['foo@bar.com'], 'body': 'koala'},
                 {'to': ['baz@bar.com'], 'body': 'baz'})
 
-            results = list(self.email_store.search('foo@bar.com', query='koala'))
+            results = self.email_store.search('foo@bar.com', page=1,
+                                              query='koala')
+            results = list(results)
 
             self.assertEqual(len(results), 4)
             self.assertContainsEmail(emails[0], results)
@@ -210,7 +241,9 @@ class Base(object):
                 {'bcc': ['foo@bar.com'], 'subject': 'koala'},
                 {'to': ['baz@bar.com'], 'subject': 'baz'})
 
-            results = list(self.email_store.search('foo@bar.com', query='koala'))
+            results = self.email_store.search('foo@bar.com', page=1,
+                                              query='koala')
+            results = list(results)
 
             self.assertEqual(len(results), 4)
             self.assertContainsEmail(emails[0], results)
@@ -223,7 +256,9 @@ class Base(object):
                 {'to': ['foo@bar.com'], 'subject': 'bar foo bar'},
                 {'to': ['baz@bar.com'], 'subject': 'baz'})
 
-            results = list(self.email_store.search('foo@bar.com', query=None))
+            results = self.email_store.search('foo@bar.com', page=1,
+                                              query=None)
+            results = list(results)
 
             self.assertEqual(results, [])
 
@@ -233,7 +268,9 @@ class Base(object):
                 {'to': ['baz@bar.com'], 'subject': 'bar'})
 
             self.email_store.mark_sent(emails)
-            pending = list(self.email_store.pending())
+
+            pending = self.email_store.pending(page=1)
+            pending = list(pending)
 
             self.assertEqual(pending, [])
 
@@ -243,8 +280,12 @@ class Base(object):
                 {'to': ['baz@bar.com'], 'subject': 'bar'})
 
             self.email_store.mark_read('foo@bar.com', emails)
-            read_emails = list(self.email_store.inbox('foo@bar.com'))
-            unchanged_emails = list(self.email_store.inbox('baz@bar.com'))
+
+            read_emails = self.email_store.inbox('foo@bar.com', page=1)
+            read_emails = list(read_emails)
+
+            unchanged_emails = self.email_store.inbox('baz@bar.com', page=1)
+            unchanged_emails = list(unchanged_emails)
 
             self.assertTrue(all(email.get('read') for email in read_emails))
             self.assertTrue(not any(email.get('read') for email in unchanged_emails))
@@ -258,8 +299,12 @@ class Base(object):
                 {'to': ['baz@bar.com'], 'subject': 'bar'})
 
             self.email_store.delete('foo@bar.com', emails[:2])
-            deleted_emails = list(self.email_store.inbox('foo@bar.com'))
-            unchanged_emails = list(self.email_store.inbox('baz@bar.com'))
+
+            deleted_emails = self.email_store.inbox('foo@bar.com', page=1)
+            deleted_emails = list(deleted_emails)
+
+            unchanged_emails = self.email_store.inbox('baz@bar.com', page=1)
+            unchanged_emails = list(unchanged_emails)
 
             self.assertEqual(len(deleted_emails), 2)
             self.assertEqual(deleted_emails[0]['_uid'], emails[2]['_uid'])

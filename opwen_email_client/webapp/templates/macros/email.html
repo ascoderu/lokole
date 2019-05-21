@@ -113,15 +113,15 @@
     {% endfor %}
   </div>
 
-  {% if emails.has_prevpage or emails.has_nextpage %}
+  {% if has_prevpage or has_nextpage %}
   <ul class=pagination>
-    <li class="{{ '' if emails.has_prevpage else 'disabled' }}">
-      <a href="{{ url_for(request.endpoint, page=page-1) if emails.has_prevpage else ''}}" title="{{ _('Previous results') }}">
+    <li class="{{ '' if has_prevpage else 'disabled' }}">
+      <a href="{{ url_for(request.endpoint, page=page-1, **request.args) if has_prevpage else ''}}" title="{{ _('Previous results') }}">
         <span class="fa fa-chevron-left" aria-hidden="true"></span>
       </a>
     </li>
-    <li class="{{ '' if emails.has_nextpage else 'disabled' }}">
-      <a href="{{ url_for(request.endpoint, page=page+1) if emails.has_nextpage else ''}}" title="{{ _('Next results') }}">
+    <li class="{{ '' if has_nextpage else 'disabled' }}">
+      <a href="{{ url_for(request.endpoint, page=page+1, **request.args) if has_nextpage else ''}}" title="{{ _('Next results') }}">
         <span class="fa fa-chevron-right" aria-hidden="true"></span>
       </a>
     </li>

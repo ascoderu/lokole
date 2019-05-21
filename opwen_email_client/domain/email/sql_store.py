@@ -185,8 +185,9 @@ class _Email(_Base):
 
 
 class _SqlalchemyEmailStore(EmailStore):
-    def __init__(self, database_uri: str, restricted=None):
+    def __init__(self, page_size: int, database_uri: str, restricted=None):
         super().__init__(restricted)
+        self._page_size = page_size
         self._base = _Base
         self._engine = create_database(database_uri, self._base)
         self._sesion_maker = sessionmaker(autocommit=False, autoflush=False,
@@ -264,21 +265,28 @@ class _SqlalchemyEmailStore(EmailStore):
             result = results.first()
         return result.to_dict() if result else None
 
-    def _query(self, query):
+    def _query(self, query, page):
+        page = max(0, page - 1)
+
         with self._dbread() as db:
-            results = db.query(_Email).filter(query)
-            results = results.order_by(_Email.sent_at.desc()).all()
-        for email in results:
-            yield email.to_dict()
+            results = db.query(_Email)\
+                .filter(query)\
+                .order_by(_Email.sent_at.desc())\
+                .offset(page * self._page_size)\
+                .limit(self._page_size)
 
-    def inbox(self, email_address):
-        return self._query(_Email.is_received_by(email_address))
+            results = [email.to_dict() for email in results]
 
-    def outbox(self, email_address):
+        return results
+
+    def inbox(self, email_address, page):
+        return self._query(_Email.is_received_by(email_address), page)
+
+    def outbox(self, email_address, page):
         return self._query(_Email.is_sent_by(email_address)
-                           & _Email.sent_at.is_(None))
+                           & _Email.sent_at.is_(None), page)
 
-    def search(self, email_address, query):
+    def search(self, email_address, page, query):
         textquery = '%{}%'.format(query)
         contains_query = or_(*(_Email.subject.ilike(textquery),
                                _Email.body.ilike(textquery),
@@ -286,10 +294,10 @@ class _SqlalchemyEmailStore(EmailStore):
                                _Email.to.any(_To.address.ilike(textquery)),
                                _Email.cc.any(_Cc.address.ilike(textquery)),
                                _Email.bcc.any(_Bcc.address.ilike(textquery))))
-        return self._query(_can_access(email_address) & contains_query)
+        return self._query(_can_access(email_address) & contains_query, page)
 
-    def pending(self):
-        return self._query(_Email.sent_at.is_(None))
+    def pending(self, page):
+        return self._query(_Email.sent_at.is_(None), page)
 
     def num_pending(self):
         with self._dbread() as db:
@@ -304,14 +312,18 @@ class _SqlalchemyEmailStore(EmailStore):
     def get_attachment(self, uid):
         return self._find(_Attachment.uid == uid, table=_Attachment)
 
-    def sent(self, email_address):
+    def sent(self, email_address, page):
         return self._query(_Email.is_sent_by(email_address)
-                           & _Email.sent_at.isnot(None))
+                           & _Email.sent_at.isnot(None), page)
 
 
 class SqliteEmailStore(_SqlalchemyEmailStore):
-    def __init__(self, database_path: str, restricted=None):
-        super().__init__('sqlite:///{}'.format(database_path), restricted)
+    def __init__(self, page_size: int, database_path: str, restricted=None):
+        super().__init__(
+            page_size=page_size,
+            database_uri='sqlite:///{}'.format(database_path),
+            restricted=restricted,
+        )
 
 
 def _can_access(email_address):

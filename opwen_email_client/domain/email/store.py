@@ -32,24 +32,24 @@ class EmailStore(metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def inbox(self, email_address: str) -> Iterable[dict]:
+    def inbox(self, email_address: str, page: int) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def outbox(self, email_address: str) -> Iterable[dict]:
+    def outbox(self, email_address: str, page: int) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def sent(self, email_address: str) -> Iterable[dict]:
+    def sent(self, email_address: str, page: int) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def search(self, email_address: str,
+    def search(self, email_address: str, page: int,
                query: Optional[str]) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def pending(self) -> Iterable[dict]:
+    def pending(self, page: int) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod

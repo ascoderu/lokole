@@ -17,7 +17,6 @@ from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
 
-from opwen_email_client.util.pagination import Pagination
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp import tasks
 from opwen_email_client.webapp.actions import SendWelcomeEmail
@@ -60,7 +59,7 @@ def about() -> Response:
 def news(page: int) -> Response:
     email_store = Ioc.email_store
 
-    return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX),
+    return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX, page),
                         page, 'news.html')
 
 
@@ -73,7 +72,7 @@ def email_inbox(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.inbox(user.email), page)
+    return _emails_view(email_store.inbox(user.email, page), page)
 
 
 @app.route('/email/outbox', defaults={'page': 1})
@@ -84,7 +83,7 @@ def email_outbox(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.outbox(user.email), page)
+    return _emails_view(email_store.outbox(user.email, page), page)
 
 
 @app.route('/email/sent', defaults={'page': 1})
@@ -95,7 +94,7 @@ def email_sent(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.sent(user.email), page)
+    return _emails_view(email_store.sent(user.email, page), page)
 
 
 @app.route('/email/search', defaults={'page': 1})
@@ -107,8 +106,8 @@ def email_search(page: int) -> Response:
     user = current_user
     query = request.args.get('query')
 
-    return _emails_view(email_store.search(user.email, query), page,
-                        'email_search.html')
+    return _emails_view(email_store.search(user.email, page, query),
+                        page, 'email_search.html')
 
 
 @app.route('/email/read/<email_uid>')
@@ -373,10 +372,7 @@ def _emails_view(emails: Iterable[dict], page: int,
     offset_minutes = getattr(current_user, 'timezone_offset_minutes', 0)
     timezone_offset = timedelta(minutes=offset_minutes)
 
-    if page < 1:
-        return abort(404)
-
-    emails = Pagination(emails, page, AppConfig.EMAILS_PER_PAGE)
+    emails = list(emails)
 
     for email in emails:
         sent_at = email.get('sent_at')
@@ -385,7 +381,11 @@ def _emails_view(emails: Iterable[dict], page: int,
             sent_at_local = sent_at_utc - timezone_offset
             email['sent_at'] = sent_at_local.strftime('%Y-%m-%d %H:%M')
 
-    return _view(template, emails=emails, page=page)
+    return _view(template,
+                 emails=emails,
+                 page=page,
+                 has_prevpage=page > 1,
+                 has_nextpage=len(emails) == AppConfig.EMAILS_PER_PAGE)
 
 
 def _view(template: str, **kwargs) -> Response:
