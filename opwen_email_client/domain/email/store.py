@@ -49,7 +49,7 @@ class EmailStore(metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def pending(self, page: int) -> Iterable[dict]:
+    def pending(self, page: Optional[int]) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod

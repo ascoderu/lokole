@@ -266,18 +266,19 @@ class _SqlalchemyEmailStore(EmailStore):
         return result.to_dict() if result else None
 
     def _query(self, query, page):
-        page = max(0, page - 1)
-
         with self._dbread() as db:
-            results = db.query(_Email)\
-                .filter(query)\
-                .order_by(_Email.sent_at.desc())\
-                .offset(page * self._page_size)\
-                .limit(self._page_size)
+            results = db.query(_Email).filter(query)
+            results = results.order_by(_Email.sent_at.desc())
 
-            results = [email.to_dict() for email in results]
+            if page is None:
+                results = results.all()
+                emails = (email.to_dict() for email in results)
+            else:
+                page = max(0, page - 1)
+                results = results.offset(page * self._page_size).limit(self._page_size)
+                emails = [email.to_dict() for email in results]
 
-        return results
+        return emails
 
     def inbox(self, email_address, page):
         return self._query(_Email.is_received_by(email_address), page)

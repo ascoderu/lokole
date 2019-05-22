@@ -168,6 +168,18 @@ class Base(object):
             self.assertContainsEmail(emails[2], results)
             self.assertContainsEmail(emails[3], results)
 
+        def test_pending_without_pagination(self):
+            self.given_emails(*[{
+                'from': 'foo@bar.com',
+                'subject': 'email{}'.format(i),
+                'sent_at': None,
+            } for i in range(self.page_size + 3)])
+
+            results = self.email_store.pending(page=None)
+            results = list(results)
+
+            self.assertEqual(len(results), 13)
+
         def test_num_pending(self):
             count = self.email_store.num_pending()
 

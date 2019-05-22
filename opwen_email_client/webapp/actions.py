@@ -33,7 +33,7 @@ class SyncEmails(object):
         self._log = log
 
     def _upload(self):
-        pending = self._email_store.pending()
+        pending = self._email_store.pending(page=None)
 
         # noinspection PyBroadException
         try:
