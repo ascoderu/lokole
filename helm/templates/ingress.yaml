@@ -16,5 +16,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: nginx
+          serviceName: {{ .Release.Name }}-nginx
           servicePort: 8888
