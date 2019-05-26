@@ -2,12 +2,12 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   creationTimestamp: null
-  name: worker
+  name: {{ .Release.Name }}-worker
 spec:
   maxReplicas: 9
   minReplicas: 3
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: worker
+    name: {{ .Release.Name }}-worker
   targetCPUUtilizationPercentage: 75

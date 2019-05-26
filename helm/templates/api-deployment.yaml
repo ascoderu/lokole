@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: api
-  name: api
+    io.kompose.service: {{ .Release.Name }}-api
+  name: {{ .Release.Name }}-api
 spec:
   replicas: 1
   strategy: {}
@@ -15,7 +15,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: api
+        io.kompose.service: {{ .Release.Name }}-api
     spec:
       containers:
       - name: api

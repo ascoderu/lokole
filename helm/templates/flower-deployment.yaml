@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: flower
-  name: flower
+    io.kompose.service: {{ .Release.Name }}-flower
+  name: {{ .Release.Name }}-flower
 spec:
   replicas: 1
   strategy: {}
@@ -15,7 +15,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: flower
+        io.kompose.service: {{ .Release.Name }}-flower
     spec:
       containers:
       - name: flower

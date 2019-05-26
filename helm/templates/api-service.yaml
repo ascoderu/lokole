@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: api
-  name: api
+    io.kompose.service: {{ .Release.Name }}-api
+  name: {{ .Release.Name }}-api
 spec:
   ports:
   - name: "8080"
     port: 8080
     targetPort: 8080
   selector:
-    io.kompose.service: api
+    io.kompose.service: {{ .Release.Name }}-api
 status:
   loadBalancer: {}

@@ -2,12 +2,12 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   creationTimestamp: null
-  name: nginx
+  name: {{ .Release.Name }}-nginx
 spec:
   maxReplicas: 5
   minReplicas: 3
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
-    name: nginx
+    name: {{ .Release.Name }}-nginx
   targetCPUUtilizationPercentage: 75
