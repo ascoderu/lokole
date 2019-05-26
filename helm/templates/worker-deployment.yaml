@@ -1,13 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --file=compose.yml --chart
-    kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: worker
-  name: worker
+    io.kompose.service: {{ .Release.Name }}-worker
+  name: {{ .Release.Name }}-worker
 spec:
   replicas: 1
   strategy: {}
@@ -15,7 +12,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: worker
+        io.kompose.service: {{ .Release.Name }}-worker
     spec:
       containers:
       - name: worker

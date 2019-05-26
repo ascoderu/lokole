@@ -1,13 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --file=compose.yml --chart
-    kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: nginx
-  name: nginx
+    io.kompose.service: {{ .Release.Name }}-nginx
+  name: {{ .Release.Name }}-nginx
 spec:
   replicas: 1
   strategy: {}
@@ -15,7 +12,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: nginx
+        io.kompose.service: {{ .Release.Name }}-nginx
     spec:
       containers:
       - name: nginx
@@ -24,17 +21,17 @@ spec:
         - name: DNS_RESOLVER
           value: 127.0.0.1:53 ipv6=off
         - name: HOSTNAME_FLOWER
-          value: flower:8080
+          value: "{{ .Release.Name }}-flower:8080"
         - name: HOSTNAME_CLIENT_METRICS
-          value: api:8080
+          value: "{{ .Release.Name }}-api:8080"
         - name: HOSTNAME_CLIENT_READ
-          value: api:8080
+          value: "{{ .Release.Name }}-api:8080"
         - name: HOSTNAME_CLIENT_WRITE
-          value: api:8080
+          value: "{{ .Release.Name }}-api:8080"
         - name: HOSTNAME_EMAIL_RECEIVE
-          value: api:8080
+          value: "{{ .Release.Name }}-api:8080"
         - name: HOSTNAME_CLIENT_REGISTER
-          value: api:8080
+          value: "{{ .Release.Name }}-api:8080"
         ports:
         - containerPort: 8888
         resources: {}

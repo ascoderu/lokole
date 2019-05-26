@@ -1,19 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --file=compose.yml --chart
-    kompose.version: 1.13.0 (84fa826)
   creationTimestamp: null
   labels:
-    io.kompose.service: flower
-  name: flower
+    io.kompose.service: {{ .Release.Name }}-flower
+  name: {{ .Release.Name }}-flower
 spec:
   ports:
   - name: "8080"
     port: 8080
     targetPort: 8080
   selector:
-    io.kompose.service: flower
+    io.kompose.service: {{ .Release.Name }}-flower
 status:
   loadBalancer: {}
