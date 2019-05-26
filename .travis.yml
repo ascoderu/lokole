@@ -37,3 +37,4 @@ deploy:
     on:
       repo: ascoderu/opwen-cloudserver
       tags: true
+      condition: $LOKOLE_QUEUE_BROKER_SCHEME = azureservicebus
