@@ -14,6 +14,7 @@ from cached_property import cached_property
 from libcloud.storage.base import Container
 from libcloud.storage.base import StorageDriver
 from libcloud.storage.providers import get_driver
+from libcloud.storage.types import ContainerAlreadyExistsError
 from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
 from libcloud.storage.types import Provider
@@ -56,7 +57,10 @@ class _BaseAzureStorage(LogMixin):
         try:
             container = self._driver.get_container(self._container)
         except ContainerDoesNotExistError:
-            container = self._driver.create_container(self._container)
+            try:
+                container = self._driver.create_container(self._container)
+            except ContainerAlreadyExistsError:
+                container = self._driver.get_container(self._container)
         return container
 
     def access_info(self) -> AccessInfo:

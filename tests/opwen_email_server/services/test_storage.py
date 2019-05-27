@@ -10,7 +10,11 @@ from tarfile import TarInfo
 from tempfile import NamedTemporaryFile
 from tempfile import mkdtemp
 from unittest import TestCase
+from unittest.mock import PropertyMock
+from unittest.mock import patch
 
+from libcloud.storage.types import ContainerAlreadyExistsError
+from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import ObjectDoesNotExistError
 from xtarfile import open as tarfile_open
 
@@ -51,6 +55,27 @@ class AzureTextStorageTests(TestCase):
         self.assertFalse(isdir(join(self._folder, self._container)))
         self._storage.ensure_exists()
         self.assertTrue(isdir(join(self._folder, self._container)))
+
+    def test_handles_race_condition_when_creating_container(self):
+        with patch.object(self._storage, '_driver', new_callable=PropertyMock) as driver:
+            container = {'get_was_called': False}
+
+            # noinspection PyUnusedLocal
+            def get_container(*args, **kwargs):
+                if not container['get_was_called']:
+                    container['get_was_called'] = True
+                    raise ContainerDoesNotExistError(None, driver, self._container)
+
+                return container
+
+            # noinspection PyUnusedLocal
+            def create_container(*args, **kwargs):
+                raise ContainerAlreadyExistsError(None, driver, self._container)
+
+            driver.get_container.side_effect = get_container
+            driver.create_container.side_effect = create_container
+
+            self.assertIs(self._storage._client, container)
 
     def setUp(self):
         self._folder = mkdtemp()
