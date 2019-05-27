@@ -1,9 +1,12 @@
 from abc import ABC
+from hashlib import sha256
 from typing import Callable
 from typing import Iterable
 from typing import Tuple
 from typing import Union
 from uuid import uuid4
+
+from libcloud.storage.types import ObjectDoesNotExistError
 
 from opwen_email_server.constants import events
 from opwen_email_server.constants import sync
@@ -78,7 +81,11 @@ class StoreInboundEmails(_Action):
         self._email_parser = email_parser or self._parse_mime_email
 
     def _action(self, resource_id):  # type: ignore
-        mime_email = self._raw_email_storage.fetch_text(resource_id)
+        try:
+            mime_email = self._raw_email_storage.fetch_text(resource_id)
+        except ObjectDoesNotExistError:
+            self.log_warning('Inbound email %s does not exist', resource_id)
+            return 'skipped', 202
 
         email = self._email_parser(mime_email)
         self._store_inbound_email(resource_id, email)
@@ -150,13 +157,11 @@ class ReceiveInboundEmail(_Action):
     def __init__(self,
                  auth: AzureAuth,
                  raw_email_storage: AzureTextStorage,
-                 next_task: Callable[[str], None],
-                 email_id_source: Callable[[], str] = None):
+                 next_task: Callable[[str], None]):
 
         self._auth = auth
         self._raw_email_storage = raw_email_storage
         self._next_task = next_task
-        self._email_id_source = email_id_source or self._new_email_id
 
     def _action(self, client_id, email):  # type: ignore
         domain = self._auth.domain_for(client_id)
@@ -164,7 +169,7 @@ class ReceiveInboundEmail(_Action):
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
             return 'client is not registered', 403
 
-        email_id = self._email_id_source()
+        email_id = self._new_email_id(email)
 
         self._raw_email_storage.store_text(email_id, email)
 
@@ -174,8 +179,8 @@ class ReceiveInboundEmail(_Action):
         return 'received', 200
 
     @classmethod
-    def _new_email_id(cls) -> str:
-        return str(uuid4())
+    def _new_email_id(cls, email: str) -> str:
+        return sha256(email.encode('utf-8')).hexdigest()
 
 
 class DownloadClientEmails(_Action):

@@ -74,9 +74,13 @@ class _BaseAzureStorage(LogMixin):
         self._client
 
     def delete(self, resource_id: str):
-        resource = self._client.get_object(resource_id)
-        resource.delete()
-        self.log_debug('deleted %s', resource_id)
+        try:
+            resource = self._client.get_object(resource_id)
+        except ObjectDoesNotExistError:
+            self.log_warning('deleted missing %s', resource_id)
+        else:
+            resource.delete()
+            self.log_debug('deleted %s', resource_id)
 
     def iter(self) -> Iterator[str]:
         for resource in self._client.list_objects():
