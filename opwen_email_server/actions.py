@@ -97,11 +97,10 @@ class StoreInboundEmails(_Action):
             pending_storage = self._pending_factory(domain)
             pending_storage.store_text(email_id, 'pending')
 
-    @classmethod
-    def _parse_mime_email(cls, mime_email: str) -> dict:
+    def _parse_mime_email(self, mime_email: str) -> dict:
         email = parse_mime_email(mime_email)
         email = format_attachments(email)
-        email = format_inline_images(email)
+        email = format_inline_images(email, self.log_warning)
         return email
 
 
