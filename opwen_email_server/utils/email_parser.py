@@ -6,6 +6,7 @@ from email.utils import parsedate_tz
 from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
+from typing import Callable
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -192,7 +193,7 @@ def _is_valid_url(url: Optional[str]) -> bool:
     return has_http_prefix or has_https_prefix
 
 
-def format_inline_images(email: dict) -> dict:
+def format_inline_images(email: dict, on_error: Callable) -> dict:
     email_body = email.get('body', '')
     if not email_body:
         return email
@@ -208,9 +209,13 @@ def format_inline_images(email: dict) -> dict:
         if not _is_valid_url(image_url):
             continue
 
-        encoded_image = _fetch_image_to_base64(image_url)
-        if encoded_image:
-            image_tag['src'] = encoded_image
+        try:
+            encoded_image = _fetch_image_to_base64(image_url)
+        except Exception as ex:
+            on_error('Unable to inline image %s: %s', image_url, ex)
+        else:
+            if encoded_image:
+                image_tag['src'] = encoded_image
 
     new_email = dict(email)
     new_email['body'] = str(soup)
