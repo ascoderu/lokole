@@ -1,6 +1,5 @@
 from mimetypes import guess_type
 from typing import Callable
-from urllib.error import URLError
 
 from cached_property import cached_property
 from requests import post as http_post
@@ -47,7 +46,7 @@ class SendSendgridEmail(LogMixin):
         request = email.get()
         try:
             status = self._client(request)
-        except URLError as ex:
+        except Exception as ex:
             status = getattr(ex, 'code', -1)
             self.log_exception(ex, 'error sending email %s:%r',
                                email_id, request)
