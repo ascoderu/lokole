@@ -6,6 +6,8 @@ from unittest.mock import Mock
 from unittest.mock import patch
 from uuid import uuid4
 
+from libcloud.storage.types import ObjectDoesNotExistError
+
 from opwen_email_server import actions
 from opwen_email_server.constants import sync
 from opwen_email_server.services.storage import AccessInfo
@@ -84,6 +86,25 @@ class StoreInboundEmailsTests(TestCase):
         self.pending_storage = Mock()
         self.pending_factory = MagicMock()
         self.email_parser = MagicMock()
+
+    def test_202(self):
+        # noinspection PyUnusedLocal
+        def throw(*args, **kwargs):
+            raise ObjectDoesNotExistError(None, None, None)
+
+        resource_id = str(uuid4())
+
+        self.raw_email_storage.fetch_text.side_effect = throw
+
+        _, status = self._execute_action(resource_id)
+
+        self.assertEqual(status, 202)
+        self.raw_email_storage.fetch_text.assert_called_once_with(resource_id)
+        self.assertFalse(self.raw_email_storage.delete.called)
+        self.assertFalse(self.email_storage.store_object.called)
+        self.assertFalse(self.pending_factory.called)
+        self.assertFalse(self.pending_storage.store_text.called)
+        self.assertFalse(self.email_parser.called)
 
     def test_200(self):
         resource_id = str(uuid4())
@@ -175,27 +196,44 @@ class ReceiveInboundEmailTests(TestCase):
 
     def test_200(self):
         client_id = str(uuid4())
-        email_id = str(uuid4())
+        email_id = 'dfbab492b9adcf20ca8424b993b0f7ec26731d069be4d451ebbf7910937a999c'
         domain = 'test.com'
         email = 'dummy-mime'
 
         self.auth.domain_for.return_value = domain
-        self.email_id_source.return_value = email_id
 
         _, status = self._execute_action(client_id, email)
 
         self.assertEqual(status, 200)
         self.auth.domain_for.assert_called_once_with(client_id)
-        self.email_id_source.assert_called_once_with()
         self.raw_email_storage.store_text.assert_called_once_with(email_id, email)
         self.next_task.assert_called_once_with(email_id)
+
+    def test_is_idempotent(self):
+        client_id = str(uuid4())
+        domain = 'test.com'
+        email = 'dummy-mime'
+        num_repeated_emails = 3
+
+        self.auth.domain_for.return_value = domain
+
+        for _ in range(num_repeated_emails):
+            _, status = self._execute_action(client_id, email)
+            self.assertEqual(status, 200)
+
+        self.assertHasSameCalls(self.raw_email_storage.store_text, num_repeated_emails)
+        self.assertHasSameCalls(self.next_task, num_repeated_emails)
+
+    def assertHasSameCalls(self, mocked_function, num_calls):
+        self.assertEqual(len(mocked_function.call_args_list), num_calls)
+        for call in mocked_function.call_args_list:
+            self.assertEqual(call, mocked_function.call_args_list[0])
 
     def _execute_action(self, *args, **kwargs):
         action = actions.ReceiveInboundEmail(
             auth=self.auth,
             raw_email_storage=self.raw_email_storage,
-            next_task=self.next_task,
-            email_id_source=self.email_id_source)
+            next_task=self.next_task)
 
         return action(*args, **kwargs)
 

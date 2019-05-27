@@ -6,8 +6,8 @@ out_dir="$(dirname "$0")/../files/end_to_end/test.out"
 mkdir -p "${out_dir}"
 
 emails_to_send="${in_dir}/client-emails.tar.gz"
-client_id="$(jq -r '.client_id' < "${out_dir}/register.json")"
-resource_container="$(jq -r '.resource_container' < "${out_dir}/register.json")"
+client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
+resource_container="$(jq -r '.resource_container' < "${out_dir}/register1.json")"
 resource_id="$(python3 -c 'import uuid;print(str(uuid.uuid4()))').tar.gz"
 
 # workflow 1: send emails written on the client to the world

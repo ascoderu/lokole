@@ -101,6 +101,8 @@ class AzureFileStorageTests(TestCase):
         with self.assertRaises(ObjectDoesNotExistError):
             self._storage.fetch_file(resource_id)
 
+        self._storage.delete(resource_id)
+
     def assertFileContains(self, path: str, content: str):
         with open(path, encoding='utf-8') as fobj:
             self.assertEqual(fobj.read(), content)
