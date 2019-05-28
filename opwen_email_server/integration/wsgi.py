@@ -21,6 +21,7 @@ def build_app(apis, host=_host, port=_port, ui=_ui):
 
     app.app.config['APPINSIGHTS_INSTRUMENTATIONKEY'] = config.APPINSIGHTS_KEY
     app.app.config['APPINSIGHTS_ENDPOINT_URI'] = config.APPINSIGHTS_HOST
+    app.app.config['APPINSIGHTS_DISABLE_TRACE_LOGGING'] = True
     AppInsights(app.app)
 
     return app

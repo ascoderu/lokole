@@ -6,6 +6,7 @@ from logging import Formatter
 from logging import Handler
 from logging import Logger
 from logging import StreamHandler
+from logging import getLevelName
 from logging import getLogger
 from typing import Any
 from typing import Iterable
@@ -16,7 +17,6 @@ from applicationinsights.channel import AsynchronousQueue
 from applicationinsights.channel import AsynchronousSender
 from applicationinsights.channel import NullSender
 from applicationinsights.channel import TelemetryChannel
-from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
 
 from opwen_email_server.config import APPINSIGHTS_HOST
@@ -50,10 +50,6 @@ class LogMixin:
         stderr = StreamHandler()
         stderr.setFormatter(Formatter(STDERR))
         handlers.append(stderr)
-
-        handlers.append(LoggingHandler(
-            self._telemetry_key,
-            telemetry_channel=self._telemetry_channel))
 
         return handlers
 
@@ -98,9 +94,8 @@ class LogMixin:
         args.extend(log_args)
         message = SEPARATOR.join(message_parts)
         self._logger.log(level, message, *args)
+        self._telemetry_client.track_trace(message % tuple(args), severity=getLevelName(level))
 
     def log_event(self, event_name: str, properties: Optional[dict] = None):
-        self.log_info('%s%s%s', event_name, SEPARATOR, properties)
-
+        self._logger.info('%s%s%s', event_name, SEPARATOR, properties)
         self._telemetry_client.track_event(event_name, properties)
-        self._telemetry_channel.flush()
