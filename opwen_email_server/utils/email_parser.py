@@ -51,7 +51,7 @@ def _parse_attachments(mailparts: Iterable[MailPart]) -> Iterable[dict]:
 
 
 def _parse_addresses(message: PyzMessage, address_type: str) -> List[str]:
-    return [email for _, email in message.get_addresses(address_type) if email]
+    return sorted(email for _, email in message.get_addresses(address_type) if email)
 
 
 def _parse_address(message: PyzMessage, address_type: str) -> Optional[str]:
