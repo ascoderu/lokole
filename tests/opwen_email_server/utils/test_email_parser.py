@@ -54,8 +54,8 @@ class ParseMimeEmailTests(TestCase):
         email = email_parser.parse_mime_email(mime_email)
 
         self.assertEqual(email.get('bcc'), ['laura@lokole.ca'])
-        self.assertEqual(email.get('cc'), ['nzola@lokole.ca',
-                                           'clemens@lokole.ca'])
+        self.assertEqual(email.get('cc'), ['clemens@lokole.ca',
+                                           'nzola@lokole.ca'])
 
     def test_parses_email_with_attachments(self):
         mime_email = self._given_mime_email('email-attachment.mime')

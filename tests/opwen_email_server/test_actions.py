@@ -107,23 +107,26 @@ class StoreInboundEmailsTests(TestCase):
         self.assertFalse(self.email_parser.called)
 
     def test_200(self):
-        resource_id = str(uuid4())
+        resource_id = 'b8dcaf40-fd14-4a89-8898-c9514b0ad724'
         domain = 'test.com'
         raw_email = 'dummy-mime'
-        email = {'to': ['foo@{}'.format(domain)], '_uid': resource_id}
+        parsed_email = {'to': ['foo@{}'.format(domain)]}
+        email_id = 'eaee7d51a5440981d5df66825134dcfe0490f145e1ad689bce8c68caeaecde53'
+        stored_email = dict(parsed_email)
+        stored_email['_uid'] = email_id
 
         self.raw_email_storage.fetch_text.return_value = raw_email
         self.pending_factory.return_value = self.pending_storage
-        self.email_parser.return_value = email
+        self.email_parser.return_value = parsed_email
 
         _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
         self.raw_email_storage.fetch_text.assert_called_once_with(resource_id)
         self.raw_email_storage.delete.assert_called_once_with(resource_id)
-        self.email_storage.store_object.assert_called_once_with(resource_id, email)
+        self.email_storage.store_object.assert_called_once_with(email_id, stored_email)
         self.pending_factory.assert_called_once_with(domain)
-        self.pending_storage.store_text.assert_called_once_with(resource_id, 'pending')
+        self.pending_storage.store_text.assert_called_once_with(email_id, 'pending')
         self.email_parser.assert_called_once_with(raw_email)
 
     def _execute_action(self, *args, **kwargs):

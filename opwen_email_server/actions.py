@@ -24,6 +24,7 @@ from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_base64
+from opwen_email_server.utils.serialization import to_json
 from opwen_email_server.utils.serialization import to_jsonl_bytes
 from opwen_email_server.utils.string import is_lowercase
 
@@ -88,14 +89,15 @@ class StoreInboundEmails(_Action):
             return 'skipped', 202
 
         email = self._email_parser(mime_email)
-        self._store_inbound_email(resource_id, email)
+        self._store_inbound_email(email)
 
         self._raw_email_storage.delete(resource_id)
 
         self.log_event(events.EMAIL_STORED_FOR_CLIENT, {'domain': get_domain(email.get('from') or '')})  # noqa: E501
         return 'OK', 200
 
-    def _store_inbound_email(self, email_id: str, email: dict):
+    def _store_inbound_email(self, email: dict):
+        email_id = self._to_id(email)
         email['_uid'] = email_id
 
         self._email_storage.store_object(email_id, email)
@@ -109,6 +111,10 @@ class StoreInboundEmails(_Action):
         email = format_attachments(email)
         email = format_inline_images(email, self.log_warning)
         return email
+
+    @classmethod
+    def _to_id(cls, email: dict) -> str:
+        return sha256(to_json(email).encode('utf-8')).hexdigest()
 
 
 class StoreWrittenClientEmails(_Action):
