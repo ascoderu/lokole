@@ -3,7 +3,7 @@ flex==6.14.0
 isort==4.3.20
 librabbitmq==2.0.0
 lockfile==0.12.2
-mypy==0.701
+mypy==0.710
 nose2[coverage_plugin]==0.9.1
 python-dotenv==0.10.3
 responses==0.10.6
