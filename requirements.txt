@@ -15,5 +15,5 @@ typing==3.7.4
 kombu==4.6.3
 celery==4.3.0
 xtarfile[zstd]==0.0.2
-azure-servicebus==0.50.0
+azure-servicebus==0.50.1
 gunicorn==19.9.0
