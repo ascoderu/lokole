@@ -1,6 +1,5 @@
 from pathlib import Path
 from subprocess import Popen  # nosec
-from tempfile import NamedTemporaryFile
 from time import sleep
 from typing import IO
 
@@ -19,8 +18,9 @@ def _start_dialer(config: Path, log_file: IO) -> Popen:
                  stderr=log_file)
 
 
-def dialup(config: Path, max_retries: int, poll_seconds: int) -> Popen:
-    with NamedTemporaryFile(prefix='wvdial', suffix='.log') as log:
+def dialup(config: Path, log: Path,
+           max_retries: int, poll_seconds: int) -> Popen:
+    with log.open(mode='w+b') as log:
         connection = _start_dialer(config, log)
 
         while not _dialer_is_connected(log.name):

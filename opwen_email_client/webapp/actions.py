@@ -22,6 +22,7 @@ from opwen_email_client.domain.modem import modem_is_plugged
 from opwen_email_client.domain.modem import modem_is_setup
 from opwen_email_client.domain.modem import setup_modem
 from opwen_email_client.domain.sim import dialup
+from opwen_email_client.util.os import backup
 from opwen_email_client.webapp.config import i8n
 
 
@@ -135,10 +136,11 @@ class StartInternetConnection(object):
     _supported_modems = (e303, e353, e3131)
 
     def __init__(self, modem_config_dir: str, sim_config_dir: str,
-                 sim_type: str):
+                 sim_type: str, state_dir: str):
         self._modem_config_dir = Path(modem_config_dir)
         self._sim_config_dir = Path(sim_config_dir)
         self._sim_type = sim_type
+        self._state_dir = Path(state_dir)
         self._modem_target_mode = '1506'
 
     @cached_property
@@ -159,6 +161,15 @@ class StartInternetConnection(object):
                 fobj.write(sim_config.wvdial)
 
         return wvdial_config
+
+    @property
+    def _wvdial_log(self) -> Path:
+        wvdial_log = self._state_dir / 'wvdial.log'
+
+        backup(wvdial_log)
+
+        wvdial_log.write_bytes(b'')
+        return wvdial_log
 
     def _modem_config_for(self, modem) -> Path:
         modem_config = self._modem_config_dir / modem.uid
@@ -196,6 +207,7 @@ class StartInternetConnection(object):
 
             connection = dialup(
                 self._wvdial_config,
+                self._wvdial_log,
                 max_retries=90,
                 poll_seconds=1)
 

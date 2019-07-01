@@ -33,6 +33,7 @@ def sync(*args, **kwargs):
         email_store=Ioc.email_store)
 
     start_internet_connection = StartInternetConnection(
+        state_dir=AppConfig.STATE_BASEDIR,
         modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
         sim_config_dir=AppConfig.SIM_CONFIG_DIR,
         sim_type=AppConfig.SIM_TYPE)

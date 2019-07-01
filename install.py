@@ -136,10 +136,6 @@ class Setup:
             'environment={}'.format(','.join('{}={}'.format(*kv) for kv in env.items())),
         ))
 
-    def start_daemons(self):
-        sh('service supervisor start; '
-           'supervisorctl reload;')
-
     def abspath(self, file_path):
         file_path = Path(file_path).absolute()
         self._mkdir(file_path.parent)
@@ -417,7 +413,6 @@ class WebappSetup(Setup):
         self._setup_celery()
         self._setup_cron()
         self._setup_restarter()
-        self.start_daemons()
 
     def _create_virtualenv(self):
         sh('{python} -m venv "{venv_path}"'.format(
@@ -691,6 +686,8 @@ def main(args, abort):
 
     webapp_setup = WebappSetup(args, abort, app_config)
     webapp_setup()
+
+    sh('shutdown --reboot now', user='root')
 
 
 def cli():

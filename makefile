@@ -58,9 +58,11 @@ clean:
 bump-version:
 	sed -i "s|^__version__ = '[^']*'|__version__ = '$(VERSION)'|g" opwen_email_client/__init__.py
 
-release: prepare-server bump-version
-	$(py_env)/bin/pip install twine
+prepare-release: prepare-server bump-version
 	$(py_env)/bin/python setup.py sdist
+
+release: prepare-release
+	$(py_env)/bin/pip install twine
 	$(py_env)/bin/twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" dist/*
 
 server: prepare-server
