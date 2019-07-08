@@ -357,6 +357,13 @@ def _inject_locales() -> dict:
     }
 
 
+@app.context_processor
+def _inject_local_only() -> dict:
+    return {
+        'local_only': AppConfig.SIM_TYPE == 'LocalOnly'
+    }
+
+
 @app.babel.localeselector
 def _localeselector() -> str:
     current_language = Session.get_current_language()

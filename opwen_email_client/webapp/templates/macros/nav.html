@@ -53,7 +53,7 @@
         {{ nav_link('email_inbox', _('Email'), level=0, icon='envelope') }}
         {{ nav_link('users', _('Users'), level=0, icon='users') }}
         {{ nav_link('news', _('News'), level=0, icon='comments') }}
-        {% if current_user.is_admin %}
+        {% if current_user.is_admin and not local_only %}
         {{ nav_link('settings', _('Settings'), level=0, icon='cog') }}
         {% endif %}
       </ul>
