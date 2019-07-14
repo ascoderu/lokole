@@ -25,11 +25,7 @@ RUN make ci clean
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    ca-certificates=20161130+nmu1+deb9u1 \
-  && rm -rf /var/lib/apt/lists/* \
-  && groupadd -r opwen \
+RUN groupadd -r opwen \
   && useradd -r -s /bin/false -g opwen opwen
 
 COPY --from=builder /deps /deps
