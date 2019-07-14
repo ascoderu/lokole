@@ -96,14 +96,13 @@ class SendSendgridEmail(LogMixin):
         filename = attachment.get('filename', '')
         content = attachment.get('content', b'')
 
-        mail_attachment = Attachment()
-        mail_attachment.disposition = 'attachment'
-        mail_attachment.filename = filename
-        mail_attachment.content_id = filename
-        mail_attachment.type = guess_type(filename)[0]
-        mail_attachment.content = to_base64(content)
-
-        return mail_attachment
+        return Attachment(
+            disposition='attachment',
+            file_name=filename,
+            content_id=filename,
+            file_type=guess_type(filename)[0],
+            file_content=to_base64(content),
+        )
 
 
 class SetupSendgridMailbox(LogMixin):
