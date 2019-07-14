@@ -24,8 +24,8 @@ from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_base64
-from opwen_email_server.utils.serialization import to_json
 from opwen_email_server.utils.serialization import to_jsonl_bytes
+from opwen_email_server.utils.serialization import to_msgpack_bytes
 from opwen_email_server.utils.string import is_lowercase
 
 Response = Union[dict, Tuple[str, int]]
@@ -114,7 +114,7 @@ class StoreInboundEmails(_Action):
 
     @classmethod
     def _to_id(cls, email: dict) -> str:
-        return sha256(to_json(email).encode('utf-8')).hexdigest()
+        return sha256(to_msgpack_bytes(email)).hexdigest()
 
 
 class StoreWrittenClientEmails(_Action):

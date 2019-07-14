@@ -111,7 +111,7 @@ class StoreInboundEmailsTests(TestCase):
         domain = 'test.com'
         raw_email = 'dummy-mime'
         parsed_email = {'to': ['foo@{}'.format(domain)]}
-        email_id = 'eaee7d51a5440981d5df66825134dcfe0490f145e1ad689bce8c68caeaecde53'
+        email_id = 'c1763288b50107e4e4df4f2d7144f1085729ed112500995ab8103dd532276c18'
         stored_email = dict(parsed_email)
         stored_email['_uid'] = email_id
 
