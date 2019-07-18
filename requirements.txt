@@ -1,5 +1,5 @@
 Pillow==6.0.0
-https://github.com/apache/libcloud/archive/70830dfa642625c3372a5bd5019d9affcfcc0789.zip
+https://github.com/apache/libcloud/archive/c3392e6ee098b44b16f4aba7b3aa294ed4b604a8.zip
 applicationinsights==0.11.9
 beautifulsoup4==4.7.1
 cached-property==1.5.1
