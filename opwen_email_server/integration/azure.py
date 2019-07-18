@@ -4,7 +4,7 @@ from opwen_email_server import config
 from opwen_email_server.constants import azure as constants
 from opwen_email_server.constants.cache import PENDING_STORAGE_CACHE_SIZE
 from opwen_email_server.services.auth import AzureAuth
-from opwen_email_server.services.cloudflare import SetupCloudflareMxRecords
+from opwen_email_server.services.dns import SetupMxRecords
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 from opwen_email_server.services.storage import AzureFileStorage
@@ -62,11 +62,11 @@ def get_mailbox_setup() -> SetupSendgridMailbox:
 
 
 @singleton
-def get_mx_setup() -> SetupCloudflareMxRecords:
-    return SetupCloudflareMxRecords(
-        user=config.CLOUDFLARE_USER,
-        key=config.CLOUDFLARE_KEY,
-        zone=config.CLOUDFLARE_ZONE)
+def get_mx_setup() -> SetupMxRecords:
+    return SetupMxRecords(
+        account=config.DNS_ACCOUNT,
+        secret=config.DNS_SECRET,
+        provider=config.DNS_PROVIDER)
 
 
 @singleton
