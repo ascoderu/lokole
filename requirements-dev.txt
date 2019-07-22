@@ -1,6 +1,6 @@
-flake8==3.7.7
+flake8==3.7.8
 isort==4.3.21
 lockfile==0.12.2
-mypy==0.711
+mypy==0.720
 nose2[coverage_plugin]==0.9.1
-bandit==1.6.1
+bandit==1.6.2
