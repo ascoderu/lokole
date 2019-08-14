@@ -57,10 +57,10 @@ services:
       - flower
 
   api:
-    << : *shared-app-build
+    <<: *shared-app-build
     command: ["/app/run-gunicorn.sh"]
     environment:
-      << : *shared-app-environment
+      <<: *shared-app-environment
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
@@ -71,10 +71,10 @@ services:
       - azurite
 
   worker:
-    << : *shared-app-build
+    <<: *shared-app-build
     command: ["/app/run-celery.sh"]
     environment:
-      << : *shared-app-environment
+      <<: *shared-app-environment
       CELERY_QUEUE_NAMES: all
       QUEUE_WORKERS: ${QUEUE_WORKERS}
     depends_on:
@@ -83,10 +83,10 @@ services:
       - rabbitmq
 
   flower:
-    << : *shared-app-build
+    <<: *shared-app-build
     command: ["/app/run-flower.sh"]
     environment:
-      << : *shared-app-environment
+      <<: *shared-app-environment
       FLOWER_USERNAME: flower
       FLOWER_PASSWORD: 123456
 

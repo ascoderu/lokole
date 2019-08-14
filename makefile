@@ -25,6 +25,12 @@ lint-python: venv
 	$(PY_ENV)/bin/bandit --recursive opwen_email_server
 	$(PY_ENV)/bin/mypy opwen_email_server
 
+lint-yaml: venv
+	find . -type f -regex '.*\.ya?ml' -not -path '$(PY_ENV)/*' | grep -v '^./helm/' | while read file; do \
+    echo "====================  $$file ===================="; \
+    $(PY_ENV)/bin/yamllint "$$file" \
+  || exit 1; done
+
 lint-docker:
 	if command -v hadolint >/dev/null; then \
     find . -type f -name Dockerfile -not -path '$(PY_ENV)/*' | while read file; do \
@@ -41,7 +47,7 @@ lint-shell:
     || exit 1; done \
   fi
 
-lint: lint-python lint-shell lint-swagger lint-docker
+lint: lint-python lint-shell lint-swagger lint-docker lint-yaml
 
 ci: tests lint
 

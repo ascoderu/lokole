@@ -34,7 +34,7 @@ before_deploy:
 deploy:
   - provider: script
     script: DOCKER_TAG="$TRAVIS_TAG" make release deploy
-    on:
+    on:  # yamllint disable rule:truthy
       repo: ascoderu/opwen-cloudserver
       tags: true
       condition: $LOKOLE_QUEUE_BROKER_SCHEME = azureservicebus
