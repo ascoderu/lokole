@@ -101,12 +101,14 @@ Third, use the makefile to verify your installation by running the tests and
 starting up the server. The makefile will automatically install all required
 dependencies into a virtual environment and set up some dummy environment
 variables for local development. The server will automatically reload whenever
-any of the Flask code or Jinja templates are changed.
+any of the Flask code or Jinja templates are changed. To play with the Lokole
+functionality, you can either register new user accounts from within the app,
+or log in as an admin with the username ``admin`` and the password ``123456``.
 
 .. sourcecode :: sh
 
   make tests
-  make server
+  make admin-user server
   make worker
   make cron
 

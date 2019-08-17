@@ -1,3 +1,5 @@
+admin_username=admin
+admin_password=123456
 py_env=venv
 log_level=INFO
 settings=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))).env
@@ -64,6 +66,12 @@ prepare-release: prepare-server bump-version
 release: prepare-release
 	$(py_env)/bin/pip install twine
 	$(py_env)/bin/twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" dist/*
+
+admin-user: prepare-server
+	OPWEN_SETTINGS=$(settings) \
+    $(py_env)/bin/manage.py createadmin \
+    --name=$(admin_username) \
+    --password=$(admin_password)
 
 server: prepare-server
 	OPWEN_SETTINGS=$(settings) \
