@@ -87,14 +87,23 @@ release:
     docker-compose push; \
   ) done
 
-deploy:
+kubeconfig:
 	if [ -f "$(PWD)/secrets/kube-config" ]; then \
     cp "$(PWD)/secrets/kube-config" "$(PWD)/kube-config"; \
   fi && \
   if [ ! -f "$(PWD)/kube-config" ]; then \
     curl -sSfL "$(KUBECONFIG_URL)" -o "$(PWD)/kube-config"; \
-  fi && \
-  docker-compose run \
+  fi
+
+renew-cert: kubeconfig
+	docker-compose run \
+    -v "$(PWD)/kube-config:/secrets/kube-config" \
+    setup \
+    /app/renew-cert.sh; \
+  rm -f "$(PWD)/kube-config"
+
+deploy: kubeconfig
+	docker-compose run \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \

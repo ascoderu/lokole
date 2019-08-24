@@ -16,6 +16,12 @@ before_script:
 
 script:
   - |
+    if [[ "$TRAVIS_EVENT_TYPE" = "cron" ]]; then
+      make renew-cert
+    else
+      echo "Skipping cert renewal for on-demand build"
+    fi
+  - |
     if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
       echo "Skipping live service test for branch build"
     else
