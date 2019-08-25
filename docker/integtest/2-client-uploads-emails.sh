@@ -1,18 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-get_dotenv() {
-  local key dotenv_file
-
-  key="$1"
-  dotenv_file="$(dirname "$0")/.env"
-
-  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
-}
-
-in_dir="$(dirname "$0")/files"
-out_dir="$(dirname "$0")/files/test.out"
+scriptdir="$(dirname "$0")"
+in_dir="${scriptdir}/files"
+out_dir="${scriptdir}/files/test.out"
 mkdir -p "${out_dir}"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
 
 emails_to_send="${in_dir}/client-emails.tar.gz"
 client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"

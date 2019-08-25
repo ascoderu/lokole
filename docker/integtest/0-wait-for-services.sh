@@ -1,35 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+scriptdir="$(dirname "$0")"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
+
 readonly polling_interval_seconds=2
-
-log() {
-  echo "$@" >&2
-}
-
-get_dotenv() {
-  local key dotenv_file
-
-  key="$1"
-  dotenv_file="$(dirname "$0")/.env"
-
-  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
-}
-
-get_container() {
-  docker ps --format  '{{.Names}}' | grep "$1"
-}
-
-sql() {
-  local postgres user database query
-
-  postgres="$(get_container postgres)"
-  user="$(get_dotenv "POSTGRES_USER")"
-  database="$(get_dotenv "POSTGRES_DB")"
-  query="$1"
-
-  docker exec "${postgres}" psql -U "${user}" -d "${database}" -c "${query}"
-}
 
 wait_for_rabbitmq() {
   local rabbitmq

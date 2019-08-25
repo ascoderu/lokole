@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-in_dir="$(dirname "$0")/files"
-out_dir="$(dirname "$0")/files/test.out"
+scriptdir="$(dirname "$0")"
+in_dir="${scriptdir}/files"
+out_dir="${scriptdir}/files/test.out"
 mkdir -p "${out_dir}"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
 
 email_to_receive="${in_dir}/inbound-email.mime"
 

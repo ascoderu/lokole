@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-out_dir="$(dirname "$0")/files/test.out"
+scriptdir="$(dirname "$0")"
+out_dir="${scriptdir}/files/test.out"
 mkdir -p "${out_dir}"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
 
 # workflow 3: register a new client called "developer"
 # normally this endpoint would be called during a new lokole device setup

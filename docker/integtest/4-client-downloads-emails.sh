@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-get_dotenv() {
-  local key dotenv_file
-
-  key="$1"
-  dotenv_file="$(dirname "$0")/.env"
-
-  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
-}
-
-out_dir="$(dirname "$0")/files/test.out"
+scriptdir="$(dirname "$0")"
+out_dir="${scriptdir}/files/test.out"
 mkdir -p "${out_dir}"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
 
 for i in 1 2; do
 
