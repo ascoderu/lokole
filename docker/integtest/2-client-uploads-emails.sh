@@ -15,13 +15,7 @@ resource_id="$(uuidgen).tar.gz"
 
 # workflow 1: send emails written on the client to the world
 # first we simulate the client uploading its emails to the shared blob storage
-storage_account="$(get_dotenv AZURITE_ACCOUNT)"
-storage_key="$(get_dotenv AZURITE_KEY)"
-az storage blob upload --no-progress \
-  --file "${emails_to_send}" \
-  --name "${resource_id}" \
-  --container-name "${resource_container}" \
-  --connection-string "DefaultEndpointsProtocol=http;AccountName=${storage_account};AccountKey=${storage_key};BlobEndpoint=http://azurite:10000/${storage_account};"
+az_storage upload "${resource_container}" "${resource_id}" "${emails_to_send}"
 
 # the client then calls the server to trigger the delivery of the emails
 curl -fs \

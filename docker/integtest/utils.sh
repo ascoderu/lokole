@@ -37,3 +37,21 @@ get_dotenv() {
 log() {
   echo "$@" >&2
 }
+
+az_storage() {
+  local mode="$1"
+  local container="$2"
+  local blob="$3"
+  local file="$4"
+  local storage_account storage_key
+
+  storage_account="$(get_dotenv AZURITE_ACCOUNT)"
+  storage_key="$(get_dotenv AZURITE_KEY)"
+
+  az storage blob "${mode}" --no-progress \
+    --file "${file}" \
+    --name "${blob}" \
+    --container-name "${container}" \
+    --connection-string "DefaultEndpointsProtocol=http;AccountName=${storage_account};AccountKey=${storage_key};BlobEndpoint=http://azurite:10000/${storage_account};" \
+  > /dev/null
+}

@@ -24,13 +24,7 @@ curl -fs \
 resource_id="$(jq -r '.resource_id' < "${out_dir}/download${i}.json")"
 
 # now we simulate the client downloading the package from the shared blob storage
-storage_account="$(get_dotenv AZURITE_ACCOUNT)"
-storage_key="$(get_dotenv AZURITE_KEY)"
-az storage blob download --no-progress \
-  --file "${out_dir}/downloaded${i}.tar.gz" \
-  --name "${resource_id}" \
-  --container-name "${resource_container}" \
-  --connection-string "DefaultEndpointsProtocol=http;AccountName=${storage_account};AccountKey=${storage_key};BlobEndpoint=http://azurite:10000/${storage_account};"
+az_storage download "${resource_container}" "${resource_id}" "${out_dir}/downloaded${i}.tar.gz"
 
 tar xzf "${out_dir}/downloaded${i}.tar.gz" -C "${out_dir}"
 
