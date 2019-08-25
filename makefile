@@ -114,7 +114,7 @@ kubeconfig:
 
 renew-cert: kubeconfig
 	docker-compose build setup && \
-  docker-compose run \
+  docker-compose run --rm \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
     /app/renew-cert.sh && \
@@ -122,7 +122,7 @@ renew-cert: kubeconfig
 
 deploy: kubeconfig
 	docker-compose build setup && \
-  docker-compose run \
+  docker-compose run --rm \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \
