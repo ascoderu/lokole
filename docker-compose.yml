@@ -129,9 +129,7 @@ services:
       - ${POSTGRES_PORT}:5432
 
   azurite:
-    image: arafato/azurite:2.6.5
-    environment:
-      executable: blob
+    image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
       - ${AZURITE_PORT}:10000
 
