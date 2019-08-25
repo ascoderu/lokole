@@ -110,19 +110,21 @@ kubeconfig:
   fi
 
 renew-cert: kubeconfig
-	docker-compose run \
+	docker-compose build setup && \
+  docker-compose run \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
-    /app/renew-cert.sh; \
+    /app/renew-cert.sh && \
   rm -f "$(PWD)/kube-config"
 
 deploy: kubeconfig
-	docker-compose run \
+	docker-compose build setup && \
+  docker-compose run \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \
     -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
-    /app/upgrade.sh; \
+    /app/upgrade.sh && \
   rm -f "$(PWD)/kube-config"
