@@ -39,14 +39,10 @@ class CreateTempFilenameTests(TestCase):
             self.fail(f'file {filename} exists')
 
     def assertPathDoesNotContain(self, filename, part):
-        self.assertTrue(
-            part not in filename,
-            f'{filename} has path part {part}')
+        self.assertTrue(part not in filename, f'{filename} has path part {part}')
 
     def assertHasExtension(self, filename, extension):
-        self.assertTrue(
-            filename.endswith(extension),
-            f'{filename} does not have extension {extension}')
+        self.assertTrue(filename.endswith(extension), f'{filename} does not have extension {extension}')
 
 
 class RemovingTests(TestCase):

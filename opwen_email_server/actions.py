@@ -36,8 +36,7 @@ class _Action(ABC, LogMixin):
         try:
             return self._action(*args, **kwargs)
         except Exception as ex:
-            self.log_exception(ex, 'error in action %s',
-                               self.__class__.__name__)
+            self.log_exception(ex, 'error in action %s', self.__class__.__name__)
             raise ex
 
     def _action(self, *args, **kwargs) -> Response:
@@ -51,9 +50,7 @@ class Ping(_Action):
 
 
 class SendOutboundEmails(_Action):
-    def __init__(self,
-                 email_storage: AzureObjectStorage,
-                 send_email: SendSendgridEmail):
+    def __init__(self, email_storage: AzureObjectStorage, send_email: SendSendgridEmail):
 
         self._email_storage = email_storage
         self._send_email = send_email
@@ -65,7 +62,7 @@ class SendOutboundEmails(_Action):
         if not success:
             return 'error', 500
 
-        self.log_event(events.EMAIL_DELIVERED_FROM_CLIENT, {'domain': get_domain(email.get('from', ''))})  # noqa: E501
+        self.log_event(events.EMAIL_DELIVERED_FROM_CLIENT, {'domain': get_domain(email.get('from', ''))})  # noqa: E501  # yapf: disable
         return 'OK', 200
 
 
@@ -93,7 +90,7 @@ class StoreInboundEmails(_Action):
 
         self._raw_email_storage.delete(resource_id)
 
-        self.log_event(events.EMAIL_STORED_FOR_CLIENT, {'domain': get_domain(email.get('from') or '')})  # noqa: E501
+        self.log_event(events.EMAIL_STORED_FOR_CLIENT, {'domain': get_domain(email.get('from') or '')})  # noqa: E501  # yapf: disable
         return 'OK', 200
 
     def _store_inbound_email(self, email: dict):
@@ -118,9 +115,7 @@ class StoreInboundEmails(_Action):
 
 
 class StoreWrittenClientEmails(_Action):
-    def __init__(self,
-                 client_storage: AzureObjectsStorage,
-                 email_storage: AzureObjectStorage,
+    def __init__(self, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  next_task: Callable[[str], None]):
 
         self._client_storage = client_storage
@@ -128,8 +123,7 @@ class StoreWrittenClientEmails(_Action):
         self._next_task = next_task
 
     def _action(self, resource_id):  # type: ignore
-        emails = self._client_storage.fetch_objects(
-            resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
+        emails = self._client_storage.fetch_objects(resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
 
         domain = ''
         num_stored = 0
@@ -145,7 +139,7 @@ class StoreWrittenClientEmails(_Action):
 
         self._client_storage.delete(resource_id)
 
-        self.log_event(events.EMAIL_STORED_FROM_CLIENT, {'domain': domain, 'num_emails': num_stored})  # noqa: E501
+        self.log_event(events.EMAIL_STORED_FROM_CLIENT, {'domain': domain, 'num_emails': num_stored})  # noqa: E501  # yapf: disable
         return 'OK', 200
 
     @classmethod
@@ -160,10 +154,7 @@ class StoreWrittenClientEmails(_Action):
 
 
 class ReceiveInboundEmail(_Action):
-    def __init__(self,
-                 auth: AzureAuth,
-                 raw_email_storage: AzureTextStorage,
-                 next_task: Callable[[str], None]):
+    def __init__(self, auth: AzureAuth, raw_email_storage: AzureTextStorage, next_task: Callable[[str], None]):
 
         self._auth = auth
         self._raw_email_storage = raw_email_storage
@@ -172,7 +163,7 @@ class ReceiveInboundEmail(_Action):
     def _action(self, client_id, email):  # type: ignore
         domain = self._auth.domain_for(client_id)
         if not domain:
-            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
+            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501  # yapf: disable
             return 'client is not registered', 403
 
         email_id = self._new_email_id(email)
@@ -181,7 +172,7 @@ class ReceiveInboundEmail(_Action):
 
         self._next_task(email_id)
 
-        self.log_event(events.EMAIL_RECEIVED_FOR_CLIENT, {'domain': domain})  # noqa: E501
+        self.log_event(events.EMAIL_RECEIVED_FOR_CLIENT, {'domain': domain})  # noqa: E501  # yapf: disable
         return 'received', 200
 
     @classmethod
@@ -190,10 +181,7 @@ class ReceiveInboundEmail(_Action):
 
 
 class DownloadClientEmails(_Action):
-    def __init__(self,
-                 auth: AzureAuth,
-                 client_storage: AzureObjectsStorage,
-                 email_storage: AzureObjectStorage,
+    def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  pending_factory: Callable[[str], AzureTextStorage]):
 
         self._auth = auth
@@ -204,11 +192,11 @@ class DownloadClientEmails(_Action):
     def _action(self, client_id, compression):  # type: ignore
         domain = self._auth.domain_for(client_id)
         if not domain:
-            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
+            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501  # yapf: disable
             return 'client is not registered', 403
 
         if compression not in self._client_storage.compression_formats():
-            self.log_event(events.UNKNOWN_COMPRESSION_FORMAT, {'client_id': client_id})  # noqa: E501
+            self.log_event(events.UNKNOWN_COMPRESSION_FORMAT, {'client_id': client_id})  # noqa: E501  # yapf: disable
             return f'unknown compression format "{compression}"', 400
 
         delivered = set()
@@ -223,13 +211,11 @@ class DownloadClientEmails(_Action):
         pending = (mark_delivered(email) for email in pending)
         pending = (self._encode_attachments(email) for email in pending)
 
-        resource_id = self._client_storage.store_objects(
-            (sync.EMAILS_FILE, pending, to_jsonl_bytes),
-            compression)
+        resource_id = self._client_storage.store_objects((sync.EMAILS_FILE, pending, to_jsonl_bytes), compression)
 
         self._mark_emails_as_delivered(pending_storage, delivered)
 
-        self.log_event(events.EMAILS_DELIVERED_TO_CLIENT, {'domain': domain, 'num_emails': len(delivered)})  # noqa: E501
+        self.log_event(events.EMAILS_DELIVERED_TO_CLIENT, {'domain': domain, 'num_emails': len(delivered)})  # noqa: E501  # yapf: disable
         return {
             'resource_id': resource_id,
         }
@@ -250,16 +236,13 @@ class DownloadClientEmails(_Action):
         return email
 
     @classmethod
-    def _mark_emails_as_delivered(cls, pending_storage: AzureTextStorage,
-                                  email_ids: Iterable[str]):
+    def _mark_emails_as_delivered(cls, pending_storage: AzureTextStorage, email_ids: Iterable[str]):
         for email_id in email_ids:
             pending_storage.delete(email_id)
 
 
 class UploadClientEmails(_Action):
-    def __init__(self,
-                 auth: AzureAuth,
-                 next_task: Callable[[str], None]):
+    def __init__(self, auth: AzureAuth, next_task: Callable[[str], None]):
 
         self._auth = auth
         self._next_task = next_task
@@ -267,14 +250,14 @@ class UploadClientEmails(_Action):
     def _action(self, client_id, upload_info):  # type: ignore
         domain = self._auth.domain_for(client_id)
         if not domain:
-            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501
+            self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501  # yapf: disable
             return 'client is not registered', 403
 
         resource_id = upload_info['resource_id']
 
         self._next_task(resource_id)
 
-        self.log_event(events.EMAILS_RECEIVED_FROM_CLIENT, {'domain': domain})  # noqa: E501
+        self.log_event(events.EMAILS_RECEIVED_FROM_CLIENT, {'domain': domain})  # noqa: E501  # yapf: disable
         return 'uploaded', 200
 
 
@@ -307,7 +290,7 @@ class RegisterClient(_Action):
         self._client_storage.ensure_exists()
         self._auth.insert(client_id, domain)
 
-        self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501
+        self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501  # yapf: disable
         return {
             'client_id': client_id,
             'storage_account': access_info.account,
@@ -321,9 +304,7 @@ class RegisterClient(_Action):
 
 
 class CalculatePendingEmailsMetric(_Action):
-    def __init__(self,
-                 auth: AzureAuth,
-                 pending_factory: Callable[[str], AzureTextStorage]):
+    def __init__(self, auth: AzureAuth, pending_factory: Callable[[str], AzureTextStorage]):
 
         self._auth = auth
         self._pending_factory = pending_factory
@@ -331,7 +312,7 @@ class CalculatePendingEmailsMetric(_Action):
     def _action(self, client_domain, **auth_args):  # type: ignore
         client_id = self._auth.client_id_for(client_domain)
         if not client_id:
-            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'client_domain': client_domain})  # noqa: E501
+            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'client_domain': client_domain})  # noqa: E501  # yapf: disable
             return 'unknown client domain', 404
 
         pending_storage = self._pending_factory(client_domain)

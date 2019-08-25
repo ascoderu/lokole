@@ -17,62 +17,45 @@ class SendgridEmailSenderTests(TestCase):
 
     def test_sends_email(self):
         self.assertSendsEmail({
-            'to': [self.recipient1],
-            'from': self.sender,
-            'subject': self.test_sends_email.__name__,
-            'message': 'simple email with <b>formatting</b>'
+            'to': [self.recipient1], 'from': self.sender, 'subject': self.test_sends_email.__name__, 'message':
+            'simple email with <b>formatting</b>'
         })
 
     def test_sends_email_with_attachments(self):
         self.assertSendsEmail({
-            'to': [self.recipient1],
-            'from': self.sender,
-            'subject': self.test_sends_email_with_attachments.__name__,
-            'message': 'simple email with attachments',
-            'attachments': [
-                {'filename': 'Some file.txt',
-                 'content': b'first file'},
-                {'filename': 'Another file.txt',
-                 'content': b'second file'}]
+            'to': [self.recipient1], 'from':
+            self.sender, 'subject':
+            self.test_sends_email_with_attachments.__name__, 'message':
+            'simple email with attachments', 'attachments':
+            [{'filename': 'Some file.txt', 'content': b'first file'},
+             {'filename': 'Another file.txt', 'content': b'second file'}]
         })
 
     def test_sends_email_to_multiple_recipients(self):
         self.assertSendsEmail({
-            'to': [self.recipient1, self.recipient2],
-            'from': self.sender,
-            'subject': self.test_sends_email_to_multiple_recipients.__name__,
-            'message': 'simple email with two recipients'
+            'to': [self.recipient1, self.recipient2], 'from': self.sender, 'subject':
+            self.test_sends_email_to_multiple_recipients.__name__, 'message': 'simple email with two recipients'
         })
 
     def test_sends_email_to_cc(self):
         self.assertSendsEmail({
-            'to': [self.recipient1],
-            'cc': [self.recipient2],
-            'from': self.sender,
-            'subject': self.test_sends_email_to_cc.__name__,
-            'message': 'email with cc'
+            'to': [self.recipient1], 'cc': [self.recipient2], 'from': self.sender, 'subject':
+            self.test_sends_email_to_cc.__name__, 'message': 'email with cc'
         })
 
     def test_sends_email_to_bcc(self):
         self.assertSendsEmail({
-            'to': [self.recipient1],
-            'bcc': [self.recipient2],
-            'from': self.sender,
-            'subject': self.test_sends_email_to_bcc.__name__,
-            'message': 'email with bcc'
+            'to': [self.recipient1], 'bcc': [self.recipient2], 'from': self.sender, 'subject':
+            self.test_sends_email_to_bcc.__name__, 'message': 'email with bcc'
         })
 
     def test_client_made_bad_request(self):
-        self.assertSendsEmail(
-            {'message': self.test_client_made_bad_request.__name__},
-            success=False,
-            status=400)
+        self.assertSendsEmail({'message': self.test_client_made_bad_request.__name__}, success=False, status=400)
 
     def test_client_had_exception(self):
-        self.assertSendsEmail(
-            {'message': self.test_client_had_exception.__name__},
-            success=False,
-            exception=URLError('sendgrid error'))
+        self.assertSendsEmail({'message': self.test_client_had_exception.__name__},
+                              success=False,
+                              exception=URLError('sendgrid error'))
 
     def test_does_not_send_email_without_key(self):
         action = SendSendgridEmail(key='')
@@ -82,7 +65,9 @@ class SendgridEmailSenderTests(TestCase):
 
         self.assertEqual(mock_log_warning.call_count, 1)
 
-    def assertSendsEmail(self, email: dict, success: bool = True,
+    def assertSendsEmail(self,
+                         email: dict,
+                         success: bool = True,
                          status: int = 200,
                          exception: Optional[Exception] = None):
         with patch('urllib.request.build_opener') as mock_build_opener:
@@ -121,14 +106,11 @@ class SetupSendgridMailboxTests(TestCase):
 
     @mock_responses.activate
     def test_makes_request_when_key_is_set(self):
-        mock_responses.add(
-            mock_responses.POST,
-            'https://api.sendgrid.com/v3/user/webhooks/parse/settings')
+        mock_responses.add(mock_responses.POST, 'https://api.sendgrid.com/v3/user/webhooks/parse/settings')
 
         action = SetupSendgridMailbox('my-key')
 
         action('my-client-id', 'my-domain')
 
         self.assertEqual(len(mock_responses.calls), 1)
-        self.assertIn(b'"hostname": "my-domain"',
-                      mock_responses.calls[0].request.body)
+        self.assertIn(b'"hostname": "my-domain"', mock_responses.calls[0].request.body)

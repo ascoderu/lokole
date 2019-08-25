@@ -37,8 +37,13 @@ Download = Tuple[str, Callable[[bytes], dict]]
 
 
 class _BaseAzureStorage(LogMixin):
-    def __init__(self, account: str, key: str, container: str, provider: str,
-                 host: Optional[str] = None, secure: bool = True) -> None:
+    def __init__(self,
+                 account: str,
+                 key: str,
+                 container: str,
+                 provider: str,
+                 host: Optional[str] = None,
+                 secure: bool = True) -> None:
         self._account = account
         self._key = key
         self._container = container
@@ -49,8 +54,7 @@ class _BaseAzureStorage(LogMixin):
     @cached_property
     def _driver(self) -> StorageDriver:
         driver = get_driver(self._provider)
-        return driver(self._account, self._key,
-                      host=self._host, secure=self._secure)
+        return driver(self._account, self._key, host=self._host, secure=self._secure)
 
     @cached_property
     def _client(self) -> Container:
@@ -67,7 +71,8 @@ class _BaseAzureStorage(LogMixin):
         return AccessInfo(
             account=self._account,
             key=self._key,
-            container=self._container)
+            container=self._container,
+        )
 
     def ensure_exists(self):
         # noinspection PyStatementEffect
@@ -157,8 +162,7 @@ class AzureObjectsStorage(LogMixin):
     _compression = 'zstd'
     _compression_level = 20
 
-    def __init__(self, file_storage: AzureFileStorage,
-                 resource_id_source: Callable[[], str] = None):
+    def __init__(self, file_storage: AzureFileStorage, resource_id_source: Callable[[], str] = None):
 
         self._file_storage = file_storage
         self._resource_id_source = resource_id_source or self._new_resource_id
@@ -175,10 +179,7 @@ class AzureObjectsStorage(LogMixin):
                 return fobj
 
         # noinspection PyProtectedMember
-        raise ObjectDoesNotExistError(
-            f'File {name} is missing in archive',
-            self._file_storage._driver,
-            archive.name)
+        raise ObjectDoesNotExistError(f'File {name} is missing in archive', self._file_storage._driver, archive.name)
 
     @classmethod
     def _open_archive(cls, path: str, mode: str) -> TarFile:
@@ -205,8 +206,7 @@ class AzureObjectsStorage(LogMixin):
     def compression_formats(cls) -> Iterable[str]:
         return SUPPORTED_FORMATS
 
-    def store_objects(self, upload: Upload,
-                      compression: Optional[str] = None) -> Optional[str]:
+    def store_objects(self, upload: Upload, compression: Optional[str] = None) -> Optional[str]:
 
         compression = compression or self._compression
 
@@ -235,8 +235,7 @@ class AzureObjectsStorage(LogMixin):
         self.log_debug('stored %d objects at %s', num_stored, resource_id)
         return resource_id if num_stored > 0 else None
 
-    def fetch_objects(self, resource_id: str,
-                      download: Download) -> Iterable[dict]:
+    def fetch_objects(self, resource_id: str, download: Download) -> Iterable[dict]:
 
         name, decoder = download
 

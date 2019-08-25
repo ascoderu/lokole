@@ -23,9 +23,11 @@ class SendSendgridEmail(LogMixin):
     @cached_property
     def _client(self) -> Callable[[dict], int]:
         if not self._key:
+
             def send_email_fake(email: dict) -> int:
                 self.log_warning('No key, not sending email %r', email)
                 return 202
+
             return send_email_fake
 
         client = SendGridAPIClient(api_key=self._key)
@@ -48,8 +50,7 @@ class SendSendgridEmail(LogMixin):
             status = self._client(request)
         except Exception as ex:
             status = getattr(ex, 'code', -1)
-            self.log_exception(ex, 'error sending email %s:%r',
-                               email_id, request)
+            self.log_exception(ex, 'error sending email %s:%r', email_id, request)
         else:
             self.log_debug('sent email %s', email_id)
 
@@ -124,7 +125,7 @@ class SetupSendgridMailbox(LogMixin):
             },
             headers={
                 'Authorization': f'Bearer {self._key}',
-            }
+            },
         ).raise_for_status()
 
         self.log_debug('Set up mailbox for %s', domain)

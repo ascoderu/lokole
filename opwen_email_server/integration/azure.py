@@ -16,26 +16,26 @@ from opwen_email_server.utils.collections import singleton
 
 @singleton
 def get_auth() -> AzureAuth:
-    return AzureAuth(
-        storage=AzureTextStorage(
-            account=config.TABLES_ACCOUNT,
-            key=config.TABLES_KEY,
-            host=config.TABLES_HOST,
-            secure=config.TABLES_SECURE,
-            container=constants.TABLE_AUTH,
-            provider=config.STORAGE_PROVIDER))
+    return AzureAuth(storage=AzureTextStorage(
+        account=config.TABLES_ACCOUNT,
+        key=config.TABLES_KEY,
+        host=config.TABLES_HOST,
+        secure=config.TABLES_SECURE,
+        container=constants.TABLE_AUTH,
+        provider=config.STORAGE_PROVIDER,
+    ))
 
 
 @singleton
 def get_client_storage() -> AzureObjectsStorage:
-    return AzureObjectsStorage(
-        file_storage=AzureFileStorage(
-            account=config.CLIENT_STORAGE_ACCOUNT,
-            key=config.CLIENT_STORAGE_KEY,
-            host=config.CLIENT_STORAGE_HOST,
-            secure=config.CLIENT_STORAGE_SECURE,
-            container=constants.CONTAINER_CLIENT_PACKAGES,
-            provider=config.STORAGE_PROVIDER))
+    return AzureObjectsStorage(file_storage=AzureFileStorage(
+        account=config.CLIENT_STORAGE_ACCOUNT,
+        key=config.CLIENT_STORAGE_KEY,
+        host=config.CLIENT_STORAGE_HOST,
+        secure=config.CLIENT_STORAGE_SECURE,
+        container=constants.CONTAINER_CLIENT_PACKAGES,
+        provider=config.STORAGE_PROVIDER,
+    ))
 
 
 @singleton
@@ -46,19 +46,18 @@ def get_raw_email_storage() -> AzureTextStorage:
         host=config.BLOBS_HOST,
         secure=config.BLOBS_SECURE,
         container=constants.CONTAINER_SENDGRID_MIME,
-        provider=config.STORAGE_PROVIDER)
+        provider=config.STORAGE_PROVIDER,
+    )
 
 
 @singleton
 def get_email_sender() -> SendSendgridEmail:
-    return SendSendgridEmail(
-        key=config.SENDGRID_KEY)
+    return SendSendgridEmail(key=config.SENDGRID_KEY)
 
 
 @singleton
 def get_mailbox_setup() -> SetupSendgridMailbox:
-    return SetupSendgridMailbox(
-        key=config.SENDGRID_KEY)
+    return SetupSendgridMailbox(key=config.SENDGRID_KEY)
 
 
 @singleton
@@ -66,7 +65,8 @@ def get_mx_setup() -> SetupMxRecords:
     return SetupMxRecords(
         account=config.DNS_ACCOUNT,
         secret=config.DNS_SECRET,
-        provider=config.DNS_PROVIDER)
+        provider=config.DNS_PROVIDER,
+    )
 
 
 @singleton
@@ -77,7 +77,8 @@ def get_email_storage() -> AzureObjectStorage:
         host=config.BLOBS_HOST,
         secure=config.BLOBS_SECURE,
         container=constants.CONTAINER_EMAILS,
-        provider=config.STORAGE_PROVIDER)
+        provider=config.STORAGE_PROVIDER,
+    )
 
 
 @lru_cache(maxsize=PENDING_STORAGE_CACHE_SIZE)
@@ -89,4 +90,5 @@ def get_pending_storage(domain: str) -> AzureTextStorage:
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
         container=container,
-        provider=config.STORAGE_PROVIDER)
+        provider=config.STORAGE_PROVIDER,
+    )
