@@ -73,7 +73,10 @@ start:
 
 logs:
 	if [ "$(ALL)" = "true" ]; then \
-    docker-compose logs; \
+    docker-compose ps --services | while read service; do \
+      echo "==================== $$service ===================="; \
+      docker-compose logs "$$service"; \
+    done \
   else \
     docker-compose logs --follow --tail=100; \
   fi
