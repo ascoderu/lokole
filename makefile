@@ -67,6 +67,19 @@ build:
 	docker-compose pull --ignore-pull-failures
 	docker-compose build
 
+start:
+	docker-compose up -d
+
+logs:
+	if [ "$(ALL)" = "true" ]; then \
+    docker-compose logs; \
+  else \
+    docker-compose logs --follow --tail=100; \
+  fi
+
+stop:
+	docker-compose down --volumes
+
 verify-build:
 	docker pull wagoodman/dive
 	docker-compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \

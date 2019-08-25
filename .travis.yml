@@ -12,7 +12,7 @@ install:
   - make build verify-build
 
 before_script:
-  - docker-compose up -d
+  - make start
 
 script:
   - |
@@ -29,10 +29,10 @@ script:
     fi
 
 after_failure:
-  - docker-compose logs
+  - ALL=true make logs
 
 after_script:
-  - docker-compose down --volumes
+  - make stop
 
 before_deploy:
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin

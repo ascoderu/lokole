@@ -65,42 +65,34 @@ describes an email, using the following schema:
 Development setup
 -----------------
 
-First, get the source code.
+First, install the system dependencies:
+
+- `curl <https://curl.haxx.se>`_
+- `docker <https://docs.docker.com>`_
+- `docker-compose <https://docs.docker.com/compose/>`_
+- `git <https://git-scm.com>`_
+- `jq <https://stedolan.github.io/jq/>`_
+- `make <https://www.gnu.org/software/make/>`_
+
+Second, get the source code.
 
 .. sourcecode :: sh
 
   git clone git@github.com:ascoderu/opwen-cloudserver.git
   cd opwen-cloudserver
 
-Second, install the system-level dependencies using your package manager,
-e.g. on Ubuntu:
+Third, build the project images. This will also verify your checkout by
+running the unit tests and other CI steps such as linting:
 
 .. sourcecode :: sh
 
-  sudo apt-get install -y make python3 python3-venv shellcheck jq curl
+  make build
 
-Also follow the `Azure CLI setup instructions <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest>`_
-to install the `az` tool.
-
-You can use the makefile to verify your checkout by running the tests and
-other CI steps such as linting. The makefile will automatically install all
-required dependencies into a virtual environment.
+You can now run the application stack:
 
 .. sourcecode :: sh
 
-  make tests lint
-
-This project consists of a number of microservices and background jobs. You
-can run all the pieces via the makefile, however, it's easiest to run and
-manage all of the moving pieces via Docker, so install Docker on your machine
-by following the `Docker setup instructions <https://docs.docker.com/install/>`_
-for your platform.
-
-After installing Docker, you can run the application stack with one command:
-
-.. sourcecode :: sh
-
-  docker-compose up --build -d
+  make start logs
 
 Finding your way around the project
 ===================================
@@ -115,13 +107,13 @@ in the integration tests folder and can be run via:
 .. sourcecode :: sh
 
   # run the services, wait for them to start
-  docker-compose up --build -d
+  make build start
 
   # in another terminal, run the integration tests
   make integration-tests
 
   # finally, tear down the services
-  docker-compose down --volumes
+  make stop
 
 Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine
