@@ -123,7 +123,7 @@ class SetupSendgridMailbox(LogMixin):
                 'send_raw': True,
             },
             headers={
-                'Authorization': 'Bearer {}'.format(self._key),
+                'Authorization': f'Bearer {self._key}',
             }
         ).raise_for_status()
 

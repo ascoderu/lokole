@@ -182,7 +182,7 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
 
     small_image_bytes = _change_image_size(response.content)
     small_image_base64 = to_base64(small_image_bytes)
-    return 'data:{};base64,{}'.format(image_type, small_image_base64)
+    return f'data:{image_type};base64,{small_image_base64}'
 
 
 def _is_valid_url(url: Optional[str]) -> bool:

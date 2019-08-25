@@ -209,7 +209,7 @@ class DownloadClientEmails(_Action):
 
         if compression not in self._client_storage.compression_formats():
             self.log_event(events.UNKNOWN_COMPRESSION_FORMAT, {'client_id': client_id})  # noqa: E501
-            return 'unknown compression format "{}"'.format(compression), 400
+            return f'unknown compression format "{compression}"', 400
 
         delivered = set()
 

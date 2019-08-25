@@ -215,13 +215,13 @@ class AzureObjectsStorageTests(TestCase):
         self.assertEqual(
             len(matches),
             count,
-            'Container does not have {} files ending with "{}"; '
-            'all files in container are: {}'
-            .format(count, suffix, ', '.join(container_files)))
+            f'Container does not have {count} files ending with "{suffix}"; '
+            f'all files in container are: {", ".join(container_files)}'
+        )
 
     def _given_resource(self, resource_id: str, name: str, lines: bytes):
         client = self._storage._file_storage._client
-        mode = 'w:{}'.format(Path(resource_id).suffix[1:])
+        mode = f'w:{Path(resource_id).suffix[1:]}'
         with removing(create_tempfilename(resource_id)) as buffer_path:
             with tarfile_open(buffer_path, mode) as archive:
                 tarinfo = TarInfo(name)

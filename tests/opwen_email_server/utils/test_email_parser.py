@@ -23,7 +23,7 @@ class ImageSize(Enum):
 
 
 def _given_test_image(size: ImageSize) -> bytes:
-    image_path = join(TEST_DATA_DIRECTORY, '{}.png'.format(size.name))
+    image_path = join(TEST_DATA_DIRECTORY, f'{size.name}.png')
     with open(image_path, 'rb') as fobj:
         return fobj.read()
 
@@ -203,7 +203,8 @@ class ConvertImgUrlToBase64Tests(TestCase):
     def assertHasCount(self, data, snippet, expected_count):
         actual_count = data.count(snippet)
         self.assertEqual(actual_count, expected_count,
-                         'Expected {} to occur {} times but got {}'.format(snippet, expected_count, actual_count))
+                         f'Expected {snippet} to occur {expected_count} '
+                         f'times but got {actual_count}')
 
     @classmethod
     def givenTestImage(cls, content_type='image/png', status=200):

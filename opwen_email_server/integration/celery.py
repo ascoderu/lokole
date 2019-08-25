@@ -46,7 +46,7 @@ def send(resource_id: str) -> None:
 
 
 def _fqn(task):
-    return '{}.{}'.format(__name__, task.__name__)
+    return f'{__name__}.{task.__name__}'
 
 
 celery.conf.update(

@@ -130,10 +130,10 @@ class _AzureBytesStorage(_BaseAzureStorage):
         super().delete(filename)
 
     def _to_filename(self, resource_id: str) -> str:
-        extension = '.{}.{}'.format(self._extension, self._compression)
+        extension = f'.{self._extension}.{self._compression}'
         if resource_id.endswith(extension):
             return resource_id
-        return '{}{}'.format(resource_id, extension)
+        return f'{resource_id}{extension}'
 
     @property
     def _extension(self) -> str:
@@ -176,7 +176,7 @@ class AzureObjectsStorage(LogMixin):
 
         # noinspection PyProtectedMember
         raise ObjectDoesNotExistError(
-            'File {} is missing in archive'.format(name),
+            f'File {name} is missing in archive',
             self._file_storage._driver,
             archive.name)
 
@@ -192,7 +192,7 @@ class AzureObjectsStorage(LogMixin):
         if compression == 'zstd' and mode == 'w':
             kwargs['level'] = cls._compression_level
 
-        mode = '{}|{}'.format(mode, compression)
+        mode = f'{mode}|{compression}'
         return tarfile_open(path, mode, **kwargs)
 
     def access_info(self) -> AccessInfo:
@@ -208,9 +208,9 @@ class AzureObjectsStorage(LogMixin):
     def store_objects(self, upload: Upload,
                       compression: Optional[str] = None) -> Optional[str]:
 
-        resource_id = '{resource_id}.tar.{compression}'.format(
-            resource_id=self._resource_id_source(),
-            compression=compression or self._compression)
+        compression = compression or self._compression
+
+        resource_id = f'{self._resource_id_source()}.tar.{compression}'
 
         name, objs, encoder = upload
 

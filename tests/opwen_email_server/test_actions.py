@@ -110,7 +110,7 @@ class StoreInboundEmailsTests(TestCase):
         resource_id = 'b8dcaf40-fd14-4a89-8898-c9514b0ad724'
         domain = 'test.com'
         raw_email = 'dummy-mime'
-        parsed_email = {'to': ['foo@{}'.format(domain)]}
+        parsed_email = {'to': [f'foo@{domain}']}
         email_id = 'c1763288b50107e4e4df4f2d7144f1085729ed112500995ab8103dd532276c18'
         stored_email = dict(parsed_email)
         stored_email['_uid'] = email_id
