@@ -32,6 +32,12 @@ spec:
               key: FLOWER_PASSWORD
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+          requests:
+            memory: "128Mi"
+            cpu: "125m"
       restartPolicy: Always
 status: {}

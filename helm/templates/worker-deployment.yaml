@@ -26,6 +26,12 @@ spec:
         {{ include "opwen.environment.shared" . }}
         ports:
         - containerPort: 80
-        resources: {}
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
       restartPolicy: Always
 status: {}

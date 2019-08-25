@@ -51,6 +51,12 @@ spec:
               key: REGISTRATION_PASSWORD
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
       restartPolicy: Always
 status: {}
