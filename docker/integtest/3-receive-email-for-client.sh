@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-in_dir="$(dirname "$0")/../files/end_to_end"
-out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+in_dir="$(dirname "$0")/files"
+out_dir="$(dirname "$0")/files/test.out"
 mkdir -p "${out_dir}"
 
 email_to_receive="${in_dir}/inbound-email.mime"

@@ -11,7 +11,7 @@ get_dotenv() {
   local key dotenv_file
 
   key="$1"
-  dotenv_file="$(dirname "$0")/../../.env"
+  dotenv_file="$(dirname "$0")/.env"
 
   grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
 }

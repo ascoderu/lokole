@@ -11,6 +11,7 @@ RUN pip3 install --no-cache-dir --upgrade pip==19.2.3 && \
 
 WORKDIR /app
 
-COPY . .
+COPY .env .
+COPY docker/integtest/ ./
 
-CMD ["./tests/integration/run.sh"]
+CMD ["./tests.sh"]

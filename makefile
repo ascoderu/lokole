@@ -54,7 +54,7 @@ ci: tests lint
 
 integration-tests:
 	docker-compose build integtest && \
-  docker-compose run --rm integtest /app/tests/integration/run.sh
+  docker-compose run --rm integtest ./tests.sh
 
 clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf

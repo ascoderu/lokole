@@ -5,13 +5,13 @@ get_dotenv() {
   local key dotenv_file
 
   key="$1"
-  dotenv_file="$(dirname "$0")/../../.env"
+  dotenv_file="$(dirname "$0")/.env"
 
   grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
 }
 
-in_dir="$(dirname "$0")/../files/end_to_end"
-out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+in_dir="$(dirname "$0")/files"
+out_dir="$(dirname "$0")/files/test.out"
 mkdir -p "${out_dir}"
 
 emails_to_send="${in_dir}/client-emails.tar.gz"

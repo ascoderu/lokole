@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+out_dir="$(dirname "$0")/files/test.out"
 mkdir -p "${out_dir}"
 
 # workflow 3: register a new client called "developer"
