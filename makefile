@@ -15,7 +15,7 @@ tests: venv
 
 lint-swagger: venv
 	find opwen_email_server/swagger -type f -name '*.yaml' | while read file; do \
-    echo "====================  $$file ===================="; \
+    echo "==================== $$file ===================="; \
     $(PY_ENV)/bin/swagger-flex --source="$$file" \
   || exit 1; done
 
@@ -28,14 +28,14 @@ lint-python: venv
 
 lint-yaml: venv
 	find . -type f -regex '.*\.ya?ml' -not -path '$(PY_ENV)/*' | grep -v '^./helm/' | while read file; do \
-    echo "====================  $$file ===================="; \
+    echo "==================== $$file ===================="; \
     $(PY_ENV)/bin/yamllint "$$file" \
   || exit 1; done
 
 lint-docker:
 	if command -v hadolint >/dev/null; then \
     find . -type f -name Dockerfile -not -path '$(PY_ENV)/*' | while read file; do \
-      echo "====================  $$file ===================="; \
+      echo "==================== $$file ===================="; \
       hadolint "$$file" \
     || exit 1; done \
   fi
@@ -43,7 +43,7 @@ lint-docker:
 lint-shell:
 	if command -v shellcheck >/dev/null; then \
     find . -type f -name '*.sh' -not -path '$(PY_ENV)/*' | while read file; do \
-      echo "====================  $$file ===================="; \
+      echo "==================== $$file ===================="; \
       shellcheck "$$file" \
     || exit 1; done \
   fi
@@ -84,7 +84,7 @@ stop:
 verify-build:
 	docker pull wagoodman/dive
 	docker-compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \
-    echo "====================  $$image ===================="; \
+    echo "==================== $$image ===================="; \
     docker run --rm \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $(PWD)/.dive-ci:/.dive-ci \
