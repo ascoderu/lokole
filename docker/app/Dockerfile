@@ -1,12 +1,12 @@
-ARG PYTHON_VERSION=3.6
+ARG PYTHON_VERSION=3.7
 FROM python:${PYTHON_VERSION} AS builder
 
-ARG HADOLINT_VERSION=v1.16.0
+ARG HADOLINT_VERSION=v1.17.1
 RUN wget -q -O /usr/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-$(uname -m)" \
   && chmod +x /usr/bin/hadolint \
   && hadolint --version
 
-ARG SHELLCHECK_VERSION=v0.6.0
+ARG SHELLCHECK_VERSION=v0.7.0
 RUN wget -q -O /tmp/shellcheck.tar.xz "https://storage.googleapis.com/shellcheck/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" \
   && tar -xJf /tmp/shellcheck.tar.xz -C /usr/bin --strip-components=1 "shellcheck-${SHELLCHECK_VERSION}/shellcheck" \
   && rm /tmp/shellcheck.tar.xz \
