@@ -15,15 +15,17 @@ resource_container="$(jq -r '.resource_container' < "${out_dir}/register${i}.jso
 # will package up the emails and store them on the shared blob storage
 curl -fs \
   -H "Accept: application/json" \
-  "http://localhost:8080/api/email/download/${client_id}" \
+  "http://nginx:8888/api/email/download/${client_id}" \
 | tee "${out_dir}/download${i}.json"
 
 resource_id="$(jq -r '.resource_id' < "${out_dir}/download${i}.json")"
 
 # now we simulate the client downloading the package from the shared blob storage
-curl -fs \
-  "http://localhost:10000/devstoreaccount1/${resource_container}/${resource_id}" \
-> "${out_dir}/downloaded${i}.tar.gz"
+az storage blob download --no-progress \
+  --file "${out_dir}/downloaded${i}.tar.gz" \
+  --name "${resource_id}" \
+  --container-name "${resource_container}" \
+  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
 
 tar xzf "${out_dir}/downloaded${i}.tar.gz" -C "${out_dir}"
 

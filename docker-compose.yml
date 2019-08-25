@@ -95,7 +95,16 @@ services:
     build:
       context: .
       dockerfile: docker/setup/Dockerfile
-    command: /app/setup.sh --help
+    command: echo skipped
+
+  integtest:
+    image: ${DOCKER_REPO}/opwenserver_integtest:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/integtest/Dockerfile
+    command: echo skipped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   rabbitmq:
     image: rabbitmq:management-alpine

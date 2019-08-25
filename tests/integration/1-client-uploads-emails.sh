@@ -12,14 +12,14 @@ resource_id="$(uuidgen).tar.gz"
 
 # workflow 1: send emails written on the client to the world
 # first we simulate the client uploading its emails to the shared blob storage
-curl -fs \
-  -X PUT -T "${emails_to_send}" \
-  -H "x-ms-blob-type: BlockBlob" \
-  -H "Content-Length: $(wc -c "${emails_to_send}" | cut -d' ' -f1)" \
-  "http://localhost:10000/devstoreaccount1/${resource_container}/${resource_id}"
+az storage blob upload --no-progress \
+  --file "${emails_to_send}" \
+  --name "${resource_id}" \
+  --container-name "${resource_container}" \
+  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
 
 # the client then calls the server to trigger the delivery of the emails
 curl -fs \
   -H "Content-Type: application/json" \
   -d '{"resource_id":"'"${resource_id}"'"}' \
-  "http://localhost:8080/api/email/upload/${client_id}"
+  "http://nginx:8888/api/email/upload/${client_id}"

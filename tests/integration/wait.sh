@@ -16,18 +16,27 @@ get_dotenv() {
   grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
 }
 
-sql() {
-  local user database query
+get_container() {
+  docker ps --format  '{{.Names}}' | grep "$1"
+}
 
+sql() {
+  local postgres user database query
+
+  postgres="$(get_container postgres)"
   user="$(get_dotenv "POSTGRES_USER")"
   database="$(get_dotenv "POSTGRES_DB")"
   query="$1"
 
-  docker-compose exec postgres psql -U "${user}" -d "${database}" -c "${query}"
+  docker exec "${postgres}" psql -U "${user}" -d "${database}" -c "${query}"
 }
 
 wait_for_rabbitmq() {
-  while ! docker-compose exec rabbitmq rabbitmqctl wait -q -P 1 -t "${polling_interval_seconds}"; do
+  local rabbitmq
+
+  rabbitmq="$(get_container rabbitmq)"
+
+  while ! docker exec "${rabbitmq}" rabbitmqctl wait -q -P 1 -t "${polling_interval_seconds}"; do
     log "Waiting for rabbitmq"
   done
 
