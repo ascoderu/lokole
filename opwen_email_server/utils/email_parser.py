@@ -125,14 +125,11 @@ def _format_attachment(filename: str, content: bytes) -> bytes:
 
 
 def _get_recipients(email: dict) -> Iterable[str]:
-    return chain(email.get('to') or [],
-                 email.get('cc') or [],
-                 email.get('bcc') or [])
+    return chain(email.get('to') or [], email.get('cc') or [], email.get('bcc') or [])
 
 
 def get_domains(email: dict) -> Iterable[str]:
-    return frozenset(get_domain(address)
-                     for address in _get_recipients(email))
+    return frozenset(get_domain(address) for address in _get_recipients(email))
 
 
 def get_domain(address: str) -> str:
@@ -182,7 +179,7 @@ def _fetch_image_to_base64(image_url: str) -> Optional[str]:
 
     small_image_bytes = _change_image_size(response.content)
     small_image_base64 = to_base64(small_image_bytes)
-    return 'data:{};base64,{}'.format(image_type, small_image_base64)
+    return f'data:{image_type};base64,{small_image_base64}'
 
 
 def _is_valid_url(url: Optional[str]) -> bool:

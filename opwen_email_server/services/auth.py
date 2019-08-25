@@ -20,15 +20,15 @@ class BasicAuth(LogMixin):
         try:
             user = self._users[username]
         except KeyError:
-            self.log_event(events.UNKNOWN_USER, {'username': username})  # noqa: E501
+            self.log_event(events.UNKNOWN_USER, {'username': username})  # noqa: E501  # yapf: disable
             return None
 
         if user['password'] != password:
-            self.log_event(events.BAD_PASSWORD, {'username': username})  # noqa: E501
+            self.log_event(events.BAD_PASSWORD, {'username': username})  # noqa: E501  # yapf: disable
             return None
 
         if not self._has_scopes(user, required_scopes):
-            self.log_event(events.MISSING_SCOPES, {'username': username})  # noqa: E501
+            self.log_event(events.MISSING_SCOPES, {'username': username})  # noqa: E501  # yapf: disable
             return None
 
         return {'sub': username}

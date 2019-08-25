@@ -19,33 +19,35 @@ from opwen_email_server.services.auth import BasicAuth
 email_receive = ReceiveInboundEmail(
     auth=get_auth(),
     raw_email_storage=get_raw_email_storage(),
-    next_task=inbound_store.delay)
+    next_task=inbound_store.delay,
+)
 
 client_write = UploadClientEmails(
     auth=get_auth(),
-    next_task=written_store.delay)
+    next_task=written_store.delay,
+)
 
 client_read = DownloadClientEmails(
     auth=get_auth(),
     client_storage=get_client_storage(),
     email_storage=get_email_storage(),
-    pending_factory=get_pending_storage)
+    pending_factory=get_pending_storage,
+)
 
 client_register = RegisterClient(
     auth=get_auth(),
     client_storage=get_client_storage(),
     setup_mailbox=get_mailbox_setup(),
-    setup_mx_records=get_mx_setup())
+    setup_mx_records=get_mx_setup(),
+)
 
 metrics_pending = CalculatePendingEmailsMetric(
     auth=get_auth(),
-    pending_factory=get_pending_storage)
+    pending_factory=get_pending_storage,
+)
 
-basic_auth = BasicAuth(
-    users={
-        config.REGISTRATION_USERNAME: {
-            'password': config.REGISTRATION_PASSWORD,
-        }
-    })
+basic_auth = BasicAuth(users={config.REGISTRATION_USERNAME: {
+    'password': config.REGISTRATION_PASSWORD,
+}})
 
 healthcheck = Ping()

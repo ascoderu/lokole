@@ -12,7 +12,7 @@ from opwen_email_server.utils.path import get_extension
 
 def create_tempfilename(suffix: Optional[str] = None) -> str:
     extension = get_extension(suffix)
-    return join(gettempdir(), '{}{}'.format(uuid4(), extension))
+    return join(gettempdir(), f'{uuid4()}{extension}')
 
 
 @contextmanager

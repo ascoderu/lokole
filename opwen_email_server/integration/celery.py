@@ -21,7 +21,8 @@ def inbound_store(resource_id: str) -> None:
     action = StoreInboundEmails(
         raw_email_storage=get_raw_email_storage(),
         email_storage=get_email_storage(),
-        pending_factory=get_pending_storage)
+        pending_factory=get_pending_storage,
+    )
 
     action(resource_id)
 
@@ -31,7 +32,8 @@ def written_store(resource_id: str) -> None:
     action = StoreWrittenClientEmails(
         client_storage=get_client_storage(),
         email_storage=get_email_storage(),
-        next_task=send.delay)
+        next_task=send.delay,
+    )
 
     action(resource_id)
 
@@ -40,22 +42,22 @@ def written_store(resource_id: str) -> None:
 def send(resource_id: str) -> None:
     action = SendOutboundEmails(
         email_storage=get_email_storage(),
-        send_email=get_email_sender())
+        send_email=get_email_sender(),
+    )
 
     action(resource_id)
 
 
 def _fqn(task):
-    return '{}.{}'.format(__name__, task.__name__)
+    return f'{__name__}.{task.__name__}'
 
 
 celery.conf.update(
     task_routes={
-         _fqn(inbound_store): {'queue': INBOUND_STORE_QUEUE},
-         _fqn(written_store): {'queue': WRITTEN_STORE_QUEUE},
-         _fqn(send): {'queue': SEND_QUEUE}
+        _fqn(inbound_store): {'queue': INBOUND_STORE_QUEUE},
+        _fqn(written_store): {'queue': WRITTEN_STORE_QUEUE},
+        _fqn(send): {'queue': SEND_QUEUE}
     })
-
 
 if __name__ == '__main__':
     celery.start()

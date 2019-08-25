@@ -11,8 +11,7 @@ class AzureTests(TestCase):
 
         for constant, value in constants:
             if not match(acceptable_config_value, value):
-                self.fail('config {} is invalid: {}, should be {}'
-                          .format(constant, value, acceptable_config_value))
+                self.fail(f'config {constant} is invalid: {value}, ' f'should be {acceptable_config_value}')
 
 
 def _get_constants(container):

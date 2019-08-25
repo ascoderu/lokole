@@ -73,7 +73,8 @@ class SendOutboundEmailsTests(TestCase):
     def _execute_action(self, *args, **kwargs):
         action = actions.SendOutboundEmails(
             email_storage=self.email_storage,
-            send_email=self.send_email)
+            send_email=self.send_email,
+        )
 
         return action(*args, **kwargs)
 
@@ -110,7 +111,7 @@ class StoreInboundEmailsTests(TestCase):
         resource_id = 'b8dcaf40-fd14-4a89-8898-c9514b0ad724'
         domain = 'test.com'
         raw_email = 'dummy-mime'
-        parsed_email = {'to': ['foo@{}'.format(domain)]}
+        parsed_email = {'to': [f'foo@{domain}']}
         email_id = 'c1763288b50107e4e4df4f2d7144f1085729ed112500995ab8103dd532276c18'
         stored_email = dict(parsed_email)
         stored_email['_uid'] = email_id
@@ -134,7 +135,8 @@ class StoreInboundEmailsTests(TestCase):
             raw_email_storage=self.raw_email_storage,
             email_storage=self.email_storage,
             pending_factory=self.pending_factory,
-            email_parser=self.email_parser)
+            email_parser=self.email_parser,
+        )
 
         return action(*args, **kwargs)
 
@@ -152,9 +154,10 @@ class StoreWrittenClientEmailsTests(TestCase):
         resource_id = str(uuid4())
         email_id = str(uuid4())
 
-        client_email = {'from': 'foo@test.com', '_uid': email_id, 'attachments': [
-            {'filename': 'test.txt', 'content': attachment_content_base64}
-        ]}
+        client_email = {
+            'from': 'foo@test.com', '_uid': email_id, 'attachments':
+            [{'filename': 'test.txt', 'content': attachment_content_base64}]
+        }
         server_email = deepcopy(client_email)
         server_email['attachments'][0]['content'] = attachment_content_bytes
 
@@ -172,7 +175,8 @@ class StoreWrittenClientEmailsTests(TestCase):
         action = actions.StoreWrittenClientEmails(
             client_storage=self.client_storage,
             email_storage=self.email_storage,
-            next_task=self.next_task)
+            next_task=self.next_task,
+        )
 
         return action(*args, **kwargs)
 
@@ -236,7 +240,8 @@ class ReceiveInboundEmailTests(TestCase):
         action = actions.ReceiveInboundEmail(
             auth=self.auth,
             raw_email_storage=self.raw_email_storage,
-            next_task=self.next_task)
+            next_task=self.next_task,
+        )
 
         return action(*args, **kwargs)
 
@@ -279,9 +284,9 @@ class DownloadClientEmailsTests(TestCase):
         resource_id = str(uuid4())
         domain = 'test.com'
 
-        server_email = {'_uid': email_id, 'attachments': [
-            {'filename': 'test.txt', 'content': attachment_content_bytes}
-        ]}
+        server_email = {
+            '_uid': email_id, 'attachments': [{'filename': 'test.txt', 'content': attachment_content_bytes}]
+        }
         client_email = deepcopy(server_email)
         client_email['attachments'][0]['content'] = attachment_content_base64
 
@@ -320,7 +325,8 @@ class DownloadClientEmailsTests(TestCase):
             auth=self.auth,
             client_storage=self.client_storage,
             email_storage=self.email_storage,
-            pending_factory=self.pending_factory)
+            pending_factory=self.pending_factory,
+        )
 
         return action(*args, **kwargs)
 
@@ -360,7 +366,8 @@ class UploadClientEmailsTests(TestCase):
     def _execute_action(self, *args, **kwargs):
         action = actions.UploadClientEmails(
             auth=self.auth,
-            next_task=self.next_task)
+            next_task=self.next_task,
+        )
 
         return action(*args, **kwargs)
 
@@ -403,7 +410,8 @@ class RegisterClientTests(TestCase):
         self.client_storage.access_info.return_value = AccessInfo(
             account=client_storage_account,
             key=client_storage_key,
-            container=client_storage_container)
+            container=client_storage_container,
+        )
 
         response = self._execute_action({'domain': domain})
 
@@ -423,7 +431,8 @@ class RegisterClientTests(TestCase):
             client_storage=self.client_storage,
             setup_mailbox=self.setup_mailbox,
             setup_mx_records=self.setup_mx_records,
-            client_id_source=self.client_id_source)
+            client_id_source=self.client_id_source,
+        )
 
         return action(*args, **kwargs)
 
@@ -464,6 +473,7 @@ class CalculatePendingEmailsMetricTests(TestCase):
     def _execute_action(self, *args, **kwargs):
         action = actions.CalculatePendingEmailsMetric(
             auth=self.auth,
-            pending_factory=self.pending_factory)
+            pending_factory=self.pending_factory,
+        )
 
         return action(*args, **kwargs)

@@ -10,10 +10,8 @@ from responses import mock
 
 from opwen_email_server.utils import email_parser
 
-
-TEST_DATA_DIRECTORY = abspath(join(
-    dirname(__file__), '..', '..',
-    'files', 'opwen_email_server', 'utils', 'test_email_parser'))
+TEST_DATA_DIRECTORY = abspath(
+    join(dirname(__file__), '..', '..', 'files', 'opwen_email_server', 'utils', 'test_email_parser'))
 
 
 @unique
@@ -23,7 +21,7 @@ class ImageSize(Enum):
 
 
 def _given_test_image(size: ImageSize) -> bytes:
-    image_path = join(TEST_DATA_DIRECTORY, '{}.png'.format(size.name))
+    image_path = join(TEST_DATA_DIRECTORY, f'{size.name}.png')
     with open(image_path, 'rb') as fobj:
         return fobj.read()
 
@@ -37,16 +35,14 @@ class ParseMimeEmailTests(TestCase):
         self.assertEqual(email.get('from'), 'clemens.wolff@gmail.com')
         self.assertEqual(email.get('subject'), 'Two recipients')
         self.assertEqual(email.get('sent_at'), '2017-02-13 06:25')
-        self.assertEqual(email.get('to'), ['clemens@victoria.lokole.ca',
-                                           'laura@victoria.lokole.ca'])
+        self.assertEqual(email.get('to'), ['clemens@victoria.lokole.ca', 'laura@victoria.lokole.ca'])
 
     def test_prefers_html_body_over_text(self):
         mime_email = self._given_mime_email('email-html.mime')
 
         email = email_parser.parse_mime_email(mime_email)
 
-        self.assertEqual(email.get('body'),
-                         '<div dir="ltr">Body of the message.</div>\n')
+        self.assertEqual(email.get('body'), '<div dir="ltr">Body of the message.</div>\n')
 
     def test_parses_email_with_cc_and_bcc(self):
         mime_email = self._given_mime_email('email-ccbcc.mime')
@@ -54,8 +50,7 @@ class ParseMimeEmailTests(TestCase):
         email = email_parser.parse_mime_email(mime_email)
 
         self.assertEqual(email.get('bcc'), ['laura@lokole.ca'])
-        self.assertEqual(email.get('cc'), ['clemens@lokole.ca',
-                                           'nzola@lokole.ca'])
+        self.assertEqual(email.get('cc'), ['clemens@lokole.ca', 'nzola@lokole.ca'])
 
     def test_parses_email_with_attachments(self):
         mime_email = self._given_mime_email('email-attachment.mime')
@@ -65,8 +60,7 @@ class ParseMimeEmailTests(TestCase):
 
         self.assertEqual(len(attachments), 1)
         self.assertGreater(len(attachments[0].get('content')), 0)
-        self.assertEqual(attachments[0].get('filename'),
-                         'cute-mouse-clipart-mouse4.png')
+        self.assertEqual(attachments[0].get('filename'), 'cute-mouse-clipart-mouse4.png')
         self.assertNotIn('id', attachments[0])
 
     def test_cid(self):
@@ -95,9 +89,7 @@ class GetDomainsTests(TestCase):
         self.assertSetEqual(set(domains), {'bar.com', 'com'})
 
     def test_gets_domains_with_cc_and_bcc(self):
-        email = {'to': ['foo@bar.com'],
-                 'cc': ['baz@bar.com'],
-                 'bcc': ['foo@com']}
+        email = {'to': ['foo@bar.com'], 'cc': ['baz@bar.com'], 'bcc': ['foo@com']}
 
         domains = email_parser.get_domains(email)
 
@@ -202,15 +194,16 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
     def assertHasCount(self, data, snippet, expected_count):
         actual_count = data.count(snippet)
-        self.assertEqual(actual_count, expected_count,
-                         'Expected {} to occur {} times but got {}'.format(snippet, expected_count, actual_count))
+        self.assertEqual(actual_count, expected_count, f'Expected {snippet} to occur {expected_count} '
+                         f'times but got {actual_count}')
 
     @classmethod
     def givenTestImage(cls, content_type='image/png', status=200):
         with open(join(TEST_DATA_DIRECTORY, 'test_image.png'), 'rb') as image:
             image_bytes = image.read()
 
-        mock.add(mock.GET, 'http://test-url.png',
+        mock.add(mock.GET,
+                 'http://test-url.png',
                  headers={'Content-Type': content_type},
                  body=image_bytes,
                  status=status)

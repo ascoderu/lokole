@@ -28,8 +28,7 @@ class SetupMxRecords(LogMixin):
         client_name = domain_parts[0]
         zone_name = '.'.join(domain_parts[1:])
 
-        zone = next(zone for zone in self._driver.iterate_zones()
-                    if zone.domain == zone_name)
+        zone = next(zone for zone in self._driver.iterate_zones() if zone.domain == zone_name)
 
         self._driver.create_record(
             zone=zone,
