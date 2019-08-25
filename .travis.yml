@@ -3,16 +3,10 @@ language: minimal
 env:
   matrix:
     - LOKOLE_QUEUE_BROKER_SCHEME=azureservicebus
-    - LOKOLE_QUEUE_BROKER_SCHEME=pyamqp
+    - LOKOLE_QUEUE_BROKER_SCHEME=amqp
 
 services:
   - docker
-
-install:
-  - make build verify-build
-
-before_script:
-  - make start
 
 script:
   - |
@@ -21,10 +15,11 @@ script:
     else
       echo "Skipping cert renewal for on-demand build"
     fi
-  - |
     if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
       echo "Skipping live service test for branch build"
     else
+      make build verify-build
+      make start
       make integration-tests
     fi
 

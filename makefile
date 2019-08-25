@@ -15,7 +15,7 @@ tests: venv
 
 lint-swagger: venv
 	find opwen_email_server/swagger -type f -name '*.yaml' | while read file; do \
-    echo "====================  $$file ===================="; \
+    echo "==================== $$file ===================="; \
     $(PY_ENV)/bin/swagger-flex --source="$$file" \
   || exit 1; done
 
@@ -28,14 +28,14 @@ lint-python: venv
 
 lint-yaml: venv
 	find . -type f -regex '.*\.ya?ml' -not -path '$(PY_ENV)/*' | grep -v '^./helm/' | while read file; do \
-    echo "====================  $$file ===================="; \
+    echo "==================== $$file ===================="; \
     $(PY_ENV)/bin/yamllint "$$file" \
   || exit 1; done
 
 lint-docker:
 	if command -v hadolint >/dev/null; then \
     find . -type f -name Dockerfile -not -path '$(PY_ENV)/*' | while read file; do \
-      echo "====================  $$file ===================="; \
+      echo "==================== $$file ===================="; \
       hadolint "$$file" \
     || exit 1; done \
   fi
@@ -43,7 +43,7 @@ lint-docker:
 lint-shell:
 	if command -v shellcheck >/dev/null; then \
     find . -type f -name '*.sh' -not -path '$(PY_ENV)/*' | while read file; do \
-      echo "====================  $$file ===================="; \
+      echo "==================== $$file ===================="; \
       shellcheck "$$file" \
     || exit 1; done \
   fi
@@ -73,7 +73,10 @@ start:
 
 logs:
 	if [ "$(ALL)" = "true" ]; then \
-    docker-compose logs; \
+    docker-compose ps --services | while read service; do \
+      echo "==================== $$service ===================="; \
+      docker-compose logs "$$service"; \
+    done \
   else \
     docker-compose logs --follow --tail=100; \
   fi
@@ -84,7 +87,7 @@ stop:
 verify-build:
 	docker pull wagoodman/dive
 	docker-compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \
-    echo "====================  $$image ===================="; \
+    echo "==================== $$image ===================="; \
     docker run --rm \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $(PWD)/.dive-ci:/.dive-ci \
@@ -110,19 +113,21 @@ kubeconfig:
   fi
 
 renew-cert: kubeconfig
-	docker-compose run \
+	docker-compose build setup && \
+  docker-compose run --rm \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
-    /app/renew-cert.sh; \
+    /app/renew-cert.sh && \
   rm -f "$(PWD)/kube-config"
 
 deploy: kubeconfig
-	docker-compose run \
+	docker-compose build setup && \
+  docker-compose run --rm \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \
     -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
-    /app/upgrade.sh; \
+    /app/upgrade.sh && \
   rm -f "$(PWD)/kube-config"

@@ -151,7 +151,7 @@ to initialize the required cloud resources.
   REGISTRATION_PASSWORD={some password for the registration endpoint}
   EOM
 
-  docker-compose run \
+  docker-compose run --rm \
     -e SP_APPID={appId field of your service principal} \
     -e SP_PASSWORD={password field of your service principal} \
     -e SP_TENANT={tenant field of your service principal} \
