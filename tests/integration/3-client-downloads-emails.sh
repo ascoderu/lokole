@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+get_dotenv() {
+  local key dotenv_file
+
+  key="$1"
+  dotenv_file="$(dirname "$0")/../../.env"
+
+  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
+}
+
 out_dir="$(dirname "$0")/../files/end_to_end/test.out"
 mkdir -p "${out_dir}"
 
@@ -21,11 +30,13 @@ curl -fs \
 resource_id="$(jq -r '.resource_id' < "${out_dir}/download${i}.json")"
 
 # now we simulate the client downloading the package from the shared blob storage
+storage_account="$(get_dotenv AZURITE_ACCOUNT)"
+storage_key="$(get_dotenv AZURITE_KEY)"
 az storage blob download --no-progress \
   --file "${out_dir}/downloaded${i}.tar.gz" \
   --name "${resource_id}" \
   --container-name "${resource_container}" \
-  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+  --connection-string "DefaultEndpointsProtocol=http;AccountName=${storage_account};AccountKey=${storage_key};BlobEndpoint=http://azurite:10000/${storage_account};"
 
 tar xzf "${out_dir}/downloaded${i}.tar.gz" -C "${out_dir}"
 

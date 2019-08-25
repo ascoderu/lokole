@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+get_dotenv() {
+  local key dotenv_file
+
+  key="$1"
+  dotenv_file="$(dirname "$0")/../../.env"
+
+  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
+}
+
 in_dir="$(dirname "$0")/../files/end_to_end"
 out_dir="$(dirname "$0")/../files/end_to_end/test.out"
 mkdir -p "${out_dir}"
@@ -12,11 +21,13 @@ resource_id="$(uuidgen).tar.gz"
 
 # workflow 1: send emails written on the client to the world
 # first we simulate the client uploading its emails to the shared blob storage
+storage_account="$(get_dotenv AZURITE_ACCOUNT)"
+storage_key="$(get_dotenv AZURITE_KEY)"
 az storage blob upload --no-progress \
   --file "${emails_to_send}" \
   --name "${resource_id}" \
   --container-name "${resource_container}" \
-  --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+  --connection-string "DefaultEndpointsProtocol=http;AccountName=${storage_account};AccountKey=${storage_key};BlobEndpoint=http://azurite:10000/${storage_account};"
 
 # the client then calls the server to trigger the delivery of the emails
 curl -fs \
