@@ -11,7 +11,7 @@ pyzmail36==1.0.4
 requests==2.22.0
 sendgrid==6.0.5
 typing-extensions==3.7.4
-typing==3.7.4
+typing==3.7.4.1
 kombu==4.6.4
 celery==4.3.0
 xtarfile[zstd]==0.0.2
