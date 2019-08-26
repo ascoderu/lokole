@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+scriptdir="$(dirname "$0")"
+out_dir="${scriptdir}/files/test.out"
 mkdir -p "${out_dir}"
-
-sql_query() {
-  docker-compose exec postgres psql -Aqt -c "$1" -U ascoderu -d telemetry \
-  | tr -d -C '0-9'
-}
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
 
 num_exceptions="$(sql_query 'select count(*) from exceptions;')"
 num_exceptions_expected=0

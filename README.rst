@@ -67,11 +67,9 @@ Development setup
 
 First, install the system dependencies:
 
-- `curl <https://curl.haxx.se>`_
 - `docker <https://docs.docker.com>`_
 - `docker-compose <https://docs.docker.com/compose/>`_
 - `git <https://git-scm.com>`_
-- `jq <https://stedolan.github.io/jq/>`_
 - `make <https://www.gnu.org/software/make/>`_
 
 Second, get the source code.

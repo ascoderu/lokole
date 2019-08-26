@@ -95,7 +95,16 @@ services:
     build:
       context: .
       dockerfile: docker/setup/Dockerfile
-    command: /app/setup.sh --help
+    command: echo skipped
+
+  integtest:
+    image: ${DOCKER_REPO}/opwenserver_integtest:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/integtest/Dockerfile
+    command: echo skipped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   rabbitmq:
     image: rabbitmq:management-alpine
@@ -120,9 +129,7 @@ services:
       - ${POSTGRES_PORT}:5432
 
   azurite:
-    image: arafato/azurite:2.6.5
-    environment:
-      executable: blob
+    image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
       - ${AZURITE_PORT}:10000
 

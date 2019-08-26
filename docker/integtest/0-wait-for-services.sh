@@ -1,33 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+scriptdir="$(dirname "$0")"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
+
 readonly polling_interval_seconds=2
 
-log() {
-  echo "$@" >&2
-}
-
-get_dotenv() {
-  local key dotenv_file
-
-  key="$1"
-  dotenv_file="$(dirname "$0")/../../.env"
-
-  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
-}
-
-sql() {
-  local user database query
-
-  user="$(get_dotenv "POSTGRES_USER")"
-  database="$(get_dotenv "POSTGRES_DB")"
-  query="$1"
-
-  docker-compose exec postgres psql -U "${user}" -d "${database}" -c "${query}"
-}
-
 wait_for_rabbitmq() {
-  while ! docker-compose exec rabbitmq rabbitmqctl wait -q -P 1 -t "${polling_interval_seconds}"; do
+  local rabbitmq
+
+  rabbitmq="$(get_container rabbitmq)"
+
+  while ! docker exec "${rabbitmq}" rabbitmqctl wait -q -P 1 -t "${polling_interval_seconds}"; do
     log "Waiting for rabbitmq"
   done
 

@@ -1,4 +1,5 @@
 *
+!.env
 !.yamllint
 !*.yml
 !docker/

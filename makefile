@@ -53,13 +53,8 @@ lint: lint-python lint-shell lint-swagger lint-docker lint-yaml
 ci: tests lint
 
 integration-tests:
-	./tests/integration/wait.sh && \
-    ./tests/integration/0-register-client.sh && \
-    ./tests/integration/1-client-uploads-emails.sh && sleep 10s && \
-    ./tests/integration/2-receive-email-for-client.sh && sleep 10s && \
-    ./tests/integration/3-client-downloads-emails.sh && \
-    ./tests/integration/assert.sh && \
-    rm -rf tests/files/end_to_end/test.out
+	docker-compose build integtest && \
+  docker-compose run --rm integtest ./tests.sh
 
 clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
@@ -82,7 +77,7 @@ logs:
   fi
 
 stop:
-	docker-compose down --volumes
+	docker-compose down --volumes --timeout=5
 
 verify-build:
 	docker pull wagoodman/dive

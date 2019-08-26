@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-out_dir="$(dirname "$0")/../files/end_to_end/test.out"
+scriptdir="$(dirname "$0")"
+out_dir="${scriptdir}/files/test.out"
 mkdir -p "${out_dir}"
+# shellcheck disable=SC1090
+. "${scriptdir}/utils.sh"
 
 for i in 1 2; do
 
@@ -15,15 +18,13 @@ resource_container="$(jq -r '.resource_container' < "${out_dir}/register${i}.jso
 # will package up the emails and store them on the shared blob storage
 curl -fs \
   -H "Accept: application/json" \
-  "http://localhost:8080/api/email/download/${client_id}" \
+  "http://nginx:8888/api/email/download/${client_id}" \
 | tee "${out_dir}/download${i}.json"
 
 resource_id="$(jq -r '.resource_id' < "${out_dir}/download${i}.json")"
 
 # now we simulate the client downloading the package from the shared blob storage
-curl -fs \
-  "http://localhost:10000/devstoreaccount1/${resource_container}/${resource_id}" \
-> "${out_dir}/downloaded${i}.tar.gz"
+az_storage download "${resource_container}" "${resource_id}" "${out_dir}/downloaded${i}.tar.gz"
 
 tar xzf "${out_dir}/downloaded${i}.tar.gz" -C "${out_dir}"
 
