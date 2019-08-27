@@ -26,7 +26,7 @@ lint-python: venv
 	$(py_env)/bin/bandit -x $(py_env) *.py
 
 lint-js: node_modules
-	yarn run eslint opwen_email_client/webapp/static/js/**/*.js
+	yarn run standard opwen_email_client/webapp/static/js/**/*.js
 
 lint: lint-python lint-js
 

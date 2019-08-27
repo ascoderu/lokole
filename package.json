@@ -6,14 +6,11 @@
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
-    "eslint": "^5.14.1",
-    "eslint-config-recommended": "^4.0.0",
-    "eslint-plugin-prettier": "^3.1.0",
     "grunt": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^2.2.0",
     "grunt-contrib-uglify": "^3.0.1",
-    "prettier": "^1.18.2"
+    "standard": "^14.0.2"
   },
   "dependencies": {
     "@bower_components/bootstrap": "twbs/bootstrap#^3.3.7",

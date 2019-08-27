@@ -1,27 +1,27 @@
-(function($, ctx) {
-  $(document).ready(function() {
-    (function styleEmailAttachmentsField() {
+(function ($, ctx) {
+  $(document).ready(function () {
+    (function styleEmailAttachmentsField () {
       $(ctx.selectors.attachments).fileinput({
         showPreview: false,
         showUpload: false,
-        msgSelected: "{n} " + ctx.i8n.filesSelected,
+        msgSelected: '{n} ' + ctx.i8n.filesSelected,
         layoutTemplates: {
           fileIcon:
             '<span class="fa fa-file-o" aria-hidden="true"></span>&nbsp;'
         },
-        removeTitle: "",
+        removeTitle: '',
         removeIcon: '<span class="fa fa-trash-o" aria-hidden="true"></span>',
         removeLabel: ctx.i8n.remove,
         browseLabel: ctx.i8n.chooseFiles,
         browseIcon: '<span class="fa fa-paperclip" aria-hidden="true"></span>',
-        browseClass: "btn btn-default"
-      });
+        browseClass: 'btn btn-default'
+      })
     })();
 
-    (function turnEmailBodyFieldIntoRichEditor() {
+    (function turnEmailBodyFieldIntoRichEditor () {
       $(ctx.selectors.formBody).wysihtml5({
         toolbar: {
-          "font-styles": false,
+          'font-styles': false,
           link: false,
           image: false,
           outdent: false,
@@ -30,7 +30,7 @@
           fa: true
         },
         customTemplates: {
-          emphasis: function() {
+          emphasis: function () {
             return (
               '<li><div class="btn-group">' +
               '<a title="' +
@@ -45,10 +45,10 @@
               ctx.i8n.underline +
               '" class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">' +
               '  <span class="fa fa-underline" aria-hidden="true"></span></a>' +
-              "</div></li>"
-            );
+              '</div></li>'
+            )
           },
-          lists: function() {
+          lists: function () {
             return (
               '<li><div class="btn-group">' +
               '<a title="' +
@@ -59,11 +59,11 @@
               ctx.i8n.orderedList +
               '" class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">' +
               '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>' +
-              "</div></li>"
-            );
+              '</div></li>'
+            )
           }
         }
-      });
-    })();
-  });
-})(window.jQuery, window.flask_jinja_context__email_new);
+      })
+    })()
+  })
+})(window.jQuery, window.flask_jinja_context__email_new)
