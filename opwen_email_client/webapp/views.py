@@ -9,6 +9,7 @@ from babel import Locale
 from flask import Response
 from flask import abort
 from flask import flash
+from flask import jsonify
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -108,6 +109,15 @@ def email_search(page: int) -> Response:
 
     return _emails_view(email_store.search(user.email, page, query),
                         page, 'email_search.html')
+
+
+@app.route('/email/unread')
+@login_required
+def email_unread() -> Response:
+    email_store = Ioc.email_store
+    user = current_user
+
+    return jsonify(unread=email_store.has_unread(user.email))
 
 
 @app.route('/email/read/<email_uid>')

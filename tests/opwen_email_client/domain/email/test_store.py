@@ -133,6 +133,25 @@ class Base(object):
             results = list(results)
             self.assertEqual(len(results), 3)
 
+        def test_unread(self):
+            self.given_emails(
+                {'to': ['Foo@bar.com'], 'sent_at': '2017-09-10 11:11', 'read': False},
+                {'to': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11', 'read': True},
+                {'to': ['bar@bar.com'], 'sent_at': '2017-09-10 11:11', 'read': True},
+                {'to': ['baz@bar.com'], 'sent_at': '2017-09-10 11:11'})
+
+            result = self.email_store.has_unread('foo@bar.com')
+
+            self.assertTrue(result)
+
+            result = self.email_store.has_unread('bar@bar.com')
+
+            self.assertFalse(result)
+
+            result = self.email_store.has_unread('baz@bar.com')
+
+            self.assertTrue(result)
+
         def test_outbox(self):
             emails = self.given_emails(
                 {'from': 'foo@bar.com'},

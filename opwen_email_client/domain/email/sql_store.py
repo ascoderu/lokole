@@ -300,6 +300,13 @@ class _SqlalchemyEmailStore(EmailStore):
     def pending(self, page):
         return self._query(_Email.sent_at.is_(None), page)
 
+    def has_unread(self, email_address):
+        with self._dbread() as db:
+            unread = exists().where(_Email.read.is_(False)
+                                    & _Email.is_received_by(email_address))
+            has_unread_emails = db.query(unread).scalar()
+        return has_unread_emails
+
     def num_pending(self):
         with self._dbread() as db:
             count = db.query(_Email)\

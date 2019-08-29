@@ -31,6 +31,16 @@
     {% block content %}{% endblock %}
   </div>
 
-  {% block scripts %}{% endblock %}
+  {% block scripts %}
+  <script>
+  window.flask_jinja_context__base = {
+    i8n: {
+      newEmails: "{{ _('You have new emails!') }}",
+      openMailbox: "{{ _('Open mailbox.') }}"
+    }
+  };
+  </script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/_base.min.js') }}"></script>
+  {% endblock %}
 </body>
 </html>

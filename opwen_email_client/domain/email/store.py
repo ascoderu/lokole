@@ -53,6 +53,10 @@ class EmailStore(metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
+    def has_unread(self, email_address: str) -> bool:
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
     def num_pending(self) -> int:
         raise NotImplementedError  # pragma: no cover
 
