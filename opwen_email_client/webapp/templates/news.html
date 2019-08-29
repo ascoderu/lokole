@@ -1,5 +1,7 @@
 {% extends "_base.html" %}
 
+{% block title %}{{ _('Lokole news page') }}{% endblock %}
+
 {% from 'macros/email.html' import email_display with context %}
 
 {% block style %}{{ super() }}
@@ -7,5 +9,7 @@
 {% endblock %}
 
 {% block content %}{{ super() }}
+<main>
 {{ email_display(emails, _('No news.'), show_actions=False, show_sent_at=False, show_sent_to=False, show_attachments=False) }}
+</main>
 {% endblock %}

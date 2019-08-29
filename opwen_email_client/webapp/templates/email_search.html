@@ -13,5 +13,7 @@
   </div>
 </div>
 
+<main>
 {{ email_display(emails, 'No emails matching query.' if request.args.get('query') else '') }}
+</main>
 {% endblock %}

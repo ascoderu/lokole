@@ -36,14 +36,23 @@
               '<a title="' +
               ctx.i8n.bold +
               '" class="btn btn-default" data-wysihtml5-command="bold" tabindex="-1" href="javascript:;" unselectable="on">' +
+              '  <span class="sr-only">' +
+              ctx.i8n.bold +
+              '</span>' +
               '  <span class="fa fa-bold" aria-hidden="true"></span></a>' +
               '<a title="' +
               ctx.i8n.italic +
               '" class="btn btn-default" data-wysihtml5-command="italic" tabindex="-1" href="javascript:;" unselectable="on">' +
+              '  <span class="sr-only">' +
+              ctx.i8n.italic +
+              '</span>' +
               '  <span class="fa fa-italic" aria-hidden="true"></span></a>' +
               '<a title="' +
               ctx.i8n.underline +
               '" class="btn btn-default" data-wysihtml5-command="underline" tabindex="-1" href="javascript:;" unselectable="on">' +
+              '  <span class="sr-only">' +
+              ctx.i8n.underline +
+              '</span>' +
               '  <span class="fa fa-underline" aria-hidden="true"></span></a>' +
               '</div></li>'
             )

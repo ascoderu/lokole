@@ -1,5 +1,7 @@
 {% extends "_base.html" %}
 
+{% block title %}{{ _('Lokole mailbox') }}{% endblock %}
+
 {% block style %}{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.min.css') }}">
 {% endblock %}

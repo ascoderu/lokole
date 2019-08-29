@@ -1,11 +1,13 @@
 {% extends "_base.html" %}
 
+{% block title %}{{ _('About Lokole') }}{% endblock %}
+
 {% block style %}{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/about.min.css') }}">
 {% endblock %}
 
 {% block content %}{{ super() }}
-<div class="container-fluid">
+<main class="container-fluid">
 
   <div class="row">
     <div class="col-sm-6 col-sm-offset-3">
@@ -19,7 +21,7 @@
     </div>
   </div>
 
-</div>
+</main>
 {% endblock %}
 
 {% macro _what_is_opwen() %}

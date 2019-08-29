@@ -3,10 +3,12 @@
 {% macro email_search_form() %}
 <form id="email-search-form" action="{{ url_for('email_search') }}" method="get">
   <div class="input-group">
-    <input type="search" name="query" class="form-control" placeholder="{{ _('Search') }}" value="{{ request.args.get('query', '') }}">
+    <input type="search" id="query" name="query" class="form-control" placeholder="{{ _('Write query...') }}" value="{{ request.args.get('query', '') }}">
+    <label class="sr-only" for="query">{{ _('Write query...') }}</label>
     <div class="input-group-btn">
-      <button type="submit" class="btn btn-default">
+      <button type="submit" class="btn btn-default" aria-describedby="search-button-label">
         <span class="fa fa-search" aria-hidden="true"></span>
+        <span class="sr-only" id="search-button-label">{{ _('Search') }}</span>
       </button>
     </div>
   </div>

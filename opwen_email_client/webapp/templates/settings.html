@@ -1,5 +1,7 @@
 {% extends "_base.html" %}
 
+{% block title %}{{ _('Lokole settings page') }}{% endblock %}
+
 {% from 'macros/form.html' import render_field %}
 {% from 'macros/form.html' import render_button %}
 
@@ -12,6 +14,7 @@
 {% endblock %}
 
 {% block content %}{{ super() }}
+<main>
 <form action="{{ url_for('settings') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
@@ -39,6 +42,7 @@
 
   {{ render_button(form.submit, _('Save settings')) }}
 </form>
+</main>
 
 <div class="modal fade" id="wvdial-modal" tabindex="-1" role="dialog" aria-labelledby="wvdial-title">
   <div class="modal-dialog" role="document">

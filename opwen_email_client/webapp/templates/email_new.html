@@ -15,6 +15,7 @@
 {% block content %}{{ super() }}
 {{ email_subnav() }}
 
+<main>
 <form action="{{ url_for('email_new', **request.args) }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
@@ -31,6 +32,7 @@
   {{ render_field(form.attachments, _('Attachments')) }}
   {{ render_button(form.submit, _('Send')) }}
 </form>
+</main>
 {% endblock %}
 
 {% block scripts %}{{ super() }}

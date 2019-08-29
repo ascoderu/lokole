@@ -1,5 +1,7 @@
 {% extends "_base.html" %}
 
+{% block title %}{{ _('Lokole homepage') }}{% endblock %}
+
 {% block style %}{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.min.css') }}">
 {% endblock %}
@@ -8,7 +10,7 @@
 <div class="row">
   <div class="col-sm-offset-3 col-sm-6">
     <div class="jumbotron">
-      <div class="container text-center">
+      <main class="container text-center">
         <h2>{{ _('Lokole') }}<br/>
           <small>{{ _('Email for all') }}</small>
         </h2>
@@ -34,7 +36,7 @@
           </div>
           {% endif %}
         </div>
-      </div>
+      </main>
     </div>
   </div>
 </div>
