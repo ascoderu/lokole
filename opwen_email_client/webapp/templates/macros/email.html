@@ -60,26 +60,6 @@
       </div>
       <div id="collapse{{ loop.index }}" class="panel-collapse collapse">
         <div class="panel-body">
-          <div class="row">
-            <div class="col-sm-12">
-              <span class="email-body">{{ email | render_body | safe }}</span>
-            </div>
-          </div>
-          {% if show_attachments %}
-          {% if email['attachments'] %}
-          <div class="row hidden-print">
-            <div class="col-sm-12">
-              <ul class="list-inline">
-                {% for attachment in email['attachments'] %}
-                <li>
-                  <a href="{{ url_for('download_attachment', uid=attachment['_uid']) }}">{{ attachment['filename'] }}</a>
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-          {% endif %}
-          {% endif %}
           {% if show_actions %}
           <div class="row">
             <div class="col-sm-12">
@@ -106,6 +86,26 @@
               </div>
             </div>
           </div>
+          {% endif %}
+          <div class="row">
+            <div class="col-sm-12">
+              <span class="email-body">{{ email | render_body | safe }}</span>
+            </div>
+          </div>
+          {% if show_attachments %}
+          {% if email['attachments'] %}
+          <div class="row hidden-print">
+            <div class="col-sm-12">
+              <ul class="list-inline">
+                {% for attachment in email['attachments'] %}
+                <li>
+                  <a href="{{ url_for('download_attachment', uid=attachment['_uid']) }}">{{ attachment['filename'] }}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
           {% endif %}
         </div>
       </div>
