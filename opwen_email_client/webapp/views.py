@@ -73,7 +73,8 @@ def email_inbox(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.inbox(user.email, page), page)
+    return _emails_view(email_store.inbox(user.email, page), page,
+                        type='inbox')
 
 
 @app.route('/email/outbox', defaults={'page': 1})
@@ -84,7 +85,8 @@ def email_outbox(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.outbox(user.email, page), page)
+    return _emails_view(email_store.outbox(user.email, page), page,
+                        type='outbox')
 
 
 @app.route('/email/sent', defaults={'page': 1})
@@ -95,7 +97,8 @@ def email_sent(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.sent(user.email, page), page)
+    return _emails_view(email_store.sent(user.email, page), page,
+                        type='sent')
 
 
 @app.route('/email/search', defaults={'page': 1})
@@ -108,7 +111,7 @@ def email_search(page: int) -> Response:
     query = request.args.get('query')
 
     return _emails_view(email_store.search(user.email, page, query),
-                        page, 'email_search.html')
+                        page, 'email_search.html', type='search')
 
 
 @app.route('/email/unread')
@@ -157,7 +160,7 @@ def email_new() -> Response:
         flash(i8n.EMAIL_SENT, category='success')
         return redirect(url_for('email_inbox'))
 
-    return _view('email_new.html', form=form)
+    return _view('email_new.html', form=form, type='write')
 
 
 @app.route('/attachment/<uid>', methods=['GET'])
@@ -385,7 +388,7 @@ def _localeselector() -> str:
 
 
 def _emails_view(emails: Iterable[dict], page: int,
-                 template: str = 'email.html') -> Response:
+                 template: str = 'email.html', **kwargs) -> Response:
     offset_minutes = getattr(current_user, 'timezone_offset_minutes', 0)
     timezone_offset = timedelta(minutes=offset_minutes)
 
@@ -402,7 +405,8 @@ def _emails_view(emails: Iterable[dict], page: int,
                  emails=emails,
                  page=page,
                  has_prevpage=page > 1,
-                 has_nextpage=len(emails) == AppConfig.EMAILS_PER_PAGE)
+                 has_nextpage=len(emails) == AppConfig.EMAILS_PER_PAGE,
+                 **kwargs)
 
 
 def _view(template: str, **kwargs) -> Response:

@@ -63,10 +63,16 @@
               '<a title="' +
               ctx.i8n.unorderedList +
               '" class="btn btn-default" data-wysihtml5-command="insertUnorderedList" tabindex="-1" href="javascript:;" unselectable="on">' +
+              '  <span class="sr-only">' +
+              ctx.i8n.unorderedList +
+              '</span>' +
               '  <span class="fa fa-list-ul" aria-hidden="true"></span></a>' +
               '<a title="' +
               ctx.i8n.orderedList +
               '" class="btn btn-default" data-wysihtml5-command="insertOrderedList" tabindex="-1" href="javascript:;" unselectable="on">' +
+              '  <span class="sr-only">' +
+              ctx.i8n.orderedList +
+              '</span>' +
               '  <span class="fa fa-list-ol" aria-hidden="true"></span></a>' +
               '</div></li>'
             )
