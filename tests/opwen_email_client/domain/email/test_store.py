@@ -34,8 +34,7 @@ class Base(object):
             self.assertIn(cleanup(expected), [cleanup(actual) for actual in collection])
 
         def test_creates_email_id(self):
-            email = self.given_emails(
-                {'to': ['foo@bar.com']})[0]
+            email = self.given_emails({'to': ['foo@bar.com']})[0]
 
             self.assertIsNotNone(email.get('_uid'), 'email id was not set')
 
@@ -43,19 +42,20 @@ class Base(object):
             restricted1 = 'restricted@test.com'
             allowed1, allowed2 = 'allowed1@bar.com', 'allowed2@baz.com'
 
-            self.email_store = self.create_email_store(
-                {restricted1: {allowed1, allowed2}})
+            self.email_store = self.create_email_store({restricted1: {allowed1, allowed2}})
 
             kept = self.given_emails(
                 {'to': [restricted1], 'from': allowed1},
                 {'to': [restricted1], 'from': allowed1},
                 {'cc': [restricted1], 'from': allowed2},
-                {'bcc': [restricted1, allowed1], 'from': allowed2})
+                {'bcc': [restricted1, allowed1], 'from': allowed2},
+            )
             self.given_emails(
                 {'to': [restricted1], 'from': 'unknown1@baz.com'},
                 {'cc': [restricted1], 'from': 'unknown2@baz.com'},
                 {'cc': [restricted1], 'from': 'unknown2@baz.com'},
-                {'bcc': [restricted1], 'from': 'unknown3@baz.com'})
+                {'bcc': [restricted1], 'from': 'unknown3@baz.com'},
+            )
 
             results = self.email_store.inbox(restricted1, page=1)
             results = list(results)
@@ -69,10 +69,12 @@ class Base(object):
         def test_does_not_overwrite_email_id(self):
             emails1 = self.given_emails(
                 {'to': ['foo@bar.com']},
-                {'to': ['foo@bar.com']})
+                {'to': ['foo@bar.com']},
+            )
             emails2 = self.given_emails(
                 {'to': ['bar@bar.com']},
-                *emails1)
+                *emails1,
+            )
 
             results = self.email_store.inbox('foo@bar.com', page=1)
             self.assertEqual(len(list(results)), 2)
@@ -85,17 +87,19 @@ class Base(object):
             self.assertEqual(ids1, ids2)
 
         def test_create_with_existing_attachment(self):
-            self.given_emails(
-                {'to': ['foo@bar.com'], 'attachments': [
+            self.given_emails({
+                'to': ['foo@bar.com'], 'attachments': [
                     {'_uid': 'a1', 'filename': 'a1', 'content': b'a1'},
                     {'_uid': 'a2', 'filename': 'a2', 'content': b'a2'},
-                ]})
+                ]
+            })
 
-            self.given_emails(
-                {'to': ['foo@bar.com'], 'attachments': [
+            self.given_emails({
+                'to': ['foo@bar.com'], 'attachments': [
                     {'_uid': 'a1', 'filename': 'a1', 'content': b'a1'},
                     {'_uid': 'a3', 'filename': 'a3', 'content': b'a3'},
-                ]})
+                ]
+            })
 
             results = self.email_store.inbox('foo@bar.com', page=1)
             self.assertEqual(len(list(results)), 2)
@@ -107,7 +111,8 @@ class Base(object):
                 {'cc': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11'},
                 {'bcc': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11'},
                 {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
-                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'},
+            )
 
             results = self.email_store.inbox('foo@bar.com', page=1)
             results = list(results)
@@ -138,7 +143,8 @@ class Base(object):
                 {'to': ['Foo@bar.com'], 'sent_at': '2017-09-10 11:11', 'read': False},
                 {'to': ['foo@bar.com'], 'sent_at': '2017-09-10 11:11', 'read': True},
                 {'to': ['bar@bar.com'], 'sent_at': '2017-09-10 11:11', 'read': True},
-                {'to': ['baz@bar.com'], 'sent_at': '2017-09-10 11:11'})
+                {'to': ['baz@bar.com'], 'sent_at': '2017-09-10 11:11'},
+            )
 
             result = self.email_store.has_unread('foo@bar.com')
 
@@ -161,7 +167,8 @@ class Base(object):
                 {'to': ['foo@bar.com']},
                 {'cc': ['foo@bar.com']},
                 {'bcc': ['foo@bar.com']},
-                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'},
+            )
 
             results = self.email_store.outbox('foo@bar.com', page=1)
             results = list(results)
@@ -177,7 +184,8 @@ class Base(object):
                 {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
                 {'from': 'foo@bar.com', 'sent_at': None},
                 {'from': 'baz@bar.com'},
-                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'},
+            )
 
             results = self.email_store.pending(page=1)
             results = list(results)
@@ -209,7 +217,8 @@ class Base(object):
                 {'from': 'foo@bar.com', 'sent_at': '2017-09-10 11:11'},
                 {'from': 'foo@bar.com', 'sent_at': None},
                 {'from': 'baz@bar.com'},
-                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'},
+            )
 
             count = self.email_store.num_pending()
 
@@ -223,7 +232,8 @@ class Base(object):
                 {'to': ['foo@bar.com']},
                 {'cc': ['foo@bar.com']},
                 {'bcc': ['foo@bar.com']},
-                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'})
+                {'from': 'baz@bar.com', 'sent_at': '2017-09-10 11:11'},
+            )
 
             results = self.email_store.sent('foo@bar.com', page=1)
             results = list(results)
@@ -235,10 +245,10 @@ class Base(object):
             emails = self.given_emails(
                 {'to': ['foo@bar.com'], 'from': 'baz@bar.com'},
                 {'to': ['foo@bar.com'], 'from': 'fuz@bar.com'},
-                {'to': ['baz@bar.com'], 'from': 'fuz@bar.com'})
+                {'to': ['baz@bar.com'], 'from': 'fuz@bar.com'},
+            )
 
-            results = self.email_store.search('foo@bar.com', page=1,
-                                              query='fuz')
+            results = self.email_store.search('foo@bar.com', page=1, query='fuz')
             results = list(results)
 
             self.assertEqual(len(results), 1)
@@ -251,10 +261,10 @@ class Base(object):
                 {'from': 'foo@bar.com', 'body': 'koala'},
                 {'cc': ['foo@bar.com'], 'body': 'koala'},
                 {'bcc': ['foo@bar.com'], 'body': 'koala'},
-                {'to': ['baz@bar.com'], 'body': 'baz'})
+                {'to': ['baz@bar.com'], 'body': 'baz'},
+            )
 
-            results = self.email_store.search('foo@bar.com', page=1,
-                                              query='koala')
+            results = self.email_store.search('foo@bar.com', page=1, query='koala')
             results = list(results)
 
             self.assertEqual(len(results), 4)
@@ -270,10 +280,10 @@ class Base(object):
                 {'from': 'foo@bar.com', 'subject': 'koala'},
                 {'cc': ['foo@bar.com'], 'subject': 'koala'},
                 {'bcc': ['foo@bar.com'], 'subject': 'koala'},
-                {'to': ['baz@bar.com'], 'subject': 'baz'})
+                {'to': ['baz@bar.com'], 'subject': 'baz'},
+            )
 
-            results = self.email_store.search('foo@bar.com', page=1,
-                                              query='koala')
+            results = self.email_store.search('foo@bar.com', page=1, query='koala')
             results = list(results)
 
             self.assertEqual(len(results), 4)
@@ -285,10 +295,10 @@ class Base(object):
         def test_search_without_query(self):
             self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'bar foo bar'},
-                {'to': ['baz@bar.com'], 'subject': 'baz'})
+                {'to': ['baz@bar.com'], 'subject': 'baz'},
+            )
 
-            results = self.email_store.search('foo@bar.com', page=1,
-                                              query=None)
+            results = self.email_store.search('foo@bar.com', page=1, query=None)
             results = list(results)
 
             self.assertEqual(results, [])
@@ -296,7 +306,8 @@ class Base(object):
         def test_mark_sent(self):
             emails = self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo'},
-                {'to': ['baz@bar.com'], 'subject': 'bar'})
+                {'to': ['baz@bar.com'], 'subject': 'bar'},
+            )
 
             self.email_store.mark_sent(emails)
 
@@ -308,7 +319,8 @@ class Base(object):
         def test_mark_read(self):
             emails = self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo'},
-                {'to': ['baz@bar.com'], 'subject': 'bar'})
+                {'to': ['baz@bar.com'], 'subject': 'bar'},
+            )
 
             self.email_store.mark_read('foo@bar.com', emails)
 
@@ -327,7 +339,8 @@ class Base(object):
                 {'to': ['foo@bar.com'], 'subject': 'deleted2'},
                 {'to': ['foo@bar.com'], 'subject': 'not-deleted1'},
                 {'to': ['foo@bar.com'], 'subject': 'not-deleted2'},
-                {'to': ['baz@bar.com'], 'subject': 'bar'})
+                {'to': ['baz@bar.com'], 'subject': 'bar'},
+            )
 
             self.email_store.delete('foo@bar.com', emails[:2])
 
@@ -345,11 +358,12 @@ class Base(object):
 
         def test_get(self):
             given = self.given_emails(
-                {'to': ['foo@bar.com'], 'subject': 'foo',
-                 'attachments': [{'filename': 'foo.txt',
-                                  'content': b'foo.txt',
-                                  'cid': None}]},
-                {'to': ['baz@bar.com'], 'subject': 'bar'})
+                {
+                    'to': ['foo@bar.com'], 'subject': 'foo', 'attachments':
+                    [{'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None}]
+                },
+                {'to': ['baz@bar.com'], 'subject': 'bar'},
+            )
 
             actual = self.email_store.get(given[0]['_uid'])
 
@@ -357,34 +371,32 @@ class Base(object):
 
         def test_get_with_separate_attachments(self):
             self.given_emails(
-                {'_type': 'email', '_uid': 'e1',
-                 'to': ['foo@bar.com'], 'subject': 'foo'},
-                {'_type': 'email', '_uid': 'e2',
-                 'to': ['baz@bar.com'], 'subject': 'bar'},
-                {'_type': 'email', '_uid': 'e3',
-                 'to': ['buz@buz.com'], 'subject': 'buz'},
-                {'_type': 'email', '_uid': 'e4',
-                 'to': ['buz@foo.com'], 'subject': 'foobuz'},
-                {'_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'],
-                 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None},
-                {'_type': 'attachment', '_uid': 'a2', 'emails': ['e3'],
-                 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None})
+                {'_type': 'email', '_uid': 'e1', 'to': ['foo@bar.com'], 'subject': 'foo'},
+                {'_type': 'email', '_uid': 'e2', 'to': ['baz@bar.com'], 'subject': 'bar'},
+                {'_type': 'email', '_uid': 'e3', 'to': ['buz@buz.com'], 'subject': 'buz'},
+                {'_type': 'email', '_uid': 'e4', 'to': ['buz@foo.com'], 'subject': 'foobuz'},
+                {
+                    '_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'], 'filename': 'foo.txt', 'content':
+                    b'foo.txt', 'cid': None
+                },
+                {
+                    '_type': 'attachment', '_uid': 'a2', 'emails': ['e3'], 'filename': 'bar.txt', 'content': b'bar.txt',
+                    'cid': None
+                },
+            )
 
             actual1 = self.email_store.get('e1')
             actual4 = self.email_store.get('e4')
 
             self.assertEqual(actual1.get('attachments'),
-                             [{'_uid': 'a1', 'filename': 'foo.txt',
-                               'content': b'foo.txt', 'cid': None}])
+                             [{'_uid': 'a1', 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None}])
 
-            self.assertEqual(actual1.get('attachments'),
-                             actual4.get('attachments'))
+            self.assertEqual(actual1.get('attachments'), actual4.get('attachments'))
 
             actual3 = self.email_store.get('e3')
 
             self.assertEqual(actual3.get('attachments'),
-                             [{'_uid': 'a2', 'filename': 'bar.txt',
-                               'content': b'bar.txt', 'cid': None}])
+                             [{'_uid': 'a2', 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None}])
 
             actual2 = self.email_store.get('e2')
 
@@ -393,7 +405,8 @@ class Base(object):
         def test_get_without_match(self):
             self.given_emails(
                 {'to': ['foo@bar.com'], 'subject': 'foo'},
-                {'to': ['baz@bar.com'], 'subject': 'bar'})
+                {'to': ['baz@bar.com'], 'subject': 'bar'},
+            )
 
             actual = self.email_store.get('uid-does-not-exist')
 
@@ -401,10 +414,15 @@ class Base(object):
 
         def test_get_attachment(self):
             self.given_emails(
-                {'_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'],
-                 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None},
-                {'_type': 'attachment', '_uid': 'a2', 'emails': ['e3'],
-                 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None})
+                {
+                    '_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'], 'filename': 'foo.txt', 'content':
+                    b'foo.txt', 'cid': None
+                },
+                {
+                    '_type': 'attachment', '_uid': 'a2', 'emails': ['e3'], 'filename': 'bar.txt', 'content': b'bar.txt',
+                    'cid': None
+                },
+            )
 
             actual = self.email_store.get_attachment('a1')
             self.assertEqual(actual['_uid'], 'a1')
@@ -414,10 +432,15 @@ class Base(object):
 
         def test_get_attachment_without_match(self):
             self.given_emails(
-                {'_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'],
-                 'filename': 'foo.txt', 'content': b'foo.txt', 'cid': None},
-                {'_type': 'attachment', '_uid': 'a2', 'emails': ['e3'],
-                 'filename': 'bar.txt', 'content': b'bar.txt', 'cid': None})
+                {
+                    '_type': 'attachment', '_uid': 'a1', 'emails': ['e1', 'e4'], 'filename': 'foo.txt', 'content':
+                    b'foo.txt', 'cid': None
+                },
+                {
+                    '_type': 'attachment', '_uid': 'a2', 'emails': ['e3'], 'filename': 'bar.txt', 'content': b'bar.txt',
+                    'cid': None
+                },
+            )
 
             actual = self.email_store.get_attachment('uid-does-not-exist')
 

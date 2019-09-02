@@ -15,8 +15,8 @@ def create_mkwvconf() -> Mkwvconf:
     return Mkwvconf({
         option: request.args.get(option, default)
         for option, default in (
-          ('modemDevice', DEFAULT_MODEM_DEVICE),
-          ('profileName', DEFAULT_PROFILE_NAME),
+            ('modemDevice', DEFAULT_MODEM_DEVICE),
+            ('profileName', DEFAULT_PROFILE_NAME),
         )
     })
 

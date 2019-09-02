@@ -18,6 +18,7 @@ tests: venv
 	$(py_env)/bin/coverage run -m nose2 && $(py_env)/bin/coverage report
 
 lint-python: venv
+	$(py_env)/bin/yapf --recursive --parallel --diff opwen_email_client tests
 	$(py_env)/bin/flake8 opwen_email_client
 	$(py_env)/bin/flake8 *.py
 	$(py_env)/bin/isort --check-only --recursive opwen_email_client

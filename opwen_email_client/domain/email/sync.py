@@ -45,10 +45,8 @@ class AzureSync(Sync):
         Download(name=_attachments_file, optional=True, type_='attachment'),
     )
 
-    def __init__(self, container: str, serializer: Serializer,
-                 account_name: str, account_key: str,
-                 email_server_client: EmailServerClient,
-                 provider: str, compression: str):
+    def __init__(self, container: str, serializer: Serializer, account_name: str, account_key: str,
+                 email_server_client: EmailServerClient, provider: str, compression: str):
 
         self._container = container
         self._serializer = serializer
@@ -123,10 +121,7 @@ class AzureSync(Sync):
                 yield download, archive.extractfile(member)
                 del downloads[filename]
 
-        missing_downloads = [
-            filename for filename, download in downloads.items()
-            if not download.optional
-        ]
+        missing_downloads = [filename for filename, download in downloads.items() if not download.optional]
 
         if missing_downloads:
             raise FileNotFoundError(','.join(missing_downloads))
@@ -142,11 +137,9 @@ class AzureSync(Sync):
 
             workspace.seek(0)
             with self._open(workspace.name, 'r') as archive:
-                for download, fobj in self._get_file_from_download(
-                        archive, self._download_files):
+                for download, fobj in self._get_file_from_download(archive, self._download_files):
                     for line in fobj:
-                        obj = self._serializer.deserialize(
-                            line, download.type_)
+                        obj = self._serializer.deserialize(line, download.type_)
                         obj['_type'] = download.type_
                         yield obj
 
@@ -155,8 +148,7 @@ class AzureSync(Sync):
 
         with self._workspace(self._emails_file) as uploaded:
             for item in items:
-                item = {key: value for (key, value) in item.items()
-                        if value is not None}
+                item = {key: value for (key, value) in item.items() if value is not None}
                 item.pop('read', False)
                 for attachment in item.get('attachments', []):
                     attachment.pop('_uid', '')
@@ -180,7 +172,6 @@ class AzureSync(Sync):
             if uploaded_ids:
                 workspace.seek(0)
                 self._upload_from_stream(upload_location, workspace)
-                self._email_server_client.upload(upload_location,
-                                                 self._container)
+                self._email_server_client.upload(upload_location, self._container)
 
         return uploaded_ids

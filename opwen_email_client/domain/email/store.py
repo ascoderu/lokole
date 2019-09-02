@@ -13,11 +13,8 @@ class EmailStore(metaclass=ABCMeta):
         self._restricted = restricted or {}
 
     def create(self, emails_or_attachments: Iterable[dict]):
-        self._create((
-            _add_uid(email_or_attachment)
-            for email_or_attachment in emails_or_attachments
-            if not _is_restricted(email_or_attachment, self._restricted)
-        ))
+        self._create((_add_uid(email_or_attachment) for email_or_attachment in emails_or_attachments
+                      if not _is_restricted(email_or_attachment, self._restricted)))
 
     @abstractmethod
     def _create(self, emails_or_attachments: Iterable[dict]):
@@ -44,8 +41,7 @@ class EmailStore(metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def search(self, email_address: str, page: int,
-               query: Optional[str]) -> Iterable[dict]:
+    def search(self, email_address: str, page: int, query: Optional[str]) -> Iterable[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
@@ -64,13 +60,11 @@ class EmailStore(metaclass=ABCMeta):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_sent(uids)
 
-    def mark_read(self, email_address: str,
-                  emails_or_uids: Iterable[Union[dict, str]]):
+    def mark_read(self, email_address: str, emails_or_uids: Iterable[Union[dict, str]]):
         uids = map(_get_uid, emails_or_uids)
         return self._mark_read(email_address, uids)
 
-    def delete(self, email_address: str,
-               emails_or_uids: Iterable[Union[dict, str]]):
+    def delete(self, email_address: str, emails_or_uids: Iterable[Union[dict, str]]):
         uids = map(_get_uid, emails_or_uids)
         return self._delete(email_address, uids)
 

@@ -17,8 +17,7 @@ def render_body(email: dict) -> str:
     if not images:
         return body
 
-    attachments = {attachment['cid']: attachment['_uid']
-                   for attachment in email.get('attachments', [])}
+    attachments = {attachment['cid']: attachment['_uid'] for attachment in email.get('attachments', [])}
     for img in images:
         src = img.get('src')
         if not src:
@@ -27,8 +26,7 @@ def render_body(email: dict) -> str:
             attachment_cid = src[4:]
             attachment_id = attachments.get(attachment_cid)
             if attachment_id:
-                src = url_for('download_attachment',
-                              attachment_id=attachment_id)
+                src = url_for('download_attachment', attachment_id=attachment_id)
         del img['src']
         img['data-original'] = src
     body = str(soup)

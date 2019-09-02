@@ -4,3 +4,4 @@ lockfile==0.12.2
 mypy==0.720
 nose2[coverage_plugin]==0.9.1
 bandit==1.6.2
+yapf==0.28.0

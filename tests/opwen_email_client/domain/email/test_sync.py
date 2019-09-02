@@ -23,35 +23,29 @@ class AzureSyncTests(TestCase):
         self._root_folder = mkdtemp()
         self.email_server_client_mock = Mock()
         self._container = 'compressedpackages'
-        self.sync = AzureSync(
-            container=self._container,
-            email_server_client=self.email_server_client_mock,
-            account_key='mock',
-            account_name=self._root_folder,
-            provider='LOCAL',
-            compression='gz',
-            serializer=JsonSerializer())
+        self.sync = AzureSync(container=self._container,
+                              email_server_client=self.email_server_client_mock,
+                              account_key='mock',
+                              account_name=self._root_folder,
+                              provider='LOCAL',
+                              compression='gz',
+                              serializer=JsonSerializer())
         self._content_root = join(self._root_folder, self._container)
         mkdir(self._content_root)
 
     def tearDown(self):
         rmtree(self._root_folder)
 
-    def assertUploadIs(self, expected: Dict[str, bytes],
-                       compression: str = ''):
-        uploaded = glob(join(
-            self._content_root,
-            '*.{}'.format(compression or self.sync._compression)))
+    def assertUploadIs(self, expected: Dict[str, bytes], compression: str = ''):
+        uploaded = glob(join(self._content_root, '*.{}'.format(compression or self.sync._compression)))
 
         self.assertEqual(len(uploaded), 1, 'Expected exactly one upload')
 
-        infos = (Download(name=name, optional=False, type_='')
-                 for name in expected)
+        infos = (Download(name=name, optional=False, type_='') for name in expected)
 
         with open(uploaded[0], 'rb') as buffer:
             with self.sync._open(buffer.name, 'r') as archive:
-                for download, fobj in self.sync._get_file_from_download(
-                        archive, infos):
+                for download, fobj in self.sync._get_file_from_download(archive, infos):
                     self.assertEqual(expected[download.name], fobj.read())
 
     def assertNoUpload(self):
@@ -79,9 +73,7 @@ class AzureSyncTests(TestCase):
                 self.sync._compression = compression
                 self.sync.upload(items=[{'foo': 'bar'}])
 
-                self.assertUploadIs(
-                    {self.sync._emails_file: b'{"foo":"bar"}\n'},
-                    compression)
+                self.assertUploadIs({self.sync._emails_file: b'{"foo":"bar"}\n'}, compression)
                 self.assertTrue(self.email_server_client_mock.upload.called)
 
     def test_upload_excludes_null_values(self):
@@ -90,13 +82,9 @@ class AzureSyncTests(TestCase):
         self.assertUploadIs({self.sync._emails_file: b'{"foo":0}\n'})
 
     def test_upload_excludes_internal_values(self):
-        self.sync.upload(items=[{'foo': 0, 'read': True, 'attachments': [
-            {'_uid': '1', 'filename': 'foo.txt'}
-        ]}])
+        self.sync.upload(items=[{'foo': 0, 'read': True, 'attachments': [{'_uid': '1', 'filename': 'foo.txt'}]}])
 
-        self.assertUploadIs(
-            {self.sync._emails_file: b'{"attachments":[{"filename":"foo.txt"}]'
-                                     b',"foo":0}\n'})
+        self.assertUploadIs({self.sync._emails_file: b'{"attachments":[{"filename":"foo.txt"}]' b',"foo":0}\n'})
 
     def test_upload_with_no_content_does_not_hit_network(self):
         self.sync.upload(items=[])
@@ -107,9 +95,7 @@ class AzureSyncTests(TestCase):
     def test_download(self):
         for compression in self._test_compressions:
             with self.subTest(compression=compression):
-                self.given_download(
-                    {self.sync._emails_file: b'{"foo":"bar"}\n{"baz":1}'},
-                    compression)
+                self.given_download({self.sync._emails_file: b'{"foo":"bar"}\n{"baz":1}'}, compression)
 
                 downloaded = list(self.sync.download())
 
@@ -122,9 +108,10 @@ class AzureSyncTests(TestCase):
         for compression in self._test_compressions:
             with self.subTest(compression=compression):
                 self.given_download(
-                    {self.sync._emails_file: b'{"foo":"bar"}\n{"baz":1}',
-                     self.sync._attachments_file: b'{"x":"y"}\n{"z":1}'},
-                    compression)
+                    {
+                        self.sync._emails_file: b'{"foo":"bar"}\n{"baz":1}', self.sync._attachments_file:
+                        b'{"x":"y"}\n{"z":1}'
+                    }, compression)
 
                 downloaded = list(self.sync.download())
 

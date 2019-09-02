@@ -22,27 +22,33 @@ from opwen_email_client.util.sqlalchemy import session
 
 _Base = declarative_base()
 
+_EmailTo = Table(
+    'emailto',
+    _Base.metadata,
+    Column('email_id', Integer, ForeignKey('email.uid')),
+    Column('to_id', Integer, ForeignKey('to.id')),
+)
 
-_EmailTo = Table('emailto',
-                 _Base.metadata,
-                 Column('email_id', Integer, ForeignKey('email.uid')),
-                 Column('to_id', Integer, ForeignKey('to.id')))
+_EmailCc = Table(
+    'emailcc',
+    _Base.metadata,
+    Column('email_id', Integer, ForeignKey('email.uid')),
+    Column('cc_id', Integer, ForeignKey('cc.id')),
+)
 
-_EmailCc = Table('emailcc',
-                 _Base.metadata,
-                 Column('email_id', Integer, ForeignKey('email.uid')),
-                 Column('cc_id', Integer, ForeignKey('cc.id')))
-
-_EmailBcc = Table('emailbcc',
-                  _Base.metadata,
-                  Column('email_id', Integer, ForeignKey('email.uid')),
-                  Column('bcc_id', Integer, ForeignKey('bcc.id')))
+_EmailBcc = Table(
+    'emailbcc',
+    _Base.metadata,
+    Column('email_id', Integer, ForeignKey('email.uid')),
+    Column('bcc_id', Integer, ForeignKey('bcc.id')),
+)
 
 _EmailAttachment = Table(
     'emailattachment',
     _Base.metadata,
     Column('email_id', Integer, ForeignKey('email.uid')),
-    Column('attachment_id', Integer, ForeignKey('attachment.uid')))
+    Column('attachment_id', Integer, ForeignKey('attachment.uid')),
+)
 
 
 class _To(_Base):
@@ -90,7 +96,8 @@ class _Attachment(_Base):
                 uid=attachment.get('_uid'),
                 filename=attachment.get('filename'),
                 content=attachment.get('content'),
-                cid=attachment.get('cid'))
+                cid=attachment.get('cid'),
+            )
 
         for pointer in attachment.pop('emails', []):
             if isinstance(pointer, _Email):
@@ -117,53 +124,50 @@ class _Email(_Base):
     sent_at = Column(DateTime())
     read = Column(Boolean, default=False, nullable=False)
     sender = Column(String(length=128), index=True)
-    attachments = relationship(_Attachment, secondary=_EmailAttachment,
-                               backref='emails', lazy='joined')
+    attachments = relationship(_Attachment, secondary=_EmailAttachment, backref='emails', lazy='joined')
     to = relationship(_To, secondary=_EmailTo, lazy='joined')
     cc = relationship(_Cc, secondary=_EmailCc, lazy='joined')
     bcc = relationship(_Bcc, secondary=_EmailBcc, lazy='joined')
 
     def to_dict(self):
         attachments = self.attachments
-        attachments = ([attachment.to_dict() for attachment in attachments]
-                       if attachments else None)
+        attachments = ([attachment.to_dict() for attachment in attachments] if attachments else None)
 
         sent_at = self.sent_at
-        sent_at = (sent_at.strftime('%Y-%m-%d %H:%M')
-                   if sent_at else None)
+        sent_at = (sent_at.strftime('%Y-%m-%d %H:%M') if sent_at else None)
 
-        return {k: v for (k, v) in (
-            ('from', self.sender),
-            ('to', [_.address for _ in self.to]),
-            ('cc', [_.address for _ in self.cc]),
-            ('bcc', [_.address for _ in self.bcc]),
-            ('subject', self.subject),
-            ('body', self.body),
-            ('_uid', self.uid),
-            ('sent_at', sent_at),
-            ('read', self.read),
-            ('attachments', attachments),
-        ) if v}
+        return {
+            k: v
+            for (k, v) in (
+                ('from', self.sender),
+                ('to', [_.address for _ in self.to]),
+                ('cc', [_.address for _ in self.cc]),
+                ('bcc', [_.address for _ in self.bcc]),
+                ('subject', self.subject),
+                ('body', self.body),
+                ('_uid', self.uid),
+                ('sent_at', sent_at),
+                ('read', self.read),
+                ('attachments', attachments),
+            ) if v
+        }
 
     @classmethod
     def from_dict(cls, db, email):
         sent_at = email.get('sent_at')
-        sent_at = (datetime.strptime(sent_at, '%Y-%m-%d %H:%M')
-                   if sent_at else None)
+        sent_at = (datetime.strptime(sent_at, '%Y-%m-%d %H:%M') if sent_at else None)
 
         self = _Email(
             uid=email['_uid'],
-            to=[get_or_create(db, _To, address=_.lower())
-                for _ in email.get('to', [])],
-            cc=[get_or_create(db, _Cc, address=_.lower())
-                for _ in email.get('cc', [])],
-            bcc=[get_or_create(db, _Bcc, address=_.lower())
-                 for _ in email.get('bcc', [])],
+            to=[get_or_create(db, _To, address=_.lower()) for _ in email.get('to', [])],
+            cc=[get_or_create(db, _Cc, address=_.lower()) for _ in email.get('cc', [])],
+            bcc=[get_or_create(db, _Bcc, address=_.lower()) for _ in email.get('bcc', [])],
             subject=email.get('subject'),
             body=email.get('body'),
             sent_at=sent_at,
             read=email.get('read', False),
-            sender=email.get('from', '').lower() or None)
+            sender=email.get('from', '').lower() or None,
+        )
 
         for attachment in email.get('attachments', []):
             attachment['emails'] = [self]
@@ -179,9 +183,10 @@ class _Email(_Base):
     @classmethod
     def is_received_by(cls, email_address):
         email_address = email_address.lower()
-        return (cls.to.any(_To.address == email_address) |
-                cls.cc.any(_Cc.address == email_address) |
-                cls.bcc.any(_Bcc.address == email_address))
+        to = cls.to.any(_To.address == email_address)
+        cc = cls.cc.any(_Cc.address == email_address)
+        bcc = cls.bcc.any(_Bcc.address == email_address)
+        return to | cc | bcc
 
 
 class _SqlalchemyEmailStore(EmailStore):
@@ -190,8 +195,7 @@ class _SqlalchemyEmailStore(EmailStore):
         self._page_size = page_size
         self._base = _Base
         self._engine = create_database(database_uri, self._base)
-        self._sesion_maker = sessionmaker(autocommit=False, autoflush=False,
-                                          bind=self._engine)
+        self._sesion_maker = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
     def _dbread(self):
         return session(self._sesion_maker, commit=False)
@@ -284,17 +288,18 @@ class _SqlalchemyEmailStore(EmailStore):
         return self._query(_Email.is_received_by(email_address), page)
 
     def outbox(self, email_address, page):
-        return self._query(_Email.is_sent_by(email_address)
-                           & _Email.sent_at.is_(None), page)
+        return self._query(_Email.is_sent_by(email_address) & _Email.sent_at.is_(None), page)
 
     def search(self, email_address, page, query):
         textquery = '%{}%'.format(query)
-        contains_query = or_(*(_Email.subject.ilike(textquery),
-                               _Email.body.ilike(textquery),
-                               _Email.sender.ilike(textquery),
-                               _Email.to.any(_To.address.ilike(textquery)),
-                               _Email.cc.any(_Cc.address.ilike(textquery)),
-                               _Email.bcc.any(_Bcc.address.ilike(textquery))))
+        contains_query = or_(*(
+            _Email.subject.ilike(textquery),
+            _Email.body.ilike(textquery),
+            _Email.sender.ilike(textquery),
+            _Email.to.any(_To.address.ilike(textquery)),
+            _Email.cc.any(_Cc.address.ilike(textquery)),
+            _Email.bcc.any(_Bcc.address.ilike(textquery)),
+        ))
         return self._query(_can_access(email_address) & contains_query, page)
 
     def pending(self, page):
@@ -302,8 +307,7 @@ class _SqlalchemyEmailStore(EmailStore):
 
     def has_unread(self, email_address):
         with self._dbread() as db:
-            unread = exists().where(_Email.read.is_(False)
-                                    & _Email.is_received_by(email_address))
+            unread = exists().where(_Email.read.is_(False) & _Email.is_received_by(email_address))
             has_unread_emails = db.query(unread).scalar()
         return has_unread_emails
 
@@ -321,8 +325,7 @@ class _SqlalchemyEmailStore(EmailStore):
         return self._find(_Attachment.uid == uid, table=_Attachment)
 
     def sent(self, email_address, page):
-        return self._query(_Email.is_sent_by(email_address)
-                           & _Email.sent_at.isnot(None), page)
+        return self._query(_Email.is_sent_by(email_address) & _Email.sent_at.isnot(None), page)
 
 
 class SqliteEmailStore(_SqlalchemyEmailStore):
@@ -335,8 +338,7 @@ class SqliteEmailStore(_SqlalchemyEmailStore):
 
 
 def _can_access(email_address):
-    return (_Email.is_sent_by(email_address)
-            | _Email.is_received_by(email_address))
+    return _Email.is_sent_by(email_address) | _Email.is_received_by(email_address)
 
 
 def _match_email_uid(uids):

@@ -26,14 +26,14 @@ class HttpEmailServerClient(EmailServerClient):
 
     @property
     def _base_url(self) -> str:
-        return 'http://{hostname}/api/email'.format(
-            hostname=self._hostname)
+        return 'http://{hostname}/api/email'.format(hostname=self._hostname)
 
     @property
     def _upload_url(self) -> str:
         return '{base_url}/upload/{client_id}'.format(
             base_url=self._base_url,
-            client_id=self._client_id)
+            client_id=self._client_id,
+        )
 
     @property
     def _download_url(self) -> str:
@@ -42,7 +42,8 @@ class HttpEmailServerClient(EmailServerClient):
             client_id=self._client_id,
             query=urlencode({
                 'compression': self._compression,
-            }))
+            }),
+        )
 
     def upload(self, resource_id, container):
         payload = {

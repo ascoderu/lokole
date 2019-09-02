@@ -24,5 +24,4 @@ def modem_is_setup(target_mode: str):
 
 
 def setup_modem(config: Path):
-    check_call('/usr/sbin/usb_modeswitch --config-file="{}"'
-               .format(config.absolute()), shell=True)  # nosec
+    check_call('/usr/sbin/usb_modeswitch --config-file="{}"'.format(config.absolute()), shell=True)  # nosec

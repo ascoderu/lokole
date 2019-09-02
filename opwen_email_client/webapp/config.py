@@ -17,8 +17,7 @@ root_domain = env('OPWEN_ROOT_DOMAIN', 'lokole.ca')
 
 # noinspection PyPep8Naming
 class i8n(object):
-    SETTINGS_UPDATED = _('Settings updated! If required, the app will '
-                         'restart soon to reflect the changes.')
+    SETTINGS_UPDATED = _('Settings updated! If required, the app will restart soon to reflect the changes.')
     LOGIN_REQUIRED = _('Please log in to access this page.')
     UNAUTHORIZED = _('You do not have permission to view this page.')
     INVALID_PASSWORD = _('Invalid password.')
@@ -33,17 +32,13 @@ class i8n(object):
     EMAIL_CHARACTERS = _('Please only use letters, numbers, dots and dashes.')
     FORBIDDEN_ACCOUNT = _('This account name is not available.')
     ACCOUNT_CREATED = _('Your Lokole account has been created successfully!')
-    ACCOUNT_SUSPENDED = _('Your account has been suspended. '
-                          'Please contact your administrator.')
+    ACCOUNT_SUSPENDED = _('Your account has been suspended. Please contact your administrator.')
     SYNC_RUNNING = _('Email synchronization running and will complete soon.')
-    UPDATE_RUNNING = _('Code update is now running. The app will restart soon '
-                       'to reflect the updates.')
-    SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _(
-        'The syntax is: "minute hour day-of-month month day-of-week". '
-        'Use "*" for any value or "," to separate multiple values '
-        'or "-" to define a range of values or "/" for step values.')
-    UNEXPECTED_ERROR = _('Unexpected error. Please contact your '
-                         'administrator.')
+    UPDATE_RUNNING = _('Code update is now running. The app will restart soon to reflect the updates.')
+    SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _('The syntax is: "minute hour day-of-month month day-of-week". '
+                                         'Use "*" for any value or "," to separate multiple values '
+                                         'or "-" to define a range of values or "/" for step values.')
+    UNEXPECTED_ERROR = _('Unexpected error. Please contact your administrator.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
     USER_DOES_NOT_EXIST = _('This user does not exist.')
     USER_SUSPENDED = _('The user was suspended.')
@@ -51,11 +46,9 @@ class i8n(object):
     USER_PROMOTED = _('The user now is an administrator.')
     ALREADY_PROMOTED = _('The user already is an administrator.')
     ADMIN_CANNOT_BE_SUSPENDED = _("Administrators can't be suspended.")
-    ADMIN_PASSWORD_CANNOT_BE_RESET = _("Administrator password can't be "
-                                       "reset.")
+    ADMIN_PASSWORD_CANNOT_BE_RESET = _("Administrator password can't be " "reset.")
     PASSWORD_CHANGED_BY_ADMIN = _('Password was reset by administrator to: ')
-    SAME_PASSWORD = _(' Your new password must be different than your '
-                      'previous password.')
+    SAME_PASSWORD = _(' Your new password must be different than your previous password.')
 
 
 class AppConfig(object):
@@ -109,9 +102,7 @@ class AppConfig(object):
 
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')
-    LOCALES = (
-        [DEFAULT_LOCALE] +
-        [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)])
+    LOCALES = [DEFAULT_LOCALE] + [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)]
 
     COMPRESSION = env('OPWEN_COMPRESSION', 'zstd')
     EMAIL_SERVER_HOSTNAME = env('OPWEN_EMAIL_SERVER_HOSTNAME', None)

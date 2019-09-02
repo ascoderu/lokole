@@ -19,12 +19,14 @@ class Ioc(object):
     email_server_client = EmailServerClient(
         compression=AppConfig.COMPRESSION,
         hostname=AppConfig.EMAIL_SERVER_HOSTNAME,
-        client_id=AppConfig.CLIENT_ID)
+        client_id=AppConfig.CLIENT_ID,
+    )
 
     email_store = EmailStore(
         page_size=AppConfig.EMAILS_PER_PAGE,
         restricted={AppConfig.NEWS_INBOX: AppConfig.NEWS_SENDERS},
-        database_path=AppConfig.LOCAL_EMAIL_STORE)
+        database_path=AppConfig.LOCAL_EMAIL_STORE,
+    )
 
     email_sync = Sync(
         compression=AppConfig.COMPRESSION,
@@ -33,7 +35,8 @@ class Ioc(object):
         email_server_client=email_server_client,
         container=AppConfig.STORAGE_CONTAINER,
         provider=AppConfig.STORAGE_PROVIDER,
-        serializer=serializer)
+        serializer=serializer,
+    )
 
 
 def create_app(config=AppConfig) -> Flask:

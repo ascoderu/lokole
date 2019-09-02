@@ -33,7 +33,8 @@ _db = SQLAlchemy(app)
 _roles_users = _db.Table(
     'roles_users',
     _db.Column('user_id', _db.Integer(), _db.ForeignKey('user.id')),
-    _db.Column('role_id', _db.Integer(), _db.ForeignKey('role.id')))
+    _db.Column('role_id', _db.Integer(), _db.ForeignKey('role.id')),
+)
 
 
 # noinspection PyUnresolvedReferences
@@ -47,11 +48,9 @@ class User(_db.Model, UserMixin):
     last_login_ip = _db.Column(_db.String(128))
     current_login_ip = _db.Column(_db.String(128))
     login_count = _db.Column(_db.Integer())
-    timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False,
-                                         default=0)
+    timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False, default=0)
     language = _db.Column(_db.String(8))
-    roles = _db.relationship('Role', secondary=_roles_users,
-                             backref=_db.backref('users', lazy='dynamic'))
+    roles = _db.relationship('Role', secondary=_roles_users, backref=_db.backref('users', lazy='dynamic'))
 
     @property
     def is_admin(self) -> bool:
@@ -95,23 +94,24 @@ class Role(_db.Model, RoleMixin):
 
 # noinspection PyClassHasNoInit
 class LoginForm(_LoginForm):
-    email = SuffixedStringField(
-        suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST))
+    email = SuffixedStringField(suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST))
 
 
-email_character_validator = Regexp(
-    '^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS)
+email_character_validator = Regexp('^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS)
 
-forbidden_account_validator = NoneOf(
-    AppConfig.FORBIDDEN_ACCOUNTS, message=i8n.FORBIDDEN_ACCOUNT)
+forbidden_account_validator = NoneOf(AppConfig.FORBIDDEN_ACCOUNTS, message=i8n.FORBIDDEN_ACCOUNT)
 
 
 # noinspection PyClassHasNoInit
 class RegisterForm(_RegisterForm):
-    email = SuffixedStringField(
-        suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
-        validators=[email_character_validator, forbidden_account_validator,
-                    email_required, email_validator, unique_user_email])
+    email = SuffixedStringField(suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
+                                validators=[
+                                    email_character_validator,
+                                    forbidden_account_validator,
+                                    email_required,
+                                    email_validator,
+                                    unique_user_email,
+                                ])
 
     timezone_offset_minutes = IntegerField(default=0)
 

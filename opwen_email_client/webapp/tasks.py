@@ -21,7 +21,8 @@ def setup_periodic_tasks(sender, **kwargs):
     if len(sync_schedule) == 5:
         sender.add_periodic_task(
             schedule=crontab(*sync_schedule),
-            sig=sync.s('periodic_email_sync'))
+            sig=sync.s('periodic_email_sync'),
+        )
 
 
 # noinspection PyUnusedLocal
@@ -30,13 +31,15 @@ def sync(*args, **kwargs):
     sync_emails = SyncEmails(
         log=log,
         email_sync=Ioc.email_sync,
-        email_store=Ioc.email_store)
+        email_store=Ioc.email_store,
+    )
 
     start_internet_connection = StartInternetConnection(
         state_dir=AppConfig.STATE_BASEDIR,
         modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
         sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-        sim_type=AppConfig.SIM_TYPE)
+        sim_type=AppConfig.SIM_TYPE,
+    )
 
     if AppConfig.SIM_TYPE != 'LocalOnly':
         with start_internet_connection():
@@ -48,14 +51,16 @@ def sync(*args, **kwargs):
 def update(*args, **kwargs):
     update_code = UpdateCode(
         version=kwargs.get('version') or '',
-        log=log)
+        log=log,
+    )
 
     restart_app = RestartApp(restart_paths=AppConfig.RESTART_PATHS)
 
     start_internet_connection = StartInternetConnection(
         modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
         sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-        sim_type=AppConfig.SIM_TYPE)
+        sim_type=AppConfig.SIM_TYPE,
+    )
 
     if AppConfig.SIM_TYPE != 'LocalOnly':
         with start_internet_connection():

@@ -9,9 +9,11 @@ class SqliteEmailStoreTests(Base.EmailStoreTests):
     store_location = None
 
     def create_email_store(self, restricted=None):
-        return SqliteEmailStore(self.page_size,
-                                self.store_location,
-                                restricted)
+        return SqliteEmailStore(
+            self.page_size,
+            self.store_location,
+            restricted,
+        )
 
     @classmethod
     def setUpClass(cls):

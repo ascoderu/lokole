@@ -24,34 +24,36 @@ from opwen_email_client.webapp.config import i8n
 
 
 class NewEmailForm(FlaskForm):
-    to = StringField(
-        validators=[DataRequired(i8n.EMAIL_TO_REQUIRED),
-                    Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,
-                           i8n.EMAIL_ADDRESS_INVALID)])
+    to = StringField(validators=[
+        DataRequired(i8n.EMAIL_TO_REQUIRED),
+        Emails(AppConfig.EMAIL_ADDRESS_DELIMITER, i8n.EMAIL_ADDRESS_INVALID),
+    ])
 
-    cc = StringField(
-        validators=[DataOptional(),
-                    Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,
-                           i8n.EMAIL_ADDRESS_INVALID)])
+    cc = StringField(validators=[
+        DataOptional(),
+        Emails(AppConfig.EMAIL_ADDRESS_DELIMITER, i8n.EMAIL_ADDRESS_INVALID),
+    ])
 
-    bcc = StringField(
-        validators=[DataOptional(),
-                    Emails(AppConfig.EMAIL_ADDRESS_DELIMITER,
-                           i8n.EMAIL_ADDRESS_INVALID)])
+    bcc = StringField(validators=[
+        DataOptional(),
+        Emails(AppConfig.EMAIL_ADDRESS_DELIMITER, i8n.EMAIL_ADDRESS_INVALID),
+    ])
 
-    subject = StringField(
-        validators=[DataOptional()])
+    subject = StringField(validators=[DataOptional()])
 
-    body = HtmlTextAreaField(
-        validators=[DataOptional()])
+    body = HtmlTextAreaField(validators=[
+        DataOptional(),
+    ])
 
-    forwarded_attachments = SelectMultipleField(
-        choices=[],
-        validators=[DataOptional()])
+    forwarded_attachments = SelectMultipleField(choices=[], validators=[
+        DataOptional(),
+    ])
 
-    attachments = FileField(
-        validators=[DataOptional()],
-        render_kw={'multiple': True})
+    attachments = FileField(validators=[
+        DataOptional(),
+    ], render_kw={
+        'multiple': True,
+    })
 
     submit = SubmitField()
 
@@ -180,25 +182,16 @@ class ForwardEmailForm(NewEmailForm):
         self._set_forwarded_attachments(email)
 
     def _set_forwarded_attachments(self, email):
-        attachment_filenames = [
-            attachment.get('filename')
-            for attachment in email.get('attachments', [])
-        ]
+        attachment_filenames = [attachment.get('filename') for attachment in email.get('attachments', [])]
 
-        self.forwarded_attachments.choices = [
-            (filename, filename)
-            for filename in attachment_filenames
-        ]
+        self.forwarded_attachments.choices = [(filename, filename) for filename in attachment_filenames]
 
         self.forwarded_attachments.render_kw = {
             'size': len(attachment_filenames),
         }
 
         if not self.forwarded_attachments.data:
-            self.forwarded_attachments.data = [
-                filename
-                for filename in attachment_filenames
-            ]
+            self.forwarded_attachments.data = [filename for filename in attachment_filenames]
 
     def as_dict(self, email_store: EmailStore):
         form = super().as_dict(email_store)
@@ -207,8 +200,7 @@ class ForwardEmailForm(NewEmailForm):
         reference_email = self._get_reference_email(email_store)
 
         forwarded_attachments = [
-            attachment
-            for attachment in reference_email.get('attachments', [])
+            attachment for attachment in reference_email.get('attachments', [])
             if attachment.get('filename') in self.forwarded_attachments.data
         ]
 

@@ -20,9 +20,7 @@ class SettingsForm(FlaskForm):
 
     sim_type = StringField()
 
-    sync_schedule = StringField(
-        validators=[CronSchedule()],
-        description=i8n.SYNC_SCHEDULE_SYNTAX_DESCRIPTION)
+    sync_schedule = StringField(validators=[CronSchedule()], description=i8n.SYNC_SCHEDULE_SYNTAX_DESCRIPTION)
 
     submit = SubmitField()
 
@@ -45,8 +43,7 @@ class SettingsForm(FlaskForm):
         path.parent.mkdir(parents=True, exist_ok=True)
 
         with path.open('w', encoding='utf-8') as fobj:
-            fobj.write('\n'.join(line.strip()
-                                 for line in wvdial.splitlines()))
+            fobj.write('\n'.join(line.strip() for line in wvdial.splitlines()))
         return False
 
     def _update_sim_type(self) -> bool:
@@ -67,10 +64,10 @@ class SettingsForm(FlaskForm):
 
     @classmethod
     def _update_config(cls, env_key: str, value: str):
-        replace_line(
-            settings_path,
-            lambda line: line.startswith('{}='.format(env_key)),
-            '{}={}'.format(env_key, value))
+        def is_env(line):
+            return line.startswith('{}='.format(env_key))
+
+        replace_line(settings_path, is_env, '{}={}'.format(env_key, value))
 
         config_key = env_key.replace('OPWEN_', '')
         setattr(AppConfig, config_key, value)
@@ -83,7 +80,7 @@ class SettingsForm(FlaskForm):
         return cls(
             wvdial=_read_wvdial(_get_wvdial_path()),
             sync_schedule=AppConfig.SYNC_SCHEDULE,
-            sim_type=AppConfig.SIM_TYPE
+            sim_type=AppConfig.SIM_TYPE,
         )
 
 

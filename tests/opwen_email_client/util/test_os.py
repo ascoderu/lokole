@@ -16,10 +16,7 @@ class ReplaceLineTests(TestCase):
             fobj.write('foo\nbar\nbaz')
             fobj.close()
 
-            replace_line(
-                fobj.name,
-                lambda line: line.startswith('ba'),
-                'changed')
+            replace_line(fobj.name, lambda line: line.startswith('ba'), 'changed')
 
             with open(fobj.name) as changed:
                 content = changed.read()

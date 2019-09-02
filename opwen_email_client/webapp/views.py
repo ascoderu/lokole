@@ -38,7 +38,8 @@ def favicon() -> Response:
     return send_from_directory(
         directory=path.join(app.root_path, 'static'),
         filename='favicon.ico',
-        mimetype='image/vnd.microsoft.icon')
+        mimetype='image/vnd.microsoft.icon',
+    )
 
 
 @app.route('/')
@@ -60,8 +61,7 @@ def about() -> Response:
 def news(page: int) -> Response:
     email_store = Ioc.email_store
 
-    return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX, page),
-                        page, 'news.html')
+    return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX, page), page, 'news.html')
 
 
 @app.route('/email')
@@ -73,8 +73,7 @@ def email_inbox(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.inbox(user.email, page), page,
-                        type='inbox')
+    return _emails_view(email_store.inbox(user.email, page), page, type='inbox')
 
 
 @app.route('/email/outbox', defaults={'page': 1})
@@ -85,8 +84,7 @@ def email_outbox(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.outbox(user.email, page), page,
-                        type='outbox')
+    return _emails_view(email_store.outbox(user.email, page), page, type='outbox')
 
 
 @app.route('/email/sent', defaults={'page': 1})
@@ -97,8 +95,7 @@ def email_sent(page: int) -> Response:
     email_store = Ioc.email_store
     user = current_user
 
-    return _emails_view(email_store.sent(user.email, page), page,
-                        type='sent')
+    return _emails_view(email_store.sent(user.email, page), page, type='sent')
 
 
 @app.route('/email/search', defaults={'page': 1})
@@ -110,8 +107,7 @@ def email_search(page: int) -> Response:
     user = current_user
     query = request.args.get('query')
 
-    return _emails_view(email_store.search(user.email, page, query),
-                        page, 'email_search.html', type='search')
+    return _emails_view(email_store.search(user.email, page, query), page, 'email_search.html', type='search')
 
 
 @app.route('/email/unread')
@@ -172,9 +168,11 @@ def download_attachment(uid: str) -> Response:
     if attachment is None:
         return abort(404)
 
-    return send_file(BytesIO(attachment['content']),
-                     attachment_filename=attachment['filename'],
-                     as_attachment=True)
+    return send_file(
+        BytesIO(attachment['content']),
+        attachment_filename=attachment['filename'],
+        as_attachment=True,
+    )
 
 
 @app.route('/user/register/complete')
@@ -183,7 +181,8 @@ def register_complete() -> Response:
     send_welcome_email = SendWelcomeEmail(
         time=datetime.utcnow(),
         to=current_user.email,
-        email_store=Ioc.email_store)
+        email_store=Ioc.email_store,
+    )
 
     send_welcome_email()
 
@@ -243,8 +242,7 @@ def language(locale: str) -> Response:
 @login_required
 @track_history
 def users() -> Response:
-    return _view('users.html',
-                 users=User.query.all())
+    return _view('users.html', users=User.query.all())
 
 
 @app.route('/admin/settings', methods=['GET', 'POST'])
@@ -259,9 +257,7 @@ def settings() -> Response:
         flash(i8n.SETTINGS_UPDATED, category='success')
         return redirect(url_for('settings'))
 
-    return _view('settings.html',
-                 form=SettingsForm.from_config(),
-                 num_pending=email_store.num_pending())
+    return _view('settings.html', form=SettingsForm.from_config(), num_pending=email_store.num_pending())
 
 
 @app.route('/admin/suspend/<userid>')
@@ -372,9 +368,7 @@ def _inject_locales() -> dict:
 
 @app.context_processor
 def _inject_local_only() -> dict:
-    return {
-        'local_only': AppConfig.SIM_TYPE == 'LocalOnly'
-    }
+    return {'local_only': AppConfig.SIM_TYPE == 'LocalOnly'}
 
 
 @app.babel.localeselector
@@ -387,8 +381,7 @@ def _localeselector() -> str:
     return current_language
 
 
-def _emails_view(emails: Iterable[dict], page: int,
-                 template: str = 'email.html', **kwargs) -> Response:
+def _emails_view(emails: Iterable[dict], page: int, template: str = 'email.html', **kwargs) -> Response:
     offset_minutes = getattr(current_user, 'timezone_offset_minutes', 0)
     timezone_offset = timedelta(minutes=offset_minutes)
 

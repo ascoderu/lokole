@@ -27,8 +27,7 @@ from opwen_email_client.webapp.config import i8n
 
 
 class SyncEmails(object):
-    def __init__(self, email_store: EmailStore, email_sync: Sync,
-                 log: Logger):
+    def __init__(self, email_store: EmailStore, email_sync: Sync, log: Logger):
         self._email_store = email_store
         self._email_sync = email_sync
         self._log = log
@@ -76,8 +75,7 @@ class UpdateCode(object):
             package = self._package_name
             self._log.debug('Updating to latest version')
 
-        stdout = check_output([executable, '-m', 'pip', 'install',
-                               '-U', package])
+        stdout = check_output([executable, '-m', 'pip', 'install', '-U', package])
 
         self._log.debug('Pip install log: %s', stdout)
 
@@ -121,8 +119,7 @@ class SendWelcomeEmail(object):
         self._email_store = email_store
 
     def __call__(self, *args, **kwargs):
-        email_body = render_template('emails/account_finalized.html',
-                                     email=self._to)
+        email_body = render_template('emails/account_finalized.html', email=self._to)
         self._email_store.create([{
             'sent_at': self._time.strftime("%Y-%m-%d %H:%M"),
             'to': [self._to],
@@ -135,8 +132,7 @@ class SendWelcomeEmail(object):
 class StartInternetConnection(object):
     _supported_modems = (e303, e353, e3131)
 
-    def __init__(self, modem_config_dir: str, sim_config_dir: str,
-                 sim_type: str, state_dir: str):
+    def __init__(self, modem_config_dir: str, sim_config_dir: str, sim_type: str, state_dir: str):
         self._modem_config_dir = Path(modem_config_dir)
         self._sim_config_dir = Path(sim_config_dir)
         self._sim_type = sim_type
@@ -153,8 +149,7 @@ class StartInternetConnection(object):
         try:
             sim_config = import_module(sim_config_module)
         except ImportError:
-            raise Exception('SIM config {} does not exist'
-                            .format(wvdial_config))
+            raise Exception('SIM config {} does not exist'.format(wvdial_config))
         else:
             wvdial_config.parent.mkdir(parents=True, exist_ok=True)
             with wvdial_config.open('w', encoding='utf-8') as fobj:
@@ -209,7 +204,8 @@ class StartInternetConnection(object):
                 self._wvdial_config,
                 self._wvdial_log,
                 max_retries=90,
-                poll_seconds=1)
+                poll_seconds=1,
+            )
 
         try:
             yield
