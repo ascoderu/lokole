@@ -1,11 +1,13 @@
 from typing import Optional
 from unittest import TestCase
+from unittest import skipUnless
 from unittest.mock import Mock
 from unittest.mock import patch
 from urllib.error import URLError
 
 from responses import mock as mock_responses
 
+from opwen_email_server.config import SENDGRID_KEY
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 
@@ -17,7 +19,7 @@ class SendgridEmailSenderTests(TestCase):
 
     def test_sends_email(self):
         self.assertSendsEmail({
-            'to': [self.recipient1], 'from': self.sender, 'subject': self.test_sends_email.__name__, 'message':
+            'to': [self.recipient1], 'from': self.sender, 'subject': self.test_sends_email.__name__, 'body':
             'simple email with <b>formatting</b>'
         })
 
@@ -25,7 +27,7 @@ class SendgridEmailSenderTests(TestCase):
         self.assertSendsEmail({
             'to': [self.recipient1], 'from':
             self.sender, 'subject':
-            self.test_sends_email_with_attachments.__name__, 'message':
+            self.test_sends_email_with_attachments.__name__, 'body':
             'simple email with attachments', 'attachments':
             [{'filename': 'Some file.txt', 'content': b'first file'},
              {'filename': 'Another file.txt', 'content': b'second file'}]
@@ -34,26 +36,26 @@ class SendgridEmailSenderTests(TestCase):
     def test_sends_email_to_multiple_recipients(self):
         self.assertSendsEmail({
             'to': [self.recipient1, self.recipient2], 'from': self.sender, 'subject':
-            self.test_sends_email_to_multiple_recipients.__name__, 'message': 'simple email with two recipients'
+            self.test_sends_email_to_multiple_recipients.__name__, 'body': 'simple email with two recipients'
         })
 
     def test_sends_email_to_cc(self):
         self.assertSendsEmail({
             'to': [self.recipient1], 'cc': [self.recipient2], 'from': self.sender, 'subject':
-            self.test_sends_email_to_cc.__name__, 'message': 'email with cc'
+            self.test_sends_email_to_cc.__name__, 'body': 'email with cc'
         })
 
     def test_sends_email_to_bcc(self):
         self.assertSendsEmail({
             'to': [self.recipient1], 'bcc': [self.recipient2], 'from': self.sender, 'subject':
-            self.test_sends_email_to_bcc.__name__, 'message': 'email with bcc'
+            self.test_sends_email_to_bcc.__name__, 'body': 'email with bcc'
         })
 
     def test_client_made_bad_request(self):
-        self.assertSendsEmail({'message': self.test_client_made_bad_request.__name__}, success=False, status=400)
+        self.assertSendsEmail({'body': self.test_client_made_bad_request.__name__}, success=False, status=400)
 
     def test_client_had_exception(self):
-        self.assertSendsEmail({'message': self.test_client_had_exception.__name__},
+        self.assertSendsEmail({'body': self.test_client_had_exception.__name__},
                               success=False,
                               exception=URLError('sendgrid error'))
 
@@ -61,7 +63,7 @@ class SendgridEmailSenderTests(TestCase):
         action = SendSendgridEmail(key='')
 
         with patch.object(action, 'log_warning') as mock_log_warning:
-            action({'message': 'message'})
+            action({'body': 'message'})
 
         self.assertEqual(mock_log_warning.call_count, 1)
 
@@ -93,6 +95,16 @@ class SendgridEmailSenderTests(TestCase):
         else:
             mock_opener.open.return_value = mock_response
             mock_response.getcode.return_value = status
+
+
+@skipUnless(SENDGRID_KEY, 'no sendgrid key configured')
+class LiveSendgridEmailSenderTests(SendgridEmailSenderTests):
+    def assertSendsEmail(self, email: dict, success: bool = True, **kwargs):
+        send_email = SendSendgridEmail(key=SENDGRID_KEY, sandbox=True)
+
+        send_success = send_email(email)
+
+        self.assertTrue(send_success if success else not send_success)
 
 
 class SetupSendgridMailboxTests(TestCase):

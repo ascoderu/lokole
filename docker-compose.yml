@@ -34,6 +34,8 @@ x-shared-app-build:
   build:
     context: .
     dockerfile: docker/app/Dockerfile
+    args:
+      LOKOLE_SENDGRID_KEY: ${LOKOLE_SENDGRID_KEY}
 
 services:
 

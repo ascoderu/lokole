@@ -11,7 +11,7 @@ $(PY_ENV)/requirements.txt.out: requirements.txt requirements-dev.txt
 venv: $(PY_ENV)/requirements.txt.out
 
 tests: venv
-	$(PY_ENV)/bin/coverage run -m nose2 && $(PY_ENV)/bin/coverage report
+	LOKOLE_LOG_LEVEL=CRITICAL $(PY_ENV)/bin/coverage run -m nose2 -v && $(PY_ENV)/bin/coverage report
 
 lint-swagger: venv
 	find opwen_email_server/swagger -type f -name '*.yaml' | while read file; do \
@@ -61,7 +61,7 @@ clean:
 
 build:
 	docker-compose pull --ignore-pull-failures
-	docker-compose build --parallel
+	docker-compose build
 
 start:
 	docker-compose up -d
