@@ -9,6 +9,7 @@ __pycache__/
 venv*/
 .coverage
 cover/
+htmlcov/
 .mypy_cache/
 dive.log
 
