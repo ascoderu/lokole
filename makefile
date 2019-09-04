@@ -61,7 +61,7 @@ clean:
 
 build:
 	docker-compose pull --ignore-pull-failures
-	docker-compose build --parallel
+	docker-compose build
 
 start:
 	docker-compose up -d
