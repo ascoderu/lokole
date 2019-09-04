@@ -2,13 +2,16 @@ from mimetypes import guess_type
 from typing import Callable
 
 from cached_property import cached_property
+from python_http_client import BadRequestsError
 from requests import post as http_post
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
 from sendgrid.helpers.mail import Content
 from sendgrid.helpers.mail import Email
 from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import MailSettings
 from sendgrid.helpers.mail import Personalization
+from sendgrid.helpers.mail import SandBoxMode
 
 from opwen_email_server.constants.sendgrid import INBOX_URL
 from opwen_email_server.constants.sendgrid import MAILBOX_URL
@@ -17,14 +20,15 @@ from opwen_email_server.utils.serialization import to_base64
 
 
 class SendSendgridEmail(LogMixin):
-    def __init__(self, key: str) -> None:
+    def __init__(self, key: str, sandbox: bool = False) -> None:
         self._key = key
+        self._sandbox = sandbox
 
     @cached_property
-    def _client(self) -> Callable[[dict], int]:
+    def _client(self) -> Callable[[Mail], int]:
         if not self._key:
 
-            def send_email_fake(email: dict) -> int:
+            def send_email_fake(email: Mail) -> int:
                 self.log_warning('No key, not sending email %r', email)
                 return 202
 
@@ -32,8 +36,14 @@ class SendSendgridEmail(LogMixin):
 
         client = SendGridAPIClient(api_key=self._key)
 
-        def send_email(email: dict) -> int:
-            response = client.send(email)
+        def send_email(email: Mail) -> int:
+            if self._sandbox:
+                self.log_warning('Sandbox mode, not delivering email %s', email)
+                email.mail_settings = MailSettings()
+                email.mail_settings.sandbox_mode = SandBoxMode()
+                email.mail_settings.sandbox_mode.enable = True
+
+            response = client.send(email.get())
             return response.status_code
 
         return send_email
@@ -45,12 +55,15 @@ class SendSendgridEmail(LogMixin):
 
     def _send_email(self, email: Mail, email_id: str) -> bool:
         self.log_debug('about to send email %s', email_id)
-        request = email.get()
         try:
-            status = self._client(request)
+            status = self._client(email)
+        except BadRequestsError as ex:
+            status = ex.status_code
+            errors = ex.to_dict.get('errors', [])
+            self.log_exception(ex, 'error sending email %s:%s:%r', email_id, email, errors)
         except Exception as ex:
             status = getattr(ex, 'code', -1)
-            self.log_exception(ex, 'error sending email %s:%r', email_id, request)
+            self.log_exception(ex, 'error sending email %s:%s', email_id, email)
         else:
             self.log_debug('sent email %s', email_id)
 

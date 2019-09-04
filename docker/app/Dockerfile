@@ -21,6 +21,7 @@ RUN pip wheel -r requirements.txt -w /deps
 
 COPY . .
 
+ARG LOKOLE_SENDGRID_KEY=""
 RUN make ci clean
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
