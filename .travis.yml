@@ -31,7 +31,7 @@ script:
 
 after_success:
   - |
-    if [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
+    if [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "amqp" ]]; then
       bash <(curl -s https://codecov.io/bash)
     fi
 
