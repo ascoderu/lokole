@@ -29,6 +29,12 @@ script:
       make integration-tests
     fi
 
+after_success:
+  - |
+    if [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
+      bash <(curl -s https://codecov.io/bash)
+    fi
+
 after_failure:
   - ALL=true make logs
 

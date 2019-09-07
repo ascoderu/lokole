@@ -8,6 +8,7 @@ __pycache__/
 /*.egg-info/
 venv*/
 .coverage
+coverage.xml
 cover/
 htmlcov/
 .mypy_cache/
