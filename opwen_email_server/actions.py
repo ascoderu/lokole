@@ -4,7 +4,6 @@ from typing import Callable
 from typing import Iterable
 from typing import Tuple
 from typing import Union
-from uuid import uuid4
 
 from libcloud.storage.types import ObjectDoesNotExistError
 
@@ -15,18 +14,17 @@ from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
-from opwen_email_server.utils.email_parser import format_attachments
-from opwen_email_server.utils.email_parser import format_inline_images
+from opwen_email_server.utils.email_parser import MimeEmailParser
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
-from opwen_email_server.utils.email_parser import parse_mime_email
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_base64
 from opwen_email_server.utils.serialization import to_jsonl_bytes
-from opwen_email_server.utils.serialization import to_msgpack_bytes
 from opwen_email_server.utils.string import is_lowercase
+from opwen_email_server.utils.unique import new_client_id
+from opwen_email_server.utils.unique import new_email_id
 
 Response = Union[dict, Tuple[str, int]]
 
@@ -76,7 +74,7 @@ class StoreInboundEmails(_Action):
         self._raw_email_storage = raw_email_storage
         self._email_storage = email_storage
         self._pending_factory = pending_factory
-        self._email_parser = email_parser or self._parse_mime_email
+        self._email_parser = email_parser or MimeEmailParser()
 
     def _action(self, resource_id):  # type: ignore
         try:
@@ -94,7 +92,7 @@ class StoreInboundEmails(_Action):
         return 'OK', 200
 
     def _store_inbound_email(self, email: dict):
-        email_id = self._to_id(email)
+        email_id = new_email_id(email)
         email['_uid'] = email_id
 
         self._email_storage.store_object(email_id, email)
@@ -102,16 +100,6 @@ class StoreInboundEmails(_Action):
         for domain in get_domains(email):
             pending_storage = self._pending_factory(domain)
             pending_storage.store_text(email_id, 'pending')
-
-    def _parse_mime_email(self, mime_email: str) -> dict:
-        email = parse_mime_email(mime_email)
-        email = format_attachments(email)
-        email = format_inline_images(email, self.log_warning)
-        return email
-
-    @classmethod
-    def _to_id(cls, email: dict) -> str:
-        return sha256(to_msgpack_bytes(email)).hexdigest()
 
 
 class StoreWrittenClientEmails(_Action):
@@ -273,7 +261,7 @@ class RegisterClient(_Action):
         self._client_storage = client_storage
         self._setup_mailbox = setup_mailbox
         self._setup_mx_records = setup_mx_records
-        self._client_id_source = client_id_source or self._new_client_id
+        self._client_id_source = client_id_source or new_client_id
 
     def _action(self, client, **auth_args):  # type: ignore
         domain = client['domain']
@@ -297,10 +285,6 @@ class RegisterClient(_Action):
             'storage_key': access_info.key,
             'resource_container': access_info.container,
         }
-
-    @classmethod
-    def _new_client_id(cls) -> str:
-        return str(uuid4())
 
 
 class CalculatePendingEmailsMetric(_Action):

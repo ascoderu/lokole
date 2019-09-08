@@ -30,11 +30,7 @@ from opwen_email_server.utils.collections import singleton
 
 @singleton
 def _create_telemetry_channel() -> TelemetryChannel:
-    if not APPINSIGHTS_KEY:
-        sender = NullSender()
-    else:
-        sender = AsynchronousSender(APPINSIGHTS_HOST)
-
+    sender = AsynchronousSender(APPINSIGHTS_HOST) if APPINSIGHTS_HOST else NullSender()
     queue = AsynchronousQueue(sender)
     return TelemetryChannel(queue=queue)
 
@@ -97,5 +93,5 @@ class LogMixin:
         self._telemetry_client.track_trace(message % tuple(args), severity=getLevelName(level))
 
     def log_event(self, event_name: str, properties: Optional[dict] = None):
-        self._logger.info('%s%s%s', event_name, SEPARATOR, properties)
+        self.log_info('%s%s%s', event_name, SEPARATOR, properties)
         self._telemetry_client.track_event(event_name, properties)

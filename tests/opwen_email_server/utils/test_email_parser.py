@@ -30,7 +30,7 @@ class ParseMimeEmailTests(TestCase):
     def test_parses_email_metadata(self):
         mime_email = self._given_mime_email('email-html.mime')
 
-        email = email_parser.parse_mime_email(mime_email)
+        email = self._parse(mime_email)
 
         self.assertEqual(email.get('from'), 'clemens.wolff@gmail.com')
         self.assertEqual(email.get('subject'), 'Two recipients')
@@ -40,14 +40,14 @@ class ParseMimeEmailTests(TestCase):
     def test_prefers_html_body_over_text(self):
         mime_email = self._given_mime_email('email-html.mime')
 
-        email = email_parser.parse_mime_email(mime_email)
+        email = self._parse(mime_email)
 
         self.assertEqual(email.get('body'), '<div dir="ltr">Body of the message.</div>\n')
 
     def test_parses_email_with_cc_and_bcc(self):
         mime_email = self._given_mime_email('email-ccbcc.mime')
 
-        email = email_parser.parse_mime_email(mime_email)
+        email = self._parse(mime_email)
 
         self.assertEqual(email.get('bcc'), ['laura@lokole.ca'])
         self.assertEqual(email.get('cc'), ['clemens@lokole.ca', 'nzola@lokole.ca'])
@@ -55,7 +55,7 @@ class ParseMimeEmailTests(TestCase):
     def test_parses_email_with_attachments(self):
         mime_email = self._given_mime_email('email-attachment.mime')
 
-        email = email_parser.parse_mime_email(mime_email)
+        email = self._parse(mime_email)
         attachments = email.get('attachments', [])
 
         self.assertEqual(len(attachments), 1)
@@ -66,7 +66,7 @@ class ParseMimeEmailTests(TestCase):
     def test_cid(self):
         mime_email = self._given_mime_email('email-cid.mime')
 
-        email = email_parser.parse_mime_email(mime_email)
+        email = self._parse(mime_email)
         attachments = email.get('attachments', [])
 
         self.assertEqual(len(attachments), 2)
@@ -75,9 +75,17 @@ class ParseMimeEmailTests(TestCase):
         self.assertNotEqual(attachments[0]['cid'], attachments[1]['cid'])
 
     @classmethod
+    def _parse(cls, mime_email):
+        return email_parser.parse_mime_email(mime_email)
+
+    @classmethod
     def _given_mime_email(cls, filename, directory=TEST_DATA_DIRECTORY):
         with open(join(directory, filename)) as fobj:
             return fobj.read()
+
+
+class MimeEmailParserTests(ParseMimeEmailTests):
+    _parse = email_parser.MimeEmailParser()
 
 
 class GetDomainsTests(TestCase):
