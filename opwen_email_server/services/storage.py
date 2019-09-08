@@ -8,7 +8,6 @@ from typing import Iterable
 from typing import Iterator
 from typing import Optional
 from typing import Tuple
-from uuid import uuid4
 
 from cached_property import cached_property
 from libcloud.storage.base import Container
@@ -29,6 +28,7 @@ from opwen_email_server.utils.serialization import gzip_bytes
 from opwen_email_server.utils.serialization import to_msgpack_bytes
 from opwen_email_server.utils.temporary import create_tempfilename
 from opwen_email_server.utils.temporary import removing
+from opwen_email_server.utils.unique import new_resource_id
 
 AccessInfo = namedtuple('AccessInfo', ['account', 'key', 'container'])
 
@@ -163,9 +163,8 @@ class AzureObjectsStorage(LogMixin):
     _compression_level = 20
 
     def __init__(self, file_storage: AzureFileStorage, resource_id_source: Callable[[], str] = None):
-
         self._file_storage = file_storage
-        self._resource_id_source = resource_id_source or self._new_resource_id
+        self._resource_id_source = resource_id_source or new_resource_id
 
     def _open_archive_file(self, archive: TarFile, name: str) -> IO[bytes]:
         while True:
@@ -253,10 +252,6 @@ class AzureObjectsStorage(LogMixin):
 
     def delete(self, resource_id: str):
         self._file_storage.delete(resource_id)
-
-    @classmethod
-    def _new_resource_id(cls) -> str:
-        return str(uuid4())
 
 
 class AzureObjectStorage(_AzureBytesStorage):

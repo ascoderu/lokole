@@ -21,6 +21,7 @@ from requests import get as http_get
 
 from opwen_email_server.config import MAX_HEIGHT_IMAGES
 from opwen_email_server.config import MAX_WIDTH_IMAGES
+from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import to_base64
 
 
@@ -217,3 +218,11 @@ def format_inline_images(email: dict, on_error: Callable) -> dict:
     new_email = dict(email)
     new_email['body'] = str(soup)
     return new_email
+
+
+class MimeEmailParser(LogMixin):
+    def __call__(self, mime_email: str) -> dict:
+        email = parse_mime_email(mime_email)
+        email = format_attachments(email)
+        email = format_inline_images(email, self.log_warning)
+        return email

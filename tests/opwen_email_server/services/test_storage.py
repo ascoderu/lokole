@@ -203,6 +203,15 @@ class AzureObjectsStorageTests(TestCase):
         self.assertIsNone(resource_id)
         self.assertContainerHasNumFiles(0)
 
+    def test_deletes_objects(self):
+        name = 'file'
+        objs = [{'foo': 'bar'}, {'baz': [1, 2, 3]}]
+
+        resource_id = self._storage.store_objects((name, objs, to_jsonl_bytes))
+        self._storage.delete(resource_id)
+
+        self.assertContainerHasNumFiles(0)
+
     def assertContainerHasNumFiles(self, count: int, suffix: str = ''):
         container_files = listdir(join(self._folder, self._container))
         matches = [entry for entry in container_files if entry.endswith(suffix)]

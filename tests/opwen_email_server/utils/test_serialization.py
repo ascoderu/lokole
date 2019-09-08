@@ -61,6 +61,11 @@ class JsonlTests(TestCase):
 
         self.assertEqual([None, {"a": 1}, {"b": 2}, None], deserialized)
 
+    def test_handles_non_utf8(self):
+        deserialized = serialization.from_jsonl_bytes(b'\xff\xfef\x00o\x00o\x00')
+
+        self.assertIsNone(deserialized)
+
 
 class GzipTests(TestCase):
     sample_string = b'hello world\n'

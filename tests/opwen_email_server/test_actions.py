@@ -4,7 +4,6 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 from unittest.mock import Mock
 from unittest.mock import patch
-from uuid import uuid4
 
 from libcloud.storage.types import ObjectDoesNotExistError
 
@@ -45,7 +44,7 @@ class SendOutboundEmailsTests(TestCase):
         self.send_email = MagicMock()
 
     def test_200(self):
-        resource_id = str(uuid4())
+        resource_id = '5f4f519a-f943-421a-94d5-cc9625047e9b'
         email = {'subject': 'test'}
 
         self.email_storage.fetch_object.return_value = email
@@ -58,7 +57,7 @@ class SendOutboundEmailsTests(TestCase):
         self.send_email.assert_called_once_with(email)
 
     def test_500(self):
-        resource_id = str(uuid4())
+        resource_id = 'b409fbad-ef80-4146-a899-0e229f6627e1'
         email = {'subject': 'test'}
 
         self.email_storage.fetch_object.return_value = email
@@ -93,7 +92,7 @@ class StoreInboundEmailsTests(TestCase):
         def throw(*args, **kwargs):
             raise ObjectDoesNotExistError(None, None, None)
 
-        resource_id = str(uuid4())
+        resource_id = 'eb93fde9-0cc6-4339-b7d6-f6e838e78f1c'
 
         self.raw_email_storage.fetch_text.side_effect = throw
 
@@ -149,17 +148,28 @@ class StoreWrittenClientEmailsTests(TestCase):
         self.next_task = MagicMock()
 
     def test_200(self):
-        attachment_content_bytes = b'some file content'
-        attachment_content_base64 = 'c29tZSBmaWxlIGNvbnRlbnQ='
-        resource_id = str(uuid4())
-        email_id = str(uuid4())
+        self._test_200(
+            attachment_content_bytes=b'some file content',
+            attachment_content_base64='c29tZSBmaWxlIGNvbnRlbnQ=',
+        )
 
-        client_email = {
-            'from': 'foo@test.com', '_uid': email_id, 'attachments':
-            [{'filename': 'test.txt', 'content': attachment_content_base64}]
-        }
+    def test_200_no_attachments(self):
+        self._test_200(
+            attachment_content_bytes=None,
+            attachment_content_base64=None,
+        )
+
+    def _test_200(self, attachment_content_bytes, attachment_content_base64):
+        resource_id = 'a2e3d5a7-cb3a-42c3-beeb-d6a2a76089dc'
+        email_id = '0194bf59-fb01-479e-bd5e-a59e4b8464d0'
+
+        client_email = {'from': 'foo@test.com', '_uid': email_id}
+        if attachment_content_base64:
+            client_email['attachments'] = [{'filename': 'test.txt', 'content': attachment_content_base64}]
+
         server_email = deepcopy(client_email)
-        server_email['attachments'][0]['content'] = attachment_content_bytes
+        if attachment_content_bytes:
+            server_email['attachments'][0]['content'] = attachment_content_bytes
 
         self.client_storage.fetch_objects.return_value = [client_email]
 
@@ -190,7 +200,7 @@ class ReceiveInboundEmailTests(TestCase):
         self.email_id_source = MagicMock()
 
     def test_403(self):
-        client_id = str(uuid4())
+        client_id = '4f7accdf-f387-46e9-bdf1-f227ffdb724d'
         domain = None
         email = 'dummy-mime'
 
@@ -202,7 +212,7 @@ class ReceiveInboundEmailTests(TestCase):
         self.auth.domain_for.assert_called_once_with(client_id)
 
     def test_200(self):
-        client_id = str(uuid4())
+        client_id = 'e440953a-4226-47a3-a116-2698c667b153'
         email_id = 'dfbab492b9adcf20ca8424b993b0f7ec26731d069be4d451ebbf7910937a999c'
         domain = 'test.com'
         email = 'dummy-mime'
@@ -217,7 +227,7 @@ class ReceiveInboundEmailTests(TestCase):
         self.next_task.assert_called_once_with(email_id)
 
     def test_is_idempotent(self):
-        client_id = str(uuid4())
+        client_id = '8c753257-6b75-4a26-a81b-bb9c09d38b52'
         domain = 'test.com'
         email = 'dummy-mime'
         num_repeated_emails = 3
@@ -256,7 +266,7 @@ class DownloadClientEmailsTests(TestCase):
         self.pending_storage = Mock()
 
     def test_400(self):
-        client_id = str(uuid4())
+        client_id = 'af962175-8757-4ac4-a199-2387b06379fa'
         domain = 'test.com'
 
         self.auth.domain_for.return_value = domain
@@ -267,7 +277,7 @@ class DownloadClientEmailsTests(TestCase):
         self.assertEqual(status, 400)
 
     def test_403(self):
-        client_id = str(uuid4())
+        client_id = '8bb3c924-aee6-4934-99dd-c7e50689489d'
         domain = None
 
         self.auth.domain_for.return_value = domain
@@ -277,18 +287,30 @@ class DownloadClientEmailsTests(TestCase):
         self.assertEqual(status, 403)
 
     def test_200(self):
-        attachment_content_bytes = b'some file content'
-        attachment_content_base64 = 'c29tZSBmaWxlIGNvbnRlbnQ='
-        client_id = str(uuid4())
-        email_id = str(uuid4())
-        resource_id = str(uuid4())
+        self._test_200(
+            attachment_content_bytes=b'some file content',
+            attachment_content_base64='c29tZSBmaWxlIGNvbnRlbnQ=',
+        )
+
+    def test_200_no_attachments(self):
+        self._test_200(
+            attachment_content_bytes=None,
+            attachment_content_base64=None,
+        )
+
+    def _test_200(self, attachment_content_bytes, attachment_content_base64):
+        client_id = 'f4e2cdc6-c79c-44ad-af35-071f8ea6e176'
+        email_id = 'b69bee6b-72fb-4b7f-a2ad-9aa7e375cf18'
+        resource_id = 'ffc86666-a9c6-403d-8a9c-c334465657c2'
         domain = 'test.com'
 
-        server_email = {
-            '_uid': email_id, 'attachments': [{'filename': 'test.txt', 'content': attachment_content_bytes}]
-        }
+        server_email = {'_uid': email_id}
+        if attachment_content_bytes:
+            server_email['attachments'] = [{'filename': 'test.txt', 'content': attachment_content_bytes}]
+
         client_email = deepcopy(server_email)
-        client_email['attachments'][0]['content'] = attachment_content_base64
+        if attachment_content_base64:
+            client_email['attachments'][0]['content'] = attachment_content_base64
 
         _stored = defaultdict(list)
         _compression = defaultdict(list)
@@ -338,7 +360,7 @@ class UploadClientEmailsTests(TestCase):
         self.next_task = MagicMock()
 
     def test_403(self):
-        client_id = str(uuid4())
+        client_id = 'e7f1c2c9-fa45-4f63-a965-a3dcddb68420'
         domain = None
         upload_info = {}
 
@@ -350,8 +372,8 @@ class UploadClientEmailsTests(TestCase):
         self.auth.domain_for.assert_called_once_with(client_id)
 
     def test_200(self):
-        client_id = str(uuid4())
-        resource_id = str(uuid4())
+        client_id = 'ef54b4bb-0f48-4dd3-8e3d-896261a15a8c'
+        resource_id = '433953ac-9be7-4525-a64c-3d25926d10ca'
         domain = 'test.com'
         upload_info = {'resource_id': resource_id}
 
@@ -399,7 +421,7 @@ class RegisterClientTests(TestCase):
         self.auth.client_id_for.assert_called_once_with(domain)
 
     def test_200(self):
-        client_id = str(uuid4())
+        client_id = '187ba644-4d46-49f6-a634-017d7f58e338'
         client_storage_account = 'account'
         client_storage_key = 'key'
         client_storage_container = 'container'
@@ -456,8 +478,12 @@ class CalculatePendingEmailsMetricTests(TestCase):
 
     def test_200(self):
         client_domain = 'test.com'
-        client_id = str(uuid4())
-        pending_email_ids = [str(uuid4()), str(uuid4()), str(uuid4())]
+        client_id = 'e8e5caa4-4ee6-4e7f-99c9-e231b6a27a9f'
+        pending_email_ids = [
+            '1de2ceb6-4f82-4cad-86ac-815bcbcb801c',
+            '9eb3f071-0f95-4317-befa-060c05ba3632',
+            '1e79ad99-1778-47b0-a2db-3c3be404640d',
+        ]
 
         self.auth.client_id_for.return_value = client_id
         self.pending_factory.return_value = self.pending_storage
