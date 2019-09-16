@@ -1,5 +1,5 @@
 flake8==3.7.8
-flex==6.14.0
+flex==6.14.1
 isort==4.3.21
 librabbitmq==2.0.0
 lockfile==0.12.2
