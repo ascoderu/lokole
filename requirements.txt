@@ -13,7 +13,7 @@ requests==2.22.0
 sendgrid==6.1.0
 typing-extensions==3.7.4
 typing==3.7.4.1
-kombu==4.6.4
+kombu==4.6.5
 celery==4.3.0
 xtarfile[zstd]==0.0.2
 azure-servicebus==0.50.1
