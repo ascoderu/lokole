@@ -3,7 +3,7 @@ apache-libcloud==2.6.0
 applicationinsights==0.11.9
 beautifulsoup4==4.8.1
 cached-property==1.5.1
-connexion[flask,swagger-ui]==2.3.0
+connexion[flask,swagger-ui]==2.4.0
 environs==6.0.0
 flower==0.9.3
 msgpack==0.6.2
