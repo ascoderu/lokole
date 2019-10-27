@@ -8,6 +8,7 @@ from typing import Union
 from libcloud.storage.types import ObjectDoesNotExistError
 
 from opwen_email_server.constants import events
+from opwen_email_server.constants import mailbox
 from opwen_email_server.constants import sync
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.sendgrid import SendSendgridEmail
@@ -17,6 +18,7 @@ from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.email_parser import MimeEmailParser
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
+from opwen_email_server.utils.email_parser import get_recipients
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes
@@ -69,11 +71,13 @@ class StoreInboundEmails(_Action):
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
                  pending_factory: Callable[[str], AzureTextStorage],
+                 next_task: Callable[[str], None],
                  email_parser: Callable[[str], dict] = None):
 
         self._raw_email_storage = raw_email_storage
         self._email_storage = email_storage
         self._pending_factory = pending_factory
+        self._next_task = next_task
         self._email_parser = email_parser or MimeEmailParser()
 
     def _action(self, resource_id):  # type: ignore
@@ -84,14 +88,15 @@ class StoreInboundEmails(_Action):
             return 'skipped', 202
 
         email = self._email_parser(mime_email)
-        self._store_inbound_email(email)
+        email_id = self._store_inbound_email(email)
 
         self._raw_email_storage.delete(resource_id)
+        self._next_task(email_id)
 
         self.log_event(events.EMAIL_STORED_FOR_CLIENT, {'domain': get_domain(email.get('from') or '')})  # noqa: E501  # yapf: disable
         return 'OK', 200
 
-    def _store_inbound_email(self, email: dict):
+    def _store_inbound_email(self, email: dict) -> str:
         email_id = new_email_id(email)
         email['_uid'] = email_id
 
@@ -100,6 +105,51 @@ class StoreInboundEmails(_Action):
         for domain in get_domains(email):
             pending_storage = self._pending_factory(domain)
             pending_storage.store_text(email_id, 'pending')
+
+        return email_id
+
+
+class _IndexEmailForMailbox(_Action):
+    def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureObjectStorage):
+
+        self._email_storage = email_storage
+        self._mailbox_storage = mailbox_storage
+
+    def _action(self, resource_id):  # type: ignore
+        email = self._email_storage.fetch_object(resource_id)
+
+        for email_address in self._get_pivot(email):
+            index = f"{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
+            self._mailbox_storage.store_object(index, email)
+
+        self.log_event(events.MAILBOX_EMAIL_INDEXED, {'folder': self._folder})  # noqa: E501  # yapf: disable
+        return 'OK', 200
+
+    @property
+    def _folder(self) -> str:
+        raise NotImplementedError  # pragma: no cover
+
+    def _get_pivot(self, email: dict) -> Iterable[str]:
+        raise NotImplementedError  # pragma: no cover
+
+
+class IndexReceivedEmailForMailbox(_IndexEmailForMailbox):
+    _folder = mailbox.RECEIVED_FOLDER
+
+    def _get_pivot(self, email: dict) -> Iterable[str]:
+        for email_address in get_recipients(email):
+            domain = get_domain(email_address)
+            if domain.endswith(mailbox.MAILBOX_DOMAIN):
+                yield email_address
+
+
+class IndexSentEmailForMailbox(_IndexEmailForMailbox):
+    _folder = mailbox.SENT_FOLDER
+
+    def _get_pivot(self, email: dict) -> Iterable[str]:
+        sender = email.get('from')
+        if sender:
+            yield sender
 
 
 class StoreWrittenClientEmails(_Action):

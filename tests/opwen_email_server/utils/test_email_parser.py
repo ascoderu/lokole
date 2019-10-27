@@ -104,6 +104,15 @@ class GetDomainsTests(TestCase):
         self.assertSetEqual(set(domains), {'bar.com', 'com'})
 
 
+class GetReceipientsTests(TestCase):
+    def test_get_recipients(self):
+        email = {'to': ['foo@bar.com'], 'cc': ['baz@bar.com', 'foo@com']}
+
+        recipients = email_parser.get_recipients(email)
+
+        self.assertSetEqual(set(recipients), {'foo@bar.com', 'baz@bar.com', 'foo@com'})
+
+
 class ResizeImageTests(TestCase):
     error_message = 'If default MAX_WIDTH_IMAGES and/or MAX_HEIGHT_IMAGES were changed ' \
                     'you may need to change the test base64 in "images_base64.json".'

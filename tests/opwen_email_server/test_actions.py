@@ -86,6 +86,7 @@ class StoreInboundEmailsTests(TestCase):
         self.pending_storage = Mock()
         self.pending_factory = MagicMock()
         self.email_parser = MagicMock()
+        self.next_task = MagicMock()
 
     def test_202(self):
         # noinspection PyUnusedLocal
@@ -128,6 +129,7 @@ class StoreInboundEmailsTests(TestCase):
         self.pending_factory.assert_called_once_with(domain)
         self.pending_storage.store_text.assert_called_once_with(email_id, 'pending')
         self.email_parser.assert_called_once_with(raw_email)
+        self.next_task.assert_called_once_with(email_id)
 
     def _execute_action(self, *args, **kwargs):
         action = actions.StoreInboundEmails(
@@ -135,6 +137,69 @@ class StoreInboundEmailsTests(TestCase):
             email_storage=self.email_storage,
             pending_factory=self.pending_factory,
             email_parser=self.email_parser,
+            next_task=self.next_task,
+        )
+
+        return action(*args, **kwargs)
+
+
+# noinspection PyTypeChecker
+class IndexReceivedEmailForMailboxTests(TestCase):
+    def setUp(self):
+        self.email_storage = Mock()
+        self.mailbox_storage = Mock()
+
+    def test_200(self):
+        email_id = '123'
+        email = {
+            'to': ['1@bar.lokole.ca', 'foo@gmail.com'], 'cc': ['2@baz.lokole.ca'], 'sent_at': '2019-10-26 22:47',
+            'from': 'foo@foo'
+        }
+
+        self.email_storage.fetch_object.return_value = email
+
+        _, status = self._execute_action(email_id)
+
+        self.assertEqual(status, 200)
+        self.email_storage.fetch_object.assert_called_once_with(email_id)
+        self.mailbox_storage.store_object.assert_any_call('1@bar.lokole.ca/received/2019-10-26 22:47/123', email)
+        self.mailbox_storage.store_object.assert_any_call('2@baz.lokole.ca/received/2019-10-26 22:47/123', email)
+        self.assertEqual(self.mailbox_storage.store_object.call_count, 2)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.IndexReceivedEmailForMailbox(
+            email_storage=self.email_storage,
+            mailbox_storage=self.mailbox_storage,
+        )
+
+        return action(*args, **kwargs)
+
+
+# noinspection PyTypeChecker
+class IndexSentEmailForMailboxTests(TestCase):
+    def setUp(self):
+        self.email_storage = Mock()
+        self.mailbox_storage = Mock()
+
+    def test_200(self):
+        email_id = '123'
+        email = {
+            'to': ['1@bar.lokole.ca', 'foo@gmail.com'], 'cc': ['2@baz.lokole.ca'], 'sent_at': '2019-10-26 22:47',
+            'from': 'foo@foo'
+        }
+
+        self.email_storage.fetch_object.return_value = email
+
+        _, status = self._execute_action(email_id)
+
+        self.assertEqual(status, 200)
+        self.email_storage.fetch_object.assert_called_once_with(email_id)
+        self.mailbox_storage.store_object.assert_called_once_with('foo@foo/sent/2019-10-26 22:47/123', email)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.IndexSentEmailForMailbox(
+            email_storage=self.email_storage,
+            mailbox_storage=self.mailbox_storage,
         )
 
         return action(*args, **kwargs)

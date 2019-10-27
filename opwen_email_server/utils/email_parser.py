@@ -125,12 +125,12 @@ def _format_attachment(filename: str, content: bytes) -> bytes:
     return content
 
 
-def _get_recipients(email: dict) -> Iterable[str]:
+def get_recipients(email: dict) -> Iterable[str]:
     return chain(email.get('to') or [], email.get('cc') or [], email.get('bcc') or [])
 
 
 def get_domains(email: dict) -> Iterable[str]:
-    return frozenset(get_domain(address) for address in _get_recipients(email))
+    return frozenset(get_domain(address) for address in get_recipients(email))
 
 
 def get_domain(address: str) -> str:
