@@ -81,6 +81,18 @@ def get_email_storage() -> AzureObjectStorage:
     )
 
 
+@singleton
+def get_mailbox_storage() -> AzureObjectStorage:
+    return AzureObjectStorage(
+        account=config.BLOBS_ACCOUNT,
+        key=config.BLOBS_KEY,
+        host=config.BLOBS_HOST,
+        secure=config.BLOBS_SECURE,
+        container=constants.CONTAINER_MAILBOX,
+        provider=config.STORAGE_PROVIDER,
+    )
+
+
 @lru_cache(maxsize=PENDING_STORAGE_CACHE_SIZE)
 def get_pending_storage(domain: str) -> AzureTextStorage:
     container = domain.replace('.', '-')

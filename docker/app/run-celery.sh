@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ "${CELERY_QUEUE_NAMES}" = "all" ]]; then
-  CELERY_QUEUE_NAMES="inbound,written,send"
+  CELERY_QUEUE_NAMES="inbound,written,send,mailboxreceived,mailboxsent"
 fi
 
 "${PY_ENV}/bin/celery" \
