@@ -17,7 +17,8 @@ from socket import gethostname
 from stat import S_IEXEC
 from string import ascii_letters
 from string import digits
-from subprocess import check_call  # nosec
+from subprocess import PIPE  # nosec
+from subprocess import run  # nosec
 from sys import executable as current_python_binary
 from sys import version_info
 from tempfile import gettempdir
@@ -50,7 +51,13 @@ class Setup:
     def user(self):
         base_user = getenv('USER')
         sudo_user = getenv('SUDO_USER')
-        return sudo_user if sudo_user and base_user == 'root' else base_user
+
+        if sudo_user and base_user == 'root':
+            return sudo_user
+        elif base_user:
+            return base_user
+        else:
+            return sh('whoami')
 
     @property
     def home(self):
@@ -154,13 +161,9 @@ class Setup:
 
 class SystemSetup(Setup):
     def _run(self):
-        self._update_apt()
         self._set_locale()
         self._set_timezone()
         self._set_password()
-
-    def _update_apt(self):
-        sh('apt-get update')
 
     def _set_locale(self):
         locale_command = (
@@ -187,6 +190,10 @@ class SystemSetup(Setup):
         sh('echo "{user}:{password}" | chpasswd'.format(
             user=self.user,
             password=self.args.password))
+
+    @property
+    def is_enabled(self):
+        return self.args.system_setup != 'no'
 
 
 class WifiSetup(Setup):
@@ -384,6 +391,10 @@ class ClientSetup(Setup):
     def registration_url(self):
         return 'https://{}/api/email/register/'.format(self.args.server_host)
 
+    @property
+    def is_enabled(self):
+        return self.args.sim_type != 'LocalOnly'
+
 
 class WebappSetup(Setup):
     packages = (
@@ -525,7 +536,13 @@ class WebappSetup(Setup):
             error_log=self.abspath(Path(self.args.log_directory) / 'nginx_error.log'),
             timeout_seconds=self.args.timeout))
 
-        sh('systemctl restart nginx')
+        sh('systemctl stop nginx', accept_failure=True)
+        sh('systemctl disable nginx', accept_failure=True)
+
+        self.create_daemon(
+            program_name=self.args.nginx_name,
+            command='/usr/sbin/nginx -g "daemon off;"',
+            user='root')
 
     def _setup_gunicorn(self):
         gunicorn_script = (
@@ -642,13 +659,20 @@ def generate_secret(length, chars=frozenset(ascii_letters + digits)):
     return secret[:length]
 
 
-def sh(command, user=None):
+def sh(command, user=None, accept_failure=False):
     if user:
         command = "su '{user}' -c '{command}'".format(
             user=user,
             command=command)
 
-    check_call(command, shell=True)  # nosec
+    process = run(command, shell=True, stderr=PIPE, stdout=PIPE)  # nosec
+    stdout = process.stdout.decode('utf-8').strip()
+    stderr = process.stderr.decode('utf-8').strip()
+
+    if process.returncode != 0 and not accept_failure:
+        raise Exception(stderr)
+
+    return stdout
 
 
 def _dump_state(args):
@@ -665,12 +689,14 @@ def _dump_state(args):
 
 
 def main(args, abort):
-    if getenv('USER') != 'root':
+    if getenv('USER') != 'root' and sh('whoami') != 'root':
         abort('Must run script via sudo')
 
     _dump_state(args)
 
     app_config = {}
+
+    sh('apt-get update')
 
     system_setup = SystemSetup(args, abort)
     system_setup()
@@ -687,7 +713,8 @@ def main(args, abort):
     webapp_setup = WebappSetup(args, abort, app_config)
     webapp_setup()
 
-    sh('shutdown --reboot now', user='root')
+    if args.reboot == 'yes':
+        sh('shutdown --reboot now', user='root')
 
 
 def cli():
@@ -725,6 +752,12 @@ def cli():
         'Useful for fully automated setups of new devices that '
         'come with a default insecure password.'
     ))
+    parser.add_argument('--system_setup', default=getenv('LOKOLE_SYSTEM_SETUP', 'yes'), help=(
+        'If set to "no", skip system setup.'
+    ))
+    parser.add_argument('--reboot', default=getenv('LOKOLE_REBOOT', 'yes'), help=(
+        'If set to "no", skip system reboot after setup.'
+    ))
     parser.add_argument('--wifi', default=getenv('LOKOLE_WIFI', 'yes'), help=(
         'If set to "no", skip setup of WiFi access point and '
         'local DNS server configuration.'
@@ -761,6 +794,9 @@ def cli():
     ))
     parser.add_argument('--server_name', default=getenv('LOKOLE_SERVER_NAME', 'lokole_gunicorn'), help=(
         'Name of the Lokole webapp server.'
+    ))
+    parser.add_argument('--nginx_name', default=getenv('LOKOLE_NGINX_NAME', 'lokole_nginx'), help=(
+        'Name of the Nginx service.'
     ))
     parser.add_argument('--worker_name', default=getenv('LOKOLE_WORKER_NAME', 'lokole_celery_worker'), help=(
         'Name of the Lokole webapp worker.'

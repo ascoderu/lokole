@@ -6,6 +6,9 @@ addons:
     packages:
       - mobile-broadband-provider-info
 
+services:
+  - docker
+
 python:
   - "3.5"
   - "3.6"
@@ -34,6 +37,9 @@ install:
 
 after_success:
   - codecov
+
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
 deploy:
   - provider: script
