@@ -20,7 +20,7 @@ environs==6.0.0
 gunicorn==19.9.0
 mkwvconf==0.1.1
 passlib==1.7.1
-python-crontab==2.3.9
+python-crontab==2.4.0
 requests==2.22.0
 typing==3.7.4.1
 tzlocal==2.0.0
