@@ -21,6 +21,9 @@ script:
     else
       echo "Skipping cert renewal for on-demand build"
     fi
+    if [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "amqp" ]]; then
+      unset "$REGISTRATION_CREDENTIALS"
+    fi
     if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
       echo "Skipping live service test for branch build"
     else
