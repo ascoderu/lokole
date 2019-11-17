@@ -14,7 +14,9 @@ from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.celery import inbound_store
 from opwen_email_server.integration.celery import written_store
+from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
+from opwen_email_server.services.auth import GithubBasicAuth
 
 email_receive = ReceiveInboundEmail(
     auth=get_auth(),
@@ -46,8 +48,14 @@ metrics_pending = CalculatePendingEmailsMetric(
     pending_factory=get_pending_storage,
 )
 
-basic_auth = BasicAuth(users={config.REGISTRATION_USERNAME: {
-    'password': config.REGISTRATION_PASSWORD,
-}})
+basic_auth = AnyOfBasicAuth(auths=[
+    BasicAuth(users={
+        config.REGISTRATION_USERNAME: {'password': config.REGISTRATION_PASSWORD},
+    }),
+    GithubBasicAuth(
+        organization=config.REGISTRATION_GITHUB_ORGANIZATION,
+        team=config.REGISTRATION_GITHUB_TEAM,
+    ),
+])
 
 healthcheck = Ping()

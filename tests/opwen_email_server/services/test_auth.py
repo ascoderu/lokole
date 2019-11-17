@@ -1,10 +1,66 @@
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
+from unittest.mock import Mock
 
+from responses import mock as mock_responses
+
+from opwen_email_server.constants import github
 from opwen_email_server.services.auth import AzureAuth
+from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
+from opwen_email_server.services.auth import GithubBasicAuth
 from opwen_email_server.services.storage import AzureTextStorage
+
+
+class _MockResponses:
+    def __init__(self, responses):
+        self._i = 0
+        self._responses = responses
+
+    def __call__(self, *args, **kwargs):
+        try:
+            status, headers, body = self._responses[self._i]
+        except ValueError:
+            body = self._responses[self._i]
+            status = 200
+            headers = {}
+
+        self._i += 1
+
+        return status, headers, body
+
+
+class AnyOfBasicAuthTests(TestCase):
+    def setUp(self):
+        self._auth1 = Mock()
+        self._auth2 = Mock()
+        self._auth3 = Mock()
+        self._auth = AnyOfBasicAuth(auths=[self._auth1, self._auth2, self._auth3])
+
+    def test_with_failing_sub_auth(self):
+        self._auth1.return_value = None
+        self._auth2.return_value = None
+        self._auth3.return_value = None
+
+        user = self._auth('username', 'password')
+
+        self.assertIsNone(user)
+        self.assertEqual(self._auth1.call_count, 1)
+        self.assertEqual(self._auth2.call_count, 1)
+        self.assertEqual(self._auth3.call_count, 1)
+
+    def test_with_passing_sub_auth(self):
+        self._auth1.return_value = None
+        self._auth2.return_value = {'sub': 'username'}
+        self._auth3.return_value = None
+
+        user = self._auth('username', 'password')
+
+        self.assertIsNotNone(user)
+        self.assertEqual(self._auth1.call_count, 1)
+        self.assertEqual(self._auth2.call_count, 1)
+        self.assertEqual(self._auth3.call_count, 0)
 
 
 class BasicAuthTests(TestCase):
@@ -36,6 +92,96 @@ class BasicAuthTests(TestCase):
         self.assertIsNotNone(self._auth(username='user1', password='pass', required_scopes=['scope1']))
 
         self.assertIsNotNone(self._auth(username='user1', password='pass', required_scopes=['scope1', 'scopeA']))
+
+
+class GithubBasicAuthTests(TestCase):
+    def setUp(self):
+        self._auth = GithubBasicAuth(organization='organization', team='team', page_size=2)
+
+    def test_with_bad_user(self):
+        self.assertIsNone(self._auth(username='', password='pass'))
+
+    @mock_responses.activate
+    def test_with_missing_user(self):
+        mock_responses.add(
+            mock_responses.POST,
+            github.GRAPHQL_URL,
+            body='''{
+                "data": {
+                    "organization": {
+                        "team": {
+                            "members": {
+                                "edges": [
+                                    {"cursor": "cursor1"}
+                                ],
+                                "nodes": [
+                                    {"login": "user1"}
+                                ]
+                            }
+                        }
+                    }
+                }
+            }''',
+            status=200,
+        )
+
+        self.assertIsNone(self._auth(username='does-not-exist', password='pass'))
+
+    @mock_responses.activate
+    def test_with_bad_password(self):
+        mock_responses.add(
+            mock_responses.POST,
+            github.GRAPHQL_URL,
+            json={'message': 'Bad credentials'},
+            status=401,
+        )
+
+        self.assertIsNone(self._auth(username='user1', password='incorrect'))
+
+    @mock_responses.activate
+    def test_with_correct_password(self):
+        mock_responses.add_callback(
+            mock_responses.POST,
+            github.GRAPHQL_URL,
+            callback=_MockResponses([
+                '''{
+                       "data": {
+                           "organization": {
+                               "team": {
+                                   "members": {
+                                       "edges": [
+                                           {"cursor": "cursor1"},
+                                           {"cursor": "cursor2"}
+                                       ],
+                                   "nodes": [
+                                       {"login": "user1"},
+                                       {"login": "user2"}
+                                   ]
+                               }
+                           }
+                       }
+                   }
+                }''',
+                '''{
+                       "data": {
+                           "organization": {
+                               "team": {
+                                   "members": {
+                                       "edges": [
+                                           {"cursor": "cursor3"}
+                                       ],
+                                   "nodes": [
+                                       {"login": "user3"}
+                                   ]
+                               }
+                           }
+                       }
+                   }
+                }''',
+            ]),
+        )
+
+        self.assertIsNotNone(self._auth(username='user3', password='pass'))
 
 
 class AzureAuthTests(TestCase):
