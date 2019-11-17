@@ -6,7 +6,7 @@ from os.path import join
 from unittest import TestCase
 from unittest.mock import patch
 
-from responses import mock
+from responses import mock as mock_responses
 
 from opwen_email_server.utils import email_parser
 
@@ -129,7 +129,7 @@ class ResizeImageTests(TestCase):
 
 
 class ConvertImgUrlToBase64Tests(TestCase):
-    @mock.activate
+    @mock_responses.activate
     def test_format_inline_images_with_img_tag(self):
         self.givenTestImage()
         input_email = {'body': '<div><h3>test image</h3><img src="http://test-url.png"/></div>'}
@@ -138,7 +138,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/png;')
 
-    @mock.activate
+    @mock_responses.activate
     @patch.object(email_parser, 'Image')
     def test_handles_exceptions_when_processing_image(self, mock_pil):
         def throw():
@@ -172,7 +172,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @mock.activate
+    @mock_responses.activate
     def test_format_inline_images_with_bad_request(self):
         self.givenTestImage(status=404)
         input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
@@ -181,7 +181,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @mock.activate
+    @mock_responses.activate
     def test_format_inline_images_with_many_img_tags(self):
         self.givenTestImage()
         input_email = {'body': '<div><img src="http://test-url.png"/><img src="http://test-url.png"/></div>'}
@@ -197,7 +197,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
         self.assertEqual(output_email, input_email)
 
-    @mock.activate
+    @mock_responses.activate
     def test_format_inline_images_without_content_type(self):
         self.givenTestImage(content_type='')
         input_email = {'body': '<div><img src="http://test-url.png"/></div>'}
@@ -219,11 +219,13 @@ class ConvertImgUrlToBase64Tests(TestCase):
         with open(join(TEST_DATA_DIRECTORY, 'test_image.png'), 'rb') as image:
             image_bytes = image.read()
 
-        mock.add(mock.GET,
-                 'http://test-url.png',
-                 headers={'Content-Type': content_type},
-                 body=image_bytes,
-                 status=status)
+        mock_responses.add(
+            mock_responses.GET,
+            'http://test-url.png',
+            headers={'Content-Type': content_type},
+            body=image_bytes,
+            status=status,
+        )
 
     def fail_if_called(self, message, *args):
         self.fail(message % args)
