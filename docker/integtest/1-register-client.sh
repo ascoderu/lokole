@@ -7,13 +7,11 @@ mkdir -p "${out_dir}"
 # shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
-registration_credentials="${REGISTRATION_CREDENTIALS:-admin:password}"
-
 # workflow 3: register a new client called "developer"
 # normally this endpoint would be called during a new lokole device setup
 curl -fs \
   -H "Content-Type: application/json" \
-  -u "${registration_credentials}" \
+  -u "${REGISTRATION_CREDENTIALS}" \
   -d '{"domain":"developer1.lokole.ca"}' \
   "http://nginx:8888/api/email/register/" \
 | tee "${out_dir}/register1.json"
@@ -29,7 +27,7 @@ if curl -fs \
 # also register another client to simulate multi-client emails
 curl -fs \
   -H "Content-Type: application/json" \
-  -u "${registration_credentials}" \
+  -u "${REGISTRATION_CREDENTIALS}" \
   -d '{"domain":"developer2.lokole.ca"}' \
   "http://nginx:8888/api/email/register/" \
 | tee "${out_dir}/register2.json"
