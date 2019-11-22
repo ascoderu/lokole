@@ -2,8 +2,8 @@ language: minimal
 
 env:
   matrix:
-    - LOKOLE_QUEUE_BROKER_SCHEME=azureservicebus
-    - LOKOLE_QUEUE_BROKER_SCHEME=amqp
+    - TEST_MODE=live
+    - TEST_MODE=local
 
 services:
   - docker
@@ -21,7 +21,14 @@ script:
     else
       echo "Skipping cert renewal for on-demand build"
     fi
-    if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "azureservicebus" ]]; then
+    if [[ "$TEST_MODE" = "live" ]]; then
+      export REGISTRATION_CREDENTIALS="$GITHUB_AUTH_USERNAME:$GITHUB_AUTH_TOKEN"
+      export LOKOLE_QUEUE_BROKER_SCHEME="azureservicebus"
+    else
+      export REGISTRATION_CREDENTIALS="admin:password"
+      export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
+    fi
+    if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
       echo "Skipping live service test for branch build"
     else
       make build verify-build
@@ -31,7 +38,7 @@ script:
 
 after_success:
   - |
-    if [[ "$LOKOLE_QUEUE_BROKER_SCHEME" = "amqp" ]]; then
+    if [[ "$TEST_MODE" = "local" ]]; then
       bash <(curl -s https://codecov.io/bash)
     fi
 
@@ -50,4 +57,4 @@ deploy:
     on:  # yamllint disable rule:truthy
       repo: ascoderu/opwen-cloudserver
       tags: true
-      condition: $LOKOLE_QUEUE_BROKER_SCHEME = azureservicebus
+      condition: $TEST_MODE = live

@@ -11,7 +11,7 @@ mkdir -p "${out_dir}"
 # normally this endpoint would be called during a new lokole device setup
 curl -fs \
   -H "Content-Type: application/json" \
-  -u "admin:password" \
+  -u "${REGISTRATION_CREDENTIALS}" \
   -d '{"domain":"developer1.lokole.ca"}' \
   "http://nginx:8888/api/email/register/" \
 | tee "${out_dir}/register1.json"
@@ -27,7 +27,7 @@ if curl -fs \
 # also register another client to simulate multi-client emails
 curl -fs \
   -H "Content-Type: application/json" \
-  -u "admin:password" \
+  -u "${REGISTRATION_CREDENTIALS}" \
   -d '{"domain":"developer2.lokole.ca"}' \
   "http://nginx:8888/api/email/register/" \
 | tee "${out_dir}/register2.json"
