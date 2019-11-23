@@ -1,4 +1,5 @@
 from functools import lru_cache
+from json import JSONDecodeError
 from typing import Callable
 from typing import Dict
 from typing import Iterable
@@ -14,6 +15,8 @@ from opwen_email_server.constants import github
 from opwen_email_server.constants.cache import AUTH_DOMAIN_CACHE_SIZE
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
+from opwen_email_server.utils.serialization import from_json
+from opwen_email_server.utils.serialization import to_json
 
 
 class AnyOfBasicAuth(LogMixin):
@@ -137,18 +140,45 @@ class AzureAuth(LogMixin):
     def __init__(self, storage: AzureTextStorage) -> None:
         self._storage = storage
 
-    def insert(self, client_id: str, domain: str):
+    def insert(self, client_id: str, domain: str, owner: str):
         self._storage.store_text(client_id, domain)
-        self._storage.store_text(domain, client_id)
+        self._storage.store_text(domain, to_json({'client_id': client_id, 'owner': owner}))
         self.log_debug('Registered client %s at domain %s', client_id, domain)
+
+    def is_owner(self, domain: str, username: str) -> bool:
+        try:
+            raw_auth = self._storage.fetch_text(domain)
+        except ObjectDoesNotExistError:
+            self.log_debug('Unrecognized domain %s', domain)
+            return False
+
+        try:
+            auth = from_json(raw_auth)
+        except JSONDecodeError:
+            # fallback for clients registered before November 2019
+            self.log_debug('Unable to lookup owner for domain %s', domain)
+            return False
+
+        return auth.get('owner') == username
+
+    def delete(self, client_id: str, domain: str) -> bool:
+        self._storage.delete(domain)
+        self._storage.delete(client_id)
+        self._domain_for_cached.cache_clear()
+        return True
 
     def client_id_for(self, domain: str) -> Optional[str]:
         try:
-            client_id = self._storage.fetch_text(domain)
+            raw_auth = self._storage.fetch_text(domain)
         except ObjectDoesNotExistError:
             self.log_debug('Unrecognized domain %s', domain)
             return None
         else:
+            try:
+                client_id = from_json(raw_auth)['client_id']
+            except JSONDecodeError:
+                # fallback for clients registered before November 2019
+                client_id = raw_auth
             self.log_debug('Domain %s has client %s', domain, client_id)
             return client_id
 

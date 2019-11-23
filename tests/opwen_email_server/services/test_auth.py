@@ -187,19 +187,38 @@ class GithubBasicAuthTests(TestCase):
 class AzureAuthTests(TestCase):
     def setUp(self):
         self._folder = mkdtemp()
-        self._auth = AzureAuth(storage=AzureTextStorage(
+        self._storage = AzureTextStorage(
             account=self._folder,
             key='key',
             container='auth',
             provider='LOCAL',
-        ))
+        )
+        self._auth = AzureAuth(storage=self._storage)
 
     def tearDown(self):
         rmtree(self._folder)
 
     def test_inserts_and_retrieves_client(self):
-        self._auth.insert('client', 'domain')
+        self._auth.insert('client', 'domain', 'owner')
         self.assertEqual(self._auth.domain_for('client'), 'domain')
         self.assertEqual(self._auth.client_id_for('domain'), 'client')
         self.assertIsNone(self._auth.domain_for('unknown-client'))
         self.assertIsNone(self._auth.client_id_for('unknown-client'))
+        self.assertTrue(self._auth.is_owner('domain', 'owner'))
+        self.assertFalse(self._auth.is_owner('domain', 'unknown-user'))
+        self.assertFalse(self._auth.is_owner('unknown-domain', 'owner'))
+
+    def test_deletes_client(self):
+        self._auth.insert('client', 'domain', 'owner')
+        self.assertIsNotNone(self._auth.domain_for('client'))
+        self._auth.delete('client', 'domain')
+        self.assertIsNone(self._auth.domain_for('client'))
+
+    def test_inserts_and_retrieves_client_backwards_compatibility_pre_november_2019(self):
+        # emulate pre november 2019 version of self._auth.insert
+        self._storage.store_text('client', 'domain')
+        self._storage.store_text('domain', 'client')
+
+        self.assertEqual(self._auth.domain_for('client'), 'domain')
+        self.assertEqual(self._auth.client_id_for('domain'), 'client')
+        self.assertFalse(self._auth.is_owner('domain', 'owner'))
