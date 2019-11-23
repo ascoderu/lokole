@@ -1,5 +1,6 @@
 from opwen_email_server import config
 from opwen_email_server.actions import CalculatePendingEmailsMetric
+from opwen_email_server.actions import DeleteClient
 from opwen_email_server.actions import DownloadClientEmails
 from opwen_email_server.actions import Ping
 from opwen_email_server.actions import ReceiveInboundEmail
@@ -8,7 +9,9 @@ from opwen_email_server.actions import UploadClientEmails
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
+from opwen_email_server.integration.azure import get_mailbox_deletion
 from opwen_email_server.integration.azure import get_mailbox_setup
+from opwen_email_server.integration.azure import get_mx_deletion
 from opwen_email_server.integration.azure import get_mx_setup
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
@@ -41,6 +44,12 @@ client_register = RegisterClient(
     client_storage=get_client_storage(),
     setup_mailbox=get_mailbox_setup(),
     setup_mx_records=get_mx_setup(),
+)
+
+client_delete = DeleteClient(
+    auth=get_auth(),
+    delete_mailbox=get_mailbox_deletion(),
+    delete_mx_records=get_mx_deletion(),
 )
 
 metrics_pending = CalculatePendingEmailsMetric(

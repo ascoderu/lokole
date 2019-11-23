@@ -37,7 +37,6 @@ class PingTests(TestCase):
         self.assertEqual(status, 200)
 
 
-# noinspection PyTypeChecker
 class SendOutboundEmailsTests(TestCase):
     def setUp(self):
         self.email_storage = Mock()
@@ -78,7 +77,6 @@ class SendOutboundEmailsTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class StoreInboundEmailsTests(TestCase):
     def setUp(self):
         self.raw_email_storage = Mock()
@@ -143,7 +141,6 @@ class StoreInboundEmailsTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class IndexReceivedEmailForMailboxTests(TestCase):
     def setUp(self):
         self.email_storage = Mock()
@@ -175,7 +172,6 @@ class IndexReceivedEmailForMailboxTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class IndexSentEmailForMailboxTests(TestCase):
     def setUp(self):
         self.email_storage = Mock()
@@ -205,7 +201,6 @@ class IndexSentEmailForMailboxTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class StoreWrittenClientEmailsTests(TestCase):
     def setUp(self):
         self.client_storage = Mock()
@@ -256,7 +251,6 @@ class StoreWrittenClientEmailsTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class ReceiveInboundEmailTests(TestCase):
     def setUp(self):
         self.auth = Mock()
@@ -321,7 +315,6 @@ class ReceiveInboundEmailTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class DownloadClientEmailsTests(TestCase):
     def setUp(self):
         self.auth = Mock()
@@ -418,7 +411,6 @@ class DownloadClientEmailsTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class UploadClientEmailsTests(TestCase):
     def setUp(self):
         self.auth = Mock()
@@ -459,7 +451,6 @@ class UploadClientEmailsTests(TestCase):
         return action(*args, **kwargs)
 
 
-# noinspection PyTypeChecker
 class RegisterClientTests(TestCase):
     def setUp(self):
         self.auth = Mock()
@@ -470,17 +461,19 @@ class RegisterClientTests(TestCase):
 
     def test_400(self):
         domain = 'TEST.com'
+        user = 'user'
 
-        _, status = self._execute_action({'domain': domain})
+        _, status = self._execute_action({'domain': domain}, user=user)
 
         self.assertEqual(status, 400)
 
     def test_409(self):
         domain = 'test.com'
+        user = 'user'
 
         self.auth.client_id_for.return_value = '123'
 
-        _, status = self._execute_action({'domain': domain})
+        _, status = self._execute_action({'domain': domain}, user=user)
 
         self.assertEqual(status, 409)
         self.auth.client_id_for.assert_called_once_with(domain)
@@ -491,6 +484,7 @@ class RegisterClientTests(TestCase):
         client_storage_key = 'key'
         client_storage_container = 'container'
         domain = 'test.com'
+        user = 'user'
 
         self.client_id_source.return_value = client_id
         self.auth.client_id_for.return_value = None
@@ -500,14 +494,14 @@ class RegisterClientTests(TestCase):
             container=client_storage_container,
         )
 
-        response = self._execute_action({'domain': domain})
+        response = self._execute_action({'domain': domain}, user=user)
 
         self.assertEqual(response['client_id'], client_id)
         self.assertEqual(response['storage_account'], client_storage_account)
         self.assertEqual(response['storage_key'], client_storage_key)
         self.assertEqual(response['resource_container'], client_storage_container)
         self.auth.client_id_for.assert_called_once_with(domain)
-        self.auth.insert.assert_called_with(client_id, domain)
+        self.auth.insert.assert_called_with(client_id, domain, user)
         self.assertEqual(self.client_storage.ensure_exists.call_count, 1)
         self.setup_mailbox.assert_called_once_with(client_id, domain)
         self.setup_mx_records.assert_called_once_with(domain)
@@ -519,6 +513,72 @@ class RegisterClientTests(TestCase):
             setup_mailbox=self.setup_mailbox,
             setup_mx_records=self.setup_mx_records,
             client_id_source=self.client_id_source,
+        )
+
+        return action(*args, **kwargs)
+
+
+class DeleteClientTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.delete_mailbox = MagicMock()
+        self.delete_mx_records = MagicMock()
+
+    def test_400(self):
+        domain = 'TEST.com'
+        user = 'user'
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 400)
+
+    def test_404(self):
+        domain = 'test.com'
+        user = 'user'
+
+        self.auth.client_id_for.return_value = None
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 404)
+        self.auth.client_id_for.assert_called_once_with(domain)
+
+    def test_403(self):
+        domain = 'test.com'
+        user = 'user'
+        client_id = '187ba644-4d46-49f6-a634-017d7f58e338'
+
+        self.auth.client_id_for.return_value = client_id
+        self.auth.is_owner.return_value = False
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 403)
+        self.auth.client_id_for.assert_called_once_with(domain)
+        self.auth.is_owner.assert_called_once_with(domain, user)
+
+    def test_200(self):
+        client_id = '187ba644-4d46-49f6-a634-017d7f58e338'
+        domain = 'test.com'
+        user = 'user'
+
+        self.auth.client_id_for.return_value = client_id
+        self.auth.is_owner.return_value = True
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 200)
+        self.auth.client_id_for.assert_called_once_with(domain)
+        self.auth.is_owner.assert_called_once_with(domain, user)
+        self.auth.delete.assert_called_once_with(client_id, domain)
+        self.delete_mailbox.assert_called_once_with(client_id, domain)
+        self.delete_mx_records.assert_called_once_with(domain)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.DeleteClient(
+            auth=self.auth,
+            delete_mailbox=self.delete_mailbox,
+            delete_mx_records=self.delete_mx_records,
         )
 
         return action(*args, **kwargs)

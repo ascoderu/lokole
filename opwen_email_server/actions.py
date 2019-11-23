@@ -326,7 +326,7 @@ class RegisterClient(_Action):
         self._setup_mailbox(client_id, domain)
         self._setup_mx_records(domain)
         self._client_storage.ensure_exists()
-        self._auth.insert(client_id, domain)
+        self._auth.insert(client_id, domain, auth_args.get('user'))
 
         self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501  # yapf: disable
         return {
@@ -335,6 +335,33 @@ class RegisterClient(_Action):
             'storage_key': access_info.key,
             'resource_container': access_info.container,
         }
+
+
+class DeleteClient(_Action):
+    def __init__(self, auth: AzureAuth, delete_mailbox: Callable[[str, str], None],
+                 delete_mx_records: Callable[[str], None]):
+
+        self._auth = auth
+        self._delete_mailbox = delete_mailbox
+        self._delete_mx_records = delete_mx_records
+
+    def _action(self, domain, **auth_args):  # type: ignore
+        if not is_lowercase(domain):
+            return 'domain must be lowercase', 400
+
+        client_id = self._auth.client_id_for(domain)
+        if client_id is None:
+            return 'client does not exist', 404
+
+        if not self._auth.is_owner(domain, auth_args.get('user')):
+            return 'client does not belong to the user', 403
+
+        self._delete_mailbox(client_id, domain)
+        self._delete_mx_records(domain)
+        self._auth.delete(client_id, domain)
+
+        self.log_event(events.CLIENT_DELETED, {'domain': domain})  # noqa: E501  # yapf: disable
+        return 'OK', 200
 
 
 class CalculatePendingEmailsMetric(_Action):

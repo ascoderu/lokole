@@ -31,3 +31,22 @@ curl -fs \
   -d '{"domain":"developer2.lokole.ca"}' \
   "http://nginx:8888/api/email/register/" \
 | tee "${out_dir}/register2.json"
+
+# after creating a client, creating the same one again should fail but we should be able to delete it
+curl -fs \
+  -H "Content-Type: application/json" \
+  -u "${REGISTRATION_CREDENTIALS}" \
+  -d '{"domain":"developer3.lokole.ca"}' \
+  "http://nginx:8888/api/email/register/"
+
+if curl -fs \
+  -H "Content-Type: application/json" \
+  -u "${REGISTRATION_CREDENTIALS}" \
+  -d '{"domain":"developer3.lokole.ca"}' \
+  "http://nginx:8888/api/email/register/" \
+; then echo "Was able to register a duplicate client" >&2; exit 5; fi
+
+curl -fs \
+  -u "${REGISTRATION_CREDENTIALS}" \
+  -X DELETE \
+  "http://nginx:8888/api/email/register/developer3.lokole.ca"

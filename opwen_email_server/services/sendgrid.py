@@ -3,6 +3,7 @@ from typing import Callable
 
 from cached_property import cached_property
 from python_http_client import BadRequestsError
+from requests import delete as http_delete
 from requests import post as http_post
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
@@ -14,7 +15,8 @@ from sendgrid.helpers.mail import Personalization
 from sendgrid.helpers.mail import SandBoxMode
 
 from opwen_email_server.constants.sendgrid import INBOX_URL
-from opwen_email_server.constants.sendgrid import MAILBOX_URL
+from opwen_email_server.constants.sendgrid import MAILBOX_CREATE_URL
+from opwen_email_server.constants.sendgrid import MAILBOX_DELETE_URL
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import to_base64
 
@@ -119,7 +121,7 @@ class SendSendgridEmail(LogMixin):
         )
 
 
-class SetupSendgridMailbox(LogMixin):
+class _SendgridManagement(LogMixin):
     def __init__(self, key: str) -> None:
         self._key = key
 
@@ -128,8 +130,28 @@ class SetupSendgridMailbox(LogMixin):
             self.log_warning('No key, skipping mailbox setup for %s', domain)
             return
 
+        self._run(client_id, domain)
+
+    def _run(self, client_id: str, domain: str) -> None:
+        raise NotImplementedError  # pragma: no cover
+
+
+class DeleteSendgridMailbox(_SendgridManagement):
+    def _run(self, client_id: str, domain: str) -> None:
+        http_delete(
+            url=MAILBOX_DELETE_URL.format(domain),
+            headers={
+                'Authorization': f'Bearer {self._key}',
+            },
+        ).raise_for_status()
+
+        self.log_debug('Deleted mailbox for %s', domain)
+
+
+class SetupSendgridMailbox(_SendgridManagement):
+    def _run(self, client_id: str, domain: str) -> None:
         http_post(
-            url=MAILBOX_URL,
+            url=MAILBOX_CREATE_URL,
             json={
                 'hostname': domain,
                 'url': INBOX_URL.format(client_id),

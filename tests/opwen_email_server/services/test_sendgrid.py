@@ -8,6 +8,7 @@ from urllib.error import URLError
 from responses import mock as mock_responses
 
 from opwen_email_server.config import SENDGRID_KEY
+from opwen_email_server.services.sendgrid import DeleteSendgridMailbox
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 
@@ -105,6 +106,26 @@ class LiveSendgridEmailSenderTests(SendgridEmailSenderTests):
         send_success = send_email(email)
 
         self.assertTrue(send_success if success else not send_success)
+
+
+class DeleteSendgridMailboxTests(TestCase):
+    def test_does_not_make_request_when_key_is_missing(self):
+        action = SetupSendgridMailbox(key='')
+
+        with patch.object(action, 'log_warning') as mock_log_warning:
+            action(client_id='', domain='')
+
+        self.assertEqual(mock_log_warning.call_count, 1)
+
+    @mock_responses.activate
+    def test_makes_request_when_key_is_set(self):
+        mock_responses.add(mock_responses.DELETE, 'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain')
+
+        action = DeleteSendgridMailbox('my-key')
+
+        action('my-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 1)
 
 
 class SetupSendgridMailboxTests(TestCase):

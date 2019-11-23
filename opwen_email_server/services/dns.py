@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from libcloud.dns.base import DNSDriver
+from libcloud.dns.base import Zone
 from libcloud.dns.providers import get_driver
 from libcloud.dns.types import Provider
 from libcloud.dns.types import RecordType
@@ -8,7 +9,7 @@ from opwen_email_server.constants.sendgrid import MX_RECORD
 from opwen_email_server.utils.log import LogMixin
 
 
-class SetupMxRecords(LogMixin):
+class _MxRecords(LogMixin):
     def __init__(self, account: str, secret: str, provider: str) -> None:
         self._account = account
         self._secret = secret
@@ -30,6 +31,23 @@ class SetupMxRecords(LogMixin):
 
         zone = next(zone for zone in self._driver.iterate_zones() if zone.domain == zone_name)
 
+        self._run(client_name, zone)
+
+    def _run(self, client_name: str, zone: Zone) -> None:
+        raise NotImplementedError  # pragma: no cover
+
+
+class DeleteMxRecords(_MxRecords):
+    def _run(self, client_name: str, zone: Zone) -> None:
+        record = next(record for record in self._driver.iterate_records(zone) if record.name == client_name)
+
+        self._driver.delete_record(record)
+
+        self.log_debug('Deleted MX records for client %s.%s', client_name, zone.domain)
+
+
+class SetupMxRecords(_MxRecords):
+    def _run(self, client_name: str, zone: Zone) -> None:
         self._driver.create_record(
             zone=zone,
             name=client_name,
@@ -37,4 +55,4 @@ class SetupMxRecords(LogMixin):
             data=MX_RECORD,
         )
 
-        self.log_debug('Set up MX records for %s', domain)
+        self.log_debug('Set up MX records for client %s.%s', client_name, zone.domain)
