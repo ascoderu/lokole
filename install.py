@@ -453,7 +453,6 @@ class WebappSetup(Setup):
         extra_settings = {
             'OPWEN_STATE_DIRECTORY': self.abspath(self.args.state_directory),
             'OPWEN_SESSION_KEY': generate_secret(32),
-            'OPWEN_PASSWORD_SALT': generate_secret(16),
             'OPWEN_SIM_TYPE': self.args.sim_type,
             'OPWEN_EMAIL_SERVER_HOSTNAME': self.args.server_host,
             'OPWEN_CLIENT_NAME': self.args.client_name,

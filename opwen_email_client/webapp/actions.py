@@ -15,6 +15,7 @@ from flask import render_template
 from opwen_email_client.domain import sim
 from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.domain.email.sync import Sync
+from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.modem import e303
 from opwen_email_client.domain.modem import e353
 from opwen_email_client.domain.modem import e3131
@@ -27,21 +28,25 @@ from opwen_email_client.webapp.config import i8n
 
 
 class SyncEmails(object):
-    def __init__(self, email_store: EmailStore, email_sync: Sync, log: Logger):
+    def __init__(self, email_store: EmailStore, email_sync: Sync, user_store: UserStore, log: Logger):
         self._email_store = email_store
         self._email_sync = email_sync
+        self._user_store = user_store
         self._log = log
 
     def _upload(self):
         pending = self._email_store.pending(page=None)
+        users = self._user_store.fetch_pending()
 
         # noinspection PyBroadException
         try:
-            uploaded = self._email_sync.upload(pending)
+            uploaded = self._email_sync.upload(pending, users)
         except Exception:
             self._log.exception('Unable to upload emails')
         else:
-            self._email_store.mark_sent(uploaded)
+            if uploaded:
+                self._email_store.mark_sent(uploaded)
+                self._user_store.mark_as_synced(users)
 
     def _download(self):
         # noinspection PyBroadException

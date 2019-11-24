@@ -14,7 +14,6 @@ from watchdog.observers import Observer
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp.actions import RestartAppComponent
 from opwen_email_client.webapp.config import AppConfig
-from opwen_email_client.webapp.login import user_datastore
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
@@ -56,14 +55,12 @@ def restarter(directory):
 @manager.option('-n', '--name', required=True)
 @manager.option('-p', '--password', required=True)
 def createadmin(name, password):
+    user_datastore = app.ioc.user_store
     email = '{}@{}'.format(name, AppConfig.CLIENT_EMAIL_HOST)
 
-    user = user_datastore.find_user(email=email)
-    if user is None:
-        user = user_datastore.create_user(email=email)
-
+    user = user_datastore.create_if_not_exists(email)
+    user_datastore.make_admin(user)
     user.reset_password(password)
-    user.make_admin()
     user.save()
 
 

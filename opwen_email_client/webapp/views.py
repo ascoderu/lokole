@@ -25,10 +25,8 @@ from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm
 from opwen_email_client.webapp.forms.settings import SettingsForm
-from opwen_email_client.webapp.ioc import Ioc
-from opwen_email_client.webapp.login import User
-from opwen_email_client.webapp.login import admin_required
-from opwen_email_client.webapp.login import login_required
+from opwen_email_client.webapp.security import admin_required
+from opwen_email_client.webapp.security import login_required
 from opwen_email_client.webapp.session import Session
 from opwen_email_client.webapp.session import track_history
 
@@ -59,7 +57,7 @@ def about() -> Response:
 @app.route('/news/<int:page>')
 @track_history
 def news(page: int) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
 
     return _emails_view(email_store.inbox(AppConfig.NEWS_INBOX, page), page, 'news.html')
 
@@ -70,7 +68,7 @@ def news(page: int) -> Response:
 @login_required
 @track_history
 def email_inbox(page: int) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
 
     return _emails_view(email_store.inbox(user.email, page), page, type='inbox')
@@ -81,7 +79,7 @@ def email_inbox(page: int) -> Response:
 @login_required
 @track_history
 def email_outbox(page: int) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
 
     return _emails_view(email_store.outbox(user.email, page), page, type='outbox')
@@ -92,7 +90,7 @@ def email_outbox(page: int) -> Response:
 @login_required
 @track_history
 def email_sent(page: int) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
 
     return _emails_view(email_store.sent(user.email, page), page, type='sent')
@@ -103,7 +101,7 @@ def email_sent(page: int) -> Response:
 @login_required
 @track_history
 def email_search(page: int) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
     query = request.args.get('query')
 
@@ -113,7 +111,7 @@ def email_search(page: int) -> Response:
 @app.route('/email/unread')
 @login_required
 def email_unread() -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
 
     return jsonify(unread=email_store.has_unread(user.email))
@@ -122,7 +120,7 @@ def email_unread() -> Response:
 @app.route('/email/read/<email_uid>')
 @login_required
 def email_read(email_uid: str) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
 
     email_store.mark_read(user.email, [email_uid])
@@ -133,7 +131,7 @@ def email_read(email_uid: str) -> Response:
 @app.route('/email/delete/<email_uid>')
 @login_required
 def email_delete(email_uid: str) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
     user = current_user
 
     email_store.delete(user.email, [email_uid])
@@ -145,7 +143,7 @@ def email_delete(email_uid: str) -> Response:
 @login_required
 @track_history
 def email_new() -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
 
     form = NewEmailForm.from_request(email_store)
     if form is None:
@@ -162,7 +160,7 @@ def email_new() -> Response:
 @app.route('/attachment/<uid>', methods=['GET'])
 @login_required
 def download_attachment(uid: str) -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
 
     attachment = email_store.get_attachment(uid)
     if attachment is None:
@@ -181,7 +179,7 @@ def register_complete() -> Response:
     send_welcome_email = SendWelcomeEmail(
         time=datetime.utcnow(),
         to=current_user.email,
-        email_store=Ioc.email_store,
+        email_store=app.ioc.email_store,
     )
 
     send_welcome_email()
@@ -242,14 +240,16 @@ def language(locale: str) -> Response:
 @login_required
 @track_history
 def users() -> Response:
-    return _view('users.html', users=User.query.all())
+    user_store = app.ioc.user_store
+
+    return _view('users.html', users=user_store.fetch_all())
 
 
 @app.route('/admin/settings', methods=['GET', 'POST'])
 @admin_required
 @track_history
 def settings() -> Response:
-    email_store = Ioc.email_store
+    email_store = app.ioc.email_store
 
     form = SettingsForm()
     if form.validate_on_submit():
@@ -263,7 +263,9 @@ def settings() -> Response:
 @app.route('/admin/suspend/<userid>')
 @admin_required
 def suspend(userid: str) -> Response:
-    user = User.query.filter_by(id=userid).first()
+    user_store = app.ioc.user_store
+
+    user = user_store.fetch_one(userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
@@ -283,7 +285,9 @@ def suspend(userid: str) -> Response:
 @app.route('/admin/unsuspend/<userid>')
 @admin_required
 def unsuspend(userid: str) -> Response:
-    user = User.query.filter_by(id=userid).first()
+    user_store = app.ioc.user_store
+
+    user = user_store.fetch_one(userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
@@ -299,7 +303,9 @@ def unsuspend(userid: str) -> Response:
 @app.route('/admin/promote/<userid>')
 @admin_required
 def promote(userid: str) -> Response:
-    user = User.query.filter_by(id=userid).first()
+    user_store = app.ioc.user_store
+
+    user = user_store.fetch_one(userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
@@ -309,7 +315,7 @@ def promote(userid: str) -> Response:
         flash(i8n.ALREADY_PROMOTED, category='error')
         return redirect(url_for('users'))
 
-    user.make_admin()
+    user_store.make_admin(user)
     user.save()
 
     flash(i8n.USER_PROMOTED, category='success')
@@ -319,7 +325,9 @@ def promote(userid: str) -> Response:
 @app.route('/admin/password/reset/<userid>')
 @admin_required
 def reset_password(userid: str) -> Response:
-    user = User.query.filter_by(id=userid).first()
+    user_store = app.ioc.user_store
+
+    user = user_store.fetch_one(userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')

@@ -7,7 +7,6 @@ from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
 from opwen_email_client.webapp.actions import UpdateCode
 from opwen_email_client.webapp.config import AppConfig
-from opwen_email_client.webapp.ioc import Ioc
 
 app = Celery(__name__, broker=AppConfig.CELERY_BROKER_URL)
 app.conf.beat_schedule_filename = AppConfig.CELERY_BEAT_SCHEDULE_FILENAME
@@ -28,10 +27,13 @@ def setup_periodic_tasks(sender, **kwargs):
 # noinspection PyUnusedLocal
 @app.task(ignore_result=True)
 def sync(*args, **kwargs):
+    from opwen_email_client.webapp import app as webapp
+
     sync_emails = SyncEmails(
         log=log,
-        email_sync=Ioc.email_sync,
-        email_store=Ioc.email_store,
+        email_sync=webapp.ioc.email_sync,
+        email_store=webapp.ioc.email_store,
+        user_store=webapp.ioc.user_store,
     )
 
     start_internet_connection = StartInternetConnection(

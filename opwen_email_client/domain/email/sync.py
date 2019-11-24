@@ -28,7 +28,7 @@ Download = namedtuple('Download', ('name', 'optional', 'type_'))
 
 class Sync(metaclass=ABCMeta):
     @abstractmethod
-    def upload(self, items: Iterable[T]) -> Iterable[str]:
+    def upload(self, items: Iterable[T], users: Iterable[T]) -> Iterable[str]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
@@ -39,6 +39,7 @@ class Sync(metaclass=ABCMeta):
 class AzureSync(Sync):
     _emails_file = 'emails.jsonl'
     _attachments_file = 'zattachments.jsonl'
+    _users_file = 'zzusers.jsonl'
 
     _download_files = (
         Download(name=_emails_file, optional=False, type_='email'),
@@ -162,12 +163,27 @@ class AzureSync(Sync):
 
         return uploaded_ids
 
-    def upload(self, items):
+    def _upload_users(self, users, archive):
+        if not users:
+            return
+
+        with self._workspace(self._users_file) as uploaded:
+            for user in users:
+                item = {'email': user.email, 'password': user.password}
+                serialized = self._serializer.serialize(item)
+                uploaded.write(serialized)
+                uploaded.write(b'\n')
+
+            uploaded.seek(0)
+            archive.add(uploaded.name, self._users_file)
+
+    def upload(self, items, users):
         upload_location = '{}.tar.{}'.format(uuid4(), self._compression)
 
         with self._workspace(upload_location) as workspace:
             with self._open(workspace.name, 'w') as archive:
                 uploaded_ids = self._upload_emails(items, archive)
+                self._upload_users(users, archive)
 
             if uploaded_ids:
                 workspace.seek(0)

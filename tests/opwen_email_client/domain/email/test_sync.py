@@ -71,23 +71,24 @@ class AzureSyncTests(TestCase):
         for compression in self._test_compressions:
             with self.subTest(compression=compression):
                 self.sync._compression = compression
-                self.sync.upload(items=[{'foo': 'bar'}])
+                self.sync.upload(items=[{'foo': 'bar'}], users=[])
 
                 self.assertUploadIs({self.sync._emails_file: b'{"foo":"bar"}\n'}, compression)
                 self.assertTrue(self.email_server_client_mock.upload.called)
 
     def test_upload_excludes_null_values(self):
-        self.sync.upload(items=[{'foo': 0, 'bar': None}])
+        self.sync.upload(items=[{'foo': 0, 'bar': None}], users=[])
 
         self.assertUploadIs({self.sync._emails_file: b'{"foo":0}\n'})
 
     def test_upload_excludes_internal_values(self):
-        self.sync.upload(items=[{'foo': 0, 'read': True, 'attachments': [{'_uid': '1', 'filename': 'foo.txt'}]}])
+        self.sync.upload(items=[{'foo': 0, 'read': True, 'attachments': [{'_uid': '1', 'filename': 'foo.txt'}]}],
+                         users=[])
 
         self.assertUploadIs({self.sync._emails_file: b'{"attachments":[{"filename":"foo.txt"}]' b',"foo":0}\n'})
 
     def test_upload_with_no_content_does_not_hit_network(self):
-        self.sync.upload(items=[])
+        self.sync.upload(items=[], users=[])
 
         self.assertNoUpload()
         self.assertFalse(self.email_server_client_mock.upload.called)

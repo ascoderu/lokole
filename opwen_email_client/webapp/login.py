@@ -2,32 +2,19 @@ from datetime import timedelta
 from typing import Optional
 
 from flask_migrate import Migrate
-from flask_security import LoginForm as _LoginForm
-from flask_security import RegisterForm as _RegisterForm
 from flask_security import RoleMixin
-from flask_security import Security
 from flask_security import SQLAlchemyUserDatastore
 from flask_security import UserMixin
-from flask_security import login_required as _login_required
-from flask_security import roles_required
-from flask_security.forms import email_required
-from flask_security.forms import email_validator
-from flask_security.forms import unique_user_email
 from flask_security.utils import hash_password
 from flask_sqlalchemy import SQLAlchemy
 from passlib.pwd import genword
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
-from wtforms import IntegerField
-from wtforms.validators import NoneOf
-from wtforms.validators import Regexp
 
-from opwen_email_client.util.wtforms import SuffixedStringField
-from opwen_email_client.webapp import app
+from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.webapp.config import AppConfig
-from opwen_email_client.webapp.config import i8n
 
-_db = SQLAlchemy(app)
+_db = SQLAlchemy()
 
 # noinspection PyUnresolvedReferences
 _roles_users = _db.Table(
@@ -38,7 +25,9 @@ _roles_users = _db.Table(
 
 
 # noinspection PyUnresolvedReferences
-class User(_db.Model, UserMixin):
+class _User(_db.Model, UserMixin):
+    __tablename__ = 'user'
+
     id = _db.Column(_db.Integer(), primary_key=True)
     email = _db.Column(_db.String(255), unique=True, index=True)
     password = _db.Column(_db.String(255), nullable=False)
@@ -50,14 +39,12 @@ class User(_db.Model, UserMixin):
     login_count = _db.Column(_db.Integer())
     timezone_offset_minutes = _db.Column(_db.Integer(), nullable=False, default=0)
     language = _db.Column(_db.String(8))
-    roles = _db.relationship('Role', secondary=_roles_users, backref=_db.backref('users', lazy='dynamic'))
+    roles = _db.relationship('_Role', secondary=_roles_users, backref=_db.backref('users', lazy='dynamic'))
+    synced = _db.Column(_db.Boolean(), default=False)
 
     @property
     def is_admin(self) -> bool:
-        return self.has_role('admin')
-
-    def make_admin(self):
-        user_datastore.add_role_to_user(self, admin_role)
+        return self.roles.filter_by(name=AppConfig.ADMIN_ROLE_NAME).first() is not None
 
     def reset_password(self, password: Optional[str] = None) -> str:
         new_password = password or genword()
@@ -86,64 +73,70 @@ class User(_db.Model, UserMixin):
 
 
 # noinspection PyUnresolvedReferences
-class Role(_db.Model, RoleMixin):
+class _Role(_db.Model, RoleMixin):
+    __tablename__ = 'role'
+
     id = _db.Column(_db.Integer(), primary_key=True)
     name = _db.Column(_db.String(32), unique=True)
     description = _db.Column(_db.String(255))
 
 
-# noinspection PyClassHasNoInit
-class LoginForm(_LoginForm):
-    email = SuffixedStringField(suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST))
+_migrate = Migrate()
 
 
-email_character_validator = Regexp('^[a-zA-Z0-9-.@]*$', message=i8n.EMAIL_CHARACTERS)
+class FlaskLoginUserStore(UserStore):
+    def __init__(self):
+        self.datastore = SQLAlchemyUserDatastore(_db, _User, _Role)
+        self.app = None
 
-forbidden_account_validator = NoneOf(AppConfig.FORBIDDEN_ACCOUNTS, message=i8n.FORBIDDEN_ACCOUNT)
+    def init_app(self, app):
+        self.app = app
+        self._init_datastore()
 
+    def _init_datastore(self):
+        with self.app.app_context():
+            _db.init_app(self.app)
+            _migrate.init_app(self.app, _db)
 
-# noinspection PyClassHasNoInit
-class RegisterForm(_RegisterForm):
-    email = SuffixedStringField(suffix='@{}'.format(AppConfig.CLIENT_EMAIL_HOST),
-                                validators=[
-                                    email_character_validator,
-                                    forbidden_account_validator,
-                                    email_required,
-                                    email_validator,
-                                    unique_user_email,
-                                ])
+            try:
+                _db.create_all()
+            except OperationalError:
+                pass
 
-    timezone_offset_minutes = IntegerField(default=0)
+            self.datastore.find_or_create_role(name=AppConfig.ADMIN_ROLE_NAME)
 
+            try:
+                self.datastore.commit()
+            except IntegrityError:
+                self.datastore.db.session.rollback()
 
-user_datastore = SQLAlchemyUserDatastore(_db, User, Role)
+    def fetch_one(self, userid):
+        with self.app.app_context():
+            return _User.query.filter_by(id=userid).first()
 
-try:
-    _db.create_all()
-except OperationalError:
-    pass
+    def fetch_all(self):
+        with self.app.app_context():
+            return _User.query.all()
 
-Migrate(app, _db)
-Security(app, user_datastore, register_form=RegisterForm, login_form=LoginForm)
+    def fetch_pending(self):
+        with self.app.app_context():
+            return _User.query.filter_by(synced=False).all()
 
-admin_role = 'admin'
-user_datastore.find_or_create_role(name=admin_role)
+    def mark_as_synced(self, users):
+        with self.app.app_context():
+            for user in users:
+                user.synced = True
+                _db.session.add(user)
+            _db.session.commit()
 
-try:
-    user_datastore.commit()
-except IntegrityError:
-    user_datastore.db.session.rollback()
+    def make_admin(self, user):
+        with self.app.app_context():
+            self.datastore.add_role_to_user(user, AppConfig.ADMIN_ROLE_NAME)
 
+    def create_if_not_exists(self, email):
+        with self.app.app_context():
+            user = self.datastore.find_user(email=email)
+            if user is None:
+                user = self.datastore.create_user(email=email, password='')  # nosec
 
-def login_required(func):
-    if AppConfig.TESTING:
-        return func
-
-    return _login_required(func)
-
-
-def admin_required(func):
-    if AppConfig.TESTING:
-        return func
-
-    return roles_required(admin_role)(func)
+            return user
