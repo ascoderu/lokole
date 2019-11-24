@@ -20,6 +20,7 @@ from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
+from opwen_email_server.integration.azure import get_user_storage
 from opwen_email_server.services.dns import SetupMxRecords
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
@@ -89,6 +90,7 @@ def written_store(resource_id: str) -> None:
     action = StoreWrittenClientEmails(
         client_storage=get_client_storage(),
         email_storage=get_email_storage(),
+        user_storage=get_user_storage(),
         next_task=_send_and_index,
     )
 

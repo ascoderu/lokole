@@ -202,6 +202,7 @@ class StoreWrittenClientEmailsTests(TestCase):
     def setUp(self):
         self.client_storage = Mock()
         self.email_storage = Mock()
+        self.user_storage = Mock()
         self.next_task = MagicMock()
 
     def test_200(self):
@@ -219,7 +220,10 @@ class StoreWrittenClientEmailsTests(TestCase):
     def _test_200(self, attachment_content_bytes, attachment_content_base64):
         resource_id = 'a2e3d5a7-cb3a-42c3-beeb-d6a2a76089dc'
         email_id = '0194bf59-fb01-479e-bd5e-a59e4b8464d0'
+        user_email = 'clemens@developer1.lokole.ca'
+        user_password = '$2b$12$9LaXqZMPJi0PiTY.95dIQOvc8LkYQzRlg5a9pDWX47L/npaYqynU2'
 
+        user = {'email': user_email, 'password': user_password}
         client_email = {'from': 'foo@test.com', '_uid': email_id}
         if attachment_content_base64:
             client_email['attachments'] = [{'filename': 'test.txt', 'content': attachment_content_base64}]
@@ -228,20 +232,23 @@ class StoreWrittenClientEmailsTests(TestCase):
         if attachment_content_bytes:
             server_email['attachments'][0]['content'] = attachment_content_bytes
 
-        self.client_storage.fetch_objects.return_value = [client_email]
+        self.client_storage.fetch_objects.side_effect = [[client_email], [user]]
 
         _, status = self._execute_action(resource_id)
 
         self.assertEqual(status, 200)
-        self.client_storage.fetch_objects.assert_called_once_with(resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
+        self.client_storage.fetch_objects.assert_any_call(resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
         self.email_storage.store_object.assert_called_once_with(email_id, server_email)
         self.next_task.assert_called_once_with(email_id)
+        self.client_storage.fetch_objects.assert_any_call(resource_id, (sync.USERS_FILE, from_jsonl_bytes))
+        self.user_storage.store_object.assert_called_once_with(user_email, user)
         self.client_storage.delete.assert_called_once_with(resource_id)
 
     def _execute_action(self, *args, **kwargs):
         action = actions.StoreWrittenClientEmails(
             client_storage=self.client_storage,
             email_storage=self.email_storage,
+            user_storage=self.user_storage,
             next_task=self.next_task,
         )
 

@@ -60,6 +60,18 @@ def get_email_storage() -> AzureObjectStorage:
 
 
 @singleton
+def get_user_storage() -> AzureObjectStorage:
+    return AzureObjectStorage(
+        account=config.TABLES_ACCOUNT,
+        key=config.TABLES_KEY,
+        host=config.TABLES_HOST,
+        secure=config.TABLES_SECURE,
+        container=constants.CONTAINER_USERS,
+        provider=config.STORAGE_PROVIDER,
+    )
+
+
+@singleton
 def get_mailbox_storage() -> AzureObjectStorage:
     return AzureObjectStorage(
         account=config.BLOBS_ACCOUNT,

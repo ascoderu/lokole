@@ -154,13 +154,21 @@ class IndexSentEmailForMailbox(_IndexEmailForMailbox):
 
 class StoreWrittenClientEmails(_Action):
     def __init__(self, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
-                 next_task: Callable[[str], None]):
+                 user_storage: AzureObjectStorage, next_task: Callable[[str], None]):
 
         self._client_storage = client_storage
         self._email_storage = email_storage
+        self._user_storage = user_storage
         self._next_task = next_task
 
     def _action(self, resource_id):  # type: ignore
+        self._store_emails(resource_id)
+        self._store_users(resource_id)
+        self._client_storage.delete(resource_id)
+
+        return 'OK', 200
+
+    def _store_emails(self, resource_id):
         emails = self._client_storage.fetch_objects(resource_id, (sync.EMAILS_FILE, from_jsonl_bytes))
 
         domain = ''
@@ -175,10 +183,21 @@ class StoreWrittenClientEmails(_Action):
             num_stored += 1
             domain = get_domain(email.get('from', ''))
 
-        self._client_storage.delete(resource_id)
-
         self.log_event(events.EMAIL_STORED_FROM_CLIENT, {'domain': domain, 'num_emails': num_stored})  # noqa: E501  # yapf: disable
-        return 'OK', 200
+
+    def _store_users(self, resource_id):
+        users = self._client_storage.fetch_objects(resource_id, (sync.USERS_FILE, from_jsonl_bytes))
+
+        domain = ''
+        num_stored = 0
+        for user in users:
+            email = user['email']
+            self._user_storage.store_object(email, user)
+
+            num_stored += 1
+            domain = email.split('@')[1]
+
+        self.log_event(events.USER_STORED_FROM_CLIENT, {'domain': domain, 'num_users': num_stored})  # noqa: E501  # yapf: disable
 
     @classmethod
     def _decode_attachments(cls, email: dict) -> dict:
