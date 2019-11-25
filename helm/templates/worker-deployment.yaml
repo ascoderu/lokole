@@ -1,18 +1,21 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: {{ .Release.Name }}-worker
+    app: {{ .Release.Name }}-worker
   name: {{ .Release.Name }}-worker
 spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-worker
   replicas: 1
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: {{ .Release.Name }}-worker
+        app: {{ .Release.Name }}-worker
     spec:
       containers:
       - name: worker

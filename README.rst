@@ -157,7 +157,7 @@ to initialize the required cloud resources.
     -e LOCATION={an azure location like eastus} \
     -e RESOURCE_GROUP_NAME={the name of the resource group to create or reuse} \
     -v ${PWD}/secrets:/secrets \
-    setup
+    setup ./setup.sh
 
 The secrets to access the Azure resources created by the setup script will be
 stored in files in the :code:`secrets` directory. Other parts of the

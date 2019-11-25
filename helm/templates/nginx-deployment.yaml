@@ -1,18 +1,21 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: {{ .Release.Name }}-nginx
+    app: {{ .Release.Name }}-nginx
   name: {{ .Release.Name }}-nginx
 spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-nginx
   replicas: 1
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: {{ .Release.Name }}-nginx
+        app: {{ .Release.Name }}-nginx
     spec:
       containers:
       - name: nginx
