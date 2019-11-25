@@ -2,7 +2,7 @@ version: '3.4'
 
 x-shared-app-environment:
   &shared-app-environment
-  LOKOLE_QUEUE_BROKER_URL: amqp://guest:guest@rabbitmq
+  LOKOLE_QUEUE_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq
   LOKOLE_QUEUE_BROKER_SCHEME: ${LOKOLE_QUEUE_BROKER_SCHEME}
   LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME: ${LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME}
   LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY: ${LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY}
@@ -49,7 +49,6 @@ services:
       - ${APP_PORT}:8888
     environment:
       DNS_RESOLVER: 127.0.0.11
-      HOSTNAME_FLOWER: flower:8080
       HOSTNAME_CLIENT_METRICS: api:8080
       HOSTNAME_CLIENT_READ: api:8080
       HOSTNAME_CLIENT_WRITE: api:8080
@@ -57,7 +56,6 @@ services:
       HOSTNAME_CLIENT_REGISTER: api:8080
     depends_on:
       - api
-      - flower
 
   api:
     <<: *shared-app-build
@@ -85,14 +83,6 @@ services:
       - azurite
       - rabbitmq
 
-  flower:
-    <<: *shared-app-build
-    command: ["/app/run-flower.sh"]
-    environment:
-      <<: *shared-app-environment
-      FLOWER_USERNAME: flower
-      FLOWER_PASSWORD: 123456
-
   setup:
     image: ${DOCKER_REPO}/opwenserver_setup:${BUILD_TAG}
     build:
@@ -113,6 +103,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
 
   appinsights:
     image: cwolff/appinsights-on-premises:0.1.2-postgres
@@ -137,6 +130,14 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
       - ${AZURITE_PORT}:10000
+
+  flower:
+    image: mher/flower:latest
+    depends_on:
+      - rabbitmq
+    command: ["--address=0.0.0.0", "--port=5555", "--broker=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq"]
+    ports:
+      - ${FLOWER_PORT}:5555
 
   pgweb:
     image: sosedoff/pgweb:latest
