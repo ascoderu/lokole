@@ -11,7 +11,7 @@ from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
 from opwen_email_server.services.auth import GithubBasicAuth
 from opwen_email_server.services.storage import AzureTextStorage
-from tests.opwen_email_server.services.utils import MockResponses
+from tests.opwen_email_server.helpers import MockResponses
 
 
 class AnyOfBasicAuthTests(TestCase):

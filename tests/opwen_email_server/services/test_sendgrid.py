@@ -11,7 +11,8 @@ from opwen_email_server.config import SENDGRID_KEY
 from opwen_email_server.services.sendgrid import DeleteSendgridMailbox
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
-from tests.opwen_email_server.services.utils import MockResponses
+from tests.opwen_email_server.helpers import MockResponses
+from tests.opwen_email_server.helpers import throw
 
 
 class SendgridEmailSenderTests(TestCase):
@@ -85,15 +86,11 @@ class SendgridEmailSenderTests(TestCase):
 
     @classmethod
     def given_response_status(cls, mock_build_opener, status, exception):
-        # noinspection PyUnusedLocal
-        def raise_exception(*args, **kargs):
-            raise exception
-
         mock_opener = Mock()
         mock_response = Mock()
         mock_build_opener.return_value = mock_opener
         if exception:
-            mock_opener.open.side_effect = raise_exception
+            mock_opener.open.side_effect = throw(exception)
         else:
             mock_opener.open.return_value = mock_response
             mock_response.getcode.return_value = status

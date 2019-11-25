@@ -12,6 +12,7 @@ from opwen_email_server.constants import sync
 from opwen_email_server.services.storage import AccessInfo
 from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_jsonl_bytes
+from tests.opwen_email_server.helpers import throw
 
 
 class ActionTests(TestCase):
@@ -87,13 +88,9 @@ class StoreInboundEmailsTests(TestCase):
         self.next_task = MagicMock()
 
     def test_202(self):
-        # noinspection PyUnusedLocal
-        def throw(*args, **kwargs):
-            raise ObjectDoesNotExistError(None, None, None)
-
         resource_id = 'eb93fde9-0cc6-4339-b7d6-f6e838e78f1c'
 
-        self.raw_email_storage.fetch_text.side_effect = throw
+        self.raw_email_storage.fetch_text.side_effect = throw(ObjectDoesNotExistError(None, None, None))
 
         _, status = self._execute_action(resource_id)
 

@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from libcloud.common.types import LibcloudError
 from libcloud.dns.base import DNSDriver
 from libcloud.dns.base import Zone
 from libcloud.dns.providers import get_driver
@@ -48,11 +49,14 @@ class DeleteMxRecords(_MxRecords):
 
 class SetupMxRecords(_MxRecords):
     def _run(self, client_name: str, zone: Zone) -> None:
-        self._driver.create_record(
-            zone=zone,
-            name=client_name,
-            type=RecordType.MX,
-            data=MX_RECORD,
-        )
-
-        self.log_debug('Set up MX records for client %s.%s', client_name, zone.domain)
+        try:
+            self._driver.create_record(
+                zone=zone,
+                name=client_name,
+                type=RecordType.MX,
+                data=MX_RECORD,
+            )
+        except LibcloudError:
+            self.log_debug('MX records for client %s.%s already exist', client_name, zone.domain)
+        else:
+            self.log_debug('Set up MX records for client %s.%s', client_name, zone.domain)

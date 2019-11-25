@@ -14,3 +14,11 @@ class MockResponses:
         self._i += 1
 
         return status, headers, body
+
+
+def throw(exception):
+    # noinspection PyUnusedLocal
+    def throws(*args, **kwargs):
+        raise exception
+
+    return throws

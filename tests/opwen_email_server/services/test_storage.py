@@ -26,6 +26,7 @@ from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_jsonl_bytes
 from opwen_email_server.utils.temporary import create_tempfilename
 from opwen_email_server.utils.temporary import removing
+from tests.opwen_email_server.helpers import throw
 
 
 class AzureTextStorageTests(TestCase):
@@ -66,12 +67,8 @@ class AzureTextStorageTests(TestCase):
 
                 return container
 
-            # noinspection PyUnusedLocal
-            def create_container(*args, **kwargs):
-                raise ContainerAlreadyExistsError(None, driver, self._container)
-
             driver.get_container.side_effect = get_container
-            driver.create_container.side_effect = create_container
+            driver.create_container.side_effect = throw(ContainerAlreadyExistsError(None, driver, self._container))
 
             self.assertIs(self._storage._client, container)
 

@@ -2,12 +2,14 @@ from unittest import TestCase
 from unittest.mock import PropertyMock
 from unittest.mock import patch
 
+from libcloud.common.types import LibcloudError
 from libcloud.dns.base import Record
 from libcloud.dns.types import RecordType
 from libcloud.dns.base import Zone
 
 from opwen_email_server.services.dns import DeleteMxRecords
 from opwen_email_server.services.dns import SetupMxRecords
+from tests.opwen_email_server.helpers import throw
 
 
 class DeleteMxRecordsTests(TestCase):
@@ -60,6 +62,21 @@ class SetupMxRecordsTests(TestCase):
                 Zone(id='1', domain='foo.com', type='master', ttl=1, driver=mock_driver),
                 Zone(id='2', domain='my-zone', type='master', ttl=1, driver=mock_driver),
             ]
+
+            action('my-domain.my-zone')
+
+            self.assertEqual(mock_driver.iterate_zones.call_count, 1)
+            self.assertEqual(mock_driver.create_record.call_count, 1)
+
+    def test_returns_when_record_already_exists(self):
+        action = SetupMxRecords('my-user', 'my-key', provider='CLOUDFLARE')
+
+        with patch.object(action, '_driver', new_callable=PropertyMock) as mock_driver:
+            mock_driver.iterate_zones.return_value = [
+                Zone(id='1', domain='foo.com', type='master', ttl=1, driver=mock_driver),
+                Zone(id='2', domain='my-zone', type='master', ttl=1, driver=mock_driver),
+            ]
+            mock_driver.create_record.side_effect = throw(LibcloudError(None, mock_driver))
 
             action('my-domain.my-zone')
 
