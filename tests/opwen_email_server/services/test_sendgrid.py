@@ -11,6 +11,7 @@ from opwen_email_server.config import SENDGRID_KEY
 from opwen_email_server.services.sendgrid import DeleteSendgridMailbox
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
+from tests.opwen_email_server.services.utils import MockResponses
 
 
 class SendgridEmailSenderTests(TestCase):
@@ -139,11 +140,55 @@ class SetupSendgridMailboxTests(TestCase):
 
     @mock_responses.activate
     def test_makes_request_when_key_is_set(self):
-        mock_responses.add(mock_responses.POST, 'https://api.sendgrid.com/v3/user/webhooks/parse/settings')
+        mock_responses.add(mock_responses.GET,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=404)
+        mock_responses.add(mock_responses.POST, 'https://api.sendgrid.com/v3/user/webhooks/parse/settings', status=200)
+
+        action = SetupSendgridMailbox('my-key')
+
+        action('my-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 2)
+        self.assertIn(b'"hostname": "my-domain"', mock_responses.calls[1].request.body)
+
+    @mock_responses.activate
+    def test_skips_request_when_domain_already_exists(self):
+        mock_responses.add(mock_responses.GET,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=200)
 
         action = SetupSendgridMailbox('my-key')
 
         action('my-client-id', 'my-domain')
 
         self.assertEqual(len(mock_responses.calls), 1)
-        self.assertIn(b'"hostname": "my-domain"', mock_responses.calls[0].request.body)
+
+    @mock_responses.activate
+    def test_retries_request_when_creation_failed(self):
+        mock_responses.add(mock_responses.GET,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=404)
+        mock_responses.add_callback(mock_responses.POST,
+                                    'https://api.sendgrid.com/v3/user/webhooks/parse/settings',
+                                    callback=MockResponses([(500, '', ''), (200, '', '')]))
+
+        action = SetupSendgridMailbox('my-key', max_retries=3, retry_interval_seconds=0.001)
+
+        action('my-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 4)
+
+    @mock_responses.activate
+    def test_fails_request_when_retry_limit_is_exceeded(self):
+        mock_responses.add(mock_responses.GET,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=404)
+        mock_responses.add_callback(mock_responses.POST,
+                                    'https://api.sendgrid.com/v3/user/webhooks/parse/settings',
+                                    callback=MockResponses([(500, '', '') for _ in range(5)]))
+
+        action = SetupSendgridMailbox('my-key', max_retries=3, retry_interval_seconds=0.001)
+
+        with self.assertRaises(Exception):
+            action('my-client-id', 'my-domain')

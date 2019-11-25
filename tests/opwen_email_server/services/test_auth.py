@@ -11,24 +11,7 @@ from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
 from opwen_email_server.services.auth import GithubBasicAuth
 from opwen_email_server.services.storage import AzureTextStorage
-
-
-class _MockResponses:
-    def __init__(self, responses):
-        self._i = 0
-        self._responses = responses
-
-    def __call__(self, *args, **kwargs):
-        try:
-            status, headers, body = self._responses[self._i]
-        except ValueError:
-            body = self._responses[self._i]
-            status = 200
-            headers = {}
-
-        self._i += 1
-
-        return status, headers, body
+from tests.opwen_email_server.services.utils import MockResponses
 
 
 class AnyOfBasicAuthTests(TestCase):
@@ -143,7 +126,7 @@ class GithubBasicAuthTests(TestCase):
         mock_responses.add_callback(
             mock_responses.POST,
             github.GRAPHQL_URL,
-            callback=_MockResponses([
+            callback=MockResponses([
                 '''{
                        "data": {
                            "organization": {
