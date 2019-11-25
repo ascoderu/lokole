@@ -1,4 +1,3 @@
-from functools import lru_cache
 from json import JSONDecodeError
 from typing import Callable
 from typing import Dict
@@ -12,7 +11,6 @@ from requests import post as http_post
 
 from opwen_email_server.constants import events
 from opwen_email_server.constants import github
-from opwen_email_server.constants.cache import AUTH_DOMAIN_CACHE_SIZE
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_json
@@ -164,7 +162,6 @@ class AzureAuth(LogMixin):
     def delete(self, client_id: str, domain: str) -> bool:
         self._storage.delete(domain)
         self._storage.delete(client_id)
-        self._domain_for_cached.cache_clear()
         return True
 
     def client_id_for(self, domain: str) -> Optional[str]:
@@ -184,14 +181,10 @@ class AzureAuth(LogMixin):
 
     def domain_for(self, client_id: str) -> Optional[str]:
         try:
-            domain = self._domain_for_cached(client_id)
+            domain = self._storage.fetch_text(client_id)
         except ObjectDoesNotExistError:
             self.log_debug('Unrecognized client %s', client_id)
             return None
         else:
             self.log_debug('Client %s has domain %s', client_id, domain)
             return domain
-
-    @lru_cache(maxsize=AUTH_DOMAIN_CACHE_SIZE)
-    def _domain_for_cached(self, client_id: str) -> str:
-        return self._storage.fetch_text(client_id)
