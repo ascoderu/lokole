@@ -16,9 +16,13 @@ client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
 # this simulates sendgrid delivering an email to the service
 http --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/${client_id}" \
+  "dkim={@sendgrid.com : pass}" \
+  "SPF=pass" \
   "email=@${email_to_receive}"
 
 # simulate delivery of the same email to the second mailbox
 http --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/${client_id}" \
+  "dkim={@sendgrid.com : pass}" \
+  "SPF=pass" \
   "email=@${email_to_receive}"
