@@ -1,9 +1,12 @@
+from itertools import count
 from mimetypes import guess_type
+from time import sleep
 from typing import Callable
 
 from cached_property import cached_property
 from python_http_client import BadRequestsError
 from requests import delete as http_delete
+from requests import get as http_get
 from requests import post as http_post
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
@@ -16,7 +19,7 @@ from sendgrid.helpers.mail import SandBoxMode
 
 from opwen_email_server.constants.sendgrid import INBOX_URL
 from opwen_email_server.constants.sendgrid import MAILBOX_CREATE_URL
-from opwen_email_server.constants.sendgrid import MAILBOX_DELETE_URL
+from opwen_email_server.constants.sendgrid import MAILBOX_DETAIL_URL
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import to_base64
 
@@ -139,7 +142,7 @@ class _SendgridManagement(LogMixin):
 class DeleteSendgridMailbox(_SendgridManagement):
     def _run(self, client_id: str, domain: str) -> None:
         http_delete(
-            url=MAILBOX_DELETE_URL.format(domain),
+            url=MAILBOX_DETAIL_URL.format(domain),
             headers={
                 'Authorization': f'Bearer {self._key}',
             },
@@ -149,18 +152,43 @@ class DeleteSendgridMailbox(_SendgridManagement):
 
 
 class SetupSendgridMailbox(_SendgridManagement):
-    def _run(self, client_id: str, domain: str) -> None:
-        http_post(
-            url=MAILBOX_CREATE_URL,
-            json={
-                'hostname': domain,
-                'url': INBOX_URL.format(client_id),
-                'spam_check': True,
-                'send_raw': True,
-            },
-            headers={
-                'Authorization': f'Bearer {self._key}',
-            },
-        ).raise_for_status()
+    def __init__(self, key: str, max_retries: int = 10, retry_interval_seconds: float = 1):
+        super().__init__(key)
+        self._max_retries = max_retries
+        self._retry_interval_seconds = retry_interval_seconds
 
-        self.log_debug('Set up mailbox for %s', domain)
+    def _run(self, client_id: str, domain: str) -> None:
+        for retry in count():
+            get_response = http_get(
+                url=MAILBOX_DETAIL_URL.format(domain),
+                headers={
+                    'Authorization': f'Bearer {self._key}',
+                },
+            )
+
+            if get_response.ok:
+                self.log_debug('Mailbox %s already exists', domain)
+                break
+
+            create_response = http_post(
+                url=MAILBOX_CREATE_URL,
+                json={
+                    'hostname': domain,
+                    'url': INBOX_URL.format(client_id),
+                    'spam_check': True,
+                    'send_raw': True,
+                },
+                headers={
+                    'Authorization': f'Bearer {self._key}',
+                },
+            )
+
+            if create_response.ok:
+                self.log_debug('Set up mailbox for %s', domain)
+                break
+
+            if retry > self._max_retries:
+                self.log_debug('Too many attempts to set up mailbox for %s', domain)
+                create_response.raise_for_status()
+
+            sleep(self._retry_interval_seconds)

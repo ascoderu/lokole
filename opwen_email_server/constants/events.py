@@ -1,6 +1,8 @@
 from typing_extensions import Final  # noqa: F401
 
 CLIENT_DELETED = 'client_deleted'  # type: Final
+CLIENT_FETCHED = 'client_fetched'  # type: Final
+CLIENT_CREATED = 'client_created'  # type: Final
 NEW_CLIENT_REGISTERED = 'new_client_registered'  # type: Final
 UNREGISTERED_CLIENT = 'unregistered_client'  # type: Final
 UNKNOWN_USER = 'unknown_user'  # type: Final

@@ -313,6 +313,23 @@ class RegisterClient(_Action):
         self._setup_mx_records = setup_mx_records
         self._client_id_source = client_id_source or new_client_id
 
+    def _action(self, domain, owner):  # type: ignore
+        client_id = self._client_id_source()
+
+        self._setup_mailbox(client_id, domain)
+        self._setup_mx_records(domain)
+        self._client_storage.ensure_exists()
+        self._auth.insert(client_id, domain, owner)
+
+        self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501  # yapf: disable
+        return 'OK', 200
+
+
+class CreateClient(_Action):
+    def __init__(self, auth: AzureAuth, task: Callable[[str, str], None]):
+        self._auth = auth
+        self._task = task
+
     def _action(self, client, **auth_args):  # type: ignore
         domain = client['domain']
         if not is_lowercase(domain):
@@ -320,15 +337,31 @@ class RegisterClient(_Action):
         if self._auth.client_id_for(domain) is not None:
             return 'client already exists', 409
 
-        client_id = self._client_id_source()
+        self._task(domain, auth_args.get('user'))
+
+        self.log_event(events.CLIENT_CREATED, {'domain': domain})  # noqa: E501  # yapf: disable
+        return 'accepted', 201
+
+
+class GetClient(_Action):
+    def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage):
+        self._auth = auth
+        self._client_storage = client_storage
+
+    def _action(self, domain, **auth_args):  # type: ignore
+        if not is_lowercase(domain):
+            return 'domain must be lowercase', 400
+
+        client_id = self._auth.client_id_for(domain)
+        if client_id is None:
+            return 'client does not exist', 404
+
+        if not self._auth.is_owner(domain, auth_args.get('user')):
+            return 'client does not belong to the user', 403
+
         access_info = self._client_storage.access_info()
 
-        self._setup_mailbox(client_id, domain)
-        self._setup_mx_records(domain)
-        self._client_storage.ensure_exists()
-        self._auth.insert(client_id, domain, auth_args.get('user'))
-
-        self.log_event(events.NEW_CLIENT_REGISTERED, {'domain': domain})  # noqa: E501  # yapf: disable
+        self.log_event(events.CLIENT_FETCHED, {'domain': domain})  # noqa: E501  # yapf: disable
         return {
             'client_id': client_id,
             'storage_account': access_info.account,

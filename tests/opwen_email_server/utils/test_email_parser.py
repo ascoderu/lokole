@@ -9,6 +9,7 @@ from unittest.mock import patch
 from responses import mock as mock_responses
 
 from opwen_email_server.utils import email_parser
+from tests.opwen_email_server.helpers import throw
 
 TEST_DATA_DIRECTORY = abspath(
     join(dirname(__file__), '..', '..', 'files', 'opwen_email_server', 'utils', 'test_email_parser'))
@@ -141,10 +142,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
     @mock_responses.activate
     @patch.object(email_parser, 'Image')
     def test_handles_exceptions_when_processing_image(self, mock_pil):
-        def throw():
-            raise IOError()
-
-        mock_pil.open.side_effect = throw
+        mock_pil.open.side_effect = throw(IOError())
         handled_errors = []
 
         def on_error(*args):
