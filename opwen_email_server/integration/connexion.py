@@ -1,21 +1,21 @@
 from opwen_email_server import config
 from opwen_email_server.actions import CalculatePendingEmailsMetric
+from opwen_email_server.actions import CreateClient
 from opwen_email_server.actions import DeleteClient
 from opwen_email_server.actions import DownloadClientEmails
+from opwen_email_server.actions import GetClient
 from opwen_email_server.actions import Ping
 from opwen_email_server.actions import ReceiveInboundEmail
-from opwen_email_server.actions import RegisterClient
 from opwen_email_server.actions import UploadClientEmails
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_deletion
-from opwen_email_server.integration.azure import get_mailbox_setup
 from opwen_email_server.integration.azure import get_mx_deletion
-from opwen_email_server.integration.azure import get_mx_setup
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.celery import inbound_store
+from opwen_email_server.integration.celery import register_client
 from opwen_email_server.integration.celery import written_store
 from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
@@ -39,11 +39,14 @@ client_read = DownloadClientEmails(
     pending_factory=get_pending_storage,
 )
 
-client_register = RegisterClient(
+client_create = CreateClient(
+    auth=get_auth(),
+    task=register_client.delay,
+)
+
+client_get = GetClient(
     auth=get_auth(),
     client_storage=get_client_storage(),
-    setup_mailbox=get_mailbox_setup(),
-    setup_mx_records=get_mx_setup(),
 )
 
 client_delete = DeleteClient(

@@ -11,19 +11,15 @@ paths:
   '/':
 
     post:
-      operationId: opwen_email_server.integration.connexion.client_register
+      operationId: opwen_email_server.integration.connexion.client_create
       summary: Endpoint where Lokole clients register themselves.
       consumes:
-        - application/json
-      produces:
         - application/json
       parameters:
         - $ref: '#/parameters/Client'
       responses:
-        200:
-          description: The client was successfully registered.
-          schema:
-            $ref: '#/definitions/RegisteredClient'
+        201:
+          description: The client registration has been accepted.
         400:
           description: The supplied client is malformed.
         409:
@@ -32,6 +28,28 @@ paths:
         - basic: []
 
   '/{domain}':
+
+    get:
+      operationId: opwen_email_server.integration.connexion.client_get
+      summary: Endpoint where Lokole clients can be looked up.
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/Domain'
+      responses:
+        200:
+          description: Information about the client.
+          schema:
+            $ref: '#/definitions/RegisteredClient'
+        400:
+          description: The supplied client is malformed.
+        403:
+          description: The client does not belong to the user.
+        404:
+          description: The supplied client does not exist.
+      security:
+        - basic: []
+
     delete:
       operationId: opwen_email_server.integration.connexion.client_delete
       summary: Endpoint where Lokole clients can be deleted.

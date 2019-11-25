@@ -456,6 +456,47 @@ class RegisterClientTests(TestCase):
         self.setup_mx_records = MagicMock()
         self.client_id_source = MagicMock()
 
+    def test_200(self):
+        client_id = '187ba644-4d46-49f6-a634-017d7f58e338'
+        client_storage_account = 'account'
+        client_storage_key = 'key'
+        client_storage_container = 'container'
+        domain = 'test.com'
+        user = 'user'
+
+        self.client_id_source.return_value = client_id
+        self.client_storage.access_info.return_value = AccessInfo(
+            account=client_storage_account,
+            key=client_storage_key,
+            container=client_storage_container,
+        )
+
+        _, status = self._execute_action(domain, user)
+
+        self.assertEqual(status, 200)
+        self.client_id_source.assert_called_once_with()
+        self.auth.insert.assert_called_with(client_id, domain, user)
+        self.assertEqual(self.client_storage.ensure_exists.call_count, 1)
+        self.setup_mailbox.assert_called_once_with(client_id, domain)
+        self.setup_mx_records.assert_called_once_with(domain)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.RegisterClient(
+            auth=self.auth,
+            client_storage=self.client_storage,
+            setup_mailbox=self.setup_mailbox,
+            setup_mx_records=self.setup_mx_records,
+            client_id_source=self.client_id_source,
+        )
+
+        return action(*args, **kwargs)
+
+
+class CreateClientTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.task = MagicMock()
+
     def test_400(self):
         domain = 'TEST.com'
         user = 'user'
@@ -476,6 +517,66 @@ class RegisterClientTests(TestCase):
         self.auth.client_id_for.assert_called_once_with(domain)
 
     def test_200(self):
+        domain = 'test.com'
+        user = 'user'
+
+        self.auth.client_id_for.return_value = None
+
+        _, status = self._execute_action({'domain': domain}, user=user)
+
+        self.assertEqual(status, 201)
+        self.auth.client_id_for.assert_called_once_with(domain)
+        self.task.assert_called_once_with(domain, user)
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.CreateClient(
+            auth=self.auth,
+            task=self.task,
+        )
+
+        return action(*args, **kwargs)
+
+
+class GetClientTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.client_storage = Mock()
+        self.setup_mailbox = MagicMock()
+        self.setup_mx_records = MagicMock()
+        self.client_id_source = MagicMock()
+
+    def test_400(self):
+        domain = 'TEST.com'
+        user = 'user'
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 400)
+
+    def test_404(self):
+        domain = 'test.com'
+        user = 'user'
+
+        self.auth.client_id_for.return_value = None
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 404)
+        self.auth.client_id_for.assert_called_once_with(domain)
+
+    def test_403(self):
+        domain = 'test.com'
+        user = 'user'
+        client_id = '187ba644-4d46-49f6-a634-017d7f58e338'
+
+        self.auth.client_id_for.return_value = client_id
+        self.auth.is_owner.return_value = False
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 403)
+
+    def test_200(self):
         client_id = '187ba644-4d46-49f6-a634-017d7f58e338'
         client_storage_account = 'account'
         client_storage_key = 'key'
@@ -483,33 +584,25 @@ class RegisterClientTests(TestCase):
         domain = 'test.com'
         user = 'user'
 
-        self.client_id_source.return_value = client_id
-        self.auth.client_id_for.return_value = None
+        self.auth.client_id_for.return_value = client_id
         self.client_storage.access_info.return_value = AccessInfo(
             account=client_storage_account,
             key=client_storage_key,
             container=client_storage_container,
         )
 
-        response = self._execute_action({'domain': domain}, user=user)
+        response = self._execute_action(domain, user=user)
 
         self.assertEqual(response['client_id'], client_id)
         self.assertEqual(response['storage_account'], client_storage_account)
         self.assertEqual(response['storage_key'], client_storage_key)
         self.assertEqual(response['resource_container'], client_storage_container)
         self.auth.client_id_for.assert_called_once_with(domain)
-        self.auth.insert.assert_called_with(client_id, domain, user)
-        self.assertEqual(self.client_storage.ensure_exists.call_count, 1)
-        self.setup_mailbox.assert_called_once_with(client_id, domain)
-        self.setup_mx_records.assert_called_once_with(domain)
 
     def _execute_action(self, *args, **kwargs):
-        action = actions.RegisterClient(
+        action = actions.GetClient(
             auth=self.auth,
             client_storage=self.client_storage,
-            setup_mailbox=self.setup_mailbox,
-            setup_mx_records=self.setup_mx_records,
-            client_id_source=self.client_id_source,
         )
 
         return action(*args, **kwargs)
