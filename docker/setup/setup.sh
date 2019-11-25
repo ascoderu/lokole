@@ -11,10 +11,10 @@
 ##   SP_TENANT
 ##   SUBSCRIPTION_ID
 ##   LOCATION
-##   RESOURCE_GROUP_NAME
 ##
 ## Optional environment variables:
 ##
+##   RESOURCE_GROUP_NAME
 ##   SERVICE_BUS_SKU
 ##   STORAGE_ACCOUNT_SKU
 ##
@@ -23,6 +23,7 @@
 ##   KUBERNETES_DOCKER_TAG
 ##   KUBERNETES_NODE_SKU
 ##   KUBERNETES_NODE_COUNT
+##   KUBERNETES_VERSION
 ##   LOKOLE_DNS_NAME
 ##
 
@@ -45,7 +46,6 @@ required_env "${scriptname}" "SP_PASSWORD"
 required_env "${scriptname}" "SP_TENANT"
 required_env "${scriptname}" "SUBSCRIPTION_ID"
 required_env "${scriptname}" "LOCATION"
-required_env "${scriptname}" "RESOURCE_GROUP_NAME"
 
 #
 # connect to azure
@@ -60,6 +60,8 @@ az configure --defaults location="${LOCATION}"
 # setup azure resources
 #
 if [[ "${DEPLOY_SERVICES}" != "no" ]]; then
+
+required_env "${scriptname}" "RESOURCE_GROUP_NAME"
 
 use_resource_group "${RESOURCE_GROUP_NAME}"
 
@@ -103,15 +105,15 @@ fi
 #
 if [[ "${DEPLOY_COMPUTE}" != "no" ]]; then
 
-if [[ -z "${KUBERNETES_RESOURCE_GROUP_NAME}" ]] || [[ -z "${KUBERNETES_NODE_COUNT}" ]] || [[ -z "${KUBERNETES_NODE_SKU}" ]]; then
-  log "Skipping production deployment to kubernetes since KUBERNETES_RESOURCE_GROUP_NAME, KUBERNETES_NODE_COUNT, or KUBERNETES_NODE_SKU are not set"
+if [[ -z "${KUBERNETES_RESOURCE_GROUP_NAME}" ]] || [[ -z "${KUBERNETES_NODE_COUNT}" ]] || [[ -z "${KUBERNETES_NODE_SKU}" ]] || [[ -z "${KUBERNETES_VERSION}" ]]; then
+  log "Skipping production deployment to kubernetes since KUBERNETES_RESOURCE_GROUP_NAME, KUBERNETES_NODE_COUNT, or KUBERNETES_NODE_SKU, or KUBERNETES_VERSION are not set"
   exit 0
 fi
 
 k8sname="opwencluster$(generate_identifier 8)"
 helmname="opwenserver$(generate_identifier 8)"
 
-log "Creating kubernetes cluster ${k8sname}"
+log "Creating kubernetes v${KUBERNETES_VERSION} cluster ${k8sname}"
 
 use_resource_group "${KUBERNETES_RESOURCE_GROUP_NAME}"
 
@@ -121,6 +123,7 @@ az provider register --wait --namespace Microsoft.Compute
 az provider register --wait --namespace Microsoft.ContainerService
 
 az aks create \
+  --kubernetes-version "${KUBERNETES_VERSION}" \
   --service-principal "${SP_APPID}" \
   --client-secret "${SP_PASSWORD}" \
   --name "${k8sname}" \
@@ -130,6 +133,45 @@ az aks create \
 
 az aks get-credentials --name "${k8sname}"
 
+log "Setting up helm in cluster ${k8sname}"
+
+kubectl apply -f- <<< "
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+"
+helm_init
+
+log "Setting up cert-manager v${CERT_MANAGER_VERSION} in cluster ${k8sname}"
+
+kubectl apply -f "https://raw.githubusercontent.com/jetstack/cert-manager/v${CERT_MANAGER_VERSION}/deploy/manifests/00-crds.yaml"
+kubectl create namespace cert-manager
+kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+helm install --name cert-manager --namespace cert-manager --version "v${CERT_MANAGER_VERSION}" jetstack/cert-manager --wait
+
+log "Setting up nginx-ingress in cluster ${k8sname}"
+
+helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo update
+helm install --name nginx-ingress --version "${NGINX_INGRESS_VERSION}" nginx-stable/nginx-ingress --set controller.replicaCount=3
+
 log "Setting up kubernetes secrets for ${k8sname}"
 
 kubectl create secret generic "azure" --from-env-file "/secrets/azure.env"
@@ -137,10 +179,7 @@ kubectl create secret generic "cloudflare" --from-env-file "/secrets/cloudflare.
 kubectl create secret generic "users" --from-env-file "/secrets/users.env"
 kubectl create secret generic "sendgrid" --from-env-file "/secrets/sendgrid.env"
 
-log "Setting up helm chart in cluster ${k8sname}"
-
-helm init --wait
-helm dependency update "${scriptdir}/helm"
+log "Installing application in ${k8sname}"
 
 k8simageregistry="${KUBERNETES_IMAGE_REGISTRY:-ascoderu}"
 k8sdockertag="${KUBERNETES_DOCKER_TAG:-latest}"
@@ -159,7 +198,7 @@ while :; do
 done
 
 while :; do
-  ingressip="$(kubectl get service --selector app=nginx-ingress,component=controller --output jsonpath={..ip})"
+  ingressip="$(kubectl get service --selector app.kubernetes.io/instance=nginx-ingress --output jsonpath={..ip})"
   if [[ -z "${ingressip}" ]]; then log "Waiting for ${k8sname} public IP"; sleep 30s; else break; fi
 done
 
@@ -193,6 +232,8 @@ else
     -d '{"type":"A","name":"'"${lokole_dns_name}"'","content":"'"${ingressip}"'","ttl":1,"proxied":false}'
 fi
 
+./renew-cert.sh
+
 cat > /secrets/kubedeployment.env << EOF
 RESOURCE_GROUP=${KUBERNETES_RESOURCE_GROUP_NAME}
 HELM_NAME=${helmname}
@@ -207,7 +248,7 @@ fi
 
 storage_account="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME')"
 storage_key="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY')"
-container_name="secrets"
+container_name="secrets-${k8sname}"
 
 log "Backing up secrets to ${storage_account}/${container_name}"
 

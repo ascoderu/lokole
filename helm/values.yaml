@@ -13,15 +13,6 @@ worker:
 logging:
   level: WARNING
 
-nginx-ingress:
-  rbac:
-    create: false
-    createRole: false
-    createClusterRole: false
-  controller:
-    replicaCount: 3
-
-kube-lego:
-  config:
-    LEGO_EMAIL: ascoderu.opwen@gmail.com
-    LEGO_URL: https://acme-v01.api.letsencrypt.org/directory
+letsencrypt:
+  email: ascoderu.opwen@gmail.com
+  url: https://acme-v02.api.letsencrypt.org/directory

@@ -1,15 +1,15 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
-    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/cluster-issuer: {{ .Release.Name }}-cluster-issuer
 spec:
   tls:
   - hosts:
     - {{.Values.domain}}
-    secretName: lego-secret
+    secretName: {{ .Release.Name }}-tls-secret
   rules:
   - host: {{.Values.domain}}
     http:

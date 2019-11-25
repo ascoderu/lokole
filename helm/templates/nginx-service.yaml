@@ -3,7 +3,7 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: {{ .Release.Name }}-nginx
+    app: {{ .Release.Name }}-nginx
   name: {{ .Release.Name }}-nginx
 spec:
   ports:
@@ -11,6 +11,6 @@ spec:
     port: 8888
     targetPort: 8888
   selector:
-    io.kompose.service: {{ .Release.Name }}-nginx
+    app: {{ .Release.Name }}-nginx
 status:
   loadBalancer: {}

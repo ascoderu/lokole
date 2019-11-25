@@ -16,17 +16,20 @@ scriptname="${BASH_SOURCE[0]}"
 required_file "${scriptname}" "/secrets/kube-config"
 
 #
-# delete kube-lego pod: the pod will be automatically re-created which will
+# delete cert-manager pod: the pod will be automatically re-created which will
 # force a refresh of the https certificate if required
 #
 
 export KUBECONFIG="/secrets/kube-config"
 
-log "Looking up current kube-lego pods"
-kubectl get pod -l app=kube-lego
+log "Looking up current cert-manager pods"
+kubectl get pod -l certmanager.k8s.io/acme-http01-solver=true
+kubectl get pod -n cert-manager
 
-log "Re-creating kube-lego pod"
-kubectl delete pod -l app=kube-lego
+log "Re-creating cert-manager pod"
+kubectl delete pod -l certmanager.k8s.io/acme-http01-solver=true
+kubectl delete pod -n cert-manager -l app=cert-manager
 
-log "Looking up new kube-lego pods"
-kubectl get pod -l app=kube-lego
+log "Looking up new cert-manager pods"
+kubectl get pod -l certmanager.k8s.io/acme-http01-solver=true
+kubectl get pod -n cert-manager

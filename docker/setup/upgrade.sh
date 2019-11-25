@@ -34,9 +34,7 @@ log "Upgrading helm deployment ${HELM_NAME}"
 
 export KUBECONFIG="/secrets/kube-config"
 
-helm init --client-only --wait
-
-helm dependency update "${scriptdir}/helm"
+helm_init
 
 helm upgrade "${HELM_NAME}" \
   --set domain="${LOKOLE_DNS_NAME}" \

@@ -69,3 +69,7 @@ use_resource_group() {
 
   az configure --defaults group="${name}"
 }
+
+helm_init() {
+  helm init --history-max 200 --service-account tiller --node-selectors "beta.kubernetes.io/os=linux" --wait
+}
