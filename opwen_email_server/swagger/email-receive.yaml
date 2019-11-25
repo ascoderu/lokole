@@ -17,7 +17,19 @@ paths:
         - multipart/form-data
       parameters:
         - $ref: '#/parameters/ClientId'
-        - $ref: '#/parameters/MimeEmail'
+        - $ref: '#/parameters/SendgridEmail'
+        - $ref: '#/parameters/SendgridDkim'
+        - $ref: '#/parameters/SendgridTo'
+        - $ref: '#/parameters/SendgridCc'
+        - $ref: '#/parameters/SendgridFrom'
+        - $ref: '#/parameters/SendgridText'
+        - $ref: '#/parameters/SendgridSenderIp'
+        - $ref: '#/parameters/SendgridSpamReport'
+        - $ref: '#/parameters/SendgridEnvelope'
+        - $ref: '#/parameters/SendgridSubject'
+        - $ref: '#/parameters/SendgridSpamScore'
+        - $ref: '#/parameters/SendgridCharsets'
+        - $ref: '#/parameters/SendgridSpf'
       responses:
         200:
           description: The email was successfully received. No need to retry it.
@@ -33,9 +45,93 @@ parameters:
     type: string
     required: true
 
-  MimeEmail:
+  SendgridEmail:
     name: email
-    description: Email represented as a MIME string.
+    description: A string containing the email headers, date, body, and attachments.
     in: formData
     type: string
     required: true
+
+  SendgridDkim:
+    name: dkim
+    description: A string containing the verification results of any DKIM and domain keys signatures in the message.
+    in: formData
+    type: string
+    required: false
+
+  SendgridTo:
+    name: to
+    description: Email recipient field as taken from the message headers.
+    in: formData
+    type: string
+    required: false
+
+  SendgridCc:
+    name: cc
+    description: Email cc field, as taken from the message headers.
+    in: formData
+    type: string
+    required: false
+
+  SendgridFrom:
+    name: from
+    description: Email sender, as taken from the message headers.
+    in: formData
+    type: string
+    required: false
+
+  SendgridText:
+    name: text
+    description: Email body in plaintext formatting.
+    in: formData
+    type: string
+    required: false
+
+  SendgridSenderIp:
+    name: sender_ip
+    description: Email sender IP address.
+    in: formData
+    type: string
+    required: false
+
+  SendgridSpamReport:
+    name: spam_report
+    description: Spam Assassin's spam report.
+    in: formData
+    type: string
+    required: false
+
+  SendgridEnvelope:
+    name: envelope
+    description: A string containing the SMTP envelope. This will have 2 variables; to, which is an single-element array containing the addresses that received the email, and from, which is the return path for the message.
+    in: formData
+    type: string
+    required: false
+
+  SendgridSubject:
+    name: subject
+    description: Email subject.
+    in: formData
+    type: string
+    required: false
+
+  SendgridSpamScore:
+    name: spam_score
+    description: Spam Assassin's rating for whether or not this is spam.
+    in: formData
+    type: string
+    required: false
+
+  SendgridCharsets:
+    name: charsets
+    description: A string containing the character sets of the fields extracted from the message.
+    in: formData
+    type: string
+    required: false
+
+  SendgridSpf:
+    name: SPF
+    description: The results of the Sender Policy Framework verification of the message sender and receiving IP address.
+    in: formData
+    type: string
+    required: false
