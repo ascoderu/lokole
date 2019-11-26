@@ -27,16 +27,6 @@ spec:
         - name: SERVER_WORKERS
           value: "{{.Values.server.serverWorkers}}"
         {{ include "opwen.environment.shared" . }}
-        - name: LOKOLE_CLOUDFLARE_USER
-          valueFrom:
-            secretKeyRef:
-              name: cloudflare
-              key: LOKOLE_CLOUDFLARE_USER
-        - name: LOKOLE_CLOUDFLARE_KEY
-          valueFrom:
-            secretKeyRef:
-              name: cloudflare
-              key: LOKOLE_CLOUDFLARE_KEY
         - name: REGISTRATION_USERNAME
           valueFrom:
             secretKeyRef:
