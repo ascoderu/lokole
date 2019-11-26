@@ -44,6 +44,27 @@ class DeleteMxRecordsTests(TestCase):
             self.assertEqual(mock_driver.iterate_records.call_count, 1)
             self.assertEqual(mock_driver.delete_record.call_count, 1)
 
+    def test_handles_missing_record(self):
+        action = DeleteMxRecords('my-user', 'my-key', provider='CLOUDFLARE')
+
+        with patch.object(action, '_driver', new_callable=PropertyMock) as mock_driver:
+            zones = [
+                Zone(id='2', domain='my-zone', type='master', ttl=1, driver=mock_driver),
+            ]
+
+            records = [
+                Record(id='1', name='bar', type=RecordType.A, data='', zone=zones[0], ttl=1, driver=mock_driver),
+            ]
+
+            mock_driver.iterate_zones.return_value = zones
+            mock_driver.iterate_records.return_value = records
+
+            action('my-domain.my-zone')
+
+            self.assertEqual(mock_driver.iterate_zones.call_count, 1)
+            self.assertEqual(mock_driver.iterate_records.call_count, 1)
+            self.assertEqual(mock_driver.delete_record.call_count, 0)
+
 
 class SetupMxRecordsTests(TestCase):
     def test_does_not_make_request_when_key_is_missing(self):
