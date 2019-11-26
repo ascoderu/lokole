@@ -36,6 +36,16 @@
             secretKeyRef:
               name: azure
               key: LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY
+        - name: LOKOLE_CLOUDFLARE_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare
+              key: LOKOLE_CLOUDFLARE_USER
+        - name: LOKOLE_CLOUDFLARE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare
+              key: LOKOLE_CLOUDFLARE_KEY
         - name: LOKOLE_SENDGRID_KEY
           valueFrom:
             secretKeyRef:
