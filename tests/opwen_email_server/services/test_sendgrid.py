@@ -125,6 +125,31 @@ class DeleteSendgridMailboxTests(TestCase):
 
         self.assertEqual(len(mock_responses.calls), 1)
 
+    @mock_responses.activate
+    def test_handles_missing_mailbox(self):
+        mock_responses.add(mock_responses.DELETE,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=404)
+
+        action = DeleteSendgridMailbox('my-key')
+
+        action('my-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 1)
+
+    @mock_responses.activate
+    def test_throws_on_errors(self):
+        mock_responses.add(mock_responses.DELETE,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=500)
+
+        action = DeleteSendgridMailbox('my-key')
+
+        with self.assertRaises(Exception):
+            action('my-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 1)
+
 
 class SetupSendgridMailboxTests(TestCase):
     def test_does_not_make_request_when_key_is_missing(self):

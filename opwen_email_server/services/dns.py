@@ -40,11 +40,13 @@ class _MxRecords(LogMixin):
 
 class DeleteMxRecords(_MxRecords):
     def _run(self, client_name: str, zone: Zone) -> None:
-        record = next(record for record in self._driver.iterate_records(zone) if record.name == client_name)
-
-        self._driver.delete_record(record)
-
-        self.log_debug('Deleted MX records for client %s.%s', client_name, zone.domain)
+        try:
+            record = next(record for record in self._driver.iterate_records(zone) if record.name == client_name)
+        except StopIteration:
+            self.log_debug('No MX records for client %s.%s exist', client_name, zone.domain)
+        else:
+            self._driver.delete_record(record)
+            self.log_debug('Deleted MX records for client %s.%s', client_name, zone.domain)
 
 
 class SetupMxRecords(_MxRecords):

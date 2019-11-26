@@ -141,12 +141,15 @@ class _SendgridManagement(LogMixin):
 
 class DeleteSendgridMailbox(_SendgridManagement):
     def _run(self, client_id: str, domain: str) -> None:
-        http_delete(
+        response = http_delete(
             url=MAILBOX_DETAIL_URL.format(domain),
             headers={
                 'Authorization': f'Bearer {self._key}',
             },
-        ).raise_for_status()
+        )
+
+        if not response.ok and response.status_code != 404:
+            response.raise_for_status()
 
         self.log_debug('Deleted mailbox for %s', domain)
 
