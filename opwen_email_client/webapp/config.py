@@ -65,7 +65,6 @@ class AppConfig(object):
     CELERY_BROKER_URL = env('CELERY_BROKER_URL', 'sqlalchemy+sqlite:///' + CELERY_SQLITE_PATH)
     CELERY_BEAT_SCHEDULE_FILENAME = path.join(STATE_BASEDIR, 'celery.cron')
 
-    ADMIN_ROLE_NAME = 'admin'
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'  # nosec
     SECURITY_PASSWORD_SINGLE_HASH = True

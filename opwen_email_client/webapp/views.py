@@ -25,7 +25,6 @@ from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm
 from opwen_email_client.webapp.forms.settings import SettingsForm
-from opwen_email_client.webapp.security import admin_required
 from opwen_email_client.webapp.security import login_required
 from opwen_email_client.webapp.session import Session
 from opwen_email_client.webapp.session import track_history
@@ -209,8 +208,10 @@ def logout_complete() -> Response:
 
 
 @app.route('/admin/sync')
-@admin_required
 def sync() -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     tasks.sync.delay()
 
     flash(i8n.SYNC_RUNNING, category='success')
@@ -219,8 +220,10 @@ def sync() -> Response:
 
 @app.route('/admin/update', defaults={'version': None})
 @app.route('/admin/update/<version>')
-@admin_required
 def update(version: Optional[str]) -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     tasks.update.delay(version=version)
 
     flash(i8n.UPDATE_RUNNING, category='success')
@@ -246,9 +249,11 @@ def users() -> Response:
 
 
 @app.route('/admin/settings', methods=['GET', 'POST'])
-@admin_required
 @track_history
 def settings() -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     email_store = app.ioc.email_store
 
     form = SettingsForm()
@@ -261,8 +266,10 @@ def settings() -> Response:
 
 
 @app.route('/admin/suspend/<userid>')
-@admin_required
 def suspend(userid: str) -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     user_store = app.ioc.user_store
 
     user = user_store.fetch_one(userid)
@@ -283,8 +290,10 @@ def suspend(userid: str) -> Response:
 
 
 @app.route('/admin/unsuspend/<userid>')
-@admin_required
 def unsuspend(userid: str) -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     user_store = app.ioc.user_store
 
     user = user_store.fetch_one(userid)
@@ -301,8 +310,10 @@ def unsuspend(userid: str) -> Response:
 
 
 @app.route('/admin/promote/<userid>')
-@admin_required
 def promote(userid: str) -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     user_store = app.ioc.user_store
 
     user = user_store.fetch_one(userid)
@@ -323,8 +334,10 @@ def promote(userid: str) -> Response:
 
 
 @app.route('/admin/password/reset/<userid>')
-@admin_required
 def reset_password(userid: str) -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
     user_store = app.ioc.user_store
 
     user = user_store.fetch_one(userid)

@@ -8,11 +8,9 @@ from flask_security import UserMixin
 from flask_security.utils import hash_password
 from flask_sqlalchemy import SQLAlchemy
 from passlib.pwd import genword
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import OperationalError
 
 from opwen_email_client.domain.email.user_store import UserStore
-from opwen_email_client.webapp.config import AppConfig
 
 _db = SQLAlchemy()
 
@@ -41,10 +39,7 @@ class _User(_db.Model, UserMixin):
     language = _db.Column(_db.String(8))
     roles = _db.relationship('_Role', secondary=_roles_users, backref=_db.backref('users', lazy='dynamic'))
     synced = _db.Column(_db.Boolean(), default=False)
-
-    @property
-    def is_admin(self) -> bool:
-        return self.roles.filter_by(name=AppConfig.ADMIN_ROLE_NAME).first() is not None
+    is_admin = _db.Column(_db.Boolean(), default=False)
 
     def reset_password(self, password: Optional[str] = None) -> str:
         new_password = password or genword()
@@ -103,13 +98,6 @@ class FlaskLoginUserStore(UserStore):
             except OperationalError:
                 pass
 
-            self.datastore.find_or_create_role(name=AppConfig.ADMIN_ROLE_NAME)
-
-            try:
-                self.datastore.commit()
-            except IntegrityError:
-                self.datastore.db.session.rollback()
-
     def fetch_one(self, userid):
         with self.app.app_context():
             return _User.query.filter_by(id=userid).first()
@@ -131,7 +119,8 @@ class FlaskLoginUserStore(UserStore):
 
     def make_admin(self, user):
         with self.app.app_context():
-            self.datastore.add_role_to_user(user, AppConfig.ADMIN_ROLE_NAME)
+            user.is_admin = True
+            user.save()
 
     def create_if_not_exists(self, email):
         with self.app.app_context():

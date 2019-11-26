@@ -22,6 +22,7 @@ from subprocess import run  # nosec
 from sys import executable as current_python_binary
 from sys import version_info
 from tempfile import gettempdir
+from time import sleep
 from time import time
 from urllib.error import HTTPError
 from urllib.request import Request
@@ -86,7 +87,8 @@ class Setup:
                .format(group=group, user=self.user))
 
     def _install_dependencies(self):
-        sh('apt-get install -y {}'.format(' '.join(self.packages)))
+        if self.packages:
+            sh('apt-get install -y {}'.format(' '.join(self.packages)))
 
     def _run(self):
         raise NotImplementedError
@@ -358,38 +360,58 @@ class ModemSetup(Setup):
 
 class ClientSetup(Setup):
     def _run(self):
-        request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
         request_auth = b64encode(self.args.registration_credentials.encode('ascii')).decode('ascii')
 
-        request = Request(self.registration_url)
-        request.add_header('Content-Type', 'application/json; charset=utf-8')
-        request.add_header('Content-Length', len(request_payload))
-        request.add_header('Authorization', 'Basic {}'.format(request_auth))
+        create_request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
+        create_request = Request(self.client_url_create)
+        create_request.add_header('Content-Type', 'application/json; charset=utf-8')
+        create_request.add_header('Content-Length', len(create_request_payload))
+        create_request.add_header('Authorization', 'Basic {}'.format(request_auth))
 
         try:
-            with urlopen(request, request_payload) as response:  # nosec
-                response_body = response.read().decode('utf-8')
+            with urlopen(create_request, create_request_payload):  # nosec
+                pass
         except HTTPError as ex:
             self.abort('Unable to register client {client_name}: [{status_code}] {message}'.format(
                 client_name=self.args.client_name,
                 status_code=ex.code,
                 message=ex.read().decode('utf-8').strip()))
-        else:
-            client_info = loads(response_body)
-            return {
-                'OPWEN_CLIENT_ID': client_info['client_id'],
-                'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
-                'OPWEN_REMOTE_ACCOUNT_KEY': client_info['storage_key'],
-                'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
-            }
+
+        while True:
+            get_request = Request(self.client_url_details)
+            get_request.add_header('Authorization', 'Basic {}'.format(request_auth))
+            try:
+                with urlopen(get_request) as response:  # nosec
+                    response_body = response.read().decode('utf-8')
+            except HTTPError as ex:
+                if ex.code != 404:
+                    self.abort('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
+                        client_name=self.args.client_name,
+                        status_code=ex.code,
+                        message=ex.read().decode('utf-8').strip()))
+                sleep(2)
+            else:
+                client_info = loads(response_body)
+                break
+
+        return {
+            'OPWEN_CLIENT_ID': client_info['client_id'],
+            'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
+            'OPWEN_REMOTE_ACCOUNT_KEY': client_info['storage_key'],
+            'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
+        }
 
     @property
     def client_domain(self):
         return '{}.{}'.format(self.args.client_name, self.args.client_domain)
 
     @property
-    def registration_url(self):
+    def client_url_create(self):
         return 'https://{}/api/email/register/'.format(self.args.server_host)
+
+    @property
+    def client_url_details(self):
+        return 'https://{}/api/email/register/{}'.format(self.args.server_host, self.client_domain)
 
     @property
     def is_enabled(self):
