@@ -1,5 +1,6 @@
 from celery import Celery
 
+from opwen_email_server import config
 from opwen_email_server.actions import IndexReceivedEmailForMailbox
 from opwen_email_server.actions import IndexSentEmailForMailbox
 from opwen_email_server.actions import RegisterClient
@@ -15,13 +16,13 @@ from opwen_email_server.constants.queues import SEND_QUEUE
 from opwen_email_server.constants.queues import WRITTEN_STORE_QUEUE
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
-from opwen_email_server.integration.azure import get_email_sender
 from opwen_email_server.integration.azure import get_email_storage
-from opwen_email_server.integration.azure import get_mailbox_setup
 from opwen_email_server.integration.azure import get_mailbox_storage
-from opwen_email_server.integration.azure import get_mx_setup
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
+from opwen_email_server.services.dns import SetupMxRecords
+from opwen_email_server.services.sendgrid import SendSendgridEmail
+from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 
 celery = Celery(broker=QUEUE_BROKER)
 
@@ -31,8 +32,12 @@ def register_client(domain: str, owner: str) -> None:
     action = RegisterClient(
         auth=get_auth(),
         client_storage=get_client_storage(),
-        setup_mailbox=get_mailbox_setup(),
-        setup_mx_records=get_mx_setup(),
+        setup_mailbox=SetupSendgridMailbox(key=config.SENDGRID_KEY),
+        setup_mx_records=SetupMxRecords(
+            account=config.DNS_ACCOUNT,
+            secret=config.DNS_SECRET,
+            provider=config.DNS_PROVIDER,
+        ),
     )
 
     action(domain, owner)
@@ -90,7 +95,7 @@ def written_store(resource_id: str) -> None:
 def send(resource_id: str) -> None:
     action = SendOutboundEmails(
         email_storage=get_email_storage(),
-        send_email=get_email_sender(),
+        send_email=SendSendgridEmail(key=config.SENDGRID_KEY),
     )
 
     action(resource_id)
