@@ -10,8 +10,6 @@ from opwen_email_server.actions import UploadClientEmails
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
-from opwen_email_server.integration.azure import get_mailbox_deletion
-from opwen_email_server.integration.azure import get_mx_deletion
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.celery import inbound_store
@@ -20,6 +18,8 @@ from opwen_email_server.integration.celery import written_store
 from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
 from opwen_email_server.services.auth import GithubBasicAuth
+from opwen_email_server.services.dns import DeleteMxRecords
+from opwen_email_server.services.sendgrid import DeleteSendgridMailbox
 
 email_receive = ReceiveInboundEmail(
     auth=get_auth(),
@@ -51,8 +51,12 @@ client_get = GetClient(
 
 client_delete = DeleteClient(
     auth=get_auth(),
-    delete_mailbox=get_mailbox_deletion(),
-    delete_mx_records=get_mx_deletion(),
+    delete_mailbox=DeleteSendgridMailbox(key=config.SENDGRID_KEY),
+    delete_mx_records=DeleteMxRecords(
+        account=config.DNS_ACCOUNT,
+        secret=config.DNS_SECRET,
+        provider=config.DNS_PROVIDER,
+    ),
 )
 
 metrics_pending = CalculatePendingEmailsMetric(
