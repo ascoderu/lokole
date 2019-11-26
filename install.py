@@ -2,7 +2,6 @@
 """Script to set up a Debian Linux based system as a Lokole client."""
 from argparse import ArgumentParser
 from base64 import b64encode
-from datetime import datetime
 from json import dumps
 from json import loads
 from logging import getLogger
@@ -65,9 +64,13 @@ class Setup:
         return Path('/') / 'home' / self.user
 
     def __call__(self):
-        if self.__is_complete:
+        try:
+            result = self.__is_complete()
+        except FileNotFoundError:
+            pass
+        else:
             LOG.info('Skipping %s: already completed', self._step_name)
-            return
+            return result
 
         if not self.is_enabled:
             LOG.info('Skipping %s: not enabled', self._step_name)
@@ -76,7 +79,7 @@ class Setup:
         self._grant_permissions()
         self._install_dependencies()
         result = self._run()
-        self.__mark_complete()
+        self.__mark_complete(result)
 
         LOG.info('Done with %s', self._step_name)
         return result
@@ -102,12 +105,11 @@ class Setup:
         guard_name = '{}.done'.format(self._step_name)
         return self.abspath(TEMP_ROOT / guard_name)
 
-    @property
     def __is_complete(self):
-        return Path(self.__guard_path).is_file()
+        return loads(Path(self.__guard_path).read_text(encoding='utf-8'))
 
-    def __mark_complete(self):
-        self.write_file(self.__guard_path, str(datetime.now()))
+    def __mark_complete(self, result):
+        self.write_file(self.__guard_path, dumps(result))
 
     def assume_ownership(self, path):
         chown(path, self.user, self.user)
