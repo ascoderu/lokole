@@ -32,7 +32,11 @@ def register_client(domain: str, owner: str) -> None:
     action = RegisterClient(
         auth=get_auth(),
         client_storage=get_client_storage(),
-        setup_mailbox=SetupSendgridMailbox(key=config.SENDGRID_KEY),
+        setup_mailbox=SetupSendgridMailbox(
+            key=config.SENDGRID_KEY,
+            max_retries=config.SENDGRID_MAX_RETRIES,
+            retry_interval_seconds=config.SENDGRID_RETRY_INTERVAL_SECONDS,
+        ),
         setup_mx_records=SetupMxRecords(
             account=config.DNS_ACCOUNT,
             secret=config.DNS_SECRET,

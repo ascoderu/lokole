@@ -155,7 +155,7 @@ class DeleteSendgridMailbox(_SendgridManagement):
 
 
 class SetupSendgridMailbox(_SendgridManagement):
-    def __init__(self, key: str, max_retries: int = 10, retry_interval_seconds: float = 1):
+    def __init__(self, key: str, max_retries: int, retry_interval_seconds: float):
         super().__init__(key)
         self._max_retries = max_retries
         self._retry_interval_seconds = retry_interval_seconds
