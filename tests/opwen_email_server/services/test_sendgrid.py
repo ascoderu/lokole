@@ -108,7 +108,7 @@ class LiveSendgridEmailSenderTests(SendgridEmailSenderTests):
 
 class DeleteSendgridMailboxTests(TestCase):
     def test_does_not_make_request_when_key_is_missing(self):
-        action = SetupSendgridMailbox(key='')
+        action = SetupSendgridMailbox(key='', max_retries=1, retry_interval_seconds=1)
 
         with patch.object(action, 'log_warning') as mock_log_warning:
             action(client_id='', domain='')
@@ -153,7 +153,7 @@ class DeleteSendgridMailboxTests(TestCase):
 
 class SetupSendgridMailboxTests(TestCase):
     def test_does_not_make_request_when_key_is_missing(self):
-        action = SetupSendgridMailbox(key='')
+        action = SetupSendgridMailbox(key='', max_retries=1, retry_interval_seconds=1)
 
         with patch.object(action, 'log_warning') as mock_log_warning:
             action(client_id='', domain='')
@@ -167,7 +167,7 @@ class SetupSendgridMailboxTests(TestCase):
                            status=404)
         mock_responses.add(mock_responses.POST, 'https://api.sendgrid.com/v3/user/webhooks/parse/settings', status=200)
 
-        action = SetupSendgridMailbox('my-key')
+        action = SetupSendgridMailbox('my-key', max_retries=1, retry_interval_seconds=1)
 
         action('my-client-id', 'my-domain')
 
@@ -180,7 +180,7 @@ class SetupSendgridMailboxTests(TestCase):
                            'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
                            status=200)
 
-        action = SetupSendgridMailbox('my-key')
+        action = SetupSendgridMailbox('my-key', max_retries=1, retry_interval_seconds=1)
 
         action('my-client-id', 'my-domain')
 
