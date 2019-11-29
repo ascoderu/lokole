@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from base64 import b64encode
 from json import dumps
 from json import loads
+from logging import StreamHandler
 from logging import getLogger
 from multiprocessing import cpu_count
 from os import chmod
@@ -75,6 +76,8 @@ class Setup:
         if not self.is_enabled:
             LOG.info('Skipping %s: not enabled', self._step_name)
             return
+
+        LOG.info('Running %s', self._step_name)
 
         self._grant_permissions()
         self._install_dependencies()
@@ -715,6 +718,9 @@ def main(args, abort):
     if getenv('USER') != 'root' and sh('whoami') != 'root':
         abort('Must run script via sudo')
 
+    LOG.setLevel(args.script_log_level)
+    LOG.addHandler(StreamHandler())
+
     _dump_state(args)
 
     app_config = {}
@@ -736,7 +742,10 @@ def main(args, abort):
     webapp_setup = WebappSetup(args, abort, app_config)
     webapp_setup()
 
+    LOG.info('All done. Lokole client %s is ready to be used.', args.client_name)
+
     if args.reboot == 'yes':
+        LOG.info('System is rebooting.')
         sh('shutdown --reboot now', user='root')
 
 
@@ -790,6 +799,9 @@ def cli():
     ))
     parser.add_argument('--wifi_password', default=getenv('LOKOLE_NETWORK_PASSWORD', 'Ascoderu'), help=(
         'The password of the WiFi network to create for the Lokole email app.'
+    ))
+    parser.add_argument('--script_log_level', default=getenv('LOKOLE_SCRIPT_LOG_LEVEL', 'INFO'), help=(
+        'The logging verbosity of this script.'
     ))
     parser.add_argument('--server_host', default=getenv('LOKOLE_SERVER_HOST', 'mailserver.lokole.ca'), help=(
         'The host of the email sync server to use.'
