@@ -169,7 +169,7 @@ following command:
 
 .. sourcecode :: sh
 
-  docker-compose -f docker-compose.yml -f docker-compose.secrets.yml up --build
+  make start-azure
 
 ---------------------
 Production deployment

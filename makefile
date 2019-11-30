@@ -70,6 +70,9 @@ build:
 start:
 	docker-compose up -d --remove-orphans
 
+start-azure:
+	docker-compose -f docker-compose.yml -f docker/docker-compose.secrets.yml up -d --remove-orphans
+
 logs:
 	if [ "$(ALL)" = "true" ]; then \
     docker-compose ps --services | while read service; do \
