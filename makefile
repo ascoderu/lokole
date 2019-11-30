@@ -73,6 +73,9 @@ start:
 start-azure:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.secrets.yml up -d --remove-orphans
 
+start-devtools:
+	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
+
 logs:
 	if [ "$(ALL)" = "true" ]; then \
     docker-compose ps --services | while read service; do \
@@ -84,7 +87,7 @@ logs:
   fi
 
 stop:
-	docker-compose down --volumes --timeout=5
+	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml down --volumes --timeout=5
 
 verify-build:
 	docker pull wagoodman/dive
