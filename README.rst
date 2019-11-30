@@ -113,6 +113,16 @@ in the integration tests folder and can be run via:
   # finally, tear down the services
   make stop
 
+The state of the system can be inspected via:
+
+.. sourcecode :: sh
+
+  # run the development tools and then
+  # view storage state at http://localhost:10001
+  # view database state at http://localhost:8882
+  # view queue state at http://localhost:5555
+  make start-devtools
+
 Note that by default the application is run in a fully local mode, without
 leveraging any cloud services. For most development purposes this is fine
 but if you wish to set up the full end-to-end stack that leverages the
@@ -169,7 +179,7 @@ following command:
 
 .. sourcecode :: sh
 
-  docker-compose -f docker-compose.yml -f docker-compose.secrets.yml up --build
+  make start-azure
 
 ---------------------
 Production deployment
