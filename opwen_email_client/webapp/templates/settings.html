@@ -19,15 +19,18 @@
   {{ form.hidden_tag() }}
 
   <fieldset>
-    <legend>{{ _('Configure SIM type') }}</legend>
+    <legend>{{ _('System information') }}
+      <a class="btn btn-link" title="{{ _('Update code now') }}" href="{{ url_for('update') }}">
+        <span class="fa fa-code" aria-hidden="true"></span>
+      </a>
+    </legend>
+    {{ render_field(form.code_version) }}
+
     {{ render_field(form.sim_type) }}
 
     <legend>{{ _('Configure sync schedule') }}
       <a class="btn btn-link" title="{{ _('Sync emails now (%(number)s pending)', number=num_pending) }}" href="{{ url_for('sync') }}">
         <span class="fa fa-cloud-upload" aria-hidden="true"></span>
-      </a>
-      <a class="btn btn-link" title="{{ _('Update code now') }}" href="{{ url_for('update') }}">
-        <span class="fa fa-code" aria-hidden="true"></span>
       </a>
     </legend>
     {{ render_field(form.sync_schedule) }}
