@@ -1,13 +1,17 @@
 from datetime import datetime
+from io import BytesIO
 from itertools import chain
+from mimetypes import guess_type
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from flask import render_template
 from flask import request
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from PIL import Image
 from werkzeug.datastructures import FileStorage
 from wtforms import FileField
 from wtforms import SelectMultipleField
@@ -20,6 +24,7 @@ from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.util.wtforms import Emails
 from opwen_email_client.util.wtforms import HtmlTextAreaField
 from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.config import ImageDimensions
 from opwen_email_client.webapp.config import i8n
 
 
@@ -215,8 +220,45 @@ def _attachments_as_dict(filestorages: Iterable[FileStorage]) \
     for filestorage in filestorages:
         filename = filestorage.filename
         content = filestorage.stream.read()
-        if filename and content:
-            yield {'filename': filename, 'content': content}
+
+        formatted_content = _format_attachment(filename, content)
+
+        if filename and formatted_content:
+            yield {'filename': filename, 'content': formatted_content}
+
+
+def _format_attachment(filename: str, content: bytes) -> bytes:
+    attachment_type = guess_type(filename)[0]
+
+    if not attachment_type:
+        return content
+
+    if 'image' in attachment_type.lower():
+        content = _change_image_size(content)
+
+    return content
+
+
+def _is_already_small(size: Tuple[int, int]) -> bool:
+    width, height = size
+    return width <= ImageDimensions.MAX_WIDTH_IMAGES and height <= ImageDimensions.MAX_HEIGHT_IMAGES
+
+
+def _change_image_size(image_content_bytes: bytes) -> bytes:
+    image_bytes = BytesIO(image_content_bytes)
+    image_bytes.seek(0)
+    image = Image.open(image_bytes)
+
+    if _is_already_small(image.size):
+        return image_content_bytes
+
+    new_size = (ImageDimensions.MAX_WIDTH_IMAGES, ImageDimensions.MAX_HEIGHT_IMAGES)
+    image.thumbnail(new_size, Image.ANTIALIAS)
+    new_image = BytesIO()
+    image.save(new_image, image.format)
+    new_image.seek(0)
+    new_image_bytes = new_image.read()
+    return new_image_bytes
 
 
 def _is_local_message(address: str) -> bool:

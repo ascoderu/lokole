@@ -16,6 +16,12 @@ root_domain = env('OPWEN_ROOT_DOMAIN', 'lokole.ca')
 
 
 # noinspection PyPep8Naming
+class ImageDimensions(object):
+    MAX_WIDTH_IMAGES = env.int('LOKOLE_MAX_WIDTH_EMAIL_IMAGES', 200)
+    MAX_HEIGHT_IMAGES = env.int('LOKOLE_MAX_HEIGHT_EMAIL_IMAGES', 200)
+
+
+# noinspection PyPep8Naming
 class i8n(object):
     SETTINGS_UPDATED = _('Settings updated! If required, the app will restart soon to reflect the changes.')
     LOGIN_REQUIRED = _('Please log in to access this page.')
