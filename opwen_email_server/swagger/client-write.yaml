@@ -44,6 +44,7 @@ parameters:
 definitions:
 
   UploadInfo:
+    type: object
     properties:
       resource_id:
         description: Id of the resource containing the emails (gzip jsonl file).

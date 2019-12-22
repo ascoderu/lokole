@@ -44,6 +44,7 @@ parameters:
 definitions:
 
   PendingEmailsMetric:
+    type: object
     properties:
       pending_emails:
         description: The number of pending emails.

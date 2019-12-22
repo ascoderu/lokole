@@ -92,6 +92,7 @@ parameters:
 definitions:
 
   RegistrationInfo:
+    type: object
     properties:
       domain:
         description: Domain for which to register the client.
@@ -100,6 +101,7 @@ definitions:
       - domain
 
   RegisteredClient:
+    type: object
     properties:
       client_id:
         description: Registered Lokole client.
