@@ -25,6 +25,7 @@ ARG LOKOLE_SENDGRID_KEY=""
 RUN make ci clean
 
 ENV PY_ENV=/app/venv
+ENV HOT_RELOAD="True"
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
