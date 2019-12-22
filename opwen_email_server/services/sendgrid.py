@@ -70,7 +70,7 @@ class SendSendgridEmail(LogMixin):
             status = getattr(ex, 'code', -1)
             self.log_exception(ex, 'error sending email %s:%s', email_id, email)
         else:
-            self.log_debug('sent email %s', email_id)
+            self.log_info('sent email %s', email_id)
 
         return status in (200, 201, 202)
 
@@ -151,7 +151,7 @@ class DeleteSendgridMailbox(_SendgridManagement):
         if not response.ok and response.status_code != 404:
             response.raise_for_status()
 
-        self.log_debug('Deleted mailbox for %s', domain)
+        self.log_info('Deleted mailbox for %s', domain)
 
 
 class SetupSendgridMailbox(_SendgridManagement):
@@ -187,7 +187,7 @@ class SetupSendgridMailbox(_SendgridManagement):
             )
 
             if create_response.ok:
-                self.log_debug('Set up mailbox for %s', domain)
+                self.log_info('Set up mailbox for %s', domain)
                 break
 
             if retry > self._max_retries:

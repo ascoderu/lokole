@@ -141,20 +141,20 @@ class AzureAuth(LogMixin):
     def insert(self, client_id: str, domain: str, owner: str):
         self._storage.store_text(client_id, domain)
         self._storage.store_text(domain, to_json({'client_id': client_id, 'owner': owner}))
-        self.log_debug('Registered client %s at domain %s', client_id, domain)
+        self.log_info('Registered client %s at domain %s', client_id, domain)
 
     def is_owner(self, domain: str, username: str) -> bool:
         try:
             raw_auth = self._storage.fetch_text(domain)
         except ObjectDoesNotExistError:
-            self.log_debug('Unrecognized domain %s', domain)
+            self.log_warning('Unrecognized domain %s', domain)
             return False
 
         try:
             auth = from_json(raw_auth)
         except JSONDecodeError:
             # fallback for clients registered before November 2019
-            self.log_debug('Unable to lookup owner for domain %s', domain)
+            self.log_warning('Unable to lookup owner for domain %s', domain)
             return False
 
         return auth.get('owner') == username
@@ -168,7 +168,7 @@ class AzureAuth(LogMixin):
         try:
             raw_auth = self._storage.fetch_text(domain)
         except ObjectDoesNotExistError:
-            self.log_debug('Unrecognized domain %s', domain)
+            self.log_warning('Unrecognized domain %s', domain)
             return None
         else:
             try:
@@ -183,7 +183,7 @@ class AzureAuth(LogMixin):
         try:
             domain = self._storage.fetch_text(client_id)
         except ObjectDoesNotExistError:
-            self.log_debug('Unrecognized client %s', client_id)
+            self.log_warning('Unrecognized client %s', client_id)
             return None
         else:
             self.log_debug('Client %s has domain %s', client_id, domain)
