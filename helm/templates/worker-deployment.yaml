@@ -20,7 +20,7 @@ spec:
       containers:
       - name: worker
         image: {{.Values.version.imageRegistry}}/opwenserver_app:{{.Values.version.dockerTag}}
-        command: ["/app/run-celery.sh"]
+        command: ["/app/docker/app/run-celery.sh"]
         env:
         - name: CELERY_QUEUE_NAMES
           value: all

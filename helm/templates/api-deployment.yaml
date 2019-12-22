@@ -20,12 +20,16 @@ spec:
       containers:
       - name: api
         image: {{.Values.version.imageRegistry}}/opwenserver_app:{{.Values.version.dockerTag}}
-        command: ["/app/run-gunicorn.sh"]
+        command: ["/app/docker/app/run-gunicorn.sh"]
         env:
+        - name: PORT
+          value: "8080"
         - name: CONNEXION_SPEC
           value: dir:/app/opwen_email_server/swagger
         - name: SERVER_WORKERS
           value: "{{.Values.server.serverWorkers}}"
+        - name: TESTING_UI
+          value: "False"
         {{ include "opwen.environment.shared" . }}
         - name: REGISTRATION_USERNAME
           valueFrom:

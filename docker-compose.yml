@@ -59,9 +59,10 @@ services:
 
   api:
     <<: *shared-app-build
-    command: ["/app/run-gunicorn.sh"]
+    command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-gunicorn.sh"]
     environment:
       <<: *shared-app-environment
+      PORT: "8080"
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
@@ -70,10 +71,13 @@ services:
     depends_on:
       - appinsights
       - azurite
+    volumes:
+      - .:/app
+      - venv:/app/venv
 
   worker:
     <<: *shared-app-build
-    command: ["/app/run-celery.sh"]
+    command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-celery.sh"]
     environment:
       <<: *shared-app-environment
       CELERY_QUEUE_NAMES: all
@@ -82,6 +86,9 @@ services:
       - appinsights
       - azurite
       - rabbitmq
+    volumes:
+      - .:/app
+      - venv:/app/venv
 
   setup:
     image: ${DOCKER_REPO}/opwenserver_setup:${BUILD_TAG}
@@ -133,3 +140,6 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite:latest
     ports:
       - ${AZURITE_PORT}:10000
+
+volumes:
+  venv:
