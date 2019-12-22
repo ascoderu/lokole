@@ -21,6 +21,8 @@ spec:
       - name: nginx
         image: {{.Values.version.imageRegistry}}/opwenserver_nginx:{{.Values.version.dockerTag}}
         env:
+        - name: PORT
+          value: "8888"
         - name: DNS_RESOLVER
           value: 127.0.0.1:53 ipv6=off
         - name: HOSTNAME_CLIENT_METRICS

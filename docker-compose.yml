@@ -62,6 +62,7 @@ services:
     command: ["/app/docker/app/run-gunicorn.sh"]
     environment:
       <<: *shared-app-environment
+      PORT: "8080"
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"

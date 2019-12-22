@@ -24,6 +24,8 @@ COPY . .
 ARG LOKOLE_SENDGRID_KEY=""
 RUN make ci clean
 
+ENV PY_ENV=/app/venv
+
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
 RUN groupadd -r opwen \
@@ -41,14 +43,6 @@ COPY --from=builder /app/docker/app/run-celery.sh ./docker/app/run-celery.sh
 COPY --from=builder /app/docker/app/run-gunicorn.sh ./docker/app/run-gunicorn.sh
 COPY --from=builder /app/opwen_email_server ./opwen_email_server
 
-ENV PY_ENV="/usr/local"
-ENV TESTING_UI="False"
-ENV CONNEXION_SPEC="SET_ME"
-ENV SERVER_WORKERS="1"
-ENV QUEUE_WORKERS="1"
-ENV LOKOLE_LOG_LEVEL="INFO"
-ENV PORT=8080
+ENV PY_ENV=/usr/local
 
-EXPOSE ${PORT}
 ENTRYPOINT ["/app/docker/docker-entrypoint.sh"]
-CMD ["bash"]
