@@ -12,7 +12,7 @@ RUN wget -q -O /tmp/shellcheck.tar.xz "https://storage.googleapis.com/shellcheck
   && rm /tmp/shellcheck.tar.xz \
   && shellcheck --version
 
-WORKDIR /src
+WORKDIR /app
 
 COPY requirements*.txt ./
 COPY makefile .
@@ -36,10 +36,10 @@ RUN pip --no-cache-dir -q install /deps/*.whl
 USER opwen
 WORKDIR /app
 
-COPY --from=builder /src/docker/docker-entrypoint.sh .
-COPY --from=builder /src/docker/app/run-celery.sh .
-COPY --from=builder /src/docker/app/run-gunicorn.sh .
-COPY --from=builder /src/opwen_email_server ./opwen_email_server
+COPY --from=builder /app/docker/docker-entrypoint.sh ./docker/docker-entrypoint.sh
+COPY --from=builder /app/docker/app/run-celery.sh ./docker/app/run-celery.sh
+COPY --from=builder /app/docker/app/run-gunicorn.sh ./docker/app/run-gunicorn.sh
+COPY --from=builder /app/opwen_email_server ./opwen_email_server
 
 ENV PY_ENV="/usr/local"
 ENV TESTING_UI="False"
@@ -50,5 +50,5 @@ ENV LOKOLE_LOG_LEVEL="INFO"
 ENV PORT=8080
 
 EXPOSE ${PORT}
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker/docker-entrypoint.sh"]
 CMD ["bash"]

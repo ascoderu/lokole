@@ -59,7 +59,7 @@ services:
 
   api:
     <<: *shared-app-build
-    command: ["/app/run-gunicorn.sh"]
+    command: ["/app/docker/app/run-gunicorn.sh"]
     environment:
       <<: *shared-app-environment
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
@@ -73,7 +73,7 @@ services:
 
   worker:
     <<: *shared-app-build
-    command: ["/app/run-celery.sh"]
+    command: ["/app/docker/app/run-celery.sh"]
     environment:
       <<: *shared-app-environment
       CELERY_QUEUE_NAMES: all

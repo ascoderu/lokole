@@ -20,7 +20,7 @@ spec:
       containers:
       - name: api
         image: {{.Values.version.imageRegistry}}/opwenserver_app:{{.Values.version.dockerTag}}
-        command: ["/app/run-gunicorn.sh"]
+        command: ["/app/docker/app/run-gunicorn.sh"]
         env:
         - name: CONNEXION_SPEC
           value: dir:/app/opwen_email_server/swagger
