@@ -1,12 +1,12 @@
 from logging import CRITICAL
 from logging import DEBUG
 from logging import INFO
+from logging import NOTSET
 from logging import WARNING
 from logging import Formatter
 from logging import Handler
 from logging import Logger
 from logging import StreamHandler
-from logging import getLevelName
 from logging import getLogger
 from typing import Any
 from typing import Iterable
@@ -17,11 +17,14 @@ from applicationinsights.channel import AsynchronousQueue
 from applicationinsights.channel import AsynchronousSender
 from applicationinsights.channel import NullSender
 from applicationinsights.channel import TelemetryChannel
+from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
 
 from opwen_email_server.config import APPINSIGHTS_HOST
 from opwen_email_server.config import APPINSIGHTS_KEY
+from opwen_email_server.config import APPINSIGHTS_LOG_LEVEL
 from opwen_email_server.config import LOG_LEVEL
+from opwen_email_server.constants.logging import APPINSIGHTS
 from opwen_email_server.constants.logging import SEPARATOR
 from opwen_email_server.constants.logging import STDERR
 from opwen_email_server.utils.collections import append
@@ -45,16 +48,23 @@ class LogMixin:
 
         stderr = StreamHandler()
         stderr.setFormatter(Formatter(STDERR))
+        stderr.setLevel(LOG_LEVEL)
         handlers.append(stderr)
+
+        appinsights = LoggingHandler(self._telemetry_key, telemetry_channel=self._telemetry_channel)
+        appinsights.setFormatter(Formatter(APPINSIGHTS))
+        appinsights.setLevel(APPINSIGHTS_LOG_LEVEL)
+        handlers.append(appinsights)
 
         return handlers
 
     @cached_property
     def _logger(self) -> Logger:
-        log = getLogger()
+        log = getLogger(self.__class__.__name__)
+        log.setLevel(NOTSET)
+        log.propagate = False
         for handler in self._default_log_handlers:
             log.addHandler(handler)
-        log.setLevel(LOG_LEVEL)
         return log
 
     @cached_property
@@ -81,16 +91,12 @@ class LogMixin:
             self._telemetry_channel.flush()
 
     def _log(self, level: int, log_message: str, log_args: Iterable[Any]):
-        if not self._logger.isEnabledFor(level):
-            return
-
         message_parts = ['%s']
         args = [self.__class__.__name__]
         message_parts.append(log_message)
         args.extend(log_args)
         message = SEPARATOR.join(message_parts)
         self._logger.log(level, message, *args)
-        self._telemetry_client.track_trace(message % tuple(args), severity=getLevelName(level))
 
     def log_event(self, event_name: str, properties: Optional[dict] = None):
         self.log_info('%s%s%s', event_name, SEPARATOR, properties)

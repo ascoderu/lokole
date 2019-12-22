@@ -191,7 +191,7 @@ class SetupSendgridMailbox(_SendgridManagement):
                 break
 
             if retry > self._max_retries:
-                self.log_debug('Too many attempts to set up mailbox for %s', domain)
+                self.log_warning('Too many attempts to set up mailbox for %s', domain)
                 create_response.raise_for_status()
 
             sleep(self._retry_interval_seconds)
