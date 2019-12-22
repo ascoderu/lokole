@@ -43,10 +43,10 @@ class DeleteMxRecords(_MxRecords):
         try:
             record = next(record for record in self._driver.iterate_records(zone) if record.name == client_name)
         except StopIteration:
-            self.log_debug('No MX records for client %s.%s exist', client_name, zone.domain)
+            self.log_warning('No MX records for client %s.%s exist', client_name, zone.domain)
         else:
             self._driver.delete_record(record)
-            self.log_debug('Deleted MX records for client %s.%s', client_name, zone.domain)
+            self.log_info('Deleted MX records for client %s.%s', client_name, zone.domain)
 
 
 class SetupMxRecords(_MxRecords):
@@ -59,6 +59,6 @@ class SetupMxRecords(_MxRecords):
                 data=MX_RECORD,
             )
         except LibcloudError:
-            self.log_debug('MX records for client %s.%s already exist', client_name, zone.domain)
+            self.log_warning('MX records for client %s.%s already exist', client_name, zone.domain)
         else:
-            self.log_debug('Set up MX records for client %s.%s', client_name, zone.domain)
+            self.log_info('Set up MX records for client %s.%s', client_name, zone.domain)
