@@ -31,6 +31,7 @@ script:
     if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
       echo "Skipping live service test for branch build"
     else
+      export BUILD_TARGET=runtime
       make build verify-build
       make start
       make integration-tests
