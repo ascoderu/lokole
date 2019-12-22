@@ -16,4 +16,5 @@ EMAIL_RECEIVED_FOR_CLIENT = 'email_received_for_client'  # type: Final
 EMAIL_DELIVERED_FROM_CLIENT = 'email_delivered_from_client'  # type: Final
 EMAIL_STORED_FOR_CLIENT = 'email_stored_for_client'  # type: Final
 EMAIL_STORED_FROM_CLIENT = 'email_stored_from_client'  # type: Final
+USER_STORED_FROM_CLIENT = 'user_stored_from_client'  # type: Final
 MAILBOX_EMAIL_INDEXED = 'mailbox_email_indexed'  # type: Final
