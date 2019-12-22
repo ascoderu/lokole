@@ -25,7 +25,6 @@ from opwen_email_server.config import APPINSIGHTS_KEY
 from opwen_email_server.config import APPINSIGHTS_LOG_LEVEL
 from opwen_email_server.config import LOG_LEVEL
 from opwen_email_server.constants.logging import APPINSIGHTS
-from opwen_email_server.constants.logging import SEPARATOR
 from opwen_email_server.constants.logging import STDERR
 from opwen_email_server.utils.collections import append
 from opwen_email_server.utils.collections import singleton
@@ -91,13 +90,8 @@ class LogMixin:
             self._telemetry_channel.flush()
 
     def _log(self, level: int, log_message: str, log_args: Iterable[Any]):
-        message_parts = ['%s']
-        args = [self.__class__.__name__]
-        message_parts.append(log_message)
-        args.extend(log_args)
-        message = SEPARATOR.join(message_parts)
-        self._logger.log(level, message, *args)
+        self._logger.log(level, log_message, *log_args)
 
     def log_event(self, event_name: str, properties: Optional[dict] = None):
-        self.log_info('%s%s%s', event_name, SEPARATOR, properties)
+        self.log_info('%s|%s', event_name, properties)
         self._telemetry_client.track_event(event_name, properties)
