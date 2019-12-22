@@ -11,7 +11,7 @@ worker:
   queueWorkers: 1
 
 logging:
-  level: WARNING
+  level: DEBUG
 
 letsencrypt:
   email: ascoderu.opwen@gmail.com
