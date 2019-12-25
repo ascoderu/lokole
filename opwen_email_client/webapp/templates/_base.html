@@ -40,7 +40,7 @@
     }
   };
   </script>
-  <script type="text/javascript" src="{{ url_for('static', filename='js/_base.min.js') }}"></script>
+  <script type="text/javascript" src="{{ 'js/_base.js' | asset_url }}"></script>
   {% endblock %}
 </body>
 </html>

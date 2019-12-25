@@ -1,7 +1,18 @@
+from os.path import splitext
+
 from bs4 import BeautifulSoup
 from flask import url_for
 
 from opwen_email_client.webapp import app
+
+
+@app.template_filter('asset_url')
+def asset_url(asset_path: str) -> str:
+    if app.config['TESTING']:
+        return url_for('static', filename=asset_path)
+
+    asset_path, extension = splitext(asset_path)
+    return url_for('static', filename='{}.min{}'.format(asset_path, extension))
 
 
 @app.template_filter('render_body')

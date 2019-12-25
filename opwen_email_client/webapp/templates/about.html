@@ -3,7 +3,7 @@
 {% block title %}{{ _('About | Lokole') }}{% endblock %}
 
 {% block style %}{{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/about.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ 'css/about.css' | asset_url }}">
 {% endblock %}
 
 {% block content %}{{ super() }}

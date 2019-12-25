@@ -6,11 +6,11 @@
 {% from 'macros/form.html' import render_button %}
 
 {% block libs %}{{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/settings.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ 'css/settings.css' | asset_url }}">
 {% endblock %}
 
 {% block scripts %}{{ super() }}
-<script type="text/javascript" src="{{ url_for('static', filename='js/settings.min.js') }}"></script>
+<script type="text/javascript" src="{{ 'js/settings.js' | asset_url }}"></script>
 {% endblock %}
 
 {% block content %}{{ super() }}

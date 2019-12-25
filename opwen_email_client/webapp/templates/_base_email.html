@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block style %}{{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ 'css/_base_email.css' | asset_url }}">
 {% endblock %}
 
 {% block libs %}{{ super() }}
@@ -24,5 +24,5 @@
 {% endblock %}
 
 {% block scripts %}{{ super() }}
-<script type="text/javascript" src="{{ url_for('static', filename='js/_base_email.min.js') }}"></script>
+<script type="text/javascript" src="{{ 'js/_base_email.js' | asset_url }}"></script>
 {% endblock %}

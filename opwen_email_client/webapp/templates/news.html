@@ -5,7 +5,7 @@
 {% from 'macros/email.html' import email_display with context %}
 
 {% block style %}{{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/_base_email.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ 'css/_base_email.css' | asset_url }}">
 {% endblock %}
 
 {% block content %}{{ super() }}
