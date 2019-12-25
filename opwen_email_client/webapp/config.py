@@ -100,6 +100,7 @@ class AppConfig(object):
     LOCAL_EMAIL_STORE = path.join(STATE_BASEDIR, 'emails.sqlite3')
     SIM_TYPE = env('OPWEN_SIM_TYPE', None)
     RESTART_PATHS = env.dict('OPWEN_RESTART_PATH', {})
+    MAX_UPLOAD_SIZE_MB = env.int('OPWEN_MAX_UPLOAD_SIZE_MB', 0)
 
     SYNC_SCHEDULE = env('OPWEN_SYNC_SCHEDULE', '').strip()
 

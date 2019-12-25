@@ -4,6 +4,7 @@
       $(ctx.selectors.attachments).fileinput({
         showPreview: false,
         showUpload: false,
+        maxFileSize: ctx.config.max_upload_size_mb * 1000,
         msgSelected: '{n} ' + ctx.i8n.filesSelected,
         layoutTemplates: {
           fileIcon:
@@ -11,6 +12,8 @@
         },
         removeTitle: '',
         removeIcon: '<span class="fa fa-trash-o" aria-hidden="true"></span>',
+        msgValidationError: ctx.i8n.fileTooLarge,
+        msgValidationErrorIcon: '<span class="fa fa-exclamation-triangle" aria-hidden="true"></span>',
         removeLabel: ctx.i8n.remove,
         browseLabel: ctx.i8n.chooseFiles,
         browseIcon: '<span class="fa fa-paperclip" aria-hidden="true"></span>',

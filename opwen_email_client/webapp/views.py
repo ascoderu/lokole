@@ -153,7 +153,7 @@ def email_new() -> Response:
         flash(i8n.EMAIL_SENT, category='success')
         return redirect(url_for('email_inbox'))
 
-    return _view('email_new.html', form=form, type='write')
+    return _view('email_new.html', max_upload_size_mb=AppConfig.MAX_UPLOAD_SIZE_MB, form=form, type='write')
 
 
 @app.route('/attachment/<uid>', methods=['GET'])

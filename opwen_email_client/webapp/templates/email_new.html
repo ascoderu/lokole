@@ -38,12 +38,16 @@
 {% block scripts %}{{ super() }}
 <script>
 window.flask_jinja_context__email_new = {
+  config: {
+    max_upload_size_mb: {{ max_upload_size_mb }},
+  },
   selectors: {
     attachments: "#{{ form.attachments.id }}",
     formBody: "#{{ form.body.id }}"
   },
   i8n: {
     filesSelected: "{{ _('files selected') }}",
+    fileTooLarge: "{{ _('The file is too large. Maximum allowed upload size is:') }} {{ max_upload_size_mb }} MB.",
     remove: "{{ _('Remove') }}",
     chooseFiles: "{{ _('Choose files') }}",
     bold: "{{ _('Bold') }}",

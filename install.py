@@ -480,6 +480,7 @@ class WebappSetup(Setup):
         extra_settings = {
             'OPWEN_STATE_DIRECTORY': self.abspath(self.args.state_directory),
             'OPWEN_SESSION_KEY': generate_secret(32),
+            'OPWEN_MAX_UPLOAD_SIZE_MB': self.args.max_upload_size,
             'OPWEN_SIM_TYPE': self.args.sim_type,
             'OPWEN_EMAIL_SERVER_HOSTNAME': self.args.server_host,
             'OPWEN_CLIENT_NAME': self.args.client_name,
@@ -551,6 +552,7 @@ class WebappSetup(Setup):
               error_log {error_log};
               gzip on;
               gzip_disable "msie6";
+              client_max_body_size {max_upload_size}M;
               include /etc/nginx/conf.d/*.conf;
               include /etc/nginx/sites-enabled/*;
 
@@ -560,6 +562,7 @@ class WebappSetup(Setup):
             }}'''.format(
             access_log=self.abspath(Path(self.args.log_directory) / 'nginx_access.log'),
             error_log=self.abspath(Path(self.args.log_directory) / 'nginx_error.log'),
+            max_upload_size=self.args.max_upload_size,
             timeout_seconds=self.args.timeout))
 
         sh('systemctl stop nginx', accept_failure=True)
@@ -847,6 +850,9 @@ def cli():
     ))
     parser.add_argument('--timeout', type=int, default=300, help=(
         'Timeout for the Lokole email app. In seconds.'
+    ))
+    parser.add_argument('--max_upload_size', type=int, default=25, help=(
+        'Maximum allowed size of uploads to the Lokole email app. In MB.'
     ))
     parser.add_argument('--num_celery_workers', type=int, default=2, help=(
         'Number of celery workers for the Lokole email app.'
