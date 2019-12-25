@@ -428,6 +428,7 @@ class WebappSetup(Setup):
         'bcrypt',
         'libffi-dev',
         'libssl-dev',
+        'libjpeg-dev',
         'nginx',
         'python3',
         'python3-dev',
