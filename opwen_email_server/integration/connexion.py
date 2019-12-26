@@ -4,6 +4,7 @@ from opwen_email_server.actions import CreateClient
 from opwen_email_server.actions import DeleteClient
 from opwen_email_server.actions import DownloadClientEmails
 from opwen_email_server.actions import GetClient
+from opwen_email_server.actions import ListClients
 from opwen_email_server.actions import Ping
 from opwen_email_server.actions import ReceiveInboundEmail
 from opwen_email_server.actions import UploadClientEmails
@@ -43,6 +44,8 @@ client_create = CreateClient(
     auth=get_auth(),
     task=register_client.delay,
 )
+
+client_list = ListClients(auth=get_auth())
 
 client_get = GetClient(
     auth=get_auth(),

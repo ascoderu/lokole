@@ -362,6 +362,19 @@ class CreateClient(_Action):
         return 'accepted', 201
 
 
+class ListClients(_Action):
+    def __init__(self, auth: AzureAuth):
+        self._auth = auth
+
+    def _action(self, **auth_args):  # type: ignore
+        clients = [{'domain': domain} for domain in self._auth.domains()]
+
+        self.log_event(events.CLIENTS_FETCHED)  # noqa: E501  # yapf: disable
+        return {
+            'clients': clients,
+        }
+
+
 class GetClient(_Action):
     def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage):
         self._auth = auth
