@@ -4,6 +4,10 @@ import axios from 'axios';
 
 const githubApi = axios.create({ baseURL: 'https://api.github.com' });
 
+const colors = {
+  icon: 'rgba(0, 0, 0, .25)',
+};
+
 class SettingsForm extends React.Component {
   _validateGithubAccessToken = async (_rule, value, callback) => {
     const { setFieldsValue } = this.props.form;
@@ -51,7 +55,7 @@ class SettingsForm extends React.Component {
             initialValue: this.props.initialValue.serverEndpoint,
           })(
             <Input
-              prefix={<Icon type="api" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              prefix={<Icon type="api" style={{ color: colors.icon }} />}
               placeholder="http://localhost:8080"
             />,
           )}
@@ -62,7 +66,7 @@ class SettingsForm extends React.Component {
             initialValue: this.props.initialValue.githubAccessToken,
           })(
             <Input.Password
-              prefix={<Icon type="github" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              prefix={<Icon type="github" style={{ color: colors.icon }} />}
               placeholder="1234567abcdefgh"
             />,
           )}
