@@ -45,7 +45,7 @@ class SettingsForm extends React.Component {
 
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.props.onChange(values);
+        this.props.onChange({ ...values, updatedAt: `${new Date()}` });
       }
     });
   };

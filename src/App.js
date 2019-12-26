@@ -29,7 +29,7 @@ class App extends React.Component {
           <Header settings={this.state.settings} onChangeSettings={this._onChangeSettings} />
           <Layout.Content style={{ padding: '0 50px' }}>
             <Divider>Stats</Divider>
-            <PingStats settings={this.state.settings} />
+            <PingStats settings={this.state.settings} key={`stats-${this.state.settings.updatedAt}`} />
           </Layout.Content>
         </Layout>
       </React.Fragment>
