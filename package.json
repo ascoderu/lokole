@@ -2,6 +2,7 @@
   "name": "opwen-statuspage",
   "homepage": "https://ascoderu.ca/opwen-statuspage",
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "private": true,
   "dependencies": {
     "antd": "^3.26.4",
