@@ -58,7 +58,7 @@ class Setup:
         elif base_user:
             return base_user
         else:
-            return sh('whoami')
+            return self.sh('whoami')
 
     @property
     def home(self):
@@ -89,12 +89,12 @@ class Setup:
 
     def _grant_permissions(self):
         for group in self.groups:
-            sh('usermod -a -G "{group}" "{user}"'
-               .format(group=group, user=self.user))
+            self.sh('usermod -a -G "{group}" "{user}"'
+                    .format(group=group, user=self.user))
 
     def _install_dependencies(self):
         if self.packages:
-            sh('apt-get install -y {}'.format(' '.join(self.packages)))
+            self.sh('apt-get install -y {}'.format(' '.join(self.packages)))
 
     def _run(self):
         raise NotImplementedError
@@ -107,6 +107,16 @@ class Setup:
     def __guard_path(self):
         guard_name = '{}.done'.format(self._step_name)
         return self.abspath(TEMP_ROOT / guard_name)
+
+    @property
+    def __stdout_path(self):
+        stdout_name = '{}.stdout'.format(self._step_name)
+        return self.abspath(TEMP_ROOT / stdout_name)
+
+    @property
+    def __stderr_path(self):
+        stderr_name = '{}.stderr'.format(self._step_name)
+        return self.abspath(TEMP_ROOT / stderr_name)
 
     def __is_complete(self):
         return loads(Path(self.__guard_path).read_text(encoding='utf-8'))
@@ -155,6 +165,32 @@ class Setup:
         self._mkdir(file_path.parent)
         return str(file_path)
 
+    def sh(self, command, user=None, accept_failure=False, retry_attempts=0, retry_interval=0):
+        if user:
+            command = "su '{user}' -c '{command}'".format(
+                user=user,
+                command=command)
+
+        process = run(command, shell=True, stderr=PIPE, stdout=PIPE)  # nosec
+        stdout = process.stdout.decode('utf-8').strip()
+        stderr = process.stderr.decode('utf-8').strip()
+        status = process.returncode
+
+        with open(self.__stdout_path, 'a', encoding='utf-8') as fobj:
+            fobj.write('===== {} =====\n{}\n{}\n\n'.format(command, status, stdout))
+
+        with open(self.__stderr_path, 'a', encoding='utf-8') as fobj:
+            fobj.write('===== {} =====\n{}\n{}\n\n'.format(command, status, stderr))
+
+        if status == 0 or accept_failure:
+            return stdout
+
+        if retry_attempts > 0:
+            sleep(retry_interval)
+            return self.sh(command, user, accept_failure, retry_attempts - 1, retry_interval)
+
+        raise Exception(stderr)
+
     def _mkdir(self, path):
         path.mkdir(parents=True, exist_ok=True)
         home_prefix = Path(self.home)
@@ -168,9 +204,18 @@ class Setup:
 
 class SystemSetup(Setup):
     def _run(self):
+        self._ensure_root()
+        self._ensure_apt()
         self._set_locale()
         self._set_timezone()
         self._set_password()
+
+    def _ensure_root(self):
+        if getenv('USER') != 'root' and self.sh('whoami') != 'root':
+            self.abort('Must run script via sudo')
+
+    def _ensure_apt(self):
+        self.sh('apt-get update')
 
     def _set_locale(self):
         locale_command = (
@@ -180,23 +225,23 @@ class SystemSetup(Setup):
             'export LC_TYPE="{0}";'
         ).format(self.args.locale)
 
-        sh('locale-gen "{}"'.format(self.args.locale))
-        sh('update-locale')
-        sh('eval "{}"'.format(locale_command))
+        self.sh('locale-gen "{}"'.format(self.args.locale))
+        self.sh('update-locale')
+        self.sh('eval "{}"'.format(locale_command))
 
         self.write_file('/etc/profile.d/set-locale.sh', locale_command,
                         executable=True)
 
     def _set_timezone(self):
-        sh('timedatectl set-timezone "{}"'.format(self.args.timezone))
+        self.sh('timedatectl set-timezone "{}"'.format(self.args.timezone))
 
     def _set_password(self):
         if not self.args.password:
             return
 
-        sh('echo "{user}:{password}" | chpasswd'.format(
-            user=self.user,
-            password=self.args.password))
+        self.sh('echo "{user}:{password}" | chpasswd'.format(
+                user=self.user,
+                password=self.args.password))
 
     @property
     def is_enabled(self):
@@ -290,11 +335,11 @@ class WifiSetup(Setup):
             'iface ppp0 inet wvdial',
         ))
 
-        sh('systemctl unmask hostapd.service')
-        sh('systemctl start hostapd.service')
+        self.sh('systemctl unmask hostapd.service')
+        self.sh('systemctl start hostapd.service')
 
     def _disable_system_power_management(self):
-        sh('systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target')
+        self.sh('systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target')
 
     @property
     def ip(self):
@@ -452,12 +497,13 @@ class WebappSetup(Setup):
         self._setup_celery()
         self._setup_cron()
         self._setup_restarter()
+        self._reboot()
 
     def _create_virtualenv(self):
-        sh('{python} -m venv "{venv_path}"'.format(
-            python=current_python_binary,
-            venv_path=self.venv_path),
-           user=self.user)
+        self.sh('{python} -m venv "{venv_path}"'.format(
+                 python=current_python_binary,
+                 venv_path=self.venv_path),
+                user=self.user)
 
         self._pip_install('pip', 'setuptools', 'wheel')
 
@@ -472,10 +518,10 @@ class WebappSetup(Setup):
         self._pip_install(package)
 
     def _compile_translations(self):
-        sh('"{pybabel}" compile -d "{translations}"'.format(
-            pybabel='{}/bin/pybabel'.format(self.venv_path),
-            translations=self.abspath(self.webapp_files_root / 'translations')),
-           user=self.user)
+        self.sh('"{pybabel}" compile -d "{translations}"'.format(
+               pybabel='{}/bin/pybabel'.format(self.venv_path),
+               translations=self.abspath(self.webapp_files_root / 'translations')),
+              user=self.user)
 
     def _setup_secrets(self):
         extra_settings = {
@@ -499,13 +545,13 @@ class WebappSetup(Setup):
             for (key, value) in settings.items()))
 
     def _create_admin_user(self):
-        sh('OPWEN_SETTINGS="{settings}" '
-           '"{manage}" createadmin --name="{name}" --password="{password}"'.format(
-            settings=self.settings_path,
-            manage='{}/bin/manage.py'.format(self.venv_path),
-            name=self.args.admin_name,
-            password=self.args.admin_password),
-           user=self.user)
+        self.sh('OPWEN_SETTINGS="{settings}" '
+                '"{manage}" createadmin --name="{name}" --password="{password}"'.format(
+                 settings=self.settings_path,
+                 manage='{}/bin/manage.py'.format(self.venv_path),
+                 name=self.args.admin_name,
+                 password=self.args.admin_password),
+                user=self.user)
 
     def _install_nginx(self):
         self.write_file('/etc/nginx/sites-available/default', '''
@@ -566,8 +612,8 @@ class WebappSetup(Setup):
             max_upload_size=self.args.max_upload_size,
             timeout_seconds=self.args.timeout))
 
-        sh('systemctl stop nginx', accept_failure=True)
-        sh('systemctl disable nginx', accept_failure=True)
+        self.sh('systemctl stop nginx', accept_failure=True)
+        self.sh('systemctl disable nginx', accept_failure=True)
 
         self.create_daemon(
             program_name=self.args.nginx_name,
@@ -639,11 +685,20 @@ class WebappSetup(Setup):
             command=restarter_command,
             user='root')
 
+    def _reboot(self):
+        LOG.info('All done. Lokole client %s is ready to be used.', self.args.client_name)
+
+        if self.args.reboot == 'yes':
+            LOG.info('System is rebooting.')
+            self.sh('shutdown --reboot now', user='root')
+
     def _pip_install(self, *packages):
-        sh('while ! "{pip}" install --no-cache-dir --upgrade {packages}; do sleep 2s; done'.format(
-            pip='{}/bin/pip'.format(self.venv_path),
-            packages=' '.join(packages)),
-           user=self.user)
+        self.sh('"{pip}" install --no-cache-dir --upgrade {packages}'.format(
+                 pip='{}/bin/pip'.format(self.venv_path),
+                 packages=' '.join(packages)),
+                retry_attempts=60,
+                retry_interval=5,
+                user=self.user)
 
     @property
     def webapp_files_root(self):
@@ -689,22 +744,6 @@ def generate_secret(length, chars=frozenset(ascii_letters + digits)):
     return secret[:length]
 
 
-def sh(command, user=None, accept_failure=False):
-    if user:
-        command = "su '{user}' -c '{command}'".format(
-            user=user,
-            command=command)
-
-    process = run(command, shell=True, stderr=PIPE, stdout=PIPE)  # nosec
-    stdout = process.stdout.decode('utf-8').strip()
-    stderr = process.stderr.decode('utf-8').strip()
-
-    if process.returncode != 0 and not accept_failure:
-        raise Exception(stderr)
-
-    return stdout
-
-
 def _dump_state(args):
     with Path(__file__).open('r', encoding='utf-8') as fobj:
         version = hash(fobj.read())
@@ -719,17 +758,12 @@ def _dump_state(args):
 
 
 def main(args, abort):
-    if getenv('USER') != 'root' and sh('whoami') != 'root':
-        abort('Must run script via sudo')
-
     LOG.setLevel(args.script_log_level)
     LOG.addHandler(StreamHandler())
 
     _dump_state(args)
 
     app_config = {}
-
-    sh('apt-get update')
 
     system_setup = SystemSetup(args, abort)
     system_setup()
@@ -745,12 +779,6 @@ def main(args, abort):
 
     webapp_setup = WebappSetup(args, abort, app_config)
     webapp_setup()
-
-    LOG.info('All done. Lokole client %s is ready to be used.', args.client_name)
-
-    if args.reboot == 'yes':
-        LOG.info('System is rebooting.')
-        sh('shutdown --reboot now', user='root')
 
 
 def cli():
