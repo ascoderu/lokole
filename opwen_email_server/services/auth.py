@@ -1,4 +1,3 @@
-from json import JSONDecodeError
 from typing import Callable
 from typing import Dict
 from typing import Iterable
@@ -150,12 +149,7 @@ class AzureAuth(LogMixin):
             self.log_warning('Unrecognized domain %s', domain)
             return False
 
-        try:
-            auth = from_json(raw_auth)
-        except JSONDecodeError:
-            # fallback for clients registered before November 2019
-            self.log_warning('Unable to lookup owner for domain %s', domain)
-            return False
+        auth = from_json(raw_auth)
 
         return auth.get('owner') == username
 
@@ -170,14 +164,11 @@ class AzureAuth(LogMixin):
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized domain %s', domain)
             return None
-        else:
-            try:
-                client_id = from_json(raw_auth)['client_id']
-            except JSONDecodeError:
-                # fallback for clients registered before November 2019
-                client_id = raw_auth
-            self.log_debug('Domain %s has client %s', domain, client_id)
-            return client_id
+
+        client_id = from_json(raw_auth)['client_id']
+
+        self.log_debug('Domain %s has client %s', domain, client_id)
+        return client_id
 
     def domain_for(self, client_id: str) -> Optional[str]:
         try:

@@ -196,12 +196,3 @@ class AzureAuthTests(TestCase):
         self.assertIsNotNone(self._auth.domain_for('client'))
         self._auth.delete('client', 'domain')
         self.assertIsNone(self._auth.domain_for('client'))
-
-    def test_inserts_and_retrieves_client_backwards_compatibility_pre_november_2019(self):
-        # emulate pre november 2019 version of self._auth.insert
-        self._storage.store_text('client_id/client', 'domain')
-        self._storage.store_text('domain/domain', 'client')
-
-        self.assertEqual(self._auth.domain_for('client'), 'domain')
-        self.assertEqual(self._auth.client_id_for('domain'), 'client')
-        self.assertFalse(self._auth.is_owner('domain', 'owner'))
