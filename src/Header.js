@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Drawer, PageHeader } from 'antd';
+import { Drawer, PageHeader } from 'antd';
+import Button from './Button';
 import Settings from './Settings';
 
 class Header extends React.PureComponent {
@@ -23,7 +24,10 @@ class Header extends React.PureComponent {
             ? { src: settings.githubAvatarUrl }
             : { icon: 'user' }}
           extra={[
-            <Button onClick={this._onOpenSettings} key="settings">Settings</Button>,
+            <Button
+              onClick={this._onOpenSettings}
+              icon="setting"
+            />,
           ]}
         />
         <Drawer title="Settings" visible={isSettingsVisible} onClose={this._onCloseSettings}>

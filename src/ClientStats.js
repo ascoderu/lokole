@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, Empty, Icon, List, Popconfirm, notification } from 'antd';
+import { Card, Empty, List, Popconfirm, notification } from 'antd';
 import axios from 'axios';
+import Button from './Button';
 import Grid from './Grid';
 
 class ClientCard extends React.Component {
@@ -41,11 +42,13 @@ class ClientCard extends React.Component {
             onConfirm={this._onClickDelete}
             disabled={this.state.isDeleting}
           >
-            <Icon type={this.state.isDeleting ? 'loading' : 'delete'} />
+            <Button
+              icon={this.state.isDeleting ? 'loading' : 'delete'}
+            />
           </Popconfirm>,
           <div>
-            <Icon
-              type={this.state.isFetchingPendingEmails ? 'loading' : 'mail'}
+            <Button
+              icon={this.state.isFetchingPendingEmails ? 'loading' : 'mail'}
               onClick={this._onClickFetchPendingEmails}
             />
             {this.state.numPendingEmails != null && <span>&nbsp;{this.state.numPendingEmails}</span>}
