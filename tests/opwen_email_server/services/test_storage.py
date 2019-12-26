@@ -45,9 +45,11 @@ class AzureTextStorageTests(TestCase):
     def test_list(self):
         self._storage.store_text('resource1', 'a')
         self._storage.store_text('resource2.txt.gz', 'b')
-        self.assertEqual(sorted(self._storage.iter()), sorted(['resource1', 'resource2']))
+        self._storage.store_text('pa.th/to/re.sou.rce.txt.gz', 'b')
+        self.assertEqual(sorted(self._storage.iter()), sorted(['resource1', 'resource2', 'pa.th/to/re.sou.rce']))
 
         self._storage.delete('resource2')
+        self._storage.delete('pa.th/to/re.sou.rce')
         self.assertEqual(sorted(self._storage.iter()), sorted(['resource1']))
 
     def test_ensure_exists(self):

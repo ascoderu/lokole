@@ -21,7 +21,6 @@ from xtarfile import open as tarfile_open
 from xtarfile.xtarfile import SUPPORTED_FORMATS
 
 from opwen_email_server.utils.log import LogMixin
-from opwen_email_server.utils.path import get_extension
 from opwen_email_server.utils.serialization import from_msgpack_bytes
 from opwen_email_server.utils.serialization import gunzip_bytes
 from opwen_email_server.utils.serialization import gzip_bytes
@@ -67,6 +66,10 @@ class _BaseAzureStorage(LogMixin):
                 container = self._driver.get_container(self._container)
         return container
 
+    @property
+    def _generated_suffix(self) -> str:
+        return ''
+
     def access_info(self) -> AccessInfo:
         return AccessInfo(
             account=self._account,
@@ -89,8 +92,7 @@ class _BaseAzureStorage(LogMixin):
 
     def iter(self) -> Iterator[str]:
         for resource in self._client.list_objects():
-            extension = get_extension(resource.name)
-            resource_id = resource.name.replace(extension, '')
+            resource_id = resource.name.replace(self._generated_suffix, '')
             yield resource_id
             self.log_debug('listed %s', resource_id)
 
@@ -135,10 +137,13 @@ class _AzureBytesStorage(_BaseAzureStorage):
         super().delete(filename)
 
     def _to_filename(self, resource_id: str) -> str:
-        extension = f'.{self._extension}.{self._compression}'
-        if resource_id.endswith(extension):
+        if resource_id.endswith(self._generated_suffix):
             return resource_id
-        return f'{resource_id}{extension}'
+        return f'{resource_id}{self._generated_suffix}'
+
+    @property
+    def _generated_suffix(self) -> str:
+        return f'.{self._extension}.{self._compression}'
 
     @property
     def _extension(self) -> str:
