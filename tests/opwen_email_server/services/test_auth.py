@@ -10,7 +10,7 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
 from opwen_email_server.services.auth import GithubBasicAuth
-from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.services.storage import AzureObjectStorage
 from tests.opwen_email_server.helpers import MockResponses
 
 
@@ -170,7 +170,7 @@ class GithubBasicAuthTests(TestCase):
 class AzureAuthTests(TestCase):
     def setUp(self):
         self._folder = mkdtemp()
-        self._storage = AzureTextStorage(
+        self._storage = AzureObjectStorage(
             account=self._folder,
             key='key',
             container='auth',
@@ -191,17 +191,13 @@ class AzureAuthTests(TestCase):
         self.assertFalse(self._auth.is_owner('domain', 'unknown-user'))
         self.assertFalse(self._auth.is_owner('unknown-domain', 'owner'))
 
+    def test_lists_domains(self):
+        self._auth.insert('client1', 'domain1', 'owner1')
+        self._auth.insert('client2', 'domain2', 'owner2')
+        self.assertEqual(sorted(self._auth.domains()), sorted(['domain1', 'domain2']))
+
     def test_deletes_client(self):
         self._auth.insert('client', 'domain', 'owner')
         self.assertIsNotNone(self._auth.domain_for('client'))
         self._auth.delete('client', 'domain')
         self.assertIsNone(self._auth.domain_for('client'))
-
-    def test_inserts_and_retrieves_client_backwards_compatibility_pre_november_2019(self):
-        # emulate pre november 2019 version of self._auth.insert
-        self._storage.store_text('client', 'domain')
-        self._storage.store_text('domain', 'client')
-
-        self.assertEqual(self._auth.domain_for('client'), 'domain')
-        self.assertEqual(self._auth.client_id_for('domain'), 'client')
-        self.assertFalse(self._auth.is_owner('domain', 'owner'))

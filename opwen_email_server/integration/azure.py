@@ -13,7 +13,7 @@ from opwen_email_server.utils.collections import singleton
 
 @singleton
 def get_auth() -> AzureAuth:
-    return AzureAuth(storage=AzureTextStorage(
+    return AzureAuth(storage=AzureObjectStorage(
         account=config.TABLES_ACCOUNT,
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,

@@ -544,6 +544,26 @@ class CreateClientTests(TestCase):
         return action(*args, **kwargs)
 
 
+class ListClientsTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+
+    def test_200(self):
+        domains = ['1.test.com', '2.test.com']
+
+        self.auth.domains.return_value = domains
+
+        response = self._execute_action()
+
+        self.assertEqual(response['clients'], [{'domain': '1.test.com'}, {'domain': '2.test.com'}])
+        self.auth.domains.assert_called_once()
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.ListClients(auth=self.auth)
+
+        return action(*args, **kwargs)
+
+
 class GetClientTests(TestCase):
     def setUp(self):
         self.auth = Mock()

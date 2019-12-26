@@ -10,6 +10,19 @@ paths:
 
   '/':
 
+    get:
+      operationId: opwen_email_server.integration.connexion.client_list
+      summary: Endpoint to list all registered Lokole clients.
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Information about the clients.
+          schema:
+            $ref: '#/definitions/RegistrationInfos'
+      security:
+        - basic: []
+
     post:
       operationId: opwen_email_server.integration.connexion.client_create
       summary: Endpoint where Lokole clients register themselves.
@@ -99,6 +112,17 @@ definitions:
         type: string
     required:
       - domain
+
+  RegistrationInfos:
+    type: object
+    properties:
+      clients:
+        description: Domains of all registered clients.
+        type: array
+        items:
+          $ref: '#/definitions/RegistrationInfo'
+    required:
+      - clients
 
   RegisteredClient:
     type: object
