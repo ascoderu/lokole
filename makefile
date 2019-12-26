@@ -3,12 +3,9 @@ PY_ENV ?= ./venv
 .PHONY: venv tests
 default: ci
 
-$(PY_ENV)/requirements.txt.out: requirements.txt requirements-dev.txt
-	if [ ! -d $(PY_ENV) ]; then python3 -m venv $(PY_ENV) && $(PY_ENV)/bin/pip install -U pip wheel | tee $(PY_ENV)/requirements.txt.out; fi
-	$(PY_ENV)/bin/pip install -r requirements.txt | tee $(PY_ENV)/requirements.txt.out
-	$(PY_ENV)/bin/pip install -r requirements-dev.txt | tee $(PY_ENV)/requirements.txt.out
-
-venv: $(PY_ENV)/requirements.txt.out
+venv: requirements.txt requirements-dev.txt
+	if [ ! -d $(PY_ENV) ]; then python3 -m venv $(PY_ENV) && $(PY_ENV)/bin/pip install -U pip wheel; fi
+	$(PY_ENV)/bin/pip install -r requirements.txt -r requirements-dev.txt
 
 tests: venv
 	LOKOLE_LOG_LEVEL=CRITICAL $(PY_ENV)/bin/coverage run -m nose2 -v && \
