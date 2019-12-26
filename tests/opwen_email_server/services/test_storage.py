@@ -52,6 +52,16 @@ class AzureTextStorageTests(TestCase):
         self._storage.delete('pa.th/to/re.sou.rce')
         self.assertEqual(sorted(self._storage.iter()), sorted(['resource1']))
 
+    def test_list_with_prefix(self):
+        self._storage.store_text('one/a', 'a')
+        self._storage.store_text('one/b.txt.gz', 'b')
+        self._storage.store_text('two/c.txt.gz', 'c')
+        self._storage.store_text('two/d', 'd')
+        self._storage.store_text('two/e', 'e')
+        self._storage.store_text('f', 'f')
+        self.assertEqual(sorted(self._storage.iter('one/')), sorted(['a', 'b']))
+        self.assertEqual(sorted(self._storage.iter('two/')), sorted(['c', 'd', 'e']))
+
     def test_ensure_exists(self):
         self.assertFalse(isdir(join(self._folder, self._container)))
         self._storage.ensure_exists()

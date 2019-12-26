@@ -191,6 +191,11 @@ class AzureAuthTests(TestCase):
         self.assertFalse(self._auth.is_owner('domain', 'unknown-user'))
         self.assertFalse(self._auth.is_owner('unknown-domain', 'owner'))
 
+    def test_lists_domains(self):
+        self._auth.insert('client1', 'domain1', 'owner1')
+        self._auth.insert('client2', 'domain2', 'owner2')
+        self.assertEqual(sorted(self._auth.domains()), sorted(['domain1', 'domain2']))
+
     def test_deletes_client(self):
         self._auth.insert('client', 'domain', 'owner')
         self.assertIsNotNone(self._auth.domain_for('client'))

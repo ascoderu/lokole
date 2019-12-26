@@ -178,6 +178,9 @@ class AzureAuth(LogMixin):
             self.log_debug('Client %s has domain %s', client_id, domain)
             return domain
 
+    def domains(self) -> Iterable[str]:
+        return self._storage.iter(self._domain_file(''))
+
     @classmethod
     def _domain_file(cls, domain: str) -> str:
         return f'domain/{domain}'
