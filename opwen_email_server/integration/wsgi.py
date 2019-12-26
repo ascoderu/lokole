@@ -2,6 +2,7 @@
 
 from applicationinsights.flask.ext import AppInsights
 from connexion import App
+from flask import Flask
 
 from opwen_email_server import config
 
@@ -18,12 +19,16 @@ def build_app(apis, host=_host, port=_port, ui=_ui):
     for api in apis:
         app.add_api(api)
 
-    app.app.config['APPINSIGHTS_INSTRUMENTATIONKEY'] = config.APPINSIGHTS_KEY
-    app.app.config['APPINSIGHTS_ENDPOINT_URI'] = config.APPINSIGHTS_HOST
-    app.app.config['APPINSIGHTS_DISABLE_TRACE_LOGGING'] = True
-    AppInsights(app.app)
+    _configure_flask(app.app)
 
     return app
+
+
+def _configure_flask(app: Flask):
+    app.config['APPINSIGHTS_INSTRUMENTATIONKEY'] = config.APPINSIGHTS_KEY
+    app.config['APPINSIGHTS_ENDPOINT_URI'] = config.APPINSIGHTS_HOST
+    app.config['APPINSIGHTS_DISABLE_TRACE_LOGGING'] = True
+    AppInsights(app)
 
 
 def _cli():
