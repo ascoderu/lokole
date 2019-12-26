@@ -103,6 +103,7 @@ verify-build:
 
 release:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
+    export BUILD_TARGET="runtime"; \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
     docker-compose build && \
