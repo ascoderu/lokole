@@ -41,6 +41,16 @@ wait_for_appinsights() {
   log "Appinsights is running"
 }
 
+wait_for_api() {
+  while ! curl -fs "http://nginx:8888/healthcheck/ping" >/dev/null; do
+    log "Waiting for api"
+    sleep "${polling_interval_seconds}s"
+  done
+
+  log "Api is running"
+}
+
 wait_for_rabbitmq
 wait_for_postgres
 wait_for_appinsights
+wait_for_api
