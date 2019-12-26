@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Icon, Input, Button } from 'antd';
+import { Button, Form, Icon, Input } from 'antd';
 import axios from 'axios';
 
 const githubApi = axios.create({ baseURL: 'https://api.github.com' });
