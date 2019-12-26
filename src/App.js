@@ -27,7 +27,7 @@ class App extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Layout>
+        <Layout style={{ minHeight: '100vh' }}>
           <Header settings={this.state.settings} onChangeSettings={this._onChangeSettings} />
           <Layout.Content style={{ padding: '0 50px' }}>
             <Divider>Stats</Divider>
