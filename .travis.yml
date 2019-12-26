@@ -7,3 +7,14 @@ cache: yarn
 
 install: yarn install
 script: yarn run lint
+
+before_deploy:
+  - yarn run build
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  local-dir: build
+  on:
+    branch: master
