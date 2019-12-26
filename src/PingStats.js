@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Icon, List, Statistic } from 'antd';
 import axios from 'axios';
+import Grid from './Grid';
 
 const colors = {
   success: '#3f8600',
@@ -58,9 +59,7 @@ class PingStats extends React.Component {
 
   render() {
     return (
-      <List
-        grid={{ gutter: 16, column: 4 }}
-        itemLayout="vertical"
+      <Grid
         loading={this.state.pingTimeMillis == null || this.state.pingSuccess == null}
         dataSource={[
           {

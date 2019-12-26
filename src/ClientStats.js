@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Empty, Icon, List, Popconfirm, notification } from 'antd';
 import axios from 'axios';
+import Grid from './Grid';
 
 class ClientCard extends React.Component {
   state = {
@@ -147,9 +148,7 @@ class ClientStats extends React.Component {
     }
 
     return (
-      <List
-        grid={{ gutter: 16, column: 4 }}
-        itemLayout="vertical"
+      <Grid
         loading={this.state.isLoading}
         dataSource={this.state.clients}
         renderItem={this._renderListItem}
