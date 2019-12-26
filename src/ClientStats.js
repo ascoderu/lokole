@@ -12,51 +12,73 @@ class ClientCard extends React.Component {
   };
 
   _onClickDelete = async () => {
-    if (this.state.isDeleting) {
+    const { domain, onDelete } = this.props;
+    const { isDeleting } = this.state;
+
+    if (isDeleting) {
       return;
     }
 
     this.setState({ isDeleting: true });
-    await this.props.onDelete(this.props.domain);
+    await onDelete(domain);
     this.setState({ isDeleting: false });
   };
 
   _onClickFetchPendingEmails = async () => {
-    if (this.state.isFetchingPendingEmails) {
+    const { domain, fetchNumPendingEmails } = this.props;
+    const { isFetchingPendingEmails } = this.state;
+
+    if (isFetchingPendingEmails) {
       return;
     }
 
     this.setState({ isFetchingPendingEmails: true });
-    const numPendingEmails = await this.props.fetchNumPendingEmails(this.props.domain);
+    const numPendingEmails = await fetchNumPendingEmails(domain);
     this.setState({ isFetchingPendingEmails: false, numPendingEmails });
   };
 
   render() {
+    const { domain } = this.props;
+
+    const {
+      isDeleting,
+      isFetchingPendingEmails,
+      numPendingEmails,
+    } = this.state;
+
     return (
       <Card
         actions={[
           <Popconfirm
-            title={<span>This will delete client <em>{this.props.domain}</em>.<br />Are you sure?</span>}
+            title={
+              <span>
+                This will delete client <em>{domain}</em>.
+                <br />
+                Are you sure?
+              </span>
+            }
             cancelText="No, cancel."
             okText="Yes, delete!"
             onConfirm={this._onClickDelete}
-            disabled={this.state.isDeleting}
+            disabled={isDeleting}
           >
-            <Button
-              icon={this.state.isDeleting ? 'loading' : 'delete'}
-            />
+            <Button icon={isDeleting ? 'loading' : 'delete'} />
           </Popconfirm>,
           <div>
             <Button
-              icon={this.state.isFetchingPendingEmails ? 'loading' : 'mail'}
+              icon={isFetchingPendingEmails ? 'loading' : 'mail'}
               onClick={this._onClickFetchPendingEmails}
             />
-            {this.state.numPendingEmails != null && <span>&nbsp;{this.state.numPendingEmails}</span>}
+            {this.state.numPendingEmails != null && (
+              <span>&nbsp;{numPendingEmails}</span>
+            )}
           </div>,
         ]}
-        style={{ textDecoration: this.state.isDeleting ? 'line-through' : undefined }}
+        style={{
+          textDecoration: isDeleting ? 'line-through' : undefined,
+        }}
       >
-        {this.props.domain}
+        {domain}
       </Card>
     );
   }
@@ -69,17 +91,25 @@ class ClientStats extends React.Component {
   };
 
   get _client() {
+    const {
+      serverEndpoint,
+      githubUsername,
+      githubAccessToken,
+    } = this.props.settings;
+
     return axios.create({
-      baseURL: this.props.settings.serverEndpoint,
+      baseURL: serverEndpoint,
       auth: {
-        username: this.props.settings.githubUsername,
-        password: this.props.settings.githubAccessToken,
+        username: githubUsername,
+        password: githubAccessToken,
       },
     });
   }
 
   get _isEnabled() {
-    return this.props.settings.githubUsername && this.props.settings.githubAccessToken;
+    const { githubUsername, githubAccessToken } = this.props.settings;
+
+    return githubUsername && githubAccessToken;
   }
 
   _fetchClients = async () => {
@@ -98,11 +128,12 @@ class ClientStats extends React.Component {
       clients: response.data.clients.sort(),
       isLoading: false,
     });
-  }
+  };
 
-  _deleteClient = async (domain) => {
+  _deleteClient = async domain => {
     try {
-      await this._client.delete(`/api/email/register/${domain}`)
+      await this._client
+        .delete(`/api/email/register/${domain}`)
         .then(this._fetchClients);
     } catch (e) {
       notification.error({
@@ -112,9 +143,11 @@ class ClientStats extends React.Component {
     }
   };
 
-  _fetchNumPendingEmails = async (domain) => {
+  _fetchNumPendingEmails = async domain => {
     try {
-      const response = await this._client.get(`/api/email/metrics/pending/${domain}`);
+      const response = await this._client.get(
+        `/api/email/metrics/pending/${domain}`
+      );
       return response.data.pending_emails;
     } catch (e) {
       notification.error({
@@ -144,6 +177,8 @@ class ClientStats extends React.Component {
   }
 
   render() {
+    const { isLoading, clients } = this.state;
+
     if (!this._isEnabled) {
       return (
         <Empty description="Add Github access token in settings to view clients." />
@@ -152,8 +187,8 @@ class ClientStats extends React.Component {
 
     return (
       <Grid
-        loading={this.state.isLoading}
-        dataSource={this.state.clients}
+        loading={isLoading}
+        dataSource={clients}
         renderItem={this._renderListItem}
       />
     );

@@ -16,7 +16,10 @@ const defaultSettings = {
 
 class App extends React.Component {
   state = {
-    settings: { ...defaultSettings, ...JSON.parse(localStorage.getItem(localStorageKey)) },
+    settings: {
+      ...defaultSettings,
+      ...JSON.parse(localStorage.getItem(localStorageKey)),
+    },
   };
 
   _onChangeSettings = settings => {
@@ -25,16 +28,26 @@ class App extends React.Component {
   };
 
   render() {
+    const { settings } = this.state;
+
     return (
       <React.Fragment>
         <Layout style={{ minHeight: '100vh' }}>
-          <Header settings={this.state.settings} onChangeSettings={this._onChangeSettings} />
+          <Header
+            settings={settings}
+            onChangeSettings={this._onChangeSettings}
+          />
           <Layout.Content style={{ padding: '0 50px' }}>
             <Divider>Stats</Divider>
-            <PingStats settings={this.state.settings} key={`stats-${this.state.settings.updatedAt}`} />
-
+            <PingStats
+              settings={settings}
+              key={`stats-${settings.updatedAt}`}
+            />
             <Divider>Clients</Divider>
-            <ClientStats settings={this.state.settings} key={`clients-${this.state.settings.updatedAt}`} />
+            <ClientStats
+              settings={settings}
+              key={`clients-${settings.updatedAt}`}
+            />
           </Layout.Content>
         </Layout>
       </React.Fragment>

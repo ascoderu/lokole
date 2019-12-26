@@ -16,111 +16,145 @@ const colors = {
 
 class SettingsForm extends React.Component {
   _validateGithubAccessToken = async (_rule, value, callback) => {
-    const { setFieldsValue } = this.props.form;
+    const { form } = this.props;
 
     if (!value) {
-      setFieldsValue({
-        githubUsername: undefined,
-        githubAvatarUrl: undefined,
-      }, callback);
+      form.setFieldsValue(
+        {
+          githubUsername: undefined,
+          githubAvatarUrl: undefined,
+        },
+        callback
+      );
       return;
     }
 
+    let response;
     try {
-      const response = await githubApi.get('/user', {
-        headers: { Authorization: `Token ${value}` }
-      })
-      setFieldsValue({
-        githubUsername: response.data.login,
-        githubAvatarUrl: response.data.avatar_url,
-      }, callback);
+      response = await githubApi.get('/user', {
+        headers: { Authorization: `Token ${value}` },
+      });
     } catch (error) {
       callback(error.response.data.message);
       return;
     }
+
+    form.setFieldsValue(
+      {
+        githubUsername: response.data.login,
+        githubAvatarUrl: response.data.avatar_url,
+      },
+      callback
+    );
   };
 
   handleSubmit = e => {
+    const { form, onChange } = this.props;
+
     e.preventDefault();
 
-    this.props.form.validateFields((err, values) => {
+    form.validateFields((err, values) => {
       if (!err) {
-        this.props.onChange({ ...values, updatedAt: `${new Date()}` });
+        onChange({ ...values, updatedAt: `${new Date()}` });
       }
     });
   };
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { form } = this.props;
+
+    const {
+      serverEndpoint,
+      githubAccessToken,
+      githubUsername,
+      githubAvatarUrl,
+      pingIntervalSeconds,
+      pingMaxLatencyMillis,
+    } = this.props.initialValue;
 
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item label="Server endpoint">
-          {getFieldDecorator('serverEndpoint', {
-            rules: [{ required: true, message: 'Please input the server endpoint!' }],
-            initialValue: this.props.initialValue.serverEndpoint,
+          {form.getFieldDecorator('serverEndpoint', {
+            rules: [
+              {
+                required: true,
+                message: 'Please input the endpoint URL of the Lokole server',
+              },
+            ],
+            initialValue: serverEndpoint,
           })(
             <Input
               prefix={<Icon type="api" style={{ color: colors.icon }} />}
               placeholder="http://localhost:8080"
-            />,
+            />
           )}
         </Form.Item>
         <Form.Item label="Github access token">
-          {getFieldDecorator('githubAccessToken', {
+          {form.getFieldDecorator('githubAccessToken', {
             rules: [{ validator: this._validateGithubAccessToken }],
-            initialValue: this.props.initialValue.githubAccessToken,
+            initialValue: githubAccessToken,
           })(
             <Input.Password
               prefix={<Icon type="github" style={{ color: colors.icon }} />}
               placeholder="1234567abcdefgh"
-            />,
+            />
           )}
         </Form.Item>
-        <Form.Item style={{display: 'none' }}>
-          {getFieldDecorator('githubUsername', {
-            initialValue: this.props.initialValue.githubUsername,
-          })(
-            <Input readOnly hidden />,
-          )}
+        <Form.Item style={{ display: 'none' }}>
+          {form.getFieldDecorator('githubUsername', {
+            initialValue: githubUsername,
+          })(<Input readOnly hidden />)}
         </Form.Item>
-        <Form.Item style={{display: 'none' }}>
-          {getFieldDecorator('githubAvatarUrl', {
-            initialValue: this.props.initialValue.githubAvatarUrl,
-          })(
-            <Input readOnly hidden />,
-          )}
+        <Form.Item style={{ display: 'none' }}>
+          {form.getFieldDecorator('githubAvatarUrl', {
+            initialValue: githubAvatarUrl,
+          })(<Input readOnly hidden />)}
         </Form.Item>
         <Form.Item label="Ping interval">
-          {getFieldDecorator('pingIntervalSeconds', {
-            rules: [{ required: true, message: 'Please input the ping interval in seconds' }],
-            initialValue: this.props.initialValue.pingIntervalSeconds,
+          {form.getFieldDecorator('pingIntervalSeconds', {
+            rules: [
+              {
+                required: true,
+                message: 'Please input the ping interval in seconds',
+              },
+            ],
+            initialValue: pingIntervalSeconds,
           })(
             <InputNumber
               style={{ width: '100%' }}
-              prefix={<Icon type="clock-circle" style={{ color: colors.icon }} />}
+              prefix={
+                <Icon type="clock-circle" style={{ color: colors.icon }} />
+              }
               placeholder="10 seconds"
               formatter={formatSeconds}
               parser={parseSeconds}
               min={1}
               max={60}
-            />,
+            />
           )}
         </Form.Item>
         <Form.Item label="Ping maximum latency">
-          {getFieldDecorator('pingMaxLatencyMillis', {
-            rules: [{ required: true, message: 'Please input the maximum acceptable ping latency in milliseconds' }],
-            initialValue: this.props.initialValue.pingMaxLatencyMillis,
+          {form.getFieldDecorator('pingMaxLatencyMillis', {
+            rules: [
+              {
+                required: true,
+                message: 'Please input the maximum ping latency in ms',
+              },
+            ],
+            initialValue: pingMaxLatencyMillis,
           })(
             <InputNumber
               style={{ width: '100%' }}
-              prefix={<Icon type="clock-circle" style={{ color: colors.icon }} />}
+              prefix={
+                <Icon type="clock-circle" style={{ color: colors.icon }} />
+              }
               placeholder="100 ms"
               formatter={formatMillis}
               parser={parseMillis}
               min={50}
               max={2000}
-            />,
+            />
           )}
         </Form.Item>
         <Form.Item>

@@ -4,10 +4,7 @@ import { Icon, Tooltip } from 'antd';
 function Button({ onClick, icon, label }) {
   return (
     <Tooltip title={label}>
-      <Icon
-        type={icon}
-        onClick={onClick}
-      />
+      <Icon type={icon} onClick={onClick} />
     </Tooltip>
   );
 }

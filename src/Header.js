@@ -5,7 +5,7 @@ import Settings from './Settings';
 
 class Header extends React.PureComponent {
   state = {
-    isSettingsVisible: false
+    isSettingsVisible: false,
   };
 
   _onOpenSettings = () => this.setState({ isSettingsVisible: true });
@@ -20,17 +20,18 @@ class Header extends React.PureComponent {
       <React.Fragment>
         <PageHeader
           title="Opwen Status Dashboard"
-          avatar={settings.githubAvatarUrl != null
-            ? { src: settings.githubAvatarUrl }
-            : { icon: 'user' }}
-          extra={[
-            <Button
-              onClick={this._onOpenSettings}
-              icon="setting"
-            />,
-          ]}
+          avatar={
+            settings.githubAvatarUrl != null
+              ? { src: settings.githubAvatarUrl }
+              : { icon: 'user' }
+          }
+          extra={[<Button onClick={this._onOpenSettings} icon="setting" />]}
         />
-        <Drawer title="Settings" visible={isSettingsVisible} onClose={this._onCloseSettings}>
+        <Drawer
+          title="Settings"
+          visible={isSettingsVisible}
+          onClose={this._onCloseSettings}
+        >
           <Settings initialValue={settings} onChange={onChangeSettings} />
         </Drawer>
       </React.Fragment>
