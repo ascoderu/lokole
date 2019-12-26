@@ -139,13 +139,13 @@ class AzureAuth(LogMixin):
         self._storage = storage
 
     def insert(self, client_id: str, domain: str, owner: str):
-        self._storage.store_text(client_id, domain)
-        self._storage.store_text(domain, to_json({'client_id': client_id, 'owner': owner}))
+        self._storage.store_text(self._client_id_file(client_id), domain)
+        self._storage.store_text(self._domain_file(domain), to_json({'client_id': client_id, 'owner': owner}))
         self.log_info('Registered client %s at domain %s', client_id, domain)
 
     def is_owner(self, domain: str, username: str) -> bool:
         try:
-            raw_auth = self._storage.fetch_text(domain)
+            raw_auth = self._storage.fetch_text(self._domain_file(domain))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized domain %s', domain)
             return False
@@ -160,13 +160,13 @@ class AzureAuth(LogMixin):
         return auth.get('owner') == username
 
     def delete(self, client_id: str, domain: str) -> bool:
-        self._storage.delete(domain)
-        self._storage.delete(client_id)
+        self._storage.delete(self._domain_file(domain))
+        self._storage.delete(self._client_id_file(client_id))
         return True
 
     def client_id_for(self, domain: str) -> Optional[str]:
         try:
-            raw_auth = self._storage.fetch_text(domain)
+            raw_auth = self._storage.fetch_text(self._domain_file(domain))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized domain %s', domain)
             return None
@@ -181,10 +181,18 @@ class AzureAuth(LogMixin):
 
     def domain_for(self, client_id: str) -> Optional[str]:
         try:
-            domain = self._storage.fetch_text(client_id)
+            domain = self._storage.fetch_text(self._client_id_file(client_id))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized client %s', client_id)
             return None
         else:
             self.log_debug('Client %s has domain %s', client_id, domain)
             return domain
+
+    @classmethod
+    def _domain_file(cls, domain: str) -> str:
+        return f'domain/{domain}'
+
+    @classmethod
+    def _client_id_file(cls, client_id: str) -> str:
+        return f'client_id/{client_id}'

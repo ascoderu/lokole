@@ -199,8 +199,8 @@ class AzureAuthTests(TestCase):
 
     def test_inserts_and_retrieves_client_backwards_compatibility_pre_november_2019(self):
         # emulate pre november 2019 version of self._auth.insert
-        self._storage.store_text('client', 'domain')
-        self._storage.store_text('domain', 'client')
+        self._storage.store_text('client_id/client', 'domain')
+        self._storage.store_text('domain/domain', 'client')
 
         self.assertEqual(self._auth.domain_for('client'), 'domain')
         self.assertEqual(self._auth.client_id_for('domain'), 'client')
