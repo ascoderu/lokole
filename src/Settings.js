@@ -45,25 +45,25 @@ class SettingsForm extends React.Component {
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item>
+        <Form.Item label="Server endpoint">
           {getFieldDecorator('serverEndpoint', {
             rules: [{ required: true, message: 'Please input the server endpoint!' }],
             initialValue: this.props.initialValue.serverEndpoint || 'https://mailserver.lokole.ca',
           })(
             <Input
               prefix={<Icon type="api" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Enter server endpoint"
+              placeholder="http://localhost:8080"
             />,
           )}
         </Form.Item>
-        <Form.Item>
+        <Form.Item label="Github access token">
           {getFieldDecorator('githubAccessToken', {
             rules: [{ validator: this._validateGithubAccessToken }],
             initialValue: this.props.initialValue.githubAccessToken,
           })(
             <Input.Password
               prefix={<Icon type="github" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Enter Github access token"
+              placeholder="1234567abcdefgh"
             />,
           )}
         </Form.Item>
