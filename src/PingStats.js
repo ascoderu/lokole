@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Col, Icon, Row, Statistic } from 'antd';
+import { Card, Icon, List, Statistic } from 'antd';
 import axios from 'axios';
 
 const colors = {
@@ -35,6 +35,16 @@ class PingStats extends React.Component {
     });
   };
 
+  _renderListItem = (props) => {
+    return (
+      <List.Item key={props.title}>
+        <Card>
+          <Statistic {...props} />
+        </Card>
+      </List.Item>
+    );
+  }
+
   async componentDidMount() {
     await this._onPing();
     this._pingInterval = setInterval(this._onPing, this.props.settings.pingIntervalSeconds * 1000);
@@ -48,29 +58,30 @@ class PingStats extends React.Component {
 
   render() {
     return (
-      <Row gutter={16}>
-        <Col span={6}>
-          <Card loading={this.state.pingTimeMillis == null}>
-            <Statistic
-              title="Ping time"
-              value={this.state.pingTimeMillis}
-              suffix="ms"
-              valueStyle={{ color: this.state.pingTimeMillis <= this.props.settings.pingMaxLatencyMillis
-                ? colors.success : colors.failure }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card loading={this.state.pingSuccess == null}>
-            <Statistic
-              title="Ping status"
-              value={this.state.pingSuccess ? 'Ok' : this.state.pingError }
-              prefix={this.state.pingSuccess ? undefined : <Icon type="warning" />}
-              valueStyle={{ color: this.state.pingSuccess ? colors.success : colors.failure }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <List
+        grid={{ gutter: 16, column: 4 }}
+        itemLayout="vertical"
+        loading={this.state.pingTimeMillis == null || this.state.pingSuccess == null}
+        dataSource={[
+          {
+            title: 'Ping time',
+            value: this.state.pingTimeMillis,
+            suffix: 'ms',
+            valueStyle: {
+              color: this.state.pingTimeMillis <= this.props.settings.pingMaxLatencyMillis
+                ? colors.success
+                : colors.failure,
+            },
+          },
+          {
+            title: 'Ping status',
+            value: this.state.pingSuccess ? 'Ok' : this.state.pingError,
+            prefix: this.state.pingSuccess ? undefined : <Icon type="warning" />,
+            valueStyle: { color: this.state.pingSuccess ? colors.success : colors.failure },
+          },
+        ]}
+        renderItem={this._renderListItem}
+      />
     );
   }
 }
