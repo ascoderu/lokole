@@ -4,9 +4,14 @@ import Header from './Header';
 
 const localStorageKey = 'settings';
 
+const defaultSettings = {
+  githubAccessToken: undefined,
+  serverEndpoint: 'https://mailserver.lokole.ca',
+};
+
 class App extends React.Component {
   state = {
-    settings: JSON.parse(localStorage.getItem(localStorageKey)) || {},
+    settings: { ...defaultSettings, ...JSON.parse(localStorage.getItem(localStorageKey)) },
   };
 
   _onChangeSettings = settings => {

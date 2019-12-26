@@ -48,7 +48,7 @@ class SettingsForm extends React.Component {
         <Form.Item label="Server endpoint">
           {getFieldDecorator('serverEndpoint', {
             rules: [{ required: true, message: 'Please input the server endpoint!' }],
-            initialValue: this.props.initialValue.serverEndpoint || 'https://mailserver.lokole.ca',
+            initialValue: this.props.initialValue.serverEndpoint,
           })(
             <Input
               prefix={<Icon type="api" style={{ color: 'rgba(0,0,0,.25)' }} />}
