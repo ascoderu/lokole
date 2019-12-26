@@ -2,10 +2,46 @@ import React from 'react';
 import { Card, Empty, Icon, List, Popconfirm, notification } from 'antd';
 import axios from 'axios';
 
+class ClientCard extends React.Component {
+  state = {
+    isDeleting: false,
+  };
+
+  _onClickDelete = async () => {
+    if (this.state.isDeleting) {
+      return;
+    }
+
+    this.setState({ isDeleting: true });
+    await this.props.onDelete(this.props.domain);
+    this.setState({ isDeleting: false });
+  };
+
+  render() {
+    return (
+      <Card
+        actions={[
+          <Popconfirm
+            title={<span>This will delete client <em>{this.props.domain}</em>.<br />Are you sure?</span>}
+            cancelText="No, cancel."
+            okText="Yes, delete!"
+            onConfirm={this._onClickDelete}
+            disabled={this.state.isDeleting}
+          >
+            <Icon type={this.state.isDeleting ? 'loading' : 'delete'} />
+          </Popconfirm>,
+        ]}
+        style={{ textDecoration: this.state.isDeleting ? 'line-through' : undefined }}
+      >
+        {this.props.domain}
+      </Card>
+    );
+  }
+}
+
 class ClientStats extends React.Component {
   state = {
     clients: [],
-    isDeleting: {},
     isLoading: true,
   };
 
@@ -41,51 +77,25 @@ class ClientStats extends React.Component {
     });
   }
 
-  _deleteClient = (domain) => () => {
-    const setDeleting = (value, callback) => {
-      this.setState(prevState => ({
-        isDeleting: {
-          ...prevState.isDeleting,
-          [domain]: value,
-        },
-      }), callback);
-    };
-
-    setDeleting(true, async () => {
-      try {
-        await this._client.delete(`/api/email/register/${domain}`)
-          .then(this._fetchClients);
-      } catch (e) {
-        notification.error({
-          message: `Unable to delete client ${domain}`,
-          description: e.response.data || e.message,
-        });
-      }
-      setDeleting(false);
-    });
+  _deleteClient = async (domain) => {
+    try {
+      await this._client.delete(`/api/email/register/${domain}`)
+        .then(this._fetchClients);
+    } catch (e) {
+      notification.error({
+        message: `Unable to delete client ${domain}`,
+        description: e.response.data || e.message,
+      });
+    }
   };
 
   _renderListItem = ({ domain }) => {
-    const isDeleting = this.state.isDeleting[domain];
-
     return (
       <List.Item key={domain}>
-        <Card
-          actions={[
-            <Popconfirm
-              title={<span>This will delete client <em>{domain}</em>.<br />Are you sure?</span>}
-              cancelText="No, cancel."
-              okText="Yes, delete!"
-              onConfirm={isDeleting ? undefined : this._deleteClient(domain)}
-              disabled={isDeleting}
-            >
-              <Icon type={isDeleting ? 'loading' : 'delete'} />
-            </Popconfirm>,
-          ]}
-          style={{ textDecoration: isDeleting ? 'line-through' : undefined }}
-        >
-          {domain}
-        </Card>
+        <ClientCard
+          domain={domain}
+          onDelete={this._deleteClient}
+        />
       </List.Item>
     );
   };
