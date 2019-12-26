@@ -3,6 +3,7 @@
 from applicationinsights.flask.ext import AppInsights
 from connexion import App
 from flask import Flask
+from flask_cors import CORS
 
 from opwen_email_server import config
 
@@ -29,6 +30,8 @@ def _configure_flask(app: Flask):
     app.config['APPINSIGHTS_ENDPOINT_URI'] = config.APPINSIGHTS_HOST
     app.config['APPINSIGHTS_DISABLE_TRACE_LOGGING'] = True
     AppInsights(app)
+
+    CORS(app)
 
 
 def _cli():
