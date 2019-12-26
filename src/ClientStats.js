@@ -85,7 +85,7 @@ class ClientStats extends React.Component {
     } catch (e) {
       notification.error({
         message: 'Unable to fetch clients',
-        description: e.response.data || e.message,
+        description: (e.response && e.response.data) || e.message,
       });
       return;
     }
@@ -103,7 +103,7 @@ class ClientStats extends React.Component {
     } catch (e) {
       notification.error({
         message: `Unable to delete client ${domain}`,
-        description: e.response.data || e.message,
+        description: (e.response && e.response.data) || e.message,
       });
     }
   };

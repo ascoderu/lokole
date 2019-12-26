@@ -24,7 +24,7 @@ class PingStats extends React.Component {
       await axios.get(`${this.props.settings.serverEndpoint}/healthcheck/ping`);
       pingSuccess = true;
     } catch (e) {
-      pingError = e.message || e.response.data;
+      pingError = (e.response && e.response.data) || e.message;
       pingSuccess = false;
     }
 
