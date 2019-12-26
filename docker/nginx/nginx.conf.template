@@ -22,6 +22,14 @@ http {
 
   keepalive_timeout 65;
 
+  upstream healthcheck_hosts {
+    server ${HOSTNAME_EMAIL_RECEIVE};
+    server ${HOSTNAME_CLIENT_METRICS};
+    server ${HOSTNAME_CLIENT_WRITE};
+    server ${HOSTNAME_CLIENT_READ};
+    server ${HOSTNAME_CLIENT_REGISTER};
+  }
+
   server {
     listen ${PORT};
 
@@ -35,6 +43,10 @@ http {
 
     location = /robots.txt {
       root /static;
+    }
+
+    location /healthcheck {
+      proxy_pass http://healthcheck_hosts;
     }
 
     location /api/email/sendgrid {
