@@ -1,10 +1,13 @@
 import React from 'react';
-import { Layout } from 'antd';
+import { Divider, Layout } from 'antd';
 import Header from './Header';
+import PingStats from './PingStats';
 
 const localStorageKey = 'settings';
 
 const defaultSettings = {
+  pingMaxLatencyMillis: 500,
+  pingIntervalSeconds: 5,
   githubAccessToken: undefined,
   serverEndpoint: 'https://mailserver.lokole.ca',
 };
@@ -24,8 +27,9 @@ class App extends React.Component {
       <React.Fragment>
         <Layout>
           <Header settings={this.state.settings} onChangeSettings={this._onChangeSettings} />
-          <Layout.Content style={{ padding: '25px 50px 0 50px' }}>
-            hi
+          <Layout.Content style={{ padding: '0 50px' }}>
+            <Divider>Stats</Divider>
+            <PingStats settings={this.state.settings} />
           </Layout.Content>
         </Layout>
       </React.Fragment>

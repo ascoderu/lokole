@@ -1,8 +1,14 @@
 import React from 'react';
-import { Button, Form, Icon, Input } from 'antd';
+import { Button, Form, Icon, Input, InputNumber } from 'antd';
 import axios from 'axios';
 
 const githubApi = axios.create({ baseURL: 'https://api.github.com' });
+
+const formatSeconds = value => `${value} seconds`;
+const parseSeconds = value => value.replace(/[^0-9]/g, '');
+
+const formatMillis = value => `${value} ms`;
+const parseMillis = value => value.replace(/[^0-9]/g, '');
 
 const colors = {
   icon: 'rgba(0, 0, 0, .25)',
@@ -83,6 +89,38 @@ class SettingsForm extends React.Component {
             initialValue: this.props.initialValue.githubAvatarUrl,
           })(
             <Input readOnly hidden />,
+          )}
+        </Form.Item>
+        <Form.Item label="Ping interval">
+          {getFieldDecorator('pingIntervalSeconds', {
+            rules: [{ required: true, message: 'Please input the ping interval in seconds' }],
+            initialValue: this.props.initialValue.pingIntervalSeconds,
+          })(
+            <InputNumber
+              style={{ width: '100%' }}
+              prefix={<Icon type="clock-circle" style={{ color: colors.icon }} />}
+              placeholder="10 seconds"
+              formatter={formatSeconds}
+              parser={parseSeconds}
+              min={1}
+              max={60}
+            />,
+          )}
+        </Form.Item>
+        <Form.Item label="Ping maximum latency">
+          {getFieldDecorator('pingMaxLatencyMillis', {
+            rules: [{ required: true, message: 'Please input the maximum acceptable ping latency in milliseconds' }],
+            initialValue: this.props.initialValue.pingMaxLatencyMillis,
+          })(
+            <InputNumber
+              style={{ width: '100%' }}
+              prefix={<Icon type="clock-circle" style={{ color: colors.icon }} />}
+              placeholder="100 ms"
+              formatter={formatMillis}
+              parser={parseMillis}
+              min={50}
+              max={2000}
+            />,
           )}
         </Form.Item>
         <Form.Item>
