@@ -5,6 +5,8 @@ import axios from 'axios';
 class ClientCard extends React.Component {
   state = {
     isDeleting: false,
+    isFetchingPendingEmails: false,
+    numPendingEmails: null,
   };
 
   _onClickDelete = async () => {
@@ -15,6 +17,16 @@ class ClientCard extends React.Component {
     this.setState({ isDeleting: true });
     await this.props.onDelete(this.props.domain);
     this.setState({ isDeleting: false });
+  };
+
+  _onClickFetchPendingEmails = async () => {
+    if (this.state.isFetchingPendingEmails) {
+      return;
+    }
+
+    this.setState({ isFetchingPendingEmails: true });
+    const numPendingEmails = await this.props.fetchNumPendingEmails(this.props.domain);
+    this.setState({ isFetchingPendingEmails: false, numPendingEmails });
   };
 
   render() {
@@ -30,6 +42,13 @@ class ClientCard extends React.Component {
           >
             <Icon type={this.state.isDeleting ? 'loading' : 'delete'} />
           </Popconfirm>,
+          <div>
+            <Icon
+              type={this.state.isFetchingPendingEmails ? 'loading' : 'mail'}
+              onClick={this._onClickFetchPendingEmails}
+            />
+            {this.state.numPendingEmails != null && <span>&nbsp;{this.state.numPendingEmails}</span>}
+          </div>,
         ]}
         style={{ textDecoration: this.state.isDeleting ? 'line-through' : undefined }}
       >
@@ -89,12 +108,26 @@ class ClientStats extends React.Component {
     }
   };
 
+  _fetchNumPendingEmails = async (domain) => {
+    try {
+      const response = await this._client.get(`/api/email/metrics/pending/${domain}`);
+      return response.data.pending_emails;
+    } catch (e) {
+      notification.error({
+        message: `Unable to fetch pending emails for client ${domain}`,
+        description: (e.response && e.response.data) || e.message,
+      });
+      return null;
+    }
+  };
+
   _renderListItem = ({ domain }) => {
     return (
       <List.Item key={domain}>
         <ClientCard
           domain={domain}
           onDelete={this._deleteClient}
+          fetchNumPendingEmails={this._fetchNumPendingEmails}
         />
       </List.Item>
     );
