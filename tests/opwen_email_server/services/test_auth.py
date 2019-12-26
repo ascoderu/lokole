@@ -10,7 +10,7 @@ from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
 from opwen_email_server.services.auth import GithubBasicAuth
-from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.services.storage import AzureObjectStorage
 from tests.opwen_email_server.helpers import MockResponses
 
 
@@ -170,7 +170,7 @@ class GithubBasicAuthTests(TestCase):
 class AzureAuthTests(TestCase):
     def setUp(self):
         self._folder = mkdtemp()
-        self._storage = AzureTextStorage(
+        self._storage = AzureObjectStorage(
             account=self._folder,
             key='key',
             container='auth',

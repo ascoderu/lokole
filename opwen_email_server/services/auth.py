@@ -10,10 +10,8 @@ from requests import post as http_post
 
 from opwen_email_server.constants import events
 from opwen_email_server.constants import github
-from opwen_email_server.services.storage import AzureTextStorage
+from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.log import LogMixin
-from opwen_email_server.utils.serialization import from_json
-from opwen_email_server.utils.serialization import to_json
 
 
 class AnyOfBasicAuth(LogMixin):
@@ -134,22 +132,21 @@ class GithubBasicAuth(LogMixin):
 
 
 class AzureAuth(LogMixin):
-    def __init__(self, storage: AzureTextStorage) -> None:
+    def __init__(self, storage: AzureObjectStorage) -> None:
         self._storage = storage
 
     def insert(self, client_id: str, domain: str, owner: str):
-        self._storage.store_text(self._client_id_file(client_id), domain)
-        self._storage.store_text(self._domain_file(domain), to_json({'client_id': client_id, 'owner': owner}))
+        auth = {'client_id': client_id, 'owner': owner, 'domain': domain}
+        self._storage.store_object(self._client_id_file(client_id), auth)
+        self._storage.store_object(self._domain_file(domain), auth)
         self.log_info('Registered client %s at domain %s', client_id, domain)
 
     def is_owner(self, domain: str, username: str) -> bool:
         try:
-            raw_auth = self._storage.fetch_text(self._domain_file(domain))
+            auth = self._storage.fetch_object(self._domain_file(domain))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized domain %s', domain)
             return False
-
-        auth = from_json(raw_auth)
 
         return auth.get('owner') == username
 
@@ -160,23 +157,24 @@ class AzureAuth(LogMixin):
 
     def client_id_for(self, domain: str) -> Optional[str]:
         try:
-            raw_auth = self._storage.fetch_text(self._domain_file(domain))
+            auth = self._storage.fetch_object(self._domain_file(domain))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized domain %s', domain)
             return None
 
-        client_id = from_json(raw_auth)['client_id']
+        client_id = auth['client_id']
 
         self.log_debug('Domain %s has client %s', domain, client_id)
         return client_id
 
     def domain_for(self, client_id: str) -> Optional[str]:
         try:
-            domain = self._storage.fetch_text(self._client_id_file(client_id))
+            auth = self._storage.fetch_object(self._client_id_file(client_id))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized client %s', client_id)
             return None
         else:
+            domain = auth['domain']
             self.log_debug('Client %s has domain %s', client_id, domain)
             return domain
 
