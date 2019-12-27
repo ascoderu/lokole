@@ -120,19 +120,20 @@ class ClientStats extends React.Component {
   }
 
   _fetchClients = async () => {
-    let response;
+    let { clients } = this.state;
+
     try {
-      response = await this._client.get('/api/email/register/');
+      const response = await this._client.get('/api/email/register/');
+      clients = response.data.clients.sort();
     } catch (e) {
       notification.error({
         message: 'Unable to fetch clients',
         description: (e.response && e.response.data) || e.message,
       });
-      return;
     }
 
     this.setState({
-      clients: response.data.clients.sort(),
+      clients,
       isLoading: false,
     });
   };
