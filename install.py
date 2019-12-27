@@ -94,7 +94,8 @@ class Setup:
 
     def _install_dependencies(self):
         if self.packages:
-            self.sh('apt-get install -y {}'.format(' '.join(self.packages)))
+            self.sh('apt-get install -y {}'.format(' '.join(self.packages)),
+                    retry_attempts=10, retry_interval=60)
 
     def _run(self):
         raise NotImplementedError
@@ -215,7 +216,7 @@ class SystemSetup(Setup):
             self.abort('Must run script via sudo')
 
     def _ensure_apt(self):
-        self.sh('apt-get update')
+        self.sh('apt-get update', retry_attempts=10, retry_interval=30)
 
     def _set_locale(self):
         locale_command = (
