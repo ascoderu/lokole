@@ -447,15 +447,12 @@ class CalculateNumberOfUsersMetric(_Action):
 
 class CalculatePendingEmailsMetric(_Action):
     def __init__(self, auth: AzureAuth, pending_factory: Callable[[str], AzureTextStorage]):
-
         self._auth = auth
         self._pending_factory = pending_factory
 
     def _action(self, domain, **auth_args):  # type: ignore
-        client_id = self._auth.client_id_for(domain)
-        if not client_id:
-            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'domain': domain})  # noqa: E501  # yapf: disable
-            return 'unknown client domain', 404
+        if not self._auth.is_owner(domain, auth_args.get('user')):
+            return 'client does not belong to the user', 403
 
         pending_storage = self._pending_factory(domain)
         pending_emails = sum(1 for _ in pending_storage.iter())

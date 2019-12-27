@@ -749,34 +749,33 @@ class CalculatePendingEmailsMetricTests(TestCase):
         self.pending_storage = Mock()
         self.pending_factory = MagicMock()
 
-    def test_404(self):
-        domain = 'does.not.exist'
-        client_id = None
+    def test_403(self):
+        domain = 'test.com'
+        user = 'user'
 
-        self.auth.client_id_for.return_value = client_id
+        self.auth.is_owner.return_value = False
 
-        _, status = self._execute_action(domain)
+        _, status = self._execute_action(domain, user=user)
 
-        self.assertEqual(status, 404)
-        self.auth.client_id_for.assert_called_once_with(domain)
+        self.assertEqual(status, 403)
 
     def test_200(self):
         domain = 'test.com'
-        client_id = 'e8e5caa4-4ee6-4e7f-99c9-e231b6a27a9f'
+        user = 'user'
         pending_email_ids = [
             '1de2ceb6-4f82-4cad-86ac-815bcbcb801c',
             '9eb3f071-0f95-4317-befa-060c05ba3632',
             '1e79ad99-1778-47b0-a2db-3c3be404640d',
         ]
 
-        self.auth.client_id_for.return_value = client_id
+        self.auth.is_owner.return_value = True
         self.pending_factory.return_value = self.pending_storage
         self.pending_storage.iter.return_value = pending_email_ids
 
-        response = self._execute_action(domain)
+        response = self._execute_action(domain, user=user)
 
         self.assertEqual(response['pending_emails'], len(pending_email_ids))
-        self.auth.client_id_for.assert_called_once_with(domain)
+        self.auth.is_owner.assert_called_once_with(domain, user)
         self.pending_factory.assert_called_once_with(domain)
         self.pending_storage.iter.assert_called_once_with()
 
