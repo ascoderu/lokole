@@ -10,6 +10,8 @@ class ClientCard extends React.Component {
     isDeleting: false,
     isFetchingPendingEmails: false,
     numPendingEmails: null,
+    isFetchingNumberOfUsers: false,
+    numUsers: null,
   };
 
   _onClickDelete = async () => {
@@ -38,6 +40,19 @@ class ClientCard extends React.Component {
     this.setState({ isFetchingPendingEmails: false, numPendingEmails });
   };
 
+  _onClickFetchNumberOfUsers = async () => {
+    const { domain, fetchNumUsers } = this.props;
+    const { isFetchingNumberOfUsers } = this.state;
+
+    if (isFetchingNumberOfUsers) {
+      return;
+    }
+
+    this.setState({ isFetchingNumberOfUsers: true });
+    const numUsers = await fetchNumUsers(domain);
+    this.setState({ isFetchingNumberOfUsers: false, numUsers });
+  };
+
   render() {
     const { domain } = this.props;
 
@@ -45,6 +60,8 @@ class ClientCard extends React.Component {
       isDeleting,
       isFetchingPendingEmails,
       numPendingEmails,
+      isFetchingNumberOfUsers,
+      numUsers,
     } = this.state;
 
     return (
@@ -73,6 +90,13 @@ class ClientCard extends React.Component {
             {this.state.numPendingEmails != null && (
               <span>&nbsp;{numPendingEmails}</span>
             )}
+          </div>,
+          <div>
+            <Button
+              icon={isFetchingNumberOfUsers ? 'loading' : 'user'}
+              onClick={this._onClickFetchNumberOfUsers}
+            />
+            {this.state.numUsers != null && <span>&nbsp;{numUsers}</span>}
           </div>,
         ]}
         style={{
@@ -166,6 +190,21 @@ class ClientStats extends React.Component {
     }
   };
 
+  _fetchNumUsers = async domain => {
+    try {
+      const response = await this._client.get(
+        `/api/email/metrics/users/${domain}`
+      );
+      return response.data.users;
+    } catch (e) {
+      notification.error({
+        message: `Unable to fetch number of users for client ${domain}`,
+        description: (e.response && e.response.data) || e.message,
+      });
+      return null;
+    }
+  };
+
   _renderListItem = ({ domain }) => {
     return (
       <List.Item key={domain}>
@@ -173,6 +212,7 @@ class ClientStats extends React.Component {
           domain={domain}
           onDelete={this._deleteClient}
           fetchNumPendingEmails={this._fetchNumPendingEmails}
+          fetchNumUsers={this._fetchNumUsers}
         />
       </List.Item>
     );
