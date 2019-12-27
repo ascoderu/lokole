@@ -12,4 +12,4 @@ Install the requirements via `yarn install`.
 
 Run the code quality checks via `yarn run ci`.
 
-Start the development server via `yarn start`.
+Start the development server via `yarn start` and view the dashboard at [http://localhost:3000](http://localhost:3000).
