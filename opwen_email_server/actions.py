@@ -192,10 +192,10 @@ class StoreWrittenClientEmails(_Action):
         num_stored = 0
         for user in users:
             email = user['email']
-            self._user_storage.store_object(email, user)
+            domain = get_domain(email)
+            self._user_storage.store_object(f'{domain}/{email}', user)
 
             num_stored += 1
-            domain = email.split('@')[1]
 
         self.log_event(events.USER_STORED_FROM_CLIENT, {'domain': domain, 'num_users': num_stored})  # noqa: E501  # yapf: disable
 
@@ -429,19 +429,35 @@ class DeleteClient(_Action):
         return 'OK', 200
 
 
+class CalculateNumberOfUsersMetric(_Action):
+    def __init__(self, auth: AzureAuth, user_storage: AzureObjectStorage):
+        self._auth = auth
+        self._user_storage = user_storage
+
+    def _action(self, domain, **auth_args):  # type: ignore
+        if not self._auth.is_owner(domain, auth_args.get('user')):
+            return 'client does not belong to the user', 403
+
+        users = sum(1 for _ in self._user_storage.iter(f'{domain}/'))
+
+        return {
+            'users': users,
+        }
+
+
 class CalculatePendingEmailsMetric(_Action):
     def __init__(self, auth: AzureAuth, pending_factory: Callable[[str], AzureTextStorage]):
 
         self._auth = auth
         self._pending_factory = pending_factory
 
-    def _action(self, client_domain, **auth_args):  # type: ignore
-        client_id = self._auth.client_id_for(client_domain)
+    def _action(self, domain, **auth_args):  # type: ignore
+        client_id = self._auth.client_id_for(domain)
         if not client_id:
-            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'client_domain': client_domain})  # noqa: E501  # yapf: disable
+            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'domain': domain})  # noqa: E501  # yapf: disable
             return 'unknown client domain', 404
 
-        pending_storage = self._pending_factory(client_domain)
+        pending_storage = self._pending_factory(domain)
         pending_emails = sum(1 for _ in pending_storage.iter())
 
         return {

@@ -8,7 +8,7 @@ basePath: '/api/email/metrics'
 
 paths:
 
-  '/pending/{client_domain}':
+  '/pending/{domain}':
 
     get:
       operationId: opwen_email_server.integration.connexion.metrics_pending
@@ -16,7 +16,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - $ref: '#/parameters/ClientDomain'
+        - $ref: '#/parameters/Domain'
       responses:
         200:
           description: The number of pending emails for the client.
@@ -27,6 +27,25 @@ paths:
       security:
         - basic: []
 
+  '/users/{domain}':
+
+    get:
+      operationId: opwen_email_server.integration.connexion.metrics_users
+      summary: Check how many users are registered for the client.
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/Domain'
+      responses:
+        200:
+          description: The number of users registered for the client.
+          schema:
+            $ref: '#/definitions/UsersMetric'
+        403:
+          description: The client does not belong to the user.
+      security:
+        - basic: []
+
 securityDefinitions:
   basic:
     type: basic
@@ -34,8 +53,8 @@ securityDefinitions:
 
 parameters:
 
-  ClientDomain:
-    name: client_domain
+  Domain:
+    name: domain
     description: Domain of the Lokole client.
     in: path
     type: string
@@ -51,3 +70,12 @@ definitions:
         type: integer
     required:
       - pending_emails
+
+  UsersMetric:
+    type: object
+    properties:
+      users:
+        description: The number of users.
+        type: integer
+    required:
+      - users

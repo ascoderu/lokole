@@ -241,7 +241,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         self.email_storage.store_object.assert_called_once_with(email_id, server_email)
         self.next_task.assert_called_once_with(email_id)
         self.client_storage.fetch_objects.assert_any_call(resource_id, (sync.USERS_FILE, from_jsonl_bytes))
-        self.user_storage.store_object.assert_called_once_with(user_email, user)
+        self.user_storage.store_object.assert_called_once_with(f'developer1.lokole.ca/{user_email}', user)
         self.client_storage.delete.assert_called_once_with(resource_id)
 
     def _execute_action(self, *args, **kwargs):
@@ -701,6 +701,48 @@ class DeleteClientTests(TestCase):
         return action(*args, **kwargs)
 
 
+class CalculateNumberOfUsersMetricTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.user_storage = Mock()
+
+    def test_403(self):
+        domain = 'test.com'
+        user = 'user'
+
+        self.auth.is_owner.return_value = False
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 403)
+
+    def test_200(self):
+        domain = 'test.com'
+        user = 'user'
+        users = [
+            'test.com/user1',
+            'test.com/user2',
+            'test.com/user3',
+        ]
+
+        self.auth.is_owner.return_value = True
+        self.user_storage.iter.return_value = users
+
+        response = self._execute_action(domain, user=user)
+
+        self.assertEqual(response['users'], len(users))
+        self.auth.is_owner.assert_called_once_with(domain, user)
+        self.user_storage.iter.assert_called_once_with(f'{domain}/')
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.CalculateNumberOfUsersMetric(
+            auth=self.auth,
+            user_storage=self.user_storage,
+        )
+
+        return action(*args, **kwargs)
+
+
 class CalculatePendingEmailsMetricTests(TestCase):
     def setUp(self):
         self.auth = Mock()
@@ -708,18 +750,18 @@ class CalculatePendingEmailsMetricTests(TestCase):
         self.pending_factory = MagicMock()
 
     def test_404(self):
-        client_domain = 'does.not.exist'
+        domain = 'does.not.exist'
         client_id = None
 
         self.auth.client_id_for.return_value = client_id
 
-        _, status = self._execute_action(client_domain)
+        _, status = self._execute_action(domain)
 
         self.assertEqual(status, 404)
-        self.auth.client_id_for.assert_called_once_with(client_domain)
+        self.auth.client_id_for.assert_called_once_with(domain)
 
     def test_200(self):
-        client_domain = 'test.com'
+        domain = 'test.com'
         client_id = 'e8e5caa4-4ee6-4e7f-99c9-e231b6a27a9f'
         pending_email_ids = [
             '1de2ceb6-4f82-4cad-86ac-815bcbcb801c',
@@ -731,11 +773,11 @@ class CalculatePendingEmailsMetricTests(TestCase):
         self.pending_factory.return_value = self.pending_storage
         self.pending_storage.iter.return_value = pending_email_ids
 
-        response = self._execute_action(client_domain)
+        response = self._execute_action(domain)
 
         self.assertEqual(response['pending_emails'], len(pending_email_ids))
-        self.auth.client_id_for.assert_called_once_with(client_domain)
-        self.pending_factory.assert_called_once_with(client_domain)
+        self.auth.client_id_for.assert_called_once_with(domain)
+        self.pending_factory.assert_called_once_with(domain)
         self.pending_storage.iter.assert_called_once_with()
 
     def _execute_action(self, *args, **kwargs):
