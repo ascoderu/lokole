@@ -429,6 +429,22 @@ class DeleteClient(_Action):
         return 'OK', 200
 
 
+class CalculateNumberOfUsersMetric(_Action):
+    def __init__(self, auth: AzureAuth, user_storage: AzureObjectStorage):
+        self._auth = auth
+        self._user_storage = user_storage
+
+    def _action(self, domain, **auth_args):  # type: ignore
+        if not self._auth.is_owner(domain, auth_args.get('user')):
+            return 'client does not belong to the user', 403
+
+        users = sum(1 for _ in self._user_storage.iter(f'{domain}/'))
+
+        return {
+            'users': users,
+        }
+
+
 class CalculatePendingEmailsMetric(_Action):
     def __init__(self, auth: AzureAuth, pending_factory: Callable[[str], AzureTextStorage]):
 

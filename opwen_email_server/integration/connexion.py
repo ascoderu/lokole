@@ -1,4 +1,5 @@
 from opwen_email_server import config
+from opwen_email_server.actions import CalculateNumberOfUsersMetric
 from opwen_email_server.actions import CalculatePendingEmailsMetric
 from opwen_email_server.actions import CreateClient
 from opwen_email_server.actions import DeleteClient
@@ -13,6 +14,7 @@ from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
+from opwen_email_server.integration.azure import get_user_storage
 from opwen_email_server.integration.celery import inbound_store
 from opwen_email_server.integration.celery import register_client
 from opwen_email_server.integration.celery import written_store
@@ -60,6 +62,11 @@ client_delete = DeleteClient(
         secret=config.DNS_SECRET,
         provider=config.DNS_PROVIDER,
     ),
+)
+
+metrics_users = CalculateNumberOfUsersMetric(
+    auth=get_auth(),
+    user_storage=get_user_storage(),
 )
 
 metrics_pending = CalculatePendingEmailsMetric(

@@ -701,6 +701,48 @@ class DeleteClientTests(TestCase):
         return action(*args, **kwargs)
 
 
+class CalculateNumberOfUsersMetricTests(TestCase):
+    def setUp(self):
+        self.auth = Mock()
+        self.user_storage = Mock()
+
+    def test_403(self):
+        domain = 'test.com'
+        user = 'user'
+
+        self.auth.is_owner.return_value = False
+
+        _, status = self._execute_action(domain, user=user)
+
+        self.assertEqual(status, 403)
+
+    def test_200(self):
+        domain = 'test.com'
+        user = 'user'
+        users = [
+            'test.com/user1',
+            'test.com/user2',
+            'test.com/user3',
+        ]
+
+        self.auth.is_owner.return_value = True
+        self.user_storage.iter.return_value = users
+
+        response = self._execute_action(domain, user=user)
+
+        self.assertEqual(response['users'], len(users))
+        self.auth.is_owner.assert_called_once_with(domain, user)
+        self.user_storage.iter.assert_called_once_with(f'{domain}/')
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.CalculateNumberOfUsersMetric(
+            auth=self.auth,
+            user_storage=self.user_storage,
+        )
+
+        return action(*args, **kwargs)
+
+
 class CalculatePendingEmailsMetricTests(TestCase):
     def setUp(self):
         self.auth = Mock()
