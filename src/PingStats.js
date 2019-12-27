@@ -49,6 +49,44 @@ class PingStats extends React.Component {
     );
   };
 
+  get _isLoading() {
+    const { pingTimeMillis, pingSuccess } = this.state;
+
+    return pingTimeMillis == null || pingSuccess == null;
+  }
+
+  get _stats() {
+    const { pingTimeMillis, pingSuccess, pingError } = this.state;
+    const { pingMaxLatencyMillis } = this.props.settings;
+
+    if (this._isLoading) {
+      return [];
+    }
+
+    return [
+      {
+        title: 'Ping time',
+        value: pingTimeMillis,
+        suffix: 'ms',
+        valueStyle: {
+          color:
+            // @ts-ignore
+            pingTimeMillis <= pingMaxLatencyMillis
+              ? colors.success
+              : colors.failure,
+        },
+      },
+      {
+        title: 'Ping status',
+        value: pingSuccess ? 'Ok' : pingError,
+        prefix: pingSuccess ? undefined : <Icon type="warning" />,
+        valueStyle: {
+          color: pingSuccess ? colors.success : colors.failure,
+        },
+      },
+    ];
+  }
+
   async componentDidMount() {
     const { pingIntervalSeconds } = this.props.settings;
 
@@ -64,34 +102,10 @@ class PingStats extends React.Component {
   }
 
   render() {
-    const { pingTimeMillis, pingSuccess, pingError } = this.state;
-    const { pingMaxLatencyMillis } = this.props.settings;
-
     return (
       <Grid
-        loading={pingTimeMillis == null || pingSuccess == null}
-        dataSource={[
-          {
-            title: 'Ping time',
-            value: pingTimeMillis,
-            suffix: 'ms',
-            valueStyle: {
-              color:
-                // @ts-ignore
-                pingTimeMillis <= pingMaxLatencyMillis
-                  ? colors.success
-                  : colors.failure,
-            },
-          },
-          {
-            title: 'Ping status',
-            value: pingSuccess ? 'Ok' : pingError,
-            prefix: pingSuccess ? undefined : <Icon type="warning" />,
-            valueStyle: {
-              color: pingSuccess ? colors.success : colors.failure,
-            },
-          },
-        ]}
+        loading={this._isLoading}
+        dataSource={this._stats}
         renderItem={this._renderListItem}
       />
     );
