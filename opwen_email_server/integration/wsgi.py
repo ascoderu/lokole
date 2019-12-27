@@ -29,6 +29,7 @@ def _configure_flask(app: Flask):
     app.config['APPINSIGHTS_INSTRUMENTATIONKEY'] = config.APPINSIGHTS_KEY
     app.config['APPINSIGHTS_ENDPOINT_URI'] = config.APPINSIGHTS_HOST
     app.config['APPINSIGHTS_DISABLE_TRACE_LOGGING'] = True
+    app.config['APPINSIGHTS_DISABLE_REQUEST_LOGGING'] = True
     AppInsights(app)
 
     CORS(app)
