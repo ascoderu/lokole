@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Icon, List, Statistic } from 'antd';
+import { Card, Icon, List, Statistic, notification } from 'antd';
 import axios from 'axios';
 import Grid from './Grid';
 
@@ -13,7 +13,6 @@ class PingStats extends React.Component {
   state = {
     pingTimeMillis: undefined,
     pingSuccess: undefined,
-    pingError: undefined,
   };
 
   _pingInterval = undefined;
@@ -23,19 +22,21 @@ class PingStats extends React.Component {
 
     const pingStart = new Date().getTime();
 
-    let pingSuccess, pingError;
+    let pingSuccess;
     try {
       await axios.get(`${serverEndpoint}/healthcheck/ping`);
       pingSuccess = true;
     } catch (e) {
-      pingError = (e.response && e.response.data) || e.message;
+      notification.error({
+        message: 'Unable to ping server',
+        description: (e.response && e.response.data) || e.message,
+      });
       pingSuccess = false;
     }
 
     this.setState({
       pingTimeMillis: new Date().getTime() - pingStart,
       pingSuccess,
-      pingError,
     });
   };
 
@@ -56,8 +57,7 @@ class PingStats extends React.Component {
   }
 
   get _stats() {
-    const { pingTimeMillis, pingSuccess, pingError } = this.state;
-    const { pingMaxLatencyMillis } = this.props.settings;
+    const { pingTimeMillis, pingSuccess } = this.state;
 
     if (this._isLoading) {
       return [];
@@ -65,21 +65,10 @@ class PingStats extends React.Component {
 
     return [
       {
-        title: 'Ping time',
+        title: 'Server ping',
         value: pingTimeMillis,
         suffix: 'ms',
-        valueStyle: {
-          color:
-            // @ts-ignore
-            pingTimeMillis <= pingMaxLatencyMillis
-              ? colors.success
-              : colors.failure,
-        },
-      },
-      {
-        title: 'Ping status',
-        value: pingSuccess ? 'Ok' : pingError,
-        prefix: pingSuccess ? undefined : <Icon type="warning" />,
+        prefix: <Icon type={pingSuccess ? 'check' : 'warning'} />,
         valueStyle: {
           color: pingSuccess ? colors.success : colors.failure,
         },
@@ -115,7 +104,6 @@ class PingStats extends React.Component {
 PingStats.propTypes = {
   settings: PropTypes.shape({
     pingIntervalSeconds: PropTypes.number.isRequired,
-    pingMaxLatencyMillis: PropTypes.number.isRequired,
     serverEndpoint: PropTypes.string.isRequired,
   }).isRequired,
 };

@@ -7,9 +7,6 @@ const githubApi = axios.create({ baseURL: 'https://api.github.com' });
 const formatSeconds = value => `${value} seconds`;
 const parseSeconds = value => value.replace(/[^0-9]/g, '');
 
-const formatMillis = value => `${value} ms`;
-const parseMillis = value => value.replace(/[^0-9]/g, '');
-
 const colors = {
   icon: 'rgba(0, 0, 0, .25)',
 };
@@ -69,7 +66,6 @@ class SettingsForm extends React.Component {
       githubUsername,
       githubAvatarUrl,
       pingIntervalSeconds,
-      pingMaxLatencyMillis,
     } = this.props.initialValue;
 
     return (
@@ -128,26 +124,6 @@ class SettingsForm extends React.Component {
               parser={parseSeconds}
               min={1}
               max={60}
-            />
-          )}
-        </Form.Item>
-        <Form.Item label="Ping maximum latency">
-          {form.getFieldDecorator('pingMaxLatencyMillis', {
-            rules: [
-              {
-                required: true,
-                message: 'Please input the maximum ping latency in ms',
-              },
-            ],
-            initialValue: pingMaxLatencyMillis,
-          })(
-            <InputNumber
-              style={{ width: '100%' }}
-              placeholder="100 ms"
-              formatter={formatMillis}
-              parser={parseMillis}
-              min={50}
-              max={2000}
             />
           )}
         </Form.Item>

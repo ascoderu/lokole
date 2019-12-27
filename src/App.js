@@ -7,7 +7,6 @@ import PingStats from './PingStats';
 const localStorageKey = 'settings';
 
 const defaultSettings = {
-  pingMaxLatencyMillis: 500,
   pingIntervalSeconds: 5,
   githubAccessToken: undefined,
   githubUsername: undefined,
