@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Empty, List, Popconfirm, notification } from 'antd';
 import axios from 'axios';
 import Button from './Button';
@@ -83,6 +84,12 @@ class ClientCard extends React.Component {
     );
   }
 }
+
+ClientCard.propTypes = {
+  domain: PropTypes.string.isRequired,
+  fetchNumPendingEmails: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
 
 class ClientStats extends React.Component {
   state = {
@@ -194,5 +201,13 @@ class ClientStats extends React.Component {
     );
   }
 }
+
+ClientStats.propTypes = {
+  settings: PropTypes.shape({
+    githubAccessToken: PropTypes.string,
+    githubUsername: PropTypes.string,
+    serverEndpoint: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default ClientStats;

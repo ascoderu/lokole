@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Drawer, PageHeader } from 'antd';
 import Button from './Button';
 import Settings from './Settings';
@@ -49,5 +50,10 @@ class Header extends React.PureComponent {
     );
   }
 }
+
+Header.propTypes = {
+  onChangeSettings: PropTypes.func.isRequired,
+  settings: PropTypes.object.isRequired,
+};
 
 export default Header;

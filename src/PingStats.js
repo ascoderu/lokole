@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Icon, List, Statistic } from 'antd';
 import axios from 'axios';
 import Grid from './Grid';
@@ -96,5 +97,13 @@ class PingStats extends React.Component {
     );
   }
 }
+
+PingStats.propTypes = {
+  settings: PropTypes.shape({
+    pingIntervalSeconds: PropTypes.number.isRequired,
+    pingMaxLatencyMillis: PropTypes.number.isRequired,
+    serverEndpoint: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default PingStats;
