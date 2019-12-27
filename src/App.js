@@ -18,7 +18,7 @@ class App extends React.Component {
   state = {
     settings: {
       ...defaultSettings,
-      ...JSON.parse(localStorage.getItem(localStorageKey)),
+      ...JSON.parse(localStorage.getItem(localStorageKey) || '{}'),
     },
   };
 

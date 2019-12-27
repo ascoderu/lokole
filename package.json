@@ -19,14 +19,18 @@
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.8.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
     "react-app-rewired": "^2.1.5",
-    "react-scripts": "3.3.0"
+    "react-scripts": "3.3.0",
+    "typescript": "^3.7.4"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "lint": "eslint src"
+    "typecheck": "tsc",
+    "lint": "eslint src --max-warnings 0",
+    "ci": "run-p typecheck lint"
   },
   "eslintConfig": {
     "extends": [

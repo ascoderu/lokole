@@ -123,9 +123,6 @@ class SettingsForm extends React.Component {
           })(
             <InputNumber
               style={{ width: '100%' }}
-              prefix={
-                <Icon type="clock-circle" style={{ color: colors.icon }} />
-              }
               placeholder="10 seconds"
               formatter={formatSeconds}
               parser={parseSeconds}
@@ -146,9 +143,6 @@ class SettingsForm extends React.Component {
           })(
             <InputNumber
               style={{ width: '100%' }}
-              prefix={
-                <Icon type="clock-circle" style={{ color: colors.icon }} />
-              }
               placeholder="100 ms"
               formatter={formatMillis}
               parser={parseMillis}

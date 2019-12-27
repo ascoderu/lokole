@@ -16,6 +16,11 @@ class Header extends React.PureComponent {
     const { isSettingsVisible } = this.state;
     const { onChangeSettings, settings } = this.props;
 
+    const settingsForm = (
+      // @ts-ignore
+      <Settings initialValue={settings} onChange={onChangeSettings} />
+    );
+
     return (
       <React.Fragment>
         <PageHeader
@@ -25,14 +30,20 @@ class Header extends React.PureComponent {
               ? { src: settings.githubAvatarUrl }
               : { icon: 'user' }
           }
-          extra={[<Button onClick={this._onOpenSettings} icon="setting" />]}
+          extra={[
+            <Button
+              onClick={this._onOpenSettings}
+              icon="setting"
+              key="setting"
+            />,
+          ]}
         />
         <Drawer
           title="Settings"
           visible={isSettingsVisible}
           onClose={this._onCloseSettings}
         >
-          <Settings initialValue={settings} onChange={onChangeSettings} />
+          {settingsForm}
         </Drawer>
       </React.Fragment>
     );

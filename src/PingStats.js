@@ -20,7 +20,7 @@ class PingStats extends React.Component {
   _onPing = async () => {
     const { serverEndpoint } = this.props.settings;
 
-    const pingStart = new Date();
+    const pingStart = new Date().getTime();
 
     let pingSuccess, pingError;
     try {
@@ -32,7 +32,7 @@ class PingStats extends React.Component {
     }
 
     this.setState({
-      pingTimeMillis: new Date() - pingStart,
+      pingTimeMillis: new Date().getTime() - pingStart,
       pingSuccess,
       pingError,
     });
@@ -76,6 +76,7 @@ class PingStats extends React.Component {
             suffix: 'ms',
             valueStyle: {
               color:
+                // @ts-ignore
                 pingTimeMillis <= pingMaxLatencyMillis
                   ? colors.success
                   : colors.failure,

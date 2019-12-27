@@ -10,4 +10,6 @@ A status and control dashboard for the Lokole service.
 
 Install the requirements via `yarn install`.
 
+Run the code quality checks via `yarn run ci`.
+
 Start the development server via `yarn start`.
