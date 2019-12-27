@@ -22,8 +22,8 @@ paths:
           description: The number of pending emails for the client.
           schema:
             $ref: '#/definitions/PendingEmailsMetric'
-        404:
-          description: No client exists for the provided domain.
+        403:
+          description: The client does not belong to the user.
       security:
         - basic: []
 
