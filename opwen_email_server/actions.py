@@ -435,13 +435,13 @@ class CalculatePendingEmailsMetric(_Action):
         self._auth = auth
         self._pending_factory = pending_factory
 
-    def _action(self, client_domain, **auth_args):  # type: ignore
-        client_id = self._auth.client_id_for(client_domain)
+    def _action(self, domain, **auth_args):  # type: ignore
+        client_id = self._auth.client_id_for(domain)
         if not client_id:
-            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'client_domain': client_domain})  # noqa: E501  # yapf: disable
+            self.log_event(events.UNKNOWN_CLIENT_DOMAIN, {'domain': domain})  # noqa: E501  # yapf: disable
             return 'unknown client domain', 404
 
-        pending_storage = self._pending_factory(client_domain)
+        pending_storage = self._pending_factory(domain)
         pending_emails = sum(1 for _ in pending_storage.iter())
 
         return {

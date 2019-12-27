@@ -708,18 +708,18 @@ class CalculatePendingEmailsMetricTests(TestCase):
         self.pending_factory = MagicMock()
 
     def test_404(self):
-        client_domain = 'does.not.exist'
+        domain = 'does.not.exist'
         client_id = None
 
         self.auth.client_id_for.return_value = client_id
 
-        _, status = self._execute_action(client_domain)
+        _, status = self._execute_action(domain)
 
         self.assertEqual(status, 404)
-        self.auth.client_id_for.assert_called_once_with(client_domain)
+        self.auth.client_id_for.assert_called_once_with(domain)
 
     def test_200(self):
-        client_domain = 'test.com'
+        domain = 'test.com'
         client_id = 'e8e5caa4-4ee6-4e7f-99c9-e231b6a27a9f'
         pending_email_ids = [
             '1de2ceb6-4f82-4cad-86ac-815bcbcb801c',
@@ -731,11 +731,11 @@ class CalculatePendingEmailsMetricTests(TestCase):
         self.pending_factory.return_value = self.pending_storage
         self.pending_storage.iter.return_value = pending_email_ids
 
-        response = self._execute_action(client_domain)
+        response = self._execute_action(domain)
 
         self.assertEqual(response['pending_emails'], len(pending_email_ids))
-        self.auth.client_id_for.assert_called_once_with(client_domain)
-        self.pending_factory.assert_called_once_with(client_domain)
+        self.auth.client_id_for.assert_called_once_with(domain)
+        self.pending_factory.assert_called_once_with(domain)
         self.pending_storage.iter.assert_called_once_with()
 
     def _execute_action(self, *args, **kwargs):
