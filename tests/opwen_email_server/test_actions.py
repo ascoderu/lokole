@@ -241,7 +241,7 @@ class StoreWrittenClientEmailsTests(TestCase):
         self.email_storage.store_object.assert_called_once_with(email_id, server_email)
         self.next_task.assert_called_once_with(email_id)
         self.client_storage.fetch_objects.assert_any_call(resource_id, (sync.USERS_FILE, from_jsonl_bytes))
-        self.user_storage.store_object.assert_called_once_with(user_email, user)
+        self.user_storage.store_object.assert_called_once_with(f'developer1.lokole.ca/{user_email}', user)
         self.client_storage.delete.assert_called_once_with(resource_id)
 
     def _execute_action(self, *args, **kwargs):

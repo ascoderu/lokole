@@ -192,10 +192,10 @@ class StoreWrittenClientEmails(_Action):
         num_stored = 0
         for user in users:
             email = user['email']
-            self._user_storage.store_object(email, user)
+            domain = get_domain(email)
+            self._user_storage.store_object(f'{domain}/{email}', user)
 
             num_stored += 1
-            domain = email.split('@')[1]
 
         self.log_event(events.USER_STORED_FROM_CLIENT, {'domain': domain, 'num_users': num_stored})  # noqa: E501  # yapf: disable
 
