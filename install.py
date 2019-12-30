@@ -475,6 +475,8 @@ class WebappSetup(Setup):
         'libffi-dev',
         'libssl-dev',
         'libjpeg-dev',
+        'libopenjp2-7',
+        'libtiff5',
         'nginx',
         'python3',
         'python3-dev',
