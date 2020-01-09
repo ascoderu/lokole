@@ -91,20 +91,13 @@ class _BaseAzureStorage(LogMixin):
             self.log_debug('deleted %s', resource_id)
 
     def iter(self, prefix: Optional[str] = None) -> Iterator[str]:
-        try:
-            # noinspection PyArgumentList
-            resources = self._driver.iterate_container_objects(self._client, prefix)
-        except TypeError:
-            resources = self._driver.iterate_container_objects(self._client)
+        resources = self._driver.iterate_container_objects(self._client, prefix=prefix)
 
         for resource in resources:
             resource_id = resource.name
 
             if prefix is not None:
-                if not resource_id.startswith(prefix):
-                    continue
-                else:
-                    resource_id = resource_id[len(prefix):]
+                resource_id = resource_id[len(prefix):]
 
             if resource_id.endswith(self._generated_suffix):
                 resource_id = resource_id[:-len(self._generated_suffix)]
