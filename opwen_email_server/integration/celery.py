@@ -111,15 +111,18 @@ def _fqn(task):
     return f'{__name__}.{task.__name__}'
 
 
-celery.conf.update(
-    task_routes={
+task_routes={
         _fqn(register_client): {'queue': REGISTER_CLIENT_QUEUE},
         _fqn(index_received_email_for_mailbox): {'queue': MAILBOX_RECEIVED_QUEUE},
         _fqn(index_sent_email_for_mailbox): {'queue': MAILBOX_SENT_QUEUE},
         _fqn(inbound_store): {'queue': INBOUND_STORE_QUEUE},
         _fqn(written_store): {'queue': WRITTEN_STORE_QUEUE},
         _fqn(send): {'queue': SEND_QUEUE}
-    })
+    }
+
+
+celery.conf.update(task_routes)
+
 
 if __name__ == '__main__':
     celery.start()
