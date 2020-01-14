@@ -15,6 +15,16 @@ case "$1" in
       exit 0
     fi
 
+    if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
+      echo "Skipping live service test for branch build" >&2
+      exit 0
+    fi
+
+    if [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/opwen-cloudserver" ]] && [[ "$TEST_MODE" = "live" ]]; then
+      echo "Skipping live service test for fork build" >&2
+      exit 0
+    fi
+
     if [[ "$TEST_MODE" = "live" ]]; then
       export REGISTRATION_CREDENTIALS="$GITHUB_AUTH_USERNAME:$GITHUB_AUTH_TOKEN"
       export LOKOLE_QUEUE_BROKER_SCHEME="azureservicebus"
@@ -22,16 +32,11 @@ case "$1" in
       export REGISTRATION_CREDENTIALS="admin:password"
       export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
     fi
-    if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
-      echo "Skipping live service test for branch build"
-    elif [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/opwen-cloudserver" ]] && [[ "$TEST_MODE" = "live" ]]; then
-      echo "Skipping live service test for fork build"
-    else
-      export BUILD_TARGET=runtime
-      make build verify-build
-      make start
-      make integration-tests
-    fi
+
+    export BUILD_TARGET=runtime
+    make build verify-build
+    make start
+    make integration-tests
     ;;
 
   after_script)
