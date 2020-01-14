@@ -10,8 +10,7 @@ from kombu import Exchange
 from kombu import Queue
 
 from opwen_email_server.config import QUEUE_BROKER
-from opwen_email_server.integration import celery as app  # ensure app tasks are loaded
-from celery import current_app  # cerely's __init__.py
+from opwen_email_server.integration.celery import celery as app, task_routes
 
 
 class TransportTests(TestCase):
@@ -41,12 +40,8 @@ class TransportTests(TestCase):
                 declare=[self.queue],
             )
 
-    def test_celery_task_routes(self):
-        registered_celerey_tasks = [
-            task_name for task_name in current_app.tasks.keys() if not task_name.startswith('celery.')
-        ]
+    def test_all_celery_tasks_are_routed(self):
+        registered_celery_tasks = [task_name for task_name in app.tasks.keys() if not task_name.startswith('celery.')]
 
-        for task_name in registered_celerey_tasks:
-            self.assertIs(
-                task_name in app.task_routes.keys(), True,
-                "Function '" + task_name + "' not found in the task_routes dictionary in '" + app.__name__ + "' module")
+        for task_name in registered_celery_tasks:
+            self.assertIn(task_name, task_routes)
