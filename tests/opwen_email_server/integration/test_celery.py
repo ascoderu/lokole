@@ -10,6 +10,8 @@ from kombu import Exchange
 from kombu import Queue
 
 from opwen_email_server.config import QUEUE_BROKER
+from opwen_email_server.integration.celery import celery as app
+from opwen_email_server.integration.celery import task_routes
 
 
 class TransportTests(TestCase):
@@ -38,3 +40,9 @@ class TransportTests(TestCase):
                 routing_key=self.routing_key,
                 declare=[self.queue],
             )
+
+    def test_all_celery_tasks_are_routed(self):
+        registered_celery_tasks = [task_name for task_name in app.tasks.keys() if not task_name.startswith('celery.')]
+
+        for task_name in registered_celery_tasks:
+            self.assertIn(task_name, task_routes)
