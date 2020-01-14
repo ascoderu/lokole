@@ -50,6 +50,7 @@ case "$1" in
     ;;
 
   after_failure)
+    docker-compose ps
     ALL=true make logs
     ;;
 
