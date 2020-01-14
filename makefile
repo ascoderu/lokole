@@ -59,7 +59,7 @@ clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 build:
-	docker-compose pull --ignore-pull-failures
+	BUILD_TAG=latest docker-compose pull --ignore-pull-failures
 	BUILD_TARGET=builder docker-compose build api && \
   docker-compose run --no-deps --rm api cat coverage.xml > coverage.xml
 	docker-compose build
