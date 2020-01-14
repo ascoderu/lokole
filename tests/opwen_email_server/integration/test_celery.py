@@ -10,7 +10,8 @@ from kombu import Exchange
 from kombu import Queue
 
 from opwen_email_server.config import QUEUE_BROKER
-from opwen_email_server.integration.celery import celery as app, task_routes
+from opwen_email_server.integration.celery import celery as app
+from opwen_email_server.integration.celery import task_routes
 
 
 class TransportTests(TestCase):

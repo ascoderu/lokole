@@ -120,7 +120,7 @@ task_routes = {
     _fqn(send): {'queue': SEND_QUEUE}
 }
 
-celery.conf.update(task_routes)
+celery.conf.update(task_routes=task_routes)
 
 if __name__ == '__main__':
     celery.start()
