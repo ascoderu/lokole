@@ -16,6 +16,7 @@ before_install:
 
 script:
   - |
+    printenv
     if [[ "$TRAVIS_EVENT_TYPE" = "cron" ]]; then
       make renew-cert
     else
