@@ -3,10 +3,35 @@
 set -eo pipefail
 
 case "$1" in
+  after_failure)
+    docker-compose ps
+    ALL=true make logs
+    ;;
+
+  after_script)
+    make stop
+    ;;
+
+  after_success)
+    if [[ "$TEST_MODE" = "local" ]]; then
+      bash <(curl -s https://codecov.io/bash)
+    fi
+    ;;
+
+  before_deploy)
+    echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+    ;;
+
   before_install)
     sudo curl -fsSL "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     docker-compose version
+    ;;
+
+  deploy)
+    if [[ "$TEST_MODE" = "live" ]]; then
+      DOCKER_TAG="$TRAVIS_TAG" make release deploy
+    fi
     ;;
 
   script)
@@ -37,31 +62,6 @@ case "$1" in
     make build verify-build
     make start
     make integration-tests
-    ;;
-
-  after_script)
-    make stop
-    ;;
-
-  after_success)
-    if [[ "$TEST_MODE" = "local" ]]; then
-      bash <(curl -s https://codecov.io/bash)
-    fi
-    ;;
-
-  after_failure)
-    docker-compose ps
-    ALL=true make logs
-    ;;
-
-  before_deploy)
-    echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-    ;;
-
-  deploy)
-    if [[ "$TEST_MODE" = "live" ]]; then
-      DOCKER_TAG="$TRAVIS_TAG" make release deploy
-    fi
     ;;
 
   *)
