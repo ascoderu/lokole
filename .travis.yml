@@ -9,6 +9,7 @@ services:
   - docker
 
 before_install: ./.travis.sh before_install
+install: ./.travis.sh install
 
 script: ./.travis.sh script
 after_success: ./.travis.sh after_success

@@ -2,6 +2,16 @@
 
 set -eo pipefail
 
+if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
+  echo "Skipping live service CI for branch build" >&2
+  exit 0
+fi
+
+if [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/opwen-cloudserver" ]] && [[ "$TEST_MODE" = "live" ]]; then
+  echo "Skipping live service CI for fork build" >&2
+  exit 0
+fi
+
 case "$1" in
   after_failure)
     docker-compose ps
@@ -34,19 +44,14 @@ case "$1" in
     fi
     ;;
 
+  install)
+    export BUILD_TARGET=runtime
+    make build verify-build
+    ;;
+
   script)
     if [[ "$TRAVIS_EVENT_TYPE" = "cron" ]]; then
       make renew-cert
-      exit 0
-    fi
-
-    if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
-      echo "Skipping live service test for branch build" >&2
-      exit 0
-    fi
-
-    if [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/opwen-cloudserver" ]] && [[ "$TEST_MODE" = "live" ]]; then
-      echo "Skipping live service test for fork build" >&2
       exit 0
     fi
 
@@ -58,8 +63,6 @@ case "$1" in
       export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
     fi
 
-    export BUILD_TARGET=runtime
-    make build verify-build
     make start
     make integration-tests
     ;;
