@@ -9,3 +9,4 @@
 !makefile
 !requirements*.txt
 !setup.cfg
+!.travis.sh
