@@ -30,6 +30,8 @@ script:
     fi
     if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
       echo "Skipping live service test for branch build"
+    elif [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/opwen-cloudserver" ]] && [[ "$TEST_MODE" = "live" ]]; then
+      echo "Skipping live service test for fork build"
     else
       set -e
       export BUILD_TARGET=runtime
