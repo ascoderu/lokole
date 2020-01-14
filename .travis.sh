@@ -12,9 +12,9 @@ case "$1" in
   script)
     if [[ "$TRAVIS_EVENT_TYPE" = "cron" ]]; then
       make renew-cert
-    else
-      echo "Skipping cert renewal for on-demand build"
+      exit 0
     fi
+
     if [[ "$TEST_MODE" = "live" ]]; then
       export REGISTRATION_CREDENTIALS="$GITHUB_AUTH_USERNAME:$GITHUB_AUTH_TOKEN"
       export LOKOLE_QUEUE_BROKER_SCHEME="azureservicebus"
