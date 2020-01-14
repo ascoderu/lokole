@@ -8,17 +8,17 @@ env:
 services:
   - docker
 
-before_install: .travis.sh before_install
+before_install: ./.travis.sh before_install
 
-script: .travis.sh script
-after_success: .travis.sh after_success
-after_failure: .travis.sh after_failure
-after_script: .travis.sh after_script
+script: ./.travis.sh script
+after_success: ./.travis.sh after_success
+after_failure: ./.travis.sh after_failure
+after_script: ./.travis.sh after_script
 
-before_deploy: .travis.sh before_deploy
+before_deploy: ./.travis.sh before_deploy
 deploy:
   - provider: script
-    script: .travis.sh deploy
+    script: ./.travis.sh deploy
     on:  # yamllint disable rule:truthy
       repo: ascoderu/opwen-cloudserver
       tags: true
