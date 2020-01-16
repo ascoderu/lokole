@@ -125,3 +125,5 @@ class AppConfig(object):
     ADMIN_INBOX = 'admin@{}'.format(CLIENT_EMAIL_HOST)
     NEWS_SENDERS = set(env.list('OPWEN_NEWS_SENDERS', []))
     FORBIDDEN_ACCOUNTS = [NEWS_INBOX, ADMIN_INBOX]
+
+    IOC = env('LOKOLE_IOC', 'opwen_email_client.webapp.ioc.Ioc')

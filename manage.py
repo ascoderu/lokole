@@ -7,6 +7,7 @@ from threading import Event
 
 from flask_migrate import MigrateCommand
 from flask_script import Manager
+from flask_security.utils import hash_password
 from watchdog.events import FileSystemEvent
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -57,11 +58,18 @@ def restarter(directory):
 def createadmin(name, password):
     user_datastore = app.ioc.user_store
     email = '{}@{}'.format(name, AppConfig.CLIENT_EMAIL_HOST)
+    password = hash_password(password)
 
-    user = user_datastore.create_if_not_exists(email)
-    user_datastore.make_admin(user)
-    user.reset_password(password)
-    user.save()
+    user = user_datastore.r.find_user(email=email)
+
+    if user is None:
+        user_datastore.w.create_user(email=email, password=password, is_admin=True)
+    else:
+        user.is_admin = True
+        user.password = password
+        user_datastore.w.put(user)
+
+    user_datastore.w.commit()
 
 
 if __name__ == '__main__':

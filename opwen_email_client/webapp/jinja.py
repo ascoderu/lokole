@@ -1,3 +1,4 @@
+from datetime import timedelta
 from os.path import splitext
 
 from bs4 import BeautifulSoup
@@ -43,3 +44,15 @@ def render_body(email: dict) -> str:
     body = str(soup)
 
     return body
+
+
+@app.context_processor
+def _inject_format_last_login():
+    def format_last_login(user, current_user) -> str:
+        if not user.last_login_at:
+            return ''
+
+        date = user.last_login_at - timedelta(minutes=current_user.timezone_offset_minutes)
+        return date.strftime('%Y-%m-%d %H:%M')
+
+    return {'format_last_login': format_last_login}

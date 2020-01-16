@@ -46,7 +46,13 @@ class SyncEmails(object):
         else:
             if uploaded:
                 self._email_store.mark_sent(uploaded)
-                self._user_store.mark_as_synced(users)
+                self._mark_as_synced(users)
+
+    def _mark_as_synced(self, users):
+        for user in users:
+            user.synced = True
+            self._user_store.w.put(user)
+        self._user_store.w.commit()
 
     def _download(self):
         # noinspection PyBroadException

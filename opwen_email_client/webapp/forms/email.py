@@ -108,10 +108,20 @@ class NewEmailForm(FlaskForm):
             return None
 
         reference = email_store.get(uid)
-        if not current_user.can_access(reference):
+        if not self._can_access(current_user, reference):
             return None
 
         return reference
+
+    @classmethod
+    def _can_access(cls, user, email: dict) -> bool:
+        actors = set()
+        actors.add(email.get('from'))
+        actors.update(email.get('to', []))
+        actors.update(email.get('cc', []))
+        actors.update(email.get('bcc', []))
+
+        return user.email in actors
 
     @classmethod
     def from_request(cls, email_store: EmailStore):

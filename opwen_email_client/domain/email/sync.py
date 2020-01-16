@@ -28,7 +28,7 @@ Download = namedtuple('Download', ('name', 'optional', 'type_'))
 
 class Sync(metaclass=ABCMeta):
     @abstractmethod
-    def upload(self, items: Iterable[T], users: Iterable[T]) -> Iterable[str]:
+    def upload(self, items: Iterable[T], users: Iterable) -> Iterable[str]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod

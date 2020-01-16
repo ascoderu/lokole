@@ -17,6 +17,8 @@ from flask import send_file
 from flask import send_from_directory
 from flask import url_for
 from flask_login import current_user
+from flask_security.utils import hash_password
+from passlib.pwd import genword
 
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp import tasks
@@ -175,6 +177,8 @@ def download_attachment(uid: str) -> Response:
 @app.route('/user/register/complete')
 @login_required
 def register_complete() -> Response:
+    user_store = app.ioc.user_store
+
     send_welcome_email = SendWelcomeEmail(
         time=datetime.utcnow(),
         to=current_user.email,
@@ -184,7 +188,8 @@ def register_complete() -> Response:
     send_welcome_email()
 
     current_user.language = Session.get_current_language()
-    current_user.save()
+    user_store.w.put(current_user)
+    user_store.w.commit()
 
     flash(i8n.ACCOUNT_CREATED, category='success')
     return redirect(url_for('email_inbox'))
@@ -232,9 +237,13 @@ def update(version: Optional[str]) -> Response:
 
 @app.route('/user/language/<locale>')
 def language(locale: str) -> Response:
+    user_store = app.ioc.user_store
+
     if current_user.is_authenticated:
         current_user.language = locale
-        current_user.save()
+        user_store.w.put(current_user)
+        user_store.w.commit()
+
     Session.store_current_language(locale)
     return redirect(Session.get_last_visited_url() or url_for('home'))
 
@@ -272,7 +281,7 @@ def suspend(userid: str) -> Response:
 
     user_store = app.ioc.user_store
 
-    user = user_store.fetch_one(userid)
+    user = user_store.r.find_user(id=userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
@@ -283,7 +292,8 @@ def suspend(userid: str) -> Response:
         return redirect(url_for('users'))
 
     user.active = False
-    user.save()
+    user_store.w.put(user)
+    user_store.w.commit()
 
     flash(i8n.USER_SUSPENDED, category='success')
     return redirect(url_for('users'))
@@ -296,14 +306,15 @@ def unsuspend(userid: str) -> Response:
 
     user_store = app.ioc.user_store
 
-    user = user_store.fetch_one(userid)
+    user = user_store.r.find_user(id=userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
         return redirect(url_for('users'))
 
     user.active = True
-    user.save()
+    user_store.w.put(user)
+    user_store.w.commit()
 
     flash(i8n.USER_UNSUSPENDED, category='success')
     return redirect(url_for('users'))
@@ -316,7 +327,7 @@ def promote(userid: str) -> Response:
 
     user_store = app.ioc.user_store
 
-    user = user_store.fetch_one(userid)
+    user = user_store.r.find_user(id=userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
@@ -326,8 +337,9 @@ def promote(userid: str) -> Response:
         flash(i8n.ALREADY_PROMOTED, category='error')
         return redirect(url_for('users'))
 
-    user_store.make_admin(user)
-    user.save()
+    user.is_admin = True
+    user_store.w.put(user)
+    user_store.w.commit()
 
     flash(i8n.USER_PROMOTED, category='success')
     return redirect(url_for('users'))
@@ -340,7 +352,7 @@ def reset_password(userid: str) -> Response:
 
     user_store = app.ioc.user_store
 
-    user = user_store.fetch_one(userid)
+    user = user_store.r.find_user(id=userid)
 
     if user is None:
         flash(i8n.USER_DOES_NOT_EXIST, category='error')
@@ -350,8 +362,10 @@ def reset_password(userid: str) -> Response:
         flash(i8n.ADMIN_PASSWORD_CANNOT_BE_RESET, category='error')
         return redirect(url_for('users'))
 
-    new_password = user.reset_password()
-    user.save()
+    new_password = genword()
+    user.password = hash_password(new_password)
+    user_store.w.put(user)
+    user_store.w.commit()
 
     flash(i8n.PASSWORD_CHANGED_BY_ADMIN + new_password, category='success')
     return redirect(url_for('users'))
@@ -403,7 +417,7 @@ def _localeselector() -> str:
 
 
 def _emails_view(emails: Iterable[dict], page: int, template: str = 'email.html', **kwargs) -> Response:
-    offset_minutes = getattr(current_user, 'timezone_offset_minutes', 0)
+    offset_minutes = getattr(current_user, 'timezone_offset_minutes', None) or 0
     timezone_offset = timedelta(minutes=offset_minutes)
 
     emails = list(emails)

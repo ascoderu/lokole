@@ -62,9 +62,6 @@ class HttpEmailServerClient(EmailServerClient):
 
 
 class LocalEmailServerClient(EmailServerClient):
-    def __init__(self, *args, **kwargs):
-        pass
-
     def download(self) -> str:
         root = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
         container = getenv('OPWEN_REMOTE_RESOURCE_CONTAINER')
