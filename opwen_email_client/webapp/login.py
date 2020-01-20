@@ -67,7 +67,7 @@ class FlaskLoginUserStore(UserStore):
 
         self._app = app
 
-    def fetch_all(self):
+    def fetch_all(self, user):
         with self._app.app_context():
             return _User.query.all()
 

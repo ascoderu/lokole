@@ -254,7 +254,7 @@ def language(locale: str) -> Response:
 def users() -> Response:
     user_store = app.ioc.user_store
 
-    return _view('users.html', users=user_store.fetch_all())
+    return _view('users.html', users=user_store.fetch_all(current_user))
 
 
 @app.route('/admin/settings', methods=['GET', 'POST'])

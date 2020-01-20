@@ -4,12 +4,12 @@ from typing import List
 
 from flask import Flask
 from flask_login import UserMixin
-from flask_security.datastore import Datastore as _UserWriteStore
-from flask_security.datastore import UserDatastore as _UserReadStore
+from flask_security.datastore import Datastore as UserWriteStore
+from flask_security.datastore import UserDatastore as UserReadStore
 
 
 class UserStore(metaclass=ABCMeta):
-    def __init__(self, read: _UserReadStore, write: _UserWriteStore) -> None:
+    def __init__(self, read: UserReadStore, write: UserWriteStore) -> None:
         self.r = read
         self.w = write
 
@@ -17,7 +17,7 @@ class UserStore(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def fetch_all(self) -> List[UserMixin]:
+    def fetch_all(self, user: UserMixin) -> List[UserMixin]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
