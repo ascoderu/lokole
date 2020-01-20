@@ -155,8 +155,8 @@ to initialize the required cloud resources.
   EOM
 
   cat > ${PWD}/secrets/users.env << EOM
-  REGISTRATION_USERNAME={some username for the registration endpoint}
-  REGISTRATION_PASSWORD={some password for the registration endpoint}
+  LOKOLE_REGISTRATION_USERNAME={some username for the registration endpoint}
+  LOKOLE_REGISTRATION_PASSWORD={some password for the registration endpoint}
   EOM
 
   docker-compose run --rm \

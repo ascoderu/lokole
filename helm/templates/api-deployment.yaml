@@ -31,11 +31,11 @@ spec:
         - name: TESTING_UI
           value: "False"
         {{ include "opwen.environment.shared" . }}
-        - name: REGISTRATION_USERNAME
+        - name: LOKOLE_REGISTRATION_USERNAME
           valueFrom:
             secretKeyRef:
               name: users
-              key: REGISTRATION_USERNAME
+              key: LOKOLE_REGISTRATION_USERNAME
         - name: REGISTRATION_PASSWORD
           valueFrom:
             secretKeyRef:

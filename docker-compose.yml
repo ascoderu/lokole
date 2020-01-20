@@ -66,8 +66,8 @@ services:
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
-      REGISTRATION_USERNAME: admin
-      REGISTRATION_PASSWORD: password
+      LOKOLE_REGISTRATION_USERNAME: admin
+      LOKOLE_REGISTRATION_PASSWORD: password
     depends_on:
       - appinsights
       - azurite
