@@ -58,6 +58,10 @@ class Ioc:
     def user_store(self):
         return FlaskLoginUserStore()
 
+    @cached_property
+    def login_form(self):
+        return LoginForm
+
 
 def _new_ioc(fqn: str) -> Ioc:
     fqn_parts = fqn.split('.')
@@ -80,7 +84,7 @@ def create_app(config=AppConfig) -> Flask:
 
     cache.init_app(app)
     app.ioc.user_store.init_app(app)
-    security.init_app(app, app.ioc.user_store.r, register_form=RegisterForm, login_form=LoginForm)
+    security.init_app(app, app.ioc.user_store.r, register_form=RegisterForm, login_form=app.ioc.login_form)
 
     app.register_blueprint(mkwvconf, url_prefix='/api/mkwvconf')
 
