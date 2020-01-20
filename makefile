@@ -100,6 +100,7 @@ verify-build:
 
 release:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
+    eval "$(shell find docker -type f -name 'Dockerfile' | while read dockerfile; do grep 'ARG ' "$$dockerfile" | sed 's/^ARG /export /g'; done)"; \
     export BUILD_TARGET="runtime"; \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
