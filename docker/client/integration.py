@@ -13,7 +13,7 @@ from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.domain.email.user_store import UserReadStore
 from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.email.user_store import UserWriteStore
-from opwen_email_client.webapp.ioc import Ioc
+from opwen_email_client.util.serialization import JsonSerializer
 
 from opwen_email_server.constants import mailbox
 from opwen_email_server.integration.azure import get_email_storage
@@ -192,13 +192,25 @@ class AzureEmailStore(EmailStore):
         pass
 
 
-class AzureIoc(Ioc):
+class AzureIoc:
+    @cached_property
+    def serializer(self):
+        return JsonSerializer()
+
+    @cached_property
+    def email_server_client(self):
+        raise NotImplementedError
+
     @cached_property
     def email_store(self):
         return AzureEmailStore(
             email_storage=get_email_storage(),
             mailbox_storage=get_mailbox_storage(),
         )
+
+    @cached_property
+    def email_sync(self):
+        raise NotImplementedError
 
     @cached_property
     def user_store(self):
