@@ -105,7 +105,7 @@ class AppConfig(object):
     SYNC_SCHEDULE = env('OPWEN_SYNC_SCHEDULE', '').strip()
 
     EMAIL_ADDRESS_DELIMITER = ','
-    EMAILS_PER_PAGE = 10
+    EMAILS_PER_PAGE = env.int('OPWEN_EMAILS_PER_PAGE', 10)
 
     LOCALES_DIRECTORY = path.join(app_basedir, 'translations')
     DEFAULT_LOCALE = Locale.parse('en_ca')
