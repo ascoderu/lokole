@@ -528,6 +528,7 @@ class WebappSetup(Setup):
 
     def _setup_secrets(self):
         extra_settings = {
+            'OPWEN_APP_ROOT': self.args.app_root,
             'OPWEN_STATE_DIRECTORY': self.abspath(self.args.state_directory),
             'OPWEN_SESSION_KEY': generate_secret(32),
             'OPWEN_MAX_UPLOAD_SIZE_MB': self.args.max_upload_size,
@@ -562,21 +563,22 @@ class WebappSetup(Setup):
               listen {port};
               server_name localhost;
 
-              location = /favicon.ico {{
-                alias {app_root}/static/favicon.ico;
+              location = {app_root}/favicon.ico {{
+                alias {files_root}/static/favicon.ico;
               }}
 
-              location /static/ {{
-                root {app_root};
+              location {app_root}/static/ {{
+                root {files_root};
               }}
 
-              location / {{
+              location {app_root}/ {{
                 include proxy_params;
                 proxy_pass http://unix:{socket};
               }}
             }}'''.format(
             port=self.args.port,
-            app_root=self.abspath(self.webapp_files_root),
+            app_root=self.args.app_root,
+            files_root=self.abspath(self.webapp_files_root),
             socket=self.socket_path))
 
         self.write_file('/etc/nginx/nginx.conf', '''
@@ -806,6 +808,9 @@ def cli():
     parser.add_argument('registration_credentials', nargs='?', help=(
         'Username and password (separated by a colon ":") for '
         'registering with the Lokole server.'
+    ))
+    parser.add_argument('--app_root', default=getenv('OPWEN_APP_ROOT', ''), help=(
+        'The URL prefix at which the app will be accessible.'
     ))
     parser.add_argument('--admin_name', default=getenv('LOKOLE_ADMIN_NAME', 'admin'), help=(
         'If set, create an admin user with this account name.'

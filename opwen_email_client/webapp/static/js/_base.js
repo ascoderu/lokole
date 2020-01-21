@@ -1,8 +1,8 @@
-(function ($, ctx) {
+(function ($, ctx, appRoot) {
   $(document).ready(function () {
     (function pollForNewEmails () {
       function checkForNewEmails () {
-        $.getJSON('/email/unread', function (response) {
+        $.getJSON(appRoot + '/email/unread', function (response) {
           if (!response.unread || document.location.pathname.startsWith('/email/') || $('.alert.new-emails').length) {
             return
           }
@@ -31,4 +31,4 @@
       window.setInterval(checkForNewEmails, 1000 * 60 * 5)
     })()
   })
-})(window.jQuery, window.flask_jinja_context__base)
+})(window.jQuery, window.flask_jinja_context__base, window.flask_jinja_context__base.appRoot)

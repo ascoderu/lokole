@@ -71,7 +71,7 @@ def _new_ioc(fqn: str) -> Ioc:
 
 
 def create_app(config=AppConfig) -> Flask:
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path=config.APP_ROOT + '/static')
     app.config.from_object(config)
 
     app.babel = Babel(app)
@@ -82,6 +82,6 @@ def create_app(config=AppConfig) -> Flask:
     app.ioc.user_store.init_app(app)
     security.init_app(app, app.ioc.user_store.r, register_form=RegisterForm, login_form=app.ioc.login_form)
 
-    app.register_blueprint(mkwvconf, url_prefix='/api/mkwvconf')
+    app.register_blueprint(mkwvconf, url_prefix=config.APP_ROOT + '/api/mkwvconf')
 
     return app

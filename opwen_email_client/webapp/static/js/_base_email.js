@@ -1,4 +1,4 @@
-(function ($) {
+(function ($, appRoot) {
   $(document).ready(function () {
     (function activateLazyload () {
       $('.email-body img').lazyload()
@@ -11,7 +11,7 @@
           var emailId = $el.data('email_id')
           if (emailId) {
             $.ajax({
-              url: '/email/read/' + emailId,
+              url: appRoot + '/email/read/' + emailId,
               success: function () {
                 $el.removeClass('panel-info').addClass('panel-default')
               }
@@ -28,4 +28,4 @@
       })
     })()
   })
-})(window.jQuery)
+})(window.jQuery, window.flask_jinja_context__base.appRoot)

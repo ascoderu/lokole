@@ -34,6 +34,7 @@
   {% block scripts %}
   <script>
   window.flask_jinja_context__base = {
+    appRoot: "{{ app_root }}",
     i8n: {
       newEmails: "{{ _('You have new emails!') }}",
       openMailbox: "{{ _('Open mailbox.') }}"

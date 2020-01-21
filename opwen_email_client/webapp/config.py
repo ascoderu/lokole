@@ -127,3 +127,5 @@ class AppConfig(object):
     FORBIDDEN_ACCOUNTS = [NEWS_INBOX, ADMIN_INBOX]
 
     IOC = env('LOKOLE_IOC', 'opwen_email_client.webapp.ioc.Ioc')
+
+    APP_ROOT = env('OPWEN_APP_ROOT', '').rstrip('/')

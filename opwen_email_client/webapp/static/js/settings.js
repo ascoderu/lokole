@@ -1,5 +1,5 @@
-(function ($) {
-  var API_BASE = '/api/mkwvconf'
+(function ($, appRoot) {
+  var API_BASE = appRoot + '/api/mkwvconf'
 
   var $modal = $('#wvdial-modal')
   var $countrySelect = $('#wvdial-country')
@@ -105,4 +105,4 @@
       })
     }
   })
-})(window.jQuery)
+})(window.jQuery, window.flask_jinja_context__base.appRoot)
