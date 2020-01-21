@@ -66,6 +66,10 @@ class AzureUser(User):
     def active(self) -> bool:
         return True
 
+    @property
+    def is_admin(self) -> bool:
+        return False
+
 
 class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
     def __init__(self, user_storage: AzureObjectStorage):
