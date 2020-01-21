@@ -1,4 +1,5 @@
 from typing import Callable
+from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -27,7 +28,7 @@ from opwen_email_server.utils.email_parser import get_domain
 
 class AzureRole:
     def __init__(self):
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
 
 
 class AzureUser(User):
@@ -76,22 +77,24 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         UserReadStore.__init__(self, user_model=AzureUser, role_model=AzureRole)
         UserWriteStore.__init__(self, db=None)
         UserStore.__init__(self, read=self, write=self)
-        self._pending_users = {}
+        self._pending_users: Dict[str, AzureUser] = {}
         self._user_storage = user_storage
 
     def init_app(self, app):
         pass
 
-    def fetch_all(self, user: User) -> List[User]:
+    def fetch_all(self, user: AzureUser) -> List[AzureUser]:
+        domain_users = []
         for email in self._user_storage.iter(f'{get_domain(user.email)}/'):
-            user = self.get_user(email)
-            if user is not None:
-                yield user
+            domain_user = self.get_user(email)
+            if domain_user is not None:
+                domain_users.append(domain_user)
+        return domain_users
 
-    def fetch_pending(self) -> List[User]:
+    def fetch_pending(self) -> List[AzureUser]:
         return []
 
-    def get_user(self, id_or_email) -> Optional[User]:
+    def get_user(self, id_or_email) -> Optional[AzureUser]:
         try:
             data = self._user_storage.fetch_object(self._path_for(id_or_email))
         except ObjectDoesNotExistError:
@@ -99,7 +102,7 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         else:
             return AzureUser(**data)
 
-    def find_user(self, *args, **kwargs) -> Optional[User]:
+    def find_user(self, *args, **kwargs) -> Optional[AzureUser]:
         if 'id' not in kwargs and 'email' not in kwargs:
             raise NotImplementedError(f'Unable to find_user by: {", ".join(kwargs.keys())}')
 
@@ -107,9 +110,9 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         return self.get_user(id_or_email)
 
     def find_role(self, *args, **kwargs):
-        raise NotImplementedError  # pragma: nocover
+        raise NotImplementedError
 
-    def put(self, user: User) -> User:
+    def put(self, user: AzureUser) -> AzureUser:
         self._pending_users[user.email] = user
         return user
 
@@ -123,7 +126,7 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
 
             self._user_storage.store_object(self._path_for(user.email), data)
 
-    def delete(self, user: User) -> None:
+    def delete(self, user: AzureUser) -> None:
         self._pending_users.pop(user.email, None)
         self._user_storage.delete(self._path_for(user.email))
 
@@ -189,7 +192,9 @@ class AzureEmailStore(EmailStore):
                 continue
             for resource_id in resource_ids:
                 email_id = resource_id.split('/')[-1]
-                yield self.get(email_id)
+                email = self.get(email_id)
+                if email:
+                    yield email
 
     def search(self, email_address: str, page: int, query: Optional[str]) -> Iterable[dict]:
         return []

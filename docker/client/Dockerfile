@@ -17,12 +17,11 @@ WORKDIR /lib
 COPY requirements.txt .
 RUN /app/lokole/venv/bin/pip install --no-cache-dir -r requirements.txt
 COPY opwen_email_server opwen_email_server
-COPY docker/client/integration.py .
 COPY docker/client/sync-settings-from-env.sh .
 
 WORKDIR /app
 ENV PYTHONPATH=/lib
-ENV LOKOLE_IOC=integration.AzureIoc
+ENV LOKOLE_IOC=opwen_email_server.integration.webapp.AzureIoc
 ENV OPWEN_EMAILS_PER_PAGE=5
 ENV OPWEN_CAN_REGISTER_USER=False
 ENV OPWEN_CAN_CHANGE_PASSWORD=False
