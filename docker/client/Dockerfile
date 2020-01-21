@@ -24,6 +24,9 @@ WORKDIR /app
 ENV PYTHONPATH=/lib
 ENV LOKOLE_IOC=integration.AzureIoc
 ENV OPWEN_EMAILS_PER_PAGE=5
+ENV OPWEN_CAN_REGISTER_USER=False
+ENV OPWEN_CAN_CHANGE_PASSWORD=False
+ENV OPWEN_CAN_SEARCH_EMAIL=False
 
 EXPOSE ${LOKOLE_PORT}
 ENTRYPOINT ["/lib/sync-settings-from-env.sh", "/app/lokole/state/settings.env"]
