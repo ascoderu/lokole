@@ -1,25 +1,25 @@
-from typing import Dict
+from typing import Callable
 from typing import Iterable
 from typing import List
 from typing import Optional
-from typing import Set
 from typing import Union
 
 from cached_property import cached_property
 from flask_security import LoginForm
 from libcloud.storage.types import ObjectDoesNotExistError
 from opwen_email_client.domain.email.store import EmailStore
+from opwen_email_client.domain.email.sync import Sync
 from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.domain.email.user_store import UserReadStore
 from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.email.user_store import UserWriteStore
-from opwen_email_client.util.serialization import JsonSerializer
 from opwen_email_client.webapp.config import AppConfig
 
 from opwen_email_server.constants import mailbox
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_user_storage
+from opwen_email_server.integration.celery import send_and_index
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.collections import chunks
 from opwen_email_server.utils.email_parser import get_domain
@@ -129,16 +129,21 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
 
 
 class AzureEmailStore(EmailStore):
-    def __init__(self,
-                 email_storage: AzureObjectStorage,
-                 mailbox_storage: AzureObjectStorage,
-                 restricted: Optional[Dict[str, Set[str]]] = None):
-        super().__init__(restricted)
+    def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureObjectStorage,
+                 send_email: Callable[[str], None]):
+        super().__init__(restricted=None)
         self._email_storage = email_storage
         self._mailbox_storage = mailbox_storage
+        self._send_email = send_email
 
     def _create(self, emails_or_attachments: Iterable[dict]):
-        raise NotImplementedError
+        for email in emails_or_attachments:
+            if email.get('_type') == 'attachment':
+                raise NotImplementedError
+
+            email_id = email['_uid']
+            self._email_storage.store_object(email_id, email)
+            self._send_email(email_id)
 
     def get(self, uid: str) -> Optional[dict]:
         try:
@@ -207,25 +212,26 @@ class AzureEmailStore(EmailStore):
         pass
 
 
+class NoSync(Sync):
+    def upload(self, items: Iterable, users: Iterable[User]) -> Iterable[str]:
+        return []
+
+    def download(self) -> Iterable:
+        return []
+
+
 class AzureIoc:
-    @cached_property
-    def serializer(self):
-        return JsonSerializer()
-
-    @cached_property
-    def email_server_client(self):
-        raise NotImplementedError
-
     @cached_property
     def email_store(self):
         return AzureEmailStore(
             email_storage=get_email_storage(),
             mailbox_storage=get_mailbox_storage(),
+            send_email=send_and_index,
         )
 
     @cached_property
     def email_sync(self):
-        raise NotImplementedError
+        return NoSync()
 
     @cached_property
     def user_store(self):
