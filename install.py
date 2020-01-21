@@ -559,6 +559,9 @@ class WebappSetup(Setup):
             for (key, value) in settings.items()))
 
     def _create_admin_user(self):
+        if self.args.admin == 'no':
+            return
+
         self.sh('OPWEN_SETTINGS="{settings}" '
                 '"{manage}" createadmin --name="{name}" --password="{password}"'.format(
                  settings=self.settings_path,
@@ -828,6 +831,9 @@ def cli():
     ))
     parser.add_argument('--app_root', default=getenv('OPWEN_APP_ROOT', ''), help=(
         'The URL prefix at which the app will be accessible.'
+    ))
+    parser.add_argument('--admin', default=getenv('LOKOLE_ADMIN', 'yes'), help=(
+        'If set to "no", skip creation of application admin user.'
     ))
     parser.add_argument('--admin_name', default=getenv('LOKOLE_ADMIN_NAME', 'admin'), help=(
         'If set, create an admin user with this account name.'
