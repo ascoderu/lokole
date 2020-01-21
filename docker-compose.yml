@@ -72,7 +72,7 @@ services:
       - appinsights
       - azurite
     volumes:
-      - .:/app
+      - ./opwen_email_server:/app/opwen_email_server
       - venv:/app/venv
 
   worker:
@@ -87,7 +87,7 @@ services:
       - azurite
       - rabbitmq
     volumes:
-      - .:/app
+      - ./opwen_email_server:/app/opwen_email_server
       - venv:/app/venv
 
   setup:
