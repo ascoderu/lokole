@@ -25,6 +25,8 @@ spec:
           value: "8888"
         - name: DNS_RESOLVER
           value: 127.0.0.1:53 ipv6=off
+        - name: HOSTNAME_WEBAPP
+          value: "{{ .Release.Name }}-webapp:8080"
         - name: HOSTNAME_CLIENT_METRICS
           value: "{{ .Release.Name }}-api:8080"
         - name: HOSTNAME_CLIENT_READ
