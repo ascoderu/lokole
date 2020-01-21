@@ -1,16 +1,23 @@
+from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Union
 
 from cached_property import cached_property
 from flask_security import LoginForm
 from libcloud.storage.types import ObjectDoesNotExistError
+from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.domain.email.user_store import UserReadStore
 from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.email.user_store import UserWriteStore
 from opwen_email_client.webapp.ioc import Ioc
 
+from opwen_email_server.constants import mailbox
+from opwen_email_server.integration.azure import get_email_storage
+from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_user_storage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.email_parser import get_domain
@@ -119,7 +126,80 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         return f'{get_domain(email)}/{email}'
 
 
+class AzureEmailStore(EmailStore):
+    def __init__(self,
+                 email_storage: AzureObjectStorage,
+                 mailbox_storage: AzureObjectStorage,
+                 restricted: Optional[Dict[str, Set[str]]] = None):
+        super().__init__(restricted)
+        self._email_storage = email_storage
+        self._mailbox_storage = mailbox_storage
+
+    def _create(self, emails_or_attachments: Iterable[dict]):
+        raise NotImplementedError
+
+    def get(self, uid: str) -> Optional[dict]:
+        try:
+            return self._email_storage.fetch_object(uid)
+        except ObjectDoesNotExistError:
+            return None
+
+    def get_attachment(self, email_id: str, attachment_id: str) -> Optional[dict]:
+        email = self.get(email_id)
+        if not email:
+            return None
+
+        for attachment in email.get('attachments', []):
+            if attachment.get('_uid') == attachment_id:
+                return attachment
+
+        return None
+
+    def inbox(self, email_address: str, page: int) -> Iterable[dict]:
+        return self._iter_mailbox(email_address, page, mailbox.RECEIVED_FOLDER)
+
+    def sent(self, email_address: str, page: int) -> Iterable[dict]:
+        return self._iter_mailbox(email_address, page, mailbox.SENT_FOLDER)
+
+    def _iter_mailbox(self, email_address: str, page: int, folder: str) -> Iterable[dict]:
+        # TODO: implement pagination
+        prefix = f'{email_address}/{folder}'
+        for email_id in self._mailbox_storage.iter(prefix):
+            yield self._mailbox_storage.fetch_object(f'{prefix}/{email_id}')
+
+    def search(self, email_address: str, page: int, query: Optional[str]) -> Iterable[dict]:
+        return []
+
+    def outbox(self, email_address: str, page: int) -> Iterable[dict]:
+        return []
+
+    def pending(self, page: Optional[int]) -> Iterable[dict]:
+        return []
+
+    def has_unread(self, email_address: str) -> bool:
+        return False
+
+    def num_pending(self) -> int:
+        return 0
+
+    def _delete(self, email_address: str, uids: Iterable[str]):
+        pass
+
+    def _mark_sent(self, uids: Iterable[str]):
+        pass
+
+    def _mark_read(self, email_address: str, uids: Iterable[str]):
+        pass
+
+
 class AzureIoc(Ioc):
+    @cached_property
+    def email_store(self):
+        return AzureEmailStore(
+            email_storage=get_email_storage(),
+            mailbox_storage=get_mailbox_storage(),
+        )
+
     @cached_property
     def user_store(self):
         return AzureUserStore(user_storage=get_user_storage())

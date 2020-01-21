@@ -6,7 +6,7 @@ RUN apt-get update \
   && pip3 install setuptools==45.1.0
 
 WORKDIR /build
-ARG CLIENT_VERSION=b9c9eab
+ARG CLIENT_VERSION=7faacc5
 RUN wget -q -O client.tar.gz "https://github.com/ascoderu/opwen-webapp/archive/${CLIENT_VERSION}.tar.gz" \
  && tar --strip-components=1 -x -f client.tar.gz \
  && rm client.tar.gz \
