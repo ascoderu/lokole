@@ -67,7 +67,6 @@ services:
       args:
         LOKOLE_PORT: "8080"
         LOKOLE_CLIENT_VERSION: ${WEBAPP_VERSION}
-        INSTALLER_VERSION: ${WEBAPP_INSTALLER_VERSION}
     environment:
       <<: *shared-app-environment
     depends_on:
