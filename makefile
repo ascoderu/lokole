@@ -68,11 +68,7 @@ release-pypi: prepare-release
 	$(py_env)/bin/pip install twine
 	$(py_env)/bin/twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" dist/*
 
-release-docker:
-	docker build -t "$(DOCKER_USERNAME)/opwenwebapp:$(VERSION)" .
-	docker push "$(DOCKER_USERNAME)/opwenwebapp:$(VERSION)"
-
-release: release-pypi release-docker
+release: release-pypi
 
 admin-user: prepare-server
 	OPWEN_SETTINGS=$(settings) \
