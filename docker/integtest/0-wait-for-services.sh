@@ -6,48 +6,71 @@ scriptdir="$(dirname "$0")"
 . "${scriptdir}/utils.sh"
 
 readonly polling_interval_seconds=2
+readonly max_retries=30
 
 wait_for_rabbitmq() {
   local rabbitmq
+  local i
 
   rabbitmq="$(get_container rabbitmq)"
 
-  while ! docker exec "${rabbitmq}" rabbitmqctl wait -q -P 1 -t "${polling_interval_seconds}"; do
-    log "Waiting for rabbitmq"
+  for i in $(seq 1 "${max_retries}"); do
+    if docker exec "${rabbitmq}" rabbitmqctl wait -q -P 1 -t "${polling_interval_seconds}"; then
+      log "Rabbitmq is running"
+      return
+    fi
+    log "Waiting for rabbitmq (${i}/${max_retries})"
   done
 
-  log "Rabbitmq is running"
+  exit 1
 }
 
 wait_for_postgres() {
-  while ! sql "select 1;" >/dev/null; do
-    log "Waiting for postgres"
+  local i
+
+  for i in $(seq 1 "${max_retries}"); do
+    if sql "select 1;" >/dev/null; then
+      log "Postgres is running"
+      return
+    fi
+    log "Waiting for postgres (${i}/${max_retries})"
     sleep "${polling_interval_seconds}s"
   done
 
-  log "Postgres is running"
+  exit 2
 }
 
 wait_for_appinsights() {
   local key
+  local i
 
   key="$(get_dotenv "APPINSIGHTS_INSTRUMENTATIONKEY")"
 
-  while ! sql "select 'ready' from clients where client = '${key}';" | grep -q 'ready'; do
-    log "Waiting for appinsights"
+  for i in $(seq 1 "${max_retries}"); do
+    if sql "select 'ready' from clients where client = '${key}';" | grep -q 'ready'; then
+      log "Appinsights is running"
+      return
+    fi
+    log "Waiting for appinsights (${i}/${max_retries})"
     sleep "${polling_interval_seconds}s"
   done
 
-  log "Appinsights is running"
+  exit 3
 }
 
 wait_for_api() {
-  while ! curl -fs "http://nginx:8888/healthcheck/ping" >/dev/null; do
-    log "Waiting for api"
+  local i
+
+  for i in $(seq 1 "${max_retries}"); do
+    if curl -fs "http://nginx:8888/healthcheck/ping" >/dev/null; then
+      log "Api is running"
+      return
+    fi
+    log "Waiting for api (${i}/${max_retries})"
     sleep "${polling_interval_seconds}s"
   done
 
-  log "Api is running"
+  exit 4
 }
 
 wait_for_rabbitmq
