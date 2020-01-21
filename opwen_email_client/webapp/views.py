@@ -158,12 +158,12 @@ def email_new() -> Response:
     return _view('email_new.html', max_upload_size_mb=AppConfig.MAX_UPLOAD_SIZE_MB, form=form, type='write')
 
 
-@app.route('/attachment/<uid>', methods=['GET'])
+@app.route('/attachment/<email_id>/<attachment_id>', methods=['GET'])
 @login_required
-def download_attachment(uid: str) -> Response:
+def download_attachment(email_id: str, attachment_id: str) -> Response:
     email_store = app.ioc.email_store
 
-    attachment = email_store.get_attachment(uid)
+    attachment = email_store.get_attachment(email_id, attachment_id)
     if attachment is None:
         return abort(404)
 

@@ -424,10 +424,10 @@ class Base(object):
                 },
             )
 
-            actual = self.email_store.get_attachment('a1')
+            actual = self.email_store.get_attachment('e1', 'a1')
             self.assertEqual(actual['_uid'], 'a1')
 
-            actual = self.email_store.get_attachment('a2')
+            actual = self.email_store.get_attachment('e3', 'a2')
             self.assertEqual(actual['_uid'], 'a2')
 
         def test_get_attachment_without_match(self):
@@ -442,6 +442,6 @@ class Base(object):
                 },
             )
 
-            actual = self.email_store.get_attachment('uid-does-not-exist')
+            actual = self.email_store.get_attachment('email-does-not-exist', 'uid-does-not-exist')
 
             self.assertIsNone(actual)

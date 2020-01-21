@@ -25,7 +25,7 @@ class EmailStore(metaclass=ABCMeta):
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
-    def get_attachment(self, uid: str) -> Optional[dict]:
+    def get_attachment(self, email_id: str, attachment_id: str) -> Optional[dict]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod

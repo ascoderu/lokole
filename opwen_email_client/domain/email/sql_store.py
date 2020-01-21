@@ -321,8 +321,8 @@ class _SqlalchemyEmailStore(EmailStore):
     def get(self, uid):
         return self._find(_Email.uid == uid)
 
-    def get_attachment(self, uid):
-        return self._find(_Attachment.uid == uid, table=_Attachment)
+    def get_attachment(self, email_id, attachment_id):
+        return self._find(_Attachment.uid == attachment_id, table=_Attachment)
 
     def sent(self, email_address, page):
         return self._query(_Email.is_sent_by(email_address) & _Email.sent_at.isnot(None), page)

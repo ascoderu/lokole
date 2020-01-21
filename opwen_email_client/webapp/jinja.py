@@ -38,7 +38,7 @@ def render_body(email: dict) -> str:
             attachment_cid = src[4:]
             attachment_id = attachments.get(attachment_cid)
             if attachment_id:
-                src = url_for('download_attachment', attachment_id=attachment_id)
+                src = url_for('download_attachment', email_id=email['_uid'], attachment_id=attachment_id)
         del img['src']
         img['data-original'] = src
     body = str(soup)

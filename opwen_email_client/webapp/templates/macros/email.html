@@ -99,7 +99,7 @@
               <ul class="list-inline">
                 {% for attachment in email['attachments'] %}
                 <li>
-                  <a href="{{ url_for('download_attachment', uid=attachment['_uid']) }}">{{ attachment['filename'] }}</a>
+                  <a href="{{ url_for('download_attachment', email_id=email['_uid'], attachment_id=attachment['_uid']) }}">{{ attachment['filename'] }}</a>
                 </li>
                 {% endfor %}
               </ul>
