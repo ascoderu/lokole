@@ -14,12 +14,14 @@ from opwen_email_client.domain.email.user_store import UserReadStore
 from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.email.user_store import UserWriteStore
 from opwen_email_client.util.serialization import JsonSerializer
+from opwen_email_client.webapp.config import AppConfig
 
 from opwen_email_server.constants import mailbox
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_user_storage
 from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.utils.collections import chunks
 from opwen_email_server.utils.email_parser import get_domain
 
 
@@ -140,20 +142,30 @@ class AzureEmailStore(EmailStore):
 
     def get(self, uid: str) -> Optional[dict]:
         try:
-            return self._email_storage.fetch_object(uid)
+            email = self._email_storage.fetch_object(uid)
         except ObjectDoesNotExistError:
             return None
+        else:
+            email['read'] = True
+            for i, attachment in enumerate(email.get('attachments', [])):
+                attachment.setdefault('_uid', i)
+                attachment.setdefault('cid', None)
+            return email
 
     def get_attachment(self, email_id: str, attachment_id: str) -> Optional[dict]:
         email = self.get(email_id)
         if not email:
             return None
 
-        for attachment in email.get('attachments', []):
+        attachments = email.get('attachments', [])
+        for attachment in attachments:
             if attachment.get('_uid') == attachment_id:
                 return attachment
 
-        return None
+        try:
+            return attachments[int(attachment_id)]
+        except (IndexError, ValueError):
+            return None
 
     def inbox(self, email_address: str, page: int) -> Iterable[dict]:
         return self._iter_mailbox(email_address, page, mailbox.RECEIVED_FOLDER)
@@ -162,10 +174,13 @@ class AzureEmailStore(EmailStore):
         return self._iter_mailbox(email_address, page, mailbox.SENT_FOLDER)
 
     def _iter_mailbox(self, email_address: str, page: int, folder: str) -> Iterable[dict]:
-        # TODO: implement pagination
-        prefix = f'{email_address}/{folder}'
-        for email_id in self._mailbox_storage.iter(prefix):
-            yield self._mailbox_storage.fetch_object(f'{prefix}/{email_id}')
+        emails = self._mailbox_storage.iter(f'{email_address}/{folder}')
+        for i, resource_ids in enumerate(chunks(emails, AppConfig.EMAILS_PER_PAGE), start=1):
+            if i != page:
+                continue
+            for resource_id in resource_ids:
+                email_id = resource_id.split('/')[-1]
+                yield self.get(email_id)
 
     def search(self, email_address: str, page: int, query: Optional[str]) -> Iterable[dict]:
         return []
