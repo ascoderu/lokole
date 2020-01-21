@@ -1,5 +1,8 @@
-from cached_property import cached_property
+from typing import List
+from typing import Optional
+from typing import Union
 
+from cached_property import cached_property
 from flask_security import LoginForm
 from libcloud.storage.types import ObjectDoesNotExistError
 from opwen_email_client.domain.email.user_store import User
@@ -66,16 +69,16 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
     def init_app(self, app):
         pass
 
-    def fetch_all(self, user):
+    def fetch_all(self, user: User) -> List[User]:
         for email in self._user_storage.iter(f'{get_domain(user.email)}/'):
             user = self.get_user(email)
             if user is not None:
                 yield user
 
-    def fetch_pending(self):
+    def fetch_pending(self) -> List[User]:
         return []
 
-    def get_user(self, id_or_email):
+    def get_user(self, id_or_email) -> Optional[User]:
         try:
             data = self._user_storage.fetch_object(self._path_for(id_or_email))
         except ObjectDoesNotExistError:
@@ -83,7 +86,7 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         else:
             return AzureUser(**data)
 
-    def find_user(self, *args, **kwargs):
+    def find_user(self, *args, **kwargs) -> Optional[User]:
         if 'id' not in kwargs and 'email' not in kwargs:
             raise NotImplementedError(f'Unable to find_user by: {", ".join(kwargs.keys())}')
 
@@ -93,11 +96,11 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
     def find_role(self, *args, **kwargs):
         raise NotImplementedError  # pragma: nocover
 
-    def put(self, user):
+    def put(self, user: User) -> User:
         self._pending_users[user.email] = user
         return user
 
-    def commit(self):
+    def commit(self) -> None:
         for user in self._pending_users.values():
             data = user.to_dict()
 
@@ -107,12 +110,12 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
 
             self._user_storage.store_object(self._path_for(user.email), data)
 
-    def delete(self, user):
+    def delete(self, user: User) -> None:
         self._pending_users.pop(user.email, None)
         self._user_storage.delete(self._path_for(user.email))
 
     @classmethod
-    def _path_for(cls, email):
+    def _path_for(cls, email: str) -> str:
         return f'{get_domain(email)}/{email}'
 
 
