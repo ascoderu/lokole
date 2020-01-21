@@ -13,6 +13,8 @@
   {{ render_button(login_user_form.submit, _('Login')) }}
 </form>
 
+{% if can_register_user %}
 {{ _("Don't have an account?") }}
 <a href="{{ url_for_security('register') }}">{{ _('Register now!') }}</a>
+{% endif %}
 {% endblock %}

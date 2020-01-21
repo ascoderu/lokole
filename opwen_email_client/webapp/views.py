@@ -102,6 +102,9 @@ def email_sent(page: int) -> Response:
 @login_required
 @track_history
 def email_search(page: int) -> Response:
+    if not AppConfig.EMAIL_SEARCHABLE:
+        return abort(404)
+
     email_store = app.ioc.email_store
     user = current_user
     query = request.args.get('query')
@@ -400,6 +403,9 @@ def _inject_config() -> dict:
         'current_locale': Locale.parse(_localeselector()),
         'local_only': AppConfig.SIM_TYPE == 'LocalOnly',
         'app_root': AppConfig.APP_ROOT,
+        'can_change_password': AppConfig.SECURITY_CHANGEABLE,
+        'can_register_user': AppConfig.SECURITY_REGISTERABLE,
+        'can_search_email': AppConfig.EMAIL_SEARCHABLE,
     }
 
 

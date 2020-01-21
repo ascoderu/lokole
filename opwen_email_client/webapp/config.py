@@ -74,8 +74,8 @@ class AppConfig(object):
     SECURITY_USER_IDENTITY_ATTRIBUTES = 'email'
     SECURITY_PASSWORD_HASH = 'bcrypt'  # nosec
     SECURITY_PASSWORD_SINGLE_HASH = True
-    SECURITY_REGISTERABLE = True
-    SECURITY_CHANGEABLE = True
+    SECURITY_REGISTERABLE = env.bool('OPWEN_CAN_REGISTER_USER', True)
+    SECURITY_CHANGEABLE = env.bool('OPWEN_CAN_CHANGE_PASSWORD', True)
     SECURITY_TRACKABLE = True
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_POST_REGISTER_VIEW = 'register_complete'
@@ -111,6 +111,7 @@ class AppConfig(object):
     DEFAULT_LOCALE = Locale.parse('en_ca')
     LOCALES = [DEFAULT_LOCALE] + [Locale.parse(code) for code in subdirectories(LOCALES_DIRECTORY)]
 
+    EMAIL_SEARCHABLE = env.bool('OPWEN_CAN_SEARCH_EMAIL', True)
     COMPRESSION = env('OPWEN_COMPRESSION', 'zstd')
     EMAIL_SERVER_HOSTNAME = env('OPWEN_EMAIL_SERVER_HOSTNAME', None)
     EMAIL_HOST_FORMAT = '{}.' + root_domain
