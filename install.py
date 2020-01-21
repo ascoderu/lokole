@@ -144,9 +144,18 @@ class Setup:
     def create_daemon(self, program_name, command, user=None, env=None):
         env = env or {}
         user = user or self.user
+        extra_conf = []
 
-        stderr = self.abspath(Path(self.args.log_directory) / '{}.stderr.log'.format(program_name))
-        stdout = self.abspath(Path(self.args.log_directory) / '{}.stdout.log'.format(program_name))
+        if self.args.log_directory == '-':
+            stderr = '/dev/fd/2'
+            stdout = '/dev/fd/1'
+            extra_conf.extend((
+                'stdout_logfile_maxbytes=0',
+                'stderr_logfile_maxbytes=0',
+            ))
+        else:
+            stderr = self.abspath(Path(self.args.log_directory) / '{}.stderr.log'.format(program_name))
+            stdout = self.abspath(Path(self.args.log_directory) / '{}.stdout.log'.format(program_name))
 
         self.write_file('/etc/supervisor/conf.d/{}.conf'.format(program_name), (
             '[program:{}]'.format(program_name),
@@ -159,6 +168,7 @@ class Setup:
             'stdout_logfile={}'.format(stdout),
             'user={}'.format(user),
             'environment={}'.format(','.join('{}={}'.format(*kv) for kv in env.items())),
+            *extra_conf,
         ))
 
     def abspath(self, file_path):
@@ -581,6 +591,13 @@ class WebappSetup(Setup):
             files_root=self.abspath(self.webapp_files_root),
             socket=self.socket_path))
 
+        if self.args.log_directory == '-':
+            access_log = 'stdout'
+            error_log = 'stderr'
+        else:
+            access_log = self.abspath(Path(self.args.log_directory) / 'nginx_access.log')
+            error_log = self.abspath(Path(self.args.log_directory) / 'nginx_error.log')
+
         self.write_file('/etc/nginx/nginx.conf', '''
             user www-data;
             worker_processes 4;
@@ -612,8 +629,8 @@ class WebappSetup(Setup):
               fastcgi_send_timeout {timeout_seconds};
               fastcgi_read_timeout {timeout_seconds};
             }}'''.format(
-            access_log=self.abspath(Path(self.args.log_directory) / 'nginx_access.log'),
-            error_log=self.abspath(Path(self.args.log_directory) / 'nginx_error.log'),
+            access_log=access_log,
+            error_log=error_log,
             max_upload_size=self.args.max_upload_size,
             timeout_seconds=self.args.timeout))
 
