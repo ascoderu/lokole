@@ -19,6 +19,7 @@ from libcloud.storage.types import ObjectDoesNotExistError
 from xtarfile import open as tarfile_open
 
 from opwen_email_client.domain.email.client import EmailServerClient
+from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.util.serialization import Serializer
 
 T = TypeVar('T')
@@ -28,7 +29,7 @@ Download = namedtuple('Download', ('name', 'optional', 'type_'))
 
 class Sync(metaclass=ABCMeta):
     @abstractmethod
-    def upload(self, items: Iterable[T], users: Iterable) -> Iterable[str]:
+    def upload(self, items: Iterable[T], users: Iterable[User]) -> Iterable[str]:
         raise NotImplementedError  # pragma: no cover
 
     @abstractmethod

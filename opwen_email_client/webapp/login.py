@@ -1,10 +1,13 @@
+from typing import List
+
+from flask import Flask
 from flask_migrate import Migrate
 from flask_security import RoleMixin
 from flask_security import SQLAlchemyUserDatastore
-from flask_security import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
 
+from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.domain.email.user_store import UserStore
 
 _db = SQLAlchemy()
@@ -18,7 +21,7 @@ _roles_users = _db.Table(
 
 
 # noinspection PyUnresolvedReferences
-class _User(_db.Model, UserMixin):
+class _User(_db.Model, User):
     __tablename__ = 'user'
 
     id = _db.Column(_db.Integer(), primary_key=True)
@@ -55,7 +58,7 @@ class FlaskLoginUserStore(UserStore):
         super().__init__(read=store, write=store)
         self._app = None
 
-    def init_app(self, app):
+    def init_app(self, app: Flask):
         with app.app_context():
             _db.init_app(app)
             _migrate.init_app(app, _db)
@@ -67,10 +70,10 @@ class FlaskLoginUserStore(UserStore):
 
         self._app = app
 
-    def fetch_all(self, user):
+    def fetch_all(self, user: User) -> List[User]:
         with self._app.app_context():
             return _User.query.all()
 
-    def fetch_pending(self):
+    def fetch_pending(self) -> List[User]:
         with self._app.app_context():
             return _User.query.filter_by(synced=False).all()
