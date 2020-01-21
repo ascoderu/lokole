@@ -20,21 +20,6 @@ from opwen_email_client.webapp.security import security
 
 class Ioc:
     @cached_property
-    def serializer(self):
-        return JsonSerializer()
-
-    @cached_property
-    def email_server_client(self):
-        if AppConfig.TESTING:
-            return LocalEmailServerClient()
-
-        return HttpEmailServerClient(
-            compression=AppConfig.COMPRESSION,
-            hostname=AppConfig.EMAIL_SERVER_HOSTNAME,
-            client_id=AppConfig.CLIENT_ID,
-        )
-
-    @cached_property
     def email_store(self):
         return SqliteEmailStore(
             page_size=AppConfig.EMAILS_PER_PAGE,
@@ -44,14 +29,25 @@ class Ioc:
 
     @cached_property
     def email_sync(self):
+        if AppConfig.TESTING:
+            email_server_client = LocalEmailServerClient()
+        else:
+            email_server_client = HttpEmailServerClient(
+                compression=AppConfig.COMPRESSION,
+                hostname=AppConfig.EMAIL_SERVER_HOSTNAME,
+                client_id=AppConfig.CLIENT_ID,
+            )
+
+        serializer = JsonSerializer()
+
         return AzureSync(
             compression=AppConfig.COMPRESSION,
             account_name=AppConfig.STORAGE_ACCOUNT_NAME,
             account_key=AppConfig.STORAGE_ACCOUNT_KEY,
-            email_server_client=self.email_server_client,
+            email_server_client=email_server_client,
             container=AppConfig.STORAGE_CONTAINER,
             provider=AppConfig.STORAGE_PROVIDER,
-            serializer=self.serializer,
+            serializer=serializer,
         )
 
     @cached_property
