@@ -63,6 +63,7 @@ case "$1" in
       export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
     fi
 
+    export CI=true
     make start
     make integration-tests
     ;;
