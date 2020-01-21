@@ -65,7 +65,11 @@ build:
 	docker-compose build
 
 start:
-	docker-compose up -d --remove-orphans
+	if [ "$(CI)" = "true" ]; then \
+    docker-compose up -d; \
+  else \
+    docker-compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d --remove-orphans; \
+  fi
 
 start-azure:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.secrets.yml up -d --remove-orphans
@@ -84,7 +88,7 @@ logs:
   fi
 
 stop:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml down --volumes --timeout=5
+	docker-compose -f docker-compose.yml -f docker/docker-compose.dev.yml -f docker/docker-compose.tools.yml down --volumes --timeout=5
 
 verify-build:
 	docker pull wagoodman/dive
