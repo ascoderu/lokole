@@ -6,16 +6,10 @@ RUN apt-get update \
  && pip3 install setuptools==45.1.0
 
 WORKDIR /app
-ARG LOKOLE_CLIENT_VERSION=0.5.5
-ARG LOKOLE_PORT=8899
-ARG OPWEN_APP_ROOT=/web
-ARG USER=root
-ARG LOKOLE_LOG_DIRECTORY=-
-ARG LOKOLE_WIFI=no
-ARG LOKOLE_REBOOT=no
-ARG LOKOLE_SYSTEM_SETUP=no
+ARG LOKOLE_CLIENT_VERSION
+ARG LOKOLE_PORT
 RUN wget -q "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${LOKOLE_CLIENT_VERSION}/install.py" \
- && python3 install.py web LocalOnly \
+ && USER=root python3 install.py web LocalOnly --system_setup=no --reboot=no --wifi=no --log_directory=- --app_root=/web \
  && rm -rf /tmp/install.py install.py
 
 WORKDIR /lib
