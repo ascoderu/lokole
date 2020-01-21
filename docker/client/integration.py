@@ -2,7 +2,7 @@ from cached_property import cached_property
 
 from flask_security import LoginForm
 from libcloud.storage.types import ObjectDoesNotExistError
-from opwen_email_client.domain.email.user_store import UserMixin
+from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.domain.email.user_store import UserReadStore
 from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.email.user_store import UserWriteStore
@@ -18,11 +18,8 @@ class AzureRole:
         raise NotImplementedError  # pragma: no cover
 
 
-class AzureUser(UserMixin):
+class AzureUser(User):
     def __init__(self, **data):
-        data['roles'] = []
-        data['active'] = True
-        data['id'] = data['email']
         super().__setattr__('_data', data)
 
     def __getattr__(self, item):
@@ -36,6 +33,26 @@ class AzureUser(UserMixin):
     def to_dict(self):
         data = super().__getattribute__('_data')
         return data
+
+    @property
+    def id(self) -> Union[str, int]:
+        return self.email
+
+    @property
+    def email(self) -> str:
+        return super().__getattribute__('_data')['email']
+
+    @property
+    def password(self) -> str:
+        return super().__getattribute__('_data')['password']
+
+    @property
+    def roles(self) -> List[str]:
+        return []
+
+    @property
+    def active(self) -> bool:
+        return True
 
 
 class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
