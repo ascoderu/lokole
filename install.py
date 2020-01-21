@@ -577,8 +577,8 @@ class WebappSetup(Setup):
                 alias {files_root}/static/favicon.ico;
               }}
 
-              location {app_root}/static/ {{
-                root {files_root};
+              location ~ ^{app_root}/static/(.*)$ {{
+                alias {files_root}/static/$1;
               }}
 
               location {app_root}/ {{

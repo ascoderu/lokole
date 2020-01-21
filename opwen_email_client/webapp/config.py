@@ -129,3 +129,4 @@ class AppConfig(object):
     IOC = env('LOKOLE_IOC', 'opwen_email_client.webapp.ioc.Ioc')
 
     APP_ROOT = env('OPWEN_APP_ROOT', '').rstrip('/')
+    SECURITY_URL_PREFIX = APP_ROOT or None
