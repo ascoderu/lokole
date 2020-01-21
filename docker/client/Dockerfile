@@ -2,35 +2,34 @@ FROM debian:buster
 
 # hadolint ignore=DL3009
 RUN apt-get update \
-  && apt-get install --no-install-recommends -y python3=3.7.3-1 python3-pip=18.1-5 wget=1.20.1-1.1 \
-  && pip3 install setuptools==45.1.0
-
-WORKDIR /build
-ARG CLIENT_VERSION=7faacc5
-RUN wget -q -O client.tar.gz "https://github.com/ascoderu/opwen-webapp/archive/${CLIENT_VERSION}.tar.gz" \
- && tar --strip-components=1 -x -f client.tar.gz \
- && rm client.tar.gz \
- && python3 setup.py sdist \
- && mkdir /app \
- && mv dist/opwen_email_client-0.0.0.tar.gz /app \
- && mv install.py /app \
- && rm -rf /build
+ && apt-get install --no-install-recommends -y python3=3.7.3-1 python3-pip=18.1-5 wget=1.20.1-1.1 \
+ && pip3 install setuptools==45.1.0
 
 WORKDIR /app
+ARG LOKOLE_CLIENT_VERSION=0.5.5
+ARG LOKOLE_PORT=8899
+ARG OPWEN_APP_ROOT=/web
+ARG USER=root
+ARG LOKOLE_LOG_DIRECTORY=-
+ARG LOKOLE_WIFI=no
+ARG LOKOLE_REBOOT=no
+ARG LOKOLE_SYSTEM_SETUP=no
+RUN wget -q "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${LOKOLE_CLIENT_VERSION}/install.py" \
+ && python3 install.py web LocalOnly \
+ && rm -rf /tmp/install.py install.py
 
-ENV USER=root
-RUN python3 install.py web LocalOnly --wifi=no --reboot=no --system_setup=no --client_dist=opwen_email_client-0.0.0.tar.gz \
- && rm -rf /tmp/install.py
-
+WORKDIR /lib
 COPY requirements.txt .
-RUN lokole/venv/bin/pip install -r requirements.txt
-
+RUN /app/lokole/venv/bin/pip install --no-cache-dir -r requirements.txt
 COPY opwen_email_server opwen_email_server
 COPY docker/client/integration.py .
 COPY docker/client/sync-settings-from-env.sh .
 
+WORKDIR /app
+ENV PYTHONPATH=/lib
 ENV LOKOLE_IOC=integration.AzureIoc
+ENV OPWEN_EMAILS_PER_PAGE=5
 
-EXPOSE 80
-ENTRYPOINT ["/app/sync-settings-from-env.sh", "/app/lokole/state/settings.env"]
+EXPOSE ${LOKOLE_PORT}
+ENTRYPOINT ["/lib/sync-settings-from-env.sh", "/app/lokole/state/settings.env"]
 CMD ["/usr/bin/supervisord", "--configuration=/etc/supervisor/supervisord.conf", "--nodaemon"]
