@@ -39,7 +39,7 @@ case "$1" in
     ;;
 
   deploy)
-    if [[ "$TEST_MODE" = "live" ]]; then
+    if [[ "$TEST_MODE" = "local" ]]; then
       DOCKER_TAG="$TRAVIS_TAG" make release deploy
     fi
     ;;
