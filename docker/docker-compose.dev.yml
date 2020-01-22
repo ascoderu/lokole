@@ -6,13 +6,8 @@ services:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-gunicorn.sh"]
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
-      - venv:/app/venv
 
   worker:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-celery.sh"]
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
-      - venv:/app/venv
-
-volumes:
-  venv:
