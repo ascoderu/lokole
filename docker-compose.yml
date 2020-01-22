@@ -49,6 +49,7 @@ services:
       - ${APP_PORT}:8888
     environment:
       DNS_RESOLVER: 127.0.0.11
+      HOSTNAME_WEBAPP: webapp:8080
       HOSTNAME_CLIENT_METRICS: api:8080
       HOSTNAME_CLIENT_READ: api:8080
       HOSTNAME_CLIENT_WRITE: api:8080
@@ -56,6 +57,20 @@ services:
       HOSTNAME_CLIENT_REGISTER: api:8080
     depends_on:
       - api
+      - webapp
+
+  webapp:
+    image: ${DOCKER_REPO}/opwenwebapp:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+      args:
+        LOKOLE_PORT: "8080"
+        LOKOLE_CLIENT_VERSION: ${WEBAPP_VERSION}
+    environment:
+      <<: *shared-app-environment
+    depends_on:
+      - azurite
 
   api:
     <<: *shared-app-build
@@ -66,8 +81,8 @@ services:
       CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
       SERVER_WORKERS: ${SERVER_WORKERS}
       TESTING_UI: "True"
-      REGISTRATION_USERNAME: admin
-      REGISTRATION_PASSWORD: password
+      LOKOLE_REGISTRATION_USERNAME: admin
+      LOKOLE_REGISTRATION_PASSWORD: password
     depends_on:
       - appinsights
       - azurite
@@ -118,8 +133,6 @@ services:
       PORT: "8000"
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       APPINSIGHTS_INSTRUMENTATIONKEY: "${APPINSIGHTS_INSTRUMENTATIONKEY}"
-    ports:
-      - ${APPINSIGHTS_PORT}:8000
 
   postgres:
     image: postgres:11-alpine
