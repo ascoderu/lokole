@@ -24,6 +24,7 @@ from opwen_email_server.integration.celery import send_and_index
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.collections import chunks
 from opwen_email_server.utils.email_parser import get_domain
+from opwen_email_server.utils.email_parser import get_recipients
 
 
 class AzureRole:
@@ -212,7 +213,20 @@ class AzureEmailStore(EmailStore):
         return 0
 
     def _delete(self, email_address: str, uids: Iterable[str]):
-        pass
+        for uid in uids:
+            email = self.get(uid)
+            if not email:
+                continue
+
+            if email_address == email.get('from'):
+                folder = mailbox.SENT_FOLDER
+            elif email_address in get_recipients(email):
+                folder = mailbox.RECEIVED_FOLDER
+            else:
+                continue
+
+            self._mailbox_storage.delete(f"{email_address}/{folder}/{email['sent_at']}/{uid}")
+            self._email_storage.delete(uid)
 
     def _mark_sent(self, uids: Iterable[str]):
         pass
