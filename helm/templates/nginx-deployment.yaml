@@ -9,7 +9,7 @@ spec:
   selector:
     matchLabels:
       app: {{ .Release.Name }}-nginx
-  replicas: 1
+  replicas: 3
   strategy: {}
   template:
     metadata:
