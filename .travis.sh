@@ -39,7 +39,7 @@ case "$1" in
     ;;
 
   deploy)
-    if [[ "$TEST_MODE" = "live" ]]; then
+    if [[ -n "$TRAVIS_TAG" ]] && [[ "$TEST_MODE" = "local" ]] && [[ "$TRAVIS_PULL_REQUEST_SLUG" = "ascoderu/opwen-cloudserver" ]]; then
       DOCKER_TAG="$TRAVIS_TAG" make release deploy
     fi
     ;;
