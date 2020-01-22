@@ -30,6 +30,6 @@ spec:
             cpu: "500m"
           requests:
             memory: "512Mi"
-            cpu: "250m"
+            cpu: "200m"
       restartPolicy: Always
 status: {}
