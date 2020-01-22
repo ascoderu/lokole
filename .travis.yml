@@ -20,3 +20,6 @@ before_deploy: ./.travis.sh before_deploy
 deploy:
   - provider: script
     script: ./.travis.sh deploy
+    on:  # yamllint disable rule:truthy
+      repo: ascoderu/opwen-cloudserver
+      tags: true
