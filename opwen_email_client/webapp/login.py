@@ -5,10 +5,12 @@ from flask_migrate import Migrate
 from flask_security import RoleMixin
 from flask_security import SQLAlchemyUserDatastore
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 from sqlalchemy.exc import OperationalError
 
 from opwen_email_client.domain.email.user_store import User
 from opwen_email_client.domain.email.user_store import UserStore
+from opwen_email_client.webapp.config import AppConfig
 
 _db = SQLAlchemy()
 
@@ -75,5 +77,10 @@ class FlaskLoginUserStore(UserStore):
             return _User.query.all()
 
     def fetch_pending(self) -> List[User]:
+        is_not_synced = _User.synced == False  # noqa: E712
+        is_non_admin = _User.email != AppConfig.ADMIN_INBOX
+
         with self._app.app_context():
-            return _User.query.filter_by(synced=False).all()
+            return _User.query\
+                .filter(and_(is_not_synced, is_non_admin))\
+                .all()
