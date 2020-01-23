@@ -47,7 +47,11 @@ lint-shell:
     || exit 1; done \
   fi
 
-lint: lint-python lint-shell lint-swagger lint-docker lint-yaml
+  lint-helm:
+    helm lint ./helm
+    mkdir -p ./k8s-temp && helm template ./helm --output-dir ./k8s-temp && kubeval -d k8s-temp,helm && rm -rf k8s-temp
+
+lint: lint-python lint-shell lint-swagger lint-docker lint-yaml lint-helm
 
 ci: tests lint
 
