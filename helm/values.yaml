@@ -1,3 +1,7 @@
+apiVersion: "v1"
+
+kind: Values
+
 domain: mailserver.lokole.ca
 
 version:
