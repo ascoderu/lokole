@@ -12,6 +12,15 @@ RUN wget -q -O /tmp/shellcheck.tar.xz "https://storage.googleapis.com/shellcheck
   && rm /tmp/shellcheck.tar.xz \
   && shellcheck --version
 
+RUN wget -q -O get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
+  && chmod 700 get_helm.sh \
+  && ./get_helm.sh \  
+  && helm version
+
+RUN wget -q https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz \
+  && tar xf kubeval-linux-amd64.tar.gz \
+  && cp kubeval /usr/local/bin
+
 WORKDIR /app
 
 COPY requirements*.txt ./
