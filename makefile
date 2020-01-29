@@ -132,16 +132,16 @@ kubeconfig:
   fi
 
 renew-cert: kubeconfig
-	docker-compose -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker/docker-compose.setup.yml run --rm \
+	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
     /app/renew-cert.sh && \
   rm -f "$(PWD)/kube-config"
 
 deploy: kubeconfig
-	docker-compose -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker/docker-compose.setup.yml run --rm \
+	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \
