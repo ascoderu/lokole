@@ -59,10 +59,15 @@ clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 build:
-	BUILD_TAG=latest docker-compose pull --ignore-pull-failures
 	BUILD_TARGET=builder docker-compose build api && \
   docker-compose run --no-deps --rm api cat coverage.xml > coverage.xml
-	docker-compose build
+	docker-compose \
+    -f docker-compose.yml \
+    -f docker/docker-compose.dev.yml \
+    -f docker/docker-compose.secrets.yml \
+    -f docker/docker-compose.test.yml \
+    -f docker/docker-compose.tools.yml \
+    build
 
 start:
 	if [ "$(CI)" = "true" ]; then \
@@ -88,7 +93,13 @@ logs:
   fi
 
 stop:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.dev.yml -f docker/docker-compose.tools.yml down --volumes --timeout=5
+	docker-compose \
+    -f docker-compose.yml \
+    -f docker/docker-compose.dev.yml \
+    -f docker/docker-compose.secrets.yml \
+    -f docker/docker-compose.test.yml \
+    -f docker/docker-compose.tools.yml \
+    down --volumes --timeout=5
 
 verify-build:
 	docker pull wagoodman/dive
