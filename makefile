@@ -52,17 +52,22 @@ lint: lint-python lint-shell lint-swagger lint-docker lint-yaml
 ci: tests lint
 
 integration-tests:
-	docker-compose build integtest && \
-  docker-compose run --rm integtest ./tests.sh
+	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest
 
 clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 build:
-	BUILD_TAG=latest docker-compose pull --ignore-pull-failures
 	BUILD_TARGET=builder docker-compose build api && \
   docker-compose run --no-deps --rm api cat coverage.xml > coverage.xml
-	docker-compose build
+	docker-compose \
+    -f docker-compose.yml \
+    -f docker/docker-compose.dev.yml \
+    -f docker/docker-compose.secrets.yml \
+    -f docker/docker-compose.test.yml \
+    -f docker/docker-compose.tools.yml \
+    build
 
 start:
 	if [ "$(CI)" = "true" ]; then \
@@ -88,7 +93,13 @@ logs:
   fi
 
 stop:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.dev.yml -f docker/docker-compose.tools.yml down --volumes --timeout=5
+	docker-compose \
+    -f docker-compose.yml \
+    -f docker/docker-compose.dev.yml \
+    -f docker/docker-compose.secrets.yml \
+    -f docker/docker-compose.test.yml \
+    -f docker/docker-compose.tools.yml \
+    down --volumes --timeout=5
 
 verify-build:
 	docker pull wagoodman/dive
@@ -121,16 +132,16 @@ kubeconfig:
   fi
 
 renew-cert: kubeconfig
-	docker-compose build setup && \
-  docker-compose run --rm \
+	docker-compose -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
     /app/renew-cert.sh && \
   rm -f "$(PWD)/kube-config"
 
 deploy: kubeconfig
-	docker-compose build setup && \
-  docker-compose run --rm \
+	docker-compose -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker/docker-compose.setup.yml run --rm \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \
