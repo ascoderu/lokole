@@ -9,7 +9,7 @@ const colors = {
   failure: '#cf1322',
 };
 
-class PingStats extends React.Component {
+class PingStat extends React.Component {
   state = {
     pingTimeMillis: undefined,
     pingSuccess: undefined,
@@ -18,13 +18,13 @@ class PingStats extends React.Component {
   _pingInterval = undefined;
 
   _onPing = async () => {
-    const { serverEndpoint } = this.props.settings;
+    const { serverEndpoint } = this.props;
 
     const pingStart = new Date().getTime();
 
     let pingSuccess;
     try {
-      await axios.get(`${serverEndpoint}/healthcheck/ping`);
+      await axios.get(serverEndpoint);
       pingSuccess = true;
     } catch (e) {
       notification.error({
@@ -40,44 +40,8 @@ class PingStats extends React.Component {
     });
   };
 
-  _renderListItem = props => {
-    return (
-      <List.Item key={props.title}>
-        <Card>
-          <Statistic {...props} />
-        </Card>
-      </List.Item>
-    );
-  };
-
-  get _isLoading() {
-    const { pingTimeMillis, pingSuccess } = this.state;
-
-    return pingTimeMillis == null || pingSuccess == null;
-  }
-
-  get _stats() {
-    const { pingTimeMillis, pingSuccess } = this.state;
-
-    if (this._isLoading) {
-      return [];
-    }
-
-    return [
-      {
-        title: 'Server ping',
-        value: pingTimeMillis,
-        suffix: 'ms',
-        prefix: <Icon type={pingSuccess ? 'check' : 'warning'} />,
-        valueStyle: {
-          color: pingSuccess ? colors.success : colors.failure,
-        },
-      },
-    ];
-  }
-
   async componentDidMount() {
-    const { pingIntervalSeconds } = this.props.settings;
+    const { pingIntervalSeconds } = this.props;
 
     await this._onPing();
 
@@ -91,14 +55,50 @@ class PingStats extends React.Component {
   }
 
   render() {
+    const { title } = this.props;
+    const { pingSuccess, pingTimeMillis } = this.state;
+
     return (
-      <Grid
-        loading={this._isLoading}
-        dataSource={this._stats}
-        renderItem={this._renderListItem}
-      />
+      <List.Item key={title}>
+        <Card>
+          <Statistic
+            title={title}
+            value={pingTimeMillis}
+            suffix="ms"
+            prefix={<Icon type={pingSuccess ? 'check' : 'warning'} />}
+            valueStyle={{
+              color: pingSuccess ? colors.success : colors.failure,
+            }}
+          />
+        </Card>
+      </List.Item>
     );
   }
+}
+
+PingStat.propTypes = {
+  title: PropTypes.string.isRequired,
+  serverEndpoint: PropTypes.string.isRequired,
+  pingIntervalSeconds: PropTypes.number.isRequired,
+};
+
+function PingStats(props) {
+  const { serverEndpoint, pingIntervalSeconds } = props.settings;
+
+  return (
+    <Grid>
+      <PingStat
+        title="Server ping"
+        pingIntervalSeconds={pingIntervalSeconds}
+        serverEndpoint={`${serverEndpoint}/healthcheck/ping`}
+      />
+      <PingStat
+        title="Webapp ping"
+        pingIntervalSeconds={pingIntervalSeconds}
+        serverEndpoint={`${serverEndpoint}/web/healthcheck/ping`}
+      />
+    </Grid>
+  );
 }
 
 PingStats.propTypes = {
