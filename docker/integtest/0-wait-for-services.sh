@@ -73,7 +73,23 @@ wait_for_api() {
   exit 4
 }
 
+wait_for_webapp() {
+  local i
+
+  for i in $(seq 1 "${max_retries}"); do
+    if curl -fs "http://nginx:8888/web/healthcheck/ping" >/dev/null; then
+      log "Webapp is running"
+      return
+    fi
+    log "Waiting for webapp (${i}/${max_retries})"
+    sleep "${polling_interval_seconds}s"
+  done
+
+  exit 4
+}
+
 wait_for_rabbitmq
 wait_for_postgres
 wait_for_appinsights
 wait_for_api
+wait_for_webapp
