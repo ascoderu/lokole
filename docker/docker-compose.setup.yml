@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+
+  setup:
+    image: ${DOCKER_REPO}/opwenserver_setup:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/setup/Dockerfile

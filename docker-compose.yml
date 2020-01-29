@@ -99,13 +99,6 @@ services:
       - azurite
       - rabbitmq
 
-  setup:
-    image: ${DOCKER_REPO}/opwenserver_setup:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/setup/Dockerfile
-    command: echo skipped
-
   rabbitmq:
     image: rabbitmq:management-alpine
     environment:
