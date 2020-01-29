@@ -52,8 +52,8 @@ lint: lint-python lint-shell lint-swagger lint-docker lint-yaml
 ci: tests lint
 
 integration-tests:
-	docker-compose build integtest && \
-  docker-compose run --rm integtest ./tests.sh
+	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest
 
 clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf

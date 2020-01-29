@@ -106,17 +106,6 @@ services:
       dockerfile: docker/setup/Dockerfile
     command: echo skipped
 
-  integtest:
-    image: ${DOCKER_REPO}/opwenserver_integtest:${BUILD_TAG}
-    build:
-      context: .
-      dockerfile: docker/integtest/Dockerfile
-    command: echo skipped
-    environment:
-      REGISTRATION_CREDENTIALS: ${REGISTRATION_CREDENTIALS}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
   rabbitmq:
     image: rabbitmq:management-alpine
     environment:

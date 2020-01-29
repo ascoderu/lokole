@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+
+  integtest:
+    image: ${DOCKER_REPO}/opwenserver_integtest:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/integtest/Dockerfile
+    environment:
+      REGISTRATION_CREDENTIALS: ${REGISTRATION_CREDENTIALS}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
