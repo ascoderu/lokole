@@ -16,6 +16,7 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask import url_for
+from flask_cors import cross_origin
 from flask_login import current_user
 from flask_security.utils import hash_password
 from passlib.pwd import genword
@@ -375,6 +376,7 @@ def reset_password(userid: str) -> Response:
 
 
 @app.route(AppConfig.APP_ROOT + '/healthcheck/ping')
+@cross_origin()
 def ping() -> Response:
     return jsonify('OK')
 
