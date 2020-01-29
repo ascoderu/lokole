@@ -374,6 +374,11 @@ def reset_password(userid: str) -> Response:
     return redirect(url_for('users'))
 
 
+@app.route(AppConfig.APP_ROOT + '/healthcheck/ping')
+def ping() -> Response:
+    return jsonify('OK')
+
+
 # noinspection PyUnusedLocal
 @app.errorhandler(404)
 def _on_404(status_code: int) -> Response:
