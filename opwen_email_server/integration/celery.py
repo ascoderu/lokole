@@ -73,7 +73,7 @@ def inbound_store(resource_id: str) -> None:
     action = StoreInboundEmails(
         raw_email_storage=get_raw_email_storage(),
         email_storage=get_email_storage(),
-        pending_factory=get_pending_storage,
+        pending_storage=get_pending_storage(),
         next_task=index_received_email_for_mailbox.delay,
     )
 

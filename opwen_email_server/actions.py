@@ -70,13 +70,13 @@ class StoreInboundEmails(_Action):
     def __init__(self,
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
-                 pending_factory: Callable[[str], AzureTextStorage],
+                 pending_storage: AzureTextStorage,
                  next_task: Callable[[str], None],
                  email_parser: Callable[[str], dict] = None):
 
         self._raw_email_storage = raw_email_storage
         self._email_storage = email_storage
-        self._pending_factory = pending_factory
+        self._pending_storage = pending_storage
         self._next_task = next_task
         self._email_parser = email_parser or MimeEmailParser()
 
@@ -103,8 +103,8 @@ class StoreInboundEmails(_Action):
         self._email_storage.store_object(email_id, email)
 
         for domain in get_domains(email):
-            pending_storage = self._pending_factory(domain)
-            pending_storage.store_text(email_id, 'pending')
+            if domain.endswith(mailbox.MAILBOX_DOMAIN):
+                self._pending_storage.store_text(f'{domain}/{email_id}', 'pending')
 
         return email_id
 
@@ -239,12 +239,12 @@ class ReceiveInboundEmail(_Action):
 
 class DownloadClientEmails(_Action):
     def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
-                 pending_factory: Callable[[str], AzureTextStorage]):
+                 pending_storage: AzureTextStorage):
 
         self._auth = auth
         self._client_storage = client_storage
         self._email_storage = email_storage
-        self._pending_factory = pending_factory
+        self._pending_storage = pending_storage
 
     def _action(self, client_id, compression):  # type: ignore
         domain = self._auth.domain_for(client_id)
@@ -262,23 +262,21 @@ class DownloadClientEmails(_Action):
             delivered.add(email['_uid'])
             return email
 
-        pending_storage = self._pending_factory(domain)
-
-        pending = self._fetch_pending_emails(pending_storage)
+        pending = self._fetch_pending_emails(domain)
         pending = (mark_delivered(email) for email in pending)
         pending = (self._encode_attachments(email) for email in pending)
 
         resource_id = self._client_storage.store_objects((sync.EMAILS_FILE, pending, to_jsonl_bytes), compression)
 
-        self._mark_emails_as_delivered(pending_storage, delivered)
+        self._mark_emails_as_delivered(domain, delivered)
 
         self.log_event(events.EMAILS_DELIVERED_TO_CLIENT, {'domain': domain, 'num_emails': len(delivered)})  # noqa: E501  # yapf: disable
         return {
             'resource_id': resource_id,
         }
 
-    def _fetch_pending_emails(self, pending_storage: AzureTextStorage):
-        for email_id in pending_storage.iter():
+    def _fetch_pending_emails(self, domain: str) -> Iterable[dict]:
+        for email_id in self._pending_storage.iter(f'{domain}/'):
             yield self._email_storage.fetch_object(email_id)
 
     @classmethod
@@ -292,10 +290,9 @@ class DownloadClientEmails(_Action):
 
         return email
 
-    @classmethod
-    def _mark_emails_as_delivered(cls, pending_storage: AzureTextStorage, email_ids: Iterable[str]):
+    def _mark_emails_as_delivered(self, domain: str, email_ids: Iterable[str]) -> None:
         for email_id in email_ids:
-            pending_storage.delete(email_id)
+            self._pending_storage.delete(f'{domain}/{email_id}')
 
 
 class UploadClientEmails(_Action):
@@ -446,16 +443,15 @@ class CalculateNumberOfUsersMetric(_Action):
 
 
 class CalculatePendingEmailsMetric(_Action):
-    def __init__(self, auth: AzureAuth, pending_factory: Callable[[str], AzureTextStorage]):
+    def __init__(self, auth: AzureAuth, pending_storage: AzureTextStorage):
         self._auth = auth
-        self._pending_factory = pending_factory
+        self._pending_storage = pending_storage
 
     def _action(self, domain, **auth_args):  # type: ignore
         if not self._auth.is_owner(domain, auth_args.get('user')):
             return 'client does not belong to the user', 403
 
-        pending_storage = self._pending_factory(domain)
-        pending_emails = sum(1 for _ in pending_storage.iter())
+        pending_emails = sum(1 for _ in self._pending_storage.iter(f'{domain}/'))
 
         return {
             'pending_emails': pending_emails,

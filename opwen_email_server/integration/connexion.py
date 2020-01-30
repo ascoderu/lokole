@@ -39,7 +39,7 @@ client_read = DownloadClientEmails(
     auth=get_auth(),
     client_storage=get_client_storage(),
     email_storage=get_email_storage(),
-    pending_factory=get_pending_storage,
+    pending_storage=get_pending_storage(),
 )
 
 client_create = CreateClient(
@@ -71,7 +71,7 @@ metrics_users = CalculateNumberOfUsersMetric(
 
 metrics_pending = CalculatePendingEmailsMetric(
     auth=get_auth(),
-    pending_factory=get_pending_storage,
+    pending_storage=get_pending_storage(),
 )
 
 basic_auth = AnyOfBasicAuth(auths=[

@@ -1,8 +1,5 @@
-from functools import lru_cache
-
 from opwen_email_server import config
 from opwen_email_server.constants import azure as constants
-from opwen_email_server.constants.cache import PENDING_STORAGE_CACHE_SIZE
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
@@ -18,7 +15,7 @@ def get_auth() -> AzureAuth:
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
-        container=constants.TABLE_AUTH,
+        container=constants.CONTAINER_AUTH,
         provider=config.STORAGE_PROVIDER,
     ))
 
@@ -83,14 +80,13 @@ def get_mailbox_storage() -> AzureObjectStorage:
     )
 
 
-@lru_cache(maxsize=PENDING_STORAGE_CACHE_SIZE)
-def get_pending_storage(domain: str) -> AzureTextStorage:
-    container = domain.replace('.', '-')
+@singleton
+def get_pending_storage() -> AzureTextStorage:
     return AzureTextStorage(
         account=config.TABLES_ACCOUNT,
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
-        container=container,
+        container=constants.CONTAINER_PENDING,
         provider=config.STORAGE_PROVIDER,
     )
