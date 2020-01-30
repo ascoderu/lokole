@@ -9,6 +9,7 @@ WORKDIR /app
 ARG LOKOLE_PORT
 ARG LOKOLE_CLIENT_VERSION
 ARG INSTALLER_VERSION=${LOKOLE_CLIENT_VERSION}
+ARG MAX_UPLOAD_SIZE_MB=1
 RUN wget -q "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${INSTALLER_VERSION}/install.py" \
  && USER=root python3 install.py web LocalOnly \
        --system_setup=no \
@@ -17,6 +18,7 @@ RUN wget -q "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${INSTALLER
        --admin=no \
        --log_directory=- \
        --app_root=/web \
+       --max_upload_size="${MAX_UPLOAD_SIZE_MB}" \
  && rm -rf /tmp/install.py install.py
 
 WORKDIR /lib
