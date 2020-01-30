@@ -17,9 +17,12 @@ RUN wget -q -O get_helm.sh https://raw.githubusercontent.com/helm/helm/master/sc
   && ./get_helm.sh \  
   && helm version
 
-RUN wget -q https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz \
+ARG KUBEVAL_VERSION=0.14.0 
+RUN wget -q https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_VERSION}/kubeval-linux-amd64.tar.gz \
   && tar xf kubeval-linux-amd64.tar.gz \
-  && cp kubeval /usr/local/bin
+  && cp kubeval /usr/local/bin \
+  && rm kubeval-linux-amd64.tar.gz \
+  && kubeval --version
 
 WORKDIR /app
 
