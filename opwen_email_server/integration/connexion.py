@@ -12,6 +12,7 @@ from opwen_email_server.actions import UploadClientEmails
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
+from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.azure import get_user_storage
@@ -62,6 +63,8 @@ client_delete = DeleteClient(
         secret=config.DNS_SECRET,
         provider=config.DNS_PROVIDER,
     ),
+    mailbox_storage=get_mailbox_storage(),
+    pending_storage=get_pending_storage(),
 )
 
 metrics_users = CalculateNumberOfUsersMetric(

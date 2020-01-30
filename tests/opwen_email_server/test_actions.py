@@ -152,8 +152,10 @@ class IndexReceivedEmailForMailboxTests(TestCase):
 
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
-        self.mailbox_storage.store_text.assert_any_call('1@bar.lokole.ca/received/2019-10-26 22:47/123', 'indexed')
-        self.mailbox_storage.store_text.assert_any_call('2@baz.lokole.ca/received/2019-10-26 22:47/123', 'indexed')
+        self.mailbox_storage.store_text.assert_any_call('bar.lokole.ca/1@bar.lokole.ca/received/2019-10-26 22:47/123',
+                                                        'indexed')
+        self.mailbox_storage.store_text.assert_any_call('baz.lokole.ca/2@baz.lokole.ca/received/2019-10-26 22:47/123',
+                                                        'indexed')
         self.assertEqual(self.mailbox_storage.store_text.call_count, 2)
 
     def _execute_action(self, *args, **kwargs):
@@ -183,7 +185,7 @@ class IndexSentEmailForMailboxTests(TestCase):
 
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
-        self.mailbox_storage.store_text.assert_called_once_with('foo@foo/sent/2019-10-26 22:47/123', 'indexed')
+        self.mailbox_storage.store_text.assert_called_once_with('foo/foo@foo/sent/2019-10-26 22:47/123', 'indexed')
 
     def _execute_action(self, *args, **kwargs):
         action = actions.IndexSentEmailForMailbox(
@@ -633,6 +635,8 @@ class DeleteClientTests(TestCase):
         self.auth = Mock()
         self.delete_mailbox = MagicMock()
         self.delete_mx_records = MagicMock()
+        self.mailbox_storage = Mock()
+        self.pending_storage = Mock()
 
     def test_400(self):
         domain = 'TEST.com'
@@ -674,6 +678,8 @@ class DeleteClientTests(TestCase):
 
         self.auth.client_id_for.return_value = client_id
         self.auth.is_owner.return_value = True
+        self.mailbox_storage.iter.return_value = ['1/2/a', '1/2/b']
+        self.pending_storage.iter.return_value = ['c', 'd', 'e']
 
         _, status = self._execute_action(domain, user=user)
 
@@ -683,12 +689,23 @@ class DeleteClientTests(TestCase):
         self.auth.delete.assert_called_once_with(client_id, domain)
         self.delete_mailbox.assert_called_once_with(client_id, domain)
         self.delete_mx_records.assert_called_once_with(domain)
+        self.mailbox_storage.iter.assert_called_once_with(f'{domain}/')
+        self.mailbox_storage.delete.assert_any_call(f'{domain}/1/2/a')
+        self.mailbox_storage.delete.assert_any_call(f'{domain}/1/2/b')
+        self.assertEqual(self.mailbox_storage.delete.call_count, 2)
+        self.pending_storage.iter.assert_called_once_with(f'{domain}/')
+        self.pending_storage.delete.assert_any_call(f'{domain}/c')
+        self.pending_storage.delete.assert_any_call(f'{domain}/d')
+        self.pending_storage.delete.assert_any_call(f'{domain}/e')
+        self.assertEqual(self.pending_storage.delete.call_count, 3)
 
     def _execute_action(self, *args, **kwargs):
         action = actions.DeleteClient(
             auth=self.auth,
             delete_mailbox=self.delete_mailbox,
             delete_mx_records=self.delete_mx_records,
+            mailbox_storage=self.mailbox_storage,
+            pending_storage=self.pending_storage,
         )
 
         return action(*args, **kwargs)
