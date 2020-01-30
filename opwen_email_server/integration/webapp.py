@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Callable
 from typing import Dict
 from typing import Iterable
@@ -148,6 +149,9 @@ class AzureEmailStore(EmailStore):
         for email in emails_or_attachments:
             if email.get('_type') == 'attachment':
                 raise NotImplementedError
+
+            if not email.get('sent_at'):
+                email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
 
             email_id = email['_uid']
             self._email_storage.store_object(email_id, email)
