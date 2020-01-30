@@ -25,6 +25,7 @@ from opwen_email_server.integration.celery import index_received_email_for_mailb
 from opwen_email_server.integration.celery import index_sent_email_for_mailbox
 from opwen_email_server.integration.celery import send
 from opwen_email_server.services.storage import AzureObjectStorage
+from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import chunks
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_recipients
@@ -140,7 +141,7 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
 
 
 class AzureEmailStore(EmailStore):
-    def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureObjectStorage,
+    def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureTextStorage,
                  send_email: Callable[[str], None]):
         super().__init__(restricted=None)
         self._email_storage = email_storage

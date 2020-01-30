@@ -110,8 +110,7 @@ class StoreInboundEmails(_Action):
 
 
 class _IndexEmailForMailbox(_Action):
-    def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureObjectStorage):
-
+    def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureTextStorage):
         self._email_storage = email_storage
         self._mailbox_storage = mailbox_storage
 
@@ -120,7 +119,7 @@ class _IndexEmailForMailbox(_Action):
 
         for email_address in self._get_pivot(email):
             index = f"{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
-            self._mailbox_storage.store_object(index, email)
+            self._mailbox_storage.store_text(index, 'indexed')
 
         self.log_event(events.MAILBOX_EMAIL_INDEXED, {'folder': self._folder})  # noqa: E501  # yapf: disable
         return 'OK', 200
