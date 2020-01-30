@@ -80,7 +80,7 @@ def inbound_store(resource_id: str) -> None:
     action(resource_id)
 
 
-def send_and_index(resource_id: str) -> None:
+def _send_email(resource_id: str) -> None:
     send.delay(resource_id)
     index_sent_email_for_mailbox.delay(resource_id)
 
@@ -91,7 +91,7 @@ def written_store(resource_id: str) -> None:
         client_storage=get_client_storage(),
         email_storage=get_email_storage(),
         user_storage=get_user_storage(),
-        next_task=send_and_index,
+        next_task=_send_email,
     )
 
     action(resource_id)
