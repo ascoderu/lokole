@@ -15,7 +15,7 @@ def get_auth() -> AzureAuth:
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
-        container=constants.TABLE_AUTH,
+        container=constants.CONTAINER_AUTH,
         provider=config.STORAGE_PROVIDER,
     ))
 
