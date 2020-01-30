@@ -118,7 +118,8 @@ class _IndexEmailForMailbox(_Action):
         email = self._email_storage.fetch_object(resource_id)
 
         for email_address in self._get_pivot(email):
-            index = f"{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
+            domain = get_domain(email_address)
+            index = f"{domain}/{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
             self._mailbox_storage.store_text(index, 'indexed')
 
         self.log_event(events.MAILBOX_EMAIL_INDEXED, {'folder': self._folder})  # noqa: E501  # yapf: disable
@@ -400,11 +401,12 @@ class GetClient(_Action):
 
 class DeleteClient(_Action):
     def __init__(self, auth: AzureAuth, delete_mailbox: Callable[[str, str], None],
-                 delete_mx_records: Callable[[str], None]):
+                 delete_mx_records: Callable[[str], None], mailbox_storage: AzureTextStorage):
 
         self._auth = auth
         self._delete_mailbox = delete_mailbox
         self._delete_mx_records = delete_mx_records
+        self._mailbox_storage = mailbox_storage
 
     def _action(self, domain, **auth_args):  # type: ignore
         if not is_lowercase(domain):
@@ -419,10 +421,15 @@ class DeleteClient(_Action):
 
         self._delete_mailbox(client_id, domain)
         self._delete_mx_records(domain)
+        self._delete_indices(domain)
         self._auth.delete(client_id, domain)
 
         self.log_event(events.CLIENT_DELETED, {'domain': domain})  # noqa: E501  # yapf: disable
         return 'OK', 200
+
+    def _delete_indices(self, domain: str) -> None:
+        for prefix in self._mailbox_storage.iter(f'{domain}/'):
+            self._mailbox_storage.delete(f'{domain}/{prefix}')
 
 
 class CalculateNumberOfUsersMetric(_Action):

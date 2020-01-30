@@ -194,7 +194,8 @@ class AzureEmailStore(EmailStore):
         return self._iter_mailbox(email_address, page, mailbox.SENT_FOLDER)
 
     def _iter_mailbox(self, email_address: str, page: int, folder: str) -> Iterable[dict]:
-        emails = self._mailbox_storage.iter(f'{email_address}/{folder}')
+        domain = get_domain(email_address)
+        emails = self._mailbox_storage.iter(f'{domain}/{email_address}/{folder}')
         for i, resource_ids in enumerate(chunks(emails, AppConfig.EMAILS_PER_PAGE), start=1):
             if i != page:
                 continue
@@ -220,6 +221,8 @@ class AzureEmailStore(EmailStore):
         return 0
 
     def _delete(self, email_address: str, uids: Iterable[str]):
+        domain = get_domain(email_address)
+
         for uid in uids:
             email = self.get(uid)
             if not email:
@@ -232,7 +235,7 @@ class AzureEmailStore(EmailStore):
             else:
                 continue
 
-            self._mailbox_storage.delete(f"{email_address}/{folder}/{email['sent_at']}/{uid}")
+            self._mailbox_storage.delete(f"{domain}/{email_address}/{folder}/{email['sent_at']}/{uid}")
             self._email_storage.delete(uid)
 
     def _mark_sent(self, uids: Iterable[str]):
