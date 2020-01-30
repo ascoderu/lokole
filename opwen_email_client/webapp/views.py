@@ -391,7 +391,10 @@ def _on_404(status_code: int) -> Response:
 
 @app.errorhandler(Exception)
 def _on_exception(exception: Exception) -> Response:
-    app.logger.error('%s: %s', exception.__class__.__name__, exception)
+    try:
+        raise exception
+    except Exception:
+        app.logger.exception('Unhandled exception!')
     flash(i8n.UNEXPECTED_ERROR, category='error')
     return redirect(url_for('home'))
 
