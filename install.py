@@ -426,7 +426,7 @@ class ClientSetup(Setup):
         create_request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
         create_request = Request(self.client_url_create)
         create_request.add_header('Content-Type', 'application/json; charset=utf-8')
-        create_request.add_header('Content-Length', len(create_request_payload))
+        create_request.add_header('Content-Length', str(len(create_request_payload)))
         create_request.add_header('Authorization', 'Basic {}'.format(request_auth))
 
         try:
