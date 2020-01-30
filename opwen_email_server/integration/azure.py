@@ -69,8 +69,8 @@ def get_user_storage() -> AzureObjectStorage:
 
 
 @singleton
-def get_mailbox_storage() -> AzureObjectStorage:
-    return AzureObjectStorage(
+def get_mailbox_storage() -> AzureTextStorage:
+    return AzureTextStorage(
         account=config.BLOBS_ACCOUNT,
         key=config.BLOBS_KEY,
         host=config.BLOBS_HOST,
