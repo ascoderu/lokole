@@ -3,7 +3,6 @@ from opwen_email_server.actions import CalculateNumberOfUsersMetric
 from opwen_email_server.actions import CalculatePendingEmailsMetric
 from opwen_email_server.actions import CreateClient
 from opwen_email_server.actions import DeleteClient
-from opwen_email_server.actions import DeleteMailboxIndices
 from opwen_email_server.actions import DownloadClientEmails
 from opwen_email_server.actions import GetClient
 from opwen_email_server.actions import ListClients
@@ -65,6 +64,7 @@ client_delete = DeleteClient(
         provider=config.DNS_PROVIDER,
     ),
     mailbox_storage=get_mailbox_storage(),
+    pending_storage=get_pending_storage(),
 )
 
 metrics_users = CalculateNumberOfUsersMetric(
