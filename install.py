@@ -911,7 +911,7 @@ def cli():
     parser.add_argument('--timeout', type=int, default=300, help=(
         'Timeout for the Lokole email app. In seconds.'
     ))
-    parser.add_argument('--max_upload_size', type=int, default=25, help=(
+    parser.add_argument('--max_upload_size', type=int, default=10, help=(
         'Maximum allowed size of uploads to the Lokole email app. In MB.'
     ))
     parser.add_argument('--num_celery_workers', type=int, default=2, help=(
