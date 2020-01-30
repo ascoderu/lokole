@@ -97,7 +97,7 @@ class SendSendgridEmail(LogMixin):
         mail.subject = email.get('subject', '(no subject)')
         self.log_debug('added subject to email %s', email_id)
 
-        mail.add_content(Content('text/html', email.get('body')))
+        mail.add_content(Content('text/html', email.get('body', '(no content)')))
         self.log_debug('added content to email %s', email_id)
 
         mail.from_email = Email(email.get('from'))
