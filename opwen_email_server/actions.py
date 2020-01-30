@@ -103,7 +103,8 @@ class StoreInboundEmails(_Action):
         self._email_storage.store_object(email_id, email)
 
         for domain in get_domains(email):
-            self._pending_storage.store_text(f'{domain}/{email_id}', 'pending')
+            if domain.endswith(mailbox.MAILBOX_DOMAIN):
+                self._pending_storage.store_text(f'{domain}/{email_id}', 'pending')
 
         return email_id
 
