@@ -5,6 +5,7 @@ CONTAINER_EMAILS = 'emails'  # type: Final
 CONTAINER_MAILBOX = 'mailbox'  # type: Final
 CONTAINER_USERS = 'users'  # type: Final
 CONTAINER_SENDGRID_MIME = 'sendgridinboundemails'  # type: Final
+CONTAINER_PENDING = 'pendingemails'  # type: Final
 TABLE_DOMAIN_X_DELIVERED = 'emaildomainxdelivered'  # type: Final
 TABLE_AUTH = 'clientsauth'  # type: Final
 QUEUE_CLIENT_PACKAGE = 'lokoleinboundemails'  # type: Final

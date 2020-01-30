@@ -83,7 +83,6 @@ class StoreInboundEmailsTests(TestCase):
         self.raw_email_storage = Mock()
         self.email_storage = Mock()
         self.pending_storage = Mock()
-        self.pending_factory = MagicMock()
         self.email_parser = MagicMock()
         self.next_task = MagicMock()
 
@@ -98,7 +97,6 @@ class StoreInboundEmailsTests(TestCase):
         self.raw_email_storage.fetch_text.assert_called_once_with(resource_id)
         self.assertFalse(self.raw_email_storage.delete.called)
         self.assertFalse(self.email_storage.store_object.called)
-        self.assertFalse(self.pending_factory.called)
         self.assertFalse(self.pending_storage.store_text.called)
         self.assertFalse(self.email_parser.called)
 
@@ -112,7 +110,6 @@ class StoreInboundEmailsTests(TestCase):
         stored_email['_uid'] = email_id
 
         self.raw_email_storage.fetch_text.return_value = raw_email
-        self.pending_factory.return_value = self.pending_storage
         self.email_parser.return_value = parsed_email
 
         _, status = self._execute_action(resource_id)
@@ -121,8 +118,7 @@ class StoreInboundEmailsTests(TestCase):
         self.raw_email_storage.fetch_text.assert_called_once_with(resource_id)
         self.raw_email_storage.delete.assert_called_once_with(resource_id)
         self.email_storage.store_object.assert_called_once_with(email_id, stored_email)
-        self.pending_factory.assert_called_once_with(domain)
-        self.pending_storage.store_text.assert_called_once_with(email_id, 'pending')
+        self.pending_storage.store_text.assert_called_once_with(f'{domain}/{email_id}', 'pending')
         self.email_parser.assert_called_once_with(raw_email)
         self.next_task.assert_called_once_with(email_id)
 
@@ -130,7 +126,7 @@ class StoreInboundEmailsTests(TestCase):
         action = actions.StoreInboundEmails(
             raw_email_storage=self.raw_email_storage,
             email_storage=self.email_storage,
-            pending_factory=self.pending_factory,
+            pending_storage=self.pending_storage,
             email_parser=self.email_parser,
             next_task=self.next_task,
         )
@@ -324,7 +320,6 @@ class DownloadClientEmailsTests(TestCase):
         self.auth = Mock()
         self.client_storage = Mock()
         self.email_storage = Mock()
-        self.pending_factory = MagicMock()
         self.pending_storage = Mock()
 
     def test_400(self):
@@ -386,7 +381,6 @@ class DownloadClientEmailsTests(TestCase):
             return resource_id
 
         self.auth.domain_for.return_value = domain
-        self.pending_factory.return_value = self.pending_storage
         self.pending_storage.iter.return_value = [email_id]
         self.email_storage.fetch_object.return_value = server_email
         self.client_storage.store_objects.side_effect = store_objects_mock
@@ -396,9 +390,8 @@ class DownloadClientEmailsTests(TestCase):
 
         self.assertEqual(response.get('resource_id'), resource_id)
         self.auth.domain_for.assert_called_once_with(client_id)
-        self.pending_factory.assert_called_once_with(domain)
-        self.pending_storage.iter.assert_called_once_with()
-        self.pending_storage.delete.assert_called_once_with(email_id)
+        self.pending_storage.iter.assert_called_once_with(f'{domain}/')
+        self.pending_storage.delete.assert_called_once_with(f'{domain}/{email_id}')
         self.email_storage.fetch_object.assert_called_once_with(email_id)
         self.assertEqual(_stored[sync.EMAILS_FILE], [client_email])
         self.assertEqual(_compression[sync.EMAILS_FILE], ['gz'])
@@ -409,7 +402,7 @@ class DownloadClientEmailsTests(TestCase):
             auth=self.auth,
             client_storage=self.client_storage,
             email_storage=self.email_storage,
-            pending_factory=self.pending_factory,
+            pending_storage=self.pending_storage,
         )
 
         return action(*args, **kwargs)
@@ -747,7 +740,6 @@ class CalculatePendingEmailsMetricTests(TestCase):
     def setUp(self):
         self.auth = Mock()
         self.pending_storage = Mock()
-        self.pending_factory = MagicMock()
 
     def test_403(self):
         domain = 'test.com'
@@ -769,20 +761,18 @@ class CalculatePendingEmailsMetricTests(TestCase):
         ]
 
         self.auth.is_owner.return_value = True
-        self.pending_factory.return_value = self.pending_storage
         self.pending_storage.iter.return_value = pending_email_ids
 
         response = self._execute_action(domain, user=user)
 
         self.assertEqual(response['pending_emails'], len(pending_email_ids))
         self.auth.is_owner.assert_called_once_with(domain, user)
-        self.pending_factory.assert_called_once_with(domain)
-        self.pending_storage.iter.assert_called_once_with()
+        self.pending_storage.iter.assert_called_once_with(f'{domain}/')
 
     def _execute_action(self, *args, **kwargs):
         action = actions.CalculatePendingEmailsMetric(
             auth=self.auth,
-            pending_factory=self.pending_factory,
+            pending_storage=self.pending_storage,
         )
 
         return action(*args, **kwargs)
