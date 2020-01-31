@@ -637,6 +637,7 @@ class DeleteClientTests(TestCase):
         self.delete_mx_records = MagicMock()
         self.mailbox_storage = Mock()
         self.pending_storage = Mock()
+        self.user_storage = Mock()
 
     def test_400(self):
         domain = 'TEST.com'
@@ -680,6 +681,7 @@ class DeleteClientTests(TestCase):
         self.auth.is_owner.return_value = True
         self.mailbox_storage.iter.return_value = ['1/2/a', '1/2/b']
         self.pending_storage.iter.return_value = ['c', 'd', 'e']
+        self.user_storage.iter.return_value = [f'{user}@{domain}']
 
         _, status = self._execute_action(domain, user=user)
 
@@ -698,6 +700,8 @@ class DeleteClientTests(TestCase):
         self.pending_storage.delete.assert_any_call(f'{domain}/d')
         self.pending_storage.delete.assert_any_call(f'{domain}/e')
         self.assertEqual(self.pending_storage.delete.call_count, 3)
+        self.user_storage.iter.assert_called_once_with(f'{domain}/')
+        self.user_storage.delete.assert_called_once_with(f'{domain}/{user}@{domain}')
 
     def _execute_action(self, *args, **kwargs):
         action = actions.DeleteClient(
@@ -706,6 +710,7 @@ class DeleteClientTests(TestCase):
             delete_mx_records=self.delete_mx_records,
             mailbox_storage=self.mailbox_storage,
             pending_storage=self.pending_storage,
+            user_storage=self.user_storage,
         )
 
         return action(*args, **kwargs)

@@ -402,13 +402,14 @@ class GetClient(_Action):
 class DeleteClient(_Action):
     def __init__(self, auth: AzureAuth, delete_mailbox: Callable[[str, str], None],
                  delete_mx_records: Callable[[str], None], mailbox_storage: AzureTextStorage,
-                 pending_storage: AzureTextStorage):
+                 pending_storage: AzureTextStorage, user_storage: AzureObjectStorage):
 
         self._auth = auth
         self._delete_mailbox = delete_mailbox
         self._delete_mx_records = delete_mx_records
         self._mailbox_storage = mailbox_storage
         self._pending_storage = pending_storage
+        self._user_storage = user_storage
 
     def _action(self, domain, **auth_args):  # type: ignore
         if not is_lowercase(domain):
@@ -425,13 +426,14 @@ class DeleteClient(_Action):
         self._delete_mx_records(domain)
         self._delete_index(self._pending_storage, domain)
         self._delete_index(self._mailbox_storage, domain)
+        self._delete_index(self._user_storage, domain)
         self._auth.delete(client_id, domain)
 
         self.log_event(events.CLIENT_DELETED, {'domain': domain})  # noqa: E501  # yapf: disable
         return 'OK', 200
 
     @classmethod
-    def _delete_index(cls, storage: AzureTextStorage, domain: str) -> None:
+    def _delete_index(cls, storage: Union[AzureTextStorage, AzureObjectStorage], domain: str) -> None:
         for prefix in storage.iter(f'{domain}/'):
             storage.delete(f'{domain}/{prefix}')
 
