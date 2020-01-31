@@ -147,6 +147,7 @@ class AzureEmailStore(EmailStore):
             if not email.get('sent_at'):
                 email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
 
+            email.pop('csrf_token', None)
             email_id = email['_uid']
             self._email_storage.store_object(email_id, email)
             self._pending_storage.store_text(f'{domain}/{email_id}', 'pending')
