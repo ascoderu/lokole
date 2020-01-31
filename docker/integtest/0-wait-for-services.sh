@@ -25,29 +25,16 @@ wait_for_rabbitmq() {
   exit 1
 }
 
-wait_for_postgres() {
-  local i
-
-  for i in $(seq 1 "${max_retries}"); do
-    if sql "select 1;" >/dev/null; then
-      log "Postgres is running"
-      return
-    fi
-    log "Waiting for postgres (${i}/${max_retries})"
-    sleep "${polling_interval_seconds}s"
-  done
-
-  exit 2
-}
-
 wait_for_appinsights() {
-  local key
   local i
 
-  key="$(get_dotenv "APPINSIGHTS_INSTRUMENTATIONKEY")"
-
   for i in $(seq 1 "${max_retries}"); do
-    if sql "select 'ready' from clients where client = '${key}';" | grep -q 'ready'; then
+    if [[ \
+      "$(az storage container exists \
+      --name "$(appinsights_container)" \
+      --connection-string "$(az_connection_string)" \
+      --output tsv)" = "True" \
+   ]]; then
       log "Appinsights is running"
       return
     fi
@@ -89,7 +76,6 @@ wait_for_webapp() {
 }
 
 wait_for_rabbitmq
-wait_for_postgres
 wait_for_appinsights
 wait_for_api
 wait_for_webapp
