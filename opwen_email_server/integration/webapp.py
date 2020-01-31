@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Callable
-from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
@@ -48,10 +47,6 @@ class AzureUser(User):
         data = super().__getattribute__('_data')
         data[key] = value
 
-    def to_dict(self):
-        data = super().__getattribute__('_data')
-        return data
-
     @property
     def id(self) -> Union[str, int]:
         return self.email
@@ -82,7 +77,6 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         UserReadStore.__init__(self, user_model=AzureUser, role_model=AzureRole)
         UserWriteStore.__init__(self, db=None)
         UserStore.__init__(self, read=self, write=self)
-        self._pending_users: Dict[str, AzureUser] = {}
         self._user_storage = user_storage
 
     def init_app(self, app):
@@ -118,21 +112,12 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
         raise NotImplementedError
 
     def put(self, user: AzureUser) -> AzureUser:
-        self._pending_users[user.email] = user
         return user
 
     def commit(self) -> None:
-        for user in self._pending_users.values():
-            data = user.to_dict()
-
-            # FIXME: deal with datetime serialization
-            data.pop('last_login_at', None)
-            data.pop('current_login_at', None)
-
-            self._user_storage.store_object(self._path_for(user.email), data)
+        pass
 
     def delete(self, user: AzureUser) -> None:
-        self._pending_users.pop(user.email, None)
         self._user_storage.delete(self._path_for(user.email))
 
     @classmethod
