@@ -7,7 +7,11 @@ mkdir -p "${out_dir}"
 # shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
-num_exceptions="$(sql_query 'select count(*) from exceptions;')"
+num_exceptions="$(az storage blob list \
+  --prefix "Microsoft.ApplicationInsights.Exception/" \
+  --container-name "$(appinsights_container)" \
+  --connection-string "$(az_connection_string)" \
+  --output tsv | wc -l)"
 num_exceptions_expected=0
 
 if [[ "${num_exceptions}" -ne "${num_exceptions_expected}" ]]; then

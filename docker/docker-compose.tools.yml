@@ -10,14 +10,6 @@ services:
     ports:
       - ${FLOWER_PORT}:5555
 
-  pgweb:
-    image: sosedoff/pgweb:latest
-    depends_on:
-      - postgres
-    command: ["/usr/bin/pgweb", "--bind=0.0.0.0", "--listen=8000", "--url=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"]
-    ports:
-      - ${PGWEB_PORT}:8000
-
   cloudbrowser:
     image: cwolff/django-cloud-browser:latest
     depends_on:
