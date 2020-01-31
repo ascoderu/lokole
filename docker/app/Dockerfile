@@ -12,10 +12,12 @@ RUN wget -q -O /tmp/shellcheck.tar.xz "https://storage.googleapis.com/shellcheck
   && rm /tmp/shellcheck.tar.xz \
   && shellcheck --version
 
-RUN wget -q -O get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
-  && chmod 700 get_helm.sh \
-  && ./get_helm.sh \  
-  && helm version
+ARG HELM_VERSION=2.16.1
+RUN wget -q "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+  && tar xf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+  && mv "linux-amd64/helm" /usr/local/bin/helm \
+  && chmod +x /usr/local/bin/helm \
+  && rm -rf "linux-amd64" "helm-v${HELM_VERSION}-linux-amd64.tar.gz"
 
 ARG KUBEVAL_VERSION=0.14.0 
 RUN wget -q https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_VERSION}/kubeval-linux-amd64.tar.gz \
