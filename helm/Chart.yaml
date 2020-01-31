@@ -1,6 +1,7 @@
 apiVersion: "v1"
 kind: Chart
-name: opwen_cloudserver
+# Below name change fixes the error 'directory name and chart name must be the same'
+name: helm
 description: A Helm Chart for the OPWEN email server by Ascoderu
 version: 0.0.1
 keywords:
