@@ -19,6 +19,7 @@ from opwen_email_client.webapp.config import AppConfig
 from opwen_email_server.constants import mailbox
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
+from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_user_storage
 from opwen_email_server.integration.celery import index_received_email_for_mailbox
 from opwen_email_server.integration.celery import index_sent_email_for_mailbox
@@ -127,10 +128,11 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
 
 class AzureEmailStore(EmailStore):
     def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureTextStorage,
-                 send_email: Callable[[str], None]):
+                 pending_storage: AzureTextStorage, send_email: Callable[[str], None]):
         super().__init__(restricted=None)
         self._email_storage = email_storage
         self._mailbox_storage = mailbox_storage
+        self._pending_storage = pending_storage
         self._send_email = send_email
 
     def _create(self, emails_or_attachments: Iterable[dict]):
@@ -138,11 +140,17 @@ class AzureEmailStore(EmailStore):
             if email.get('_type') == 'attachment':
                 raise NotImplementedError
 
+            domain = get_domain(email.get('from', ''))
+            if not domain.endswith(mailbox.MAILBOX_DOMAIN):
+                continue
+
             if not email.get('sent_at'):
                 email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
 
+            email.pop('csrf_token', None)
             email_id = email['_uid']
             self._email_storage.store_object(email_id, email)
+            self._pending_storage.store_text(f'{domain}/{email_id}', 'pending')
             self._send_email(email_id)
 
     def get(self, uid: str) -> Optional[dict]:
@@ -250,6 +258,7 @@ class AzureIoc:
         return AzureEmailStore(
             email_storage=get_email_storage(),
             mailbox_storage=get_mailbox_storage(),
+            pending_storage=get_pending_storage(),
             send_email=_send_email,
         )
 
