@@ -65,6 +65,7 @@ client_delete = DeleteClient(
     ),
     mailbox_storage=get_mailbox_storage(),
     pending_storage=get_pending_storage(),
+    user_storage=get_user_storage(),
 )
 
 metrics_users = CalculateNumberOfUsersMetric(
