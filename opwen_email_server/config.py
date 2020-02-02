@@ -21,13 +21,14 @@ CLIENT_STORAGE_KEY = env('LOKOLE_CLIENT_AZURE_STORAGE_KEY', '')
 CLIENT_STORAGE_HOST = env('LOKOLE_CLIENT_AZURE_STORAGE_HOST', '')
 CLIENT_STORAGE_SECURE = env.bool('LOKOLE_CLIENT_AZURE_STORAGE_SECURE', True)
 
-CONTAINER_CLIENT_PACKAGES = 'compressedpackages'
-CONTAINER_EMAILS = 'emails'
-CONTAINER_MAILBOX = 'mailbox'
-CONTAINER_USERS = 'users'
-CONTAINER_SENDGRID_MIME = 'sendgridinboundemails'
-CONTAINER_PENDING = 'pendingemails'
-CONTAINER_AUTH = 'clientsauth'
+resource_suffix = env('LOKOLE_RESOURCE_SUFFIX', '')
+CONTAINER_CLIENT_PACKAGES = f"compressedpackages{resource_suffix}"
+CONTAINER_EMAILS = f"emails{resource_suffix}"
+CONTAINER_MAILBOX = f"mailbox{resource_suffix}"
+CONTAINER_USERS = f"users{resource_suffix}"
+CONTAINER_SENDGRID_MIME = f"sendgridinboundemails{resource_suffix}"
+CONTAINER_PENDING = f"pendingemails{resource_suffix}"
+CONTAINER_AUTH = f"clientsauth{resource_suffix}"
 
 SENDGRID_MAX_RETRIES = env.int('LOKOLE_SENDGRID_MAX_RETRIES', 20)
 SENDGRID_RETRY_INTERVAL_SECONDS = env.float('LOKOLE_SENDGRID_RETRY_INTERVAL_SECONDS', 5)

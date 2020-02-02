@@ -14,7 +14,11 @@ appinsights_container() {
 }
 
 az_connection_string() {
-  echo "AccountName=${AZURITE_ACCOUNT};AccountKey=${AZURITE_KEY};DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite:10000/${AZURITE_ACCOUNT};"
+  if [[ -z "${AZURITE_HOST}" ]]; then
+    echo "AccountName=${AZURITE_ACCOUNT};AccountKey=${AZURITE_KEY};"
+  else
+    echo "AccountName=${AZURITE_ACCOUNT};AccountKey=${AZURITE_KEY};BlobEndpoint=http://${AZURITE_HOST}/${AZURITE_ACCOUNT};"
+  fi
 }
 
 az_storage() {

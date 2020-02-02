@@ -58,6 +58,11 @@ case "$1" in
     if [[ "$TEST_MODE" = "live" ]]; then
       export REGISTRATION_CREDENTIALS="$GITHUB_AUTH_USERNAME:$GITHUB_AUTH_TOKEN"
       export LOKOLE_QUEUE_BROKER_SCHEME="azureservicebus"
+      export LOKOLE_RESOURCE_SUFFIX="$RANDOM$RANDOM"
+      export AZURITE_ACCOUNT="$TEST_AZURE_STORAGE_ACCOUNT"
+      export AZURITE_KEY="$TEST_AZURE_STORAGE_KEY"
+      export AZURITE_HOST=""
+      export AZURITE_SECURE="True"
     else
       export REGISTRATION_CREDENTIALS="admin:password"
       export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
