@@ -1,17 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 get_container() {
   docker ps --format  '{{.Names}}' | grep "$1"
-}
-
-get_dotenv() {
-  local key dotenv_file
-
-  key="$1"
-  dotenv_file="$(dirname "$0")/.env"
-
-  grep "^${key}=" "${dotenv_file}" | cut -d'=' -f2-
 }
 
 log() {
@@ -19,16 +10,11 @@ log() {
 }
 
 appinsights_container() {
-  get_dotenv "APPINSIGHTS_INSTRUMENTATIONKEY" | tr -d '-'
+  tr -d '-' <<< "${APPINSIGHTS_INSTRUMENTATIONKEY}"
 }
 
 az_connection_string() {
-  local storage_account storage_key
-
-  storage_account="$(get_dotenv AZURITE_ACCOUNT)"
-  storage_key="$(get_dotenv AZURITE_KEY)"
-
-  echo "DefaultEndpointsProtocol=http;AccountName=${storage_account};AccountKey=${storage_key};BlobEndpoint=http://azurite:10000/${storage_account};"
+  echo "AccountName=${AZURITE_ACCOUNT};AccountKey=${AZURITE_KEY};DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite:10000/${AZURITE_ACCOUNT};"
 }
 
 az_storage() {

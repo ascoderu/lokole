@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 scriptdir="$(dirname "$0")"
 in_dir="${scriptdir}/files"

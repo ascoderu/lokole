@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 scriptdir="$(dirname "$0")"
 # shellcheck disable=SC1090
