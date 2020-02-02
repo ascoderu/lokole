@@ -137,6 +137,11 @@ def get_domain(address: str) -> str:
     return address.split('@')[-1]
 
 
+def ensure_has_sent_at(email: dict):
+    if not email.get('sent_at'):
+        email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+
+
 def _get_image_type(response: Response, url: str) -> Optional[str]:
     content_type = response.headers.get('Content-Type')
     if not content_type:

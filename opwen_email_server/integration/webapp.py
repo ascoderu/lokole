@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Callable
 from typing import Iterable
 from typing import List
@@ -27,6 +26,7 @@ from opwen_email_server.integration.celery import send
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import chunks
+from opwen_email_server.utils.email_parser import ensure_has_sent_at
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_recipients
 
@@ -144,9 +144,7 @@ class AzureEmailStore(EmailStore):
             if not domain.endswith(mailbox.MAILBOX_DOMAIN):
                 continue
 
-            if not email.get('sent_at'):
-                email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
-
+            ensure_has_sent_at(email)
             email.pop('csrf_token', None)
             email_id = email['_uid']
             self._email_storage.store_object(email_id, email)

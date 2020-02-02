@@ -104,8 +104,8 @@ class StoreInboundEmailsTests(TestCase):
         resource_id = 'b8dcaf40-fd14-4a89-8898-c9514b0ad724'
         domain = 'test.lokole.ca'
         raw_email = 'dummy-mime'
-        parsed_email = {'to': [f'foo@{domain}', 'bar@test.com']}
-        email_id = '9241404a42d74e1b6eba626711cae643fccf79af9c2c2cc385a89142b89fed1a'
+        parsed_email = {'to': [f'foo@{domain}', 'bar@test.com'], 'sent_at': '2020-02-01 21:17'}
+        email_id = '03cbd3b41deca5f92a1d25cc0c50a6eae908d23770fd47ebca0d614eef96a46e'
         stored_email = dict(parsed_email)
         stored_email['_uid'] = email_id
 
