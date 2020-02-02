@@ -229,6 +229,32 @@ class ConvertImgUrlToBase64Tests(TestCase):
         self.fail(message % args)
 
 
+class EnsureHasSentAtTests(TestCase):
+    def test_sets_sent_at_if_missing(self):
+        input_email = {}
+
+        email_parser.ensure_has_sent_at(input_email)
+
+        self.assertIn('sent_at', input_email)
+        self.assertEqual(len(input_email['sent_at']), 16)
+
+    def test_sets_sent_at_if_empty(self):
+        input_email = {'sent_at': ''}
+
+        email_parser.ensure_has_sent_at(input_email)
+
+        self.assertIn('sent_at', input_email)
+        self.assertEqual(len(input_email['sent_at']), 16)
+
+    def test_respects_sent_at_if_existing(self):
+        sent_at = '2020-02-01 21:09'
+        input_email = {'sent_at': sent_at}
+
+        email_parser.ensure_has_sent_at(input_email)
+
+        self.assertEqual(input_email['sent_at'], sent_at)
+
+
 class FormatAttachedFilesTests(TestCase):
     def test_format_attachments_without_attachment(self):
         input_email = {'attachments': []}
