@@ -16,6 +16,7 @@ from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.email_parser import MimeEmailParser
+from opwen_email_server.utils.email_parser import ensure_has_sent_at
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
 from opwen_email_server.utils.email_parser import get_recipients
@@ -97,6 +98,7 @@ class StoreInboundEmails(_Action):
         return 'OK', 200
 
     def _store_inbound_email(self, email: dict) -> str:
+        ensure_has_sent_at(email)
         email_id = new_email_id(email)
         email['_uid'] = email_id
 
