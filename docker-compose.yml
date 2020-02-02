@@ -109,7 +109,7 @@ services:
       - ${RABBITMQ_PORT}:15672
 
   appinsights:
-    image: cwolff/appinsights-on-premises:0.1.4-libcloud
+    image: cwolff/appinsights-on-premises:0.2.0-libcloud
     depends_on:
       - azurite
     environment:

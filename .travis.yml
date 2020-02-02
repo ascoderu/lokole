@@ -11,7 +11,24 @@ services:
 before_install: ./.travis.sh before_install
 install: ./.travis.sh install
 
-before_script: export TRAVIS_SCRIPT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+before_script: |
+  export TRAVIS_SCRIPT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+  export CI=true
+
+  if [[ "$TEST_MODE" = "live" ]]; then
+    export REGISTRATION_CREDENTIALS="$GITHUB_AUTH_USERNAME:$GITHUB_AUTH_TOKEN"
+    export LOKOLE_QUEUE_BROKER_SCHEME="azureservicebus"
+    export LOKOLE_RESOURCE_SUFFIX="$TRAVIS_SCRIPT_UUID"
+    export APPINSIGHTS_INSTRUMENTATIONKEY="$TRAVIS_SCRIPT_UUID"
+    export AZURITE_ACCOUNT="$TEST_AZURE_STORAGE_ACCOUNT"
+    export AZURITE_KEY="$TEST_AZURE_STORAGE_KEY"
+    export AZURITE_HOST=""
+    export AZURITE_SECURE="True"
+  else
+    export REGISTRATION_CREDENTIALS="admin:password"
+    export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
+  fi
+
 script: ./.travis.sh script
 after_success: ./.travis.sh after_success
 after_failure: ./.travis.sh after_failure
