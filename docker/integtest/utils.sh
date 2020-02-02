@@ -9,10 +9,6 @@ log() {
   echo "$@" >&2
 }
 
-appinsights_container() {
-  tr -d '-' <<< "${APPINSIGHTS_INSTRUMENTATIONKEY}"
-}
-
 az_connection_string() {
   if [[ -z "${AZURITE_HOST}" ]]; then
     echo "AccountName=${AZURITE_ACCOUNT};AccountKey=${AZURITE_KEY};"
