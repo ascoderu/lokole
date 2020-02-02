@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 scriptdir="$(dirname "$0")"
 out_dir="${scriptdir}/files/test.out"
@@ -9,7 +9,7 @@ mkdir -p "${out_dir}"
 
 num_exceptions="$(az storage blob list \
   --prefix "Microsoft.ApplicationInsights.Exception/" \
-  --container-name "$(appinsights_container)" \
+  --container-name "${APPINSIGHTS_INSTRUMENTATIONKEY}" \
   --connection-string "$(az_connection_string)" \
   --output tsv | wc -l)"
 num_exceptions_expected=0

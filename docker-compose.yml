@@ -10,6 +10,7 @@ x-shared-app-environment:
   LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
   LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY: ${APPINSIGHTS_INSTRUMENTATIONKEY}
   LOKOLE_EMAIL_SERVER_APPINSIGHTS_HOST: http://appinsights:8000
+  LOKOLE_RESOURCE_SUFFIX: ${LOKOLE_RESOURCE_SUFFIX}
 
   LOKOLE_STORAGE_PROVIDER: AZURE_BLOBS
 
@@ -108,12 +109,12 @@ services:
       - ${RABBITMQ_PORT}:15672
 
   appinsights:
-    image: cwolff/appinsights-on-premises:0.1.3-libcloud
+    image: cwolff/appinsights-on-premises:0.2.0-libcloud
     depends_on:
       - azurite
     environment:
       PORT: "8000"
-      DATABASE_URL: "libcloud://${AZURITE_ACCOUNT}:${AZURITE_KEY}@azure_blobs?endpoint=azurite:10000&ssl=False"
+      DATABASE_URL: "libcloud://${AZURITE_ACCOUNT}:${AZURITE_KEY}@azure_blobs?endpoint=${AZURITE_HOST}&ssl=${AZURITE_SECURE}"
       APPINSIGHTS_INSTRUMENTATIONKEY: "${APPINSIGHTS_INSTRUMENTATIONKEY}"
 
   azurite:

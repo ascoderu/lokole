@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 scriptdir="$(dirname "$0")"
 # shellcheck disable=SC1090
@@ -31,7 +31,7 @@ wait_for_appinsights() {
   for i in $(seq 1 "${max_retries}"); do
     if [[ \
       "$(az storage container exists \
-      --name "$(appinsights_container)" \
+      --name "${APPINSIGHTS_INSTRUMENTATIONKEY}" \
       --connection-string "$(az_connection_string)" \
       --output tsv)" = "True" \
    ]]; then

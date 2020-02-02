@@ -1,5 +1,4 @@
 from opwen_email_server import config
-from opwen_email_server.constants import azure as constants
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
@@ -15,7 +14,7 @@ def get_auth() -> AzureAuth:
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
-        container=constants.CONTAINER_AUTH,
+        container=config.CONTAINER_AUTH,
         provider=config.STORAGE_PROVIDER,
     ))
 
@@ -27,7 +26,7 @@ def get_client_storage() -> AzureObjectsStorage:
         key=config.CLIENT_STORAGE_KEY,
         host=config.CLIENT_STORAGE_HOST,
         secure=config.CLIENT_STORAGE_SECURE,
-        container=constants.CONTAINER_CLIENT_PACKAGES,
+        container=config.CONTAINER_CLIENT_PACKAGES,
         provider=config.STORAGE_PROVIDER,
     ))
 
@@ -39,7 +38,7 @@ def get_raw_email_storage() -> AzureTextStorage:
         key=config.BLOBS_KEY,
         host=config.BLOBS_HOST,
         secure=config.BLOBS_SECURE,
-        container=constants.CONTAINER_SENDGRID_MIME,
+        container=config.CONTAINER_SENDGRID_MIME,
         provider=config.STORAGE_PROVIDER,
     )
 
@@ -51,7 +50,7 @@ def get_email_storage() -> AzureObjectStorage:
         key=config.BLOBS_KEY,
         host=config.BLOBS_HOST,
         secure=config.BLOBS_SECURE,
-        container=constants.CONTAINER_EMAILS,
+        container=config.CONTAINER_EMAILS,
         provider=config.STORAGE_PROVIDER,
     )
 
@@ -63,7 +62,7 @@ def get_user_storage() -> AzureObjectStorage:
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
-        container=constants.CONTAINER_USERS,
+        container=config.CONTAINER_USERS,
         provider=config.STORAGE_PROVIDER,
     )
 
@@ -75,7 +74,7 @@ def get_mailbox_storage() -> AzureTextStorage:
         key=config.BLOBS_KEY,
         host=config.BLOBS_HOST,
         secure=config.BLOBS_SECURE,
-        container=constants.CONTAINER_MAILBOX,
+        container=config.CONTAINER_MAILBOX,
         provider=config.STORAGE_PROVIDER,
     )
 
@@ -87,6 +86,6 @@ def get_pending_storage() -> AzureTextStorage:
         key=config.TABLES_KEY,
         host=config.TABLES_HOST,
         secure=config.TABLES_SECURE,
-        container=constants.CONTAINER_PENDING,
+        container=config.CONTAINER_PENDING,
         provider=config.STORAGE_PROVIDER,
     )

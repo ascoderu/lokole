@@ -19,6 +19,7 @@ case "$1" in
     ;;
 
   after_script)
+    SUFFIX="$TRAVIS_SCRIPT_UUID" make clean-storage
     make stop
     ;;
 
@@ -45,8 +46,7 @@ case "$1" in
     ;;
 
   install)
-    export BUILD_TARGET=runtime
-    make build verify-build
+    BUILD_TARGET=runtime make build verify-build
     ;;
 
   script)
@@ -55,15 +55,6 @@ case "$1" in
       exit 0
     fi
 
-    if [[ "$TEST_MODE" = "live" ]]; then
-      export REGISTRATION_CREDENTIALS="$GITHUB_AUTH_USERNAME:$GITHUB_AUTH_TOKEN"
-      export LOKOLE_QUEUE_BROKER_SCHEME="azureservicebus"
-    else
-      export REGISTRATION_CREDENTIALS="admin:password"
-      export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
-    fi
-
-    export CI=true
     make start
     make integration-tests
     ;;
