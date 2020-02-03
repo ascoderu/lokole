@@ -220,7 +220,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
         mock_responses.add(
             mock_responses.GET,
             'http://test-url.png',
-            headers={'Content-Type': content_type},
+            content_type=content_type,
             body=image_bytes,
             status=status,
         )
