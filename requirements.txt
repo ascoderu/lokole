@@ -16,7 +16,7 @@ typing==3.7.4.1
 kombu==4.6.7
 celery==4.4.0
 xtarfile[zstd]==0.0.2
-azure-servicebus==0.50.1
+azure-servicebus==0.50.2
 gunicorn==19.9.0
 
 # TODO: remove when libcloud > 2.8.0 is released
