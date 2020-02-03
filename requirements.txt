@@ -1,6 +1,7 @@
 Flask==1.1.1
 Flask-Cors==3.0.8
 Pillow==7.0.0
+apache-libcloud==3.0.0rc1
 applicationinsights==0.11.9
 beautifulsoup4==4.8.2
 cached-property==1.5.1
@@ -18,6 +19,3 @@ celery==4.4.0
 xtarfile[zstd]==0.0.2
 azure-servicebus==0.50.2
 gunicorn==20.0.4
-
-# TODO: remove when libcloud > 2.8.0 is released
-https://github.com/apache/libcloud/archive/f176f5b8b2b50162f68d4a1f1cb456b8d09e70a2.zip
