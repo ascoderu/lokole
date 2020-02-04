@@ -14,13 +14,11 @@ fi
 
 case "$1" in
   after_failure)
-    docker-compose ps
-    ALL=true make logs
+    make logs
     ;;
 
   after_script)
-    SUFFIX="$TRAVIS_SCRIPT_UUID" make clean-storage
-    make stop
+    make clean-storage stop
     ;;
 
   after_success)
@@ -41,12 +39,12 @@ case "$1" in
 
   deploy)
     if [[ "$TEST_MODE" = "local" ]]; then
-      DOCKER_TAG="$TRAVIS_TAG" make release deploy
+      make release deploy
     fi
     ;;
 
   install)
-    BUILD_TARGET=runtime make build verify-build
+    make build verify-build
     ;;
 
   script)
