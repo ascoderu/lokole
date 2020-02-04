@@ -28,8 +28,7 @@ def print_queues(separator):
 
 
 @cli.command()
-@click.option('--queues', '-q', default=_QUEUES, multiple=True)
-def delete_queues(queues):
+def delete_queues():
     queue_broker = urlparse(config.QUEUE_BROKER)
     if queue_broker.scheme != 'azureservicebus':
         click.echo(f'Skipping queue cleanup for {queue_broker.scheme}')
@@ -41,7 +40,7 @@ def delete_queues(queues):
         shared_access_key_value=unquote(queue_broker.password),
     )
 
-    for queue in queues:
+    for queue in _QUEUES:
         click.echo(f'Deleting queue {queue}')
         client.delete_queue(queue)
 

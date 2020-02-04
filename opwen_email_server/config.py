@@ -23,13 +23,13 @@ CLIENT_STORAGE_SECURE = env.bool('LOKOLE_CLIENT_AZURE_STORAGE_SECURE', True)
 
 resource_suffix = env('LOKOLE_RESOURCE_SUFFIX', '')
 
-CONTAINER_CLIENT_PACKAGES = f"compressedpackages{resource_suffix}"
-CONTAINER_EMAILS = f"emails{resource_suffix}"
-CONTAINER_MAILBOX = f"mailbox{resource_suffix}"
-CONTAINER_USERS = f"users{resource_suffix}"
-CONTAINER_SENDGRID_MIME = f"sendgridinboundemails{resource_suffix}"
-CONTAINER_PENDING = f"pendingemails{resource_suffix}"
-CONTAINER_AUTH = f"clientsauth{resource_suffix}"
+CONTAINER_CLIENT_PACKAGES = f'compressedpackages{resource_suffix}'
+CONTAINER_EMAILS = f'emails{resource_suffix}'
+CONTAINER_MAILBOX = f'mailbox{resource_suffix}'
+CONTAINER_USERS = f'users{resource_suffix}'
+CONTAINER_SENDGRID_MIME = f'sendgridinboundemails{resource_suffix}'
+CONTAINER_PENDING = f'pendingemails{resource_suffix}'
+CONTAINER_AUTH = f'clientsauth{resource_suffix}'
 
 REGISTER_CLIENT_QUEUE = f'register{resource_suffix}'
 INBOUND_STORE_QUEUE = f'inbound{resource_suffix}'
