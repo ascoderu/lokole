@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 
 import click
 from azure.servicebus import ServiceBusClient
+from libcloud.storage.providers import get_driver
 
 from opwen_email_server import config
 
@@ -15,6 +16,27 @@ _QUEUES = (
     config.MAILBOX_SENT_QUEUE,
 )
 
+_STORAGES = (
+    (
+        config.BLOBS_ACCOUNT,
+        config.BLOBS_KEY,
+        config.BLOBS_HOST,
+        config.BLOBS_SECURE,
+    ),
+    (
+        config.TABLES_ACCOUNT,
+        config.TABLES_KEY,
+        config.TABLES_HOST,
+        config.TABLES_SECURE,
+    ),
+    (
+        config.CLIENT_STORAGE_ACCOUNT,
+        config.CLIENT_STORAGE_KEY,
+        config.CLIENT_STORAGE_HOST,
+        config.CLIENT_STORAGE_SECURE,
+    ),
+)
+
 
 @click.group()
 def cli():
@@ -22,7 +44,7 @@ def cli():
 
 
 @cli.command()
-@click.option('--separator', '-s', default='\n')
+@click.option("--separator", "-s", default="\n")
 def print_queues(separator):
     click.echo(separator.join(_QUEUES))
 
@@ -30,8 +52,8 @@ def print_queues(separator):
 @cli.command()
 def delete_queues():
     queue_broker = urlparse(config.QUEUE_BROKER)
-    if queue_broker.scheme != 'azureservicebus':
-        click.echo(f'Skipping queue cleanup for {queue_broker.scheme}')
+    if queue_broker.scheme != "azureservicebus":
+        click.echo(f"Skipping queue cleanup for {queue_broker.scheme}")
         return
 
     client = ServiceBusClient(
@@ -41,8 +63,28 @@ def delete_queues():
     )
 
     for queue in _QUEUES:
-        click.echo(f'Deleting queue {queue}')
+        click.echo(f"Deleting queue {queue}")
         client.delete_queue(queue)
+
+
+@cli.command()
+@click.option('-s', '--suffix')
+def delete_containers(suffix):
+    for account, key, host, secure in _STORAGES:
+        client = get_driver(config.STORAGE_PROVIDER)(account, key, host=host, secure=secure)
+
+        for container in client.iterate_containers():
+            if container.name.endswith(suffix):
+                click.echo(f'Deleting container {container.name}')
+
+                response = client.connection.request(
+                    f'/{container.name}',
+                    params={'restype': 'container'},
+                    method='DELETE',
+                )
+
+                if response.status != 202:
+                    raise ValueError(f'Unable to delete container {container.name}')
 
 
 if __name__ == '__main__':
