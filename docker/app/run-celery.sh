@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ "${CELERY_QUEUE_NAMES}" = "all" ]]; then
-  CELERY_QUEUE_NAMES="register,inbound,written,send,mailboxreceived,mailboxsent"
+  CELERY_QUEUE_NAMES="$("${PY_ENV}/bin/python" -m opwen_email_server.integration.cli print_queues --separator=,)"
 fi
 
 "${PY_ENV}/bin/celery" \

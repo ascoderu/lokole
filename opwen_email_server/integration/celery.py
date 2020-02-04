@@ -7,13 +7,6 @@ from opwen_email_server.actions import RegisterClient
 from opwen_email_server.actions import SendOutboundEmails
 from opwen_email_server.actions import StoreInboundEmails
 from opwen_email_server.actions import StoreWrittenClientEmails
-from opwen_email_server.config import QUEUE_BROKER
-from opwen_email_server.constants.queues import INBOUND_STORE_QUEUE
-from opwen_email_server.constants.queues import MAILBOX_RECEIVED_QUEUE
-from opwen_email_server.constants.queues import MAILBOX_SENT_QUEUE
-from opwen_email_server.constants.queues import REGISTER_CLIENT_QUEUE
-from opwen_email_server.constants.queues import SEND_QUEUE
-from opwen_email_server.constants.queues import WRITTEN_STORE_QUEUE
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
@@ -25,7 +18,7 @@ from opwen_email_server.services.dns import SetupMxRecords
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
 
-celery = Celery(broker=QUEUE_BROKER)
+celery = Celery(broker=config.QUEUE_BROKER)
 
 
 @celery.task(ignore_result=True)
@@ -112,12 +105,12 @@ def _fqn(task):
 
 
 task_routes = {
-    _fqn(register_client): {'queue': REGISTER_CLIENT_QUEUE},
-    _fqn(index_received_email_for_mailbox): {'queue': MAILBOX_RECEIVED_QUEUE},
-    _fqn(index_sent_email_for_mailbox): {'queue': MAILBOX_SENT_QUEUE},
-    _fqn(inbound_store): {'queue': INBOUND_STORE_QUEUE},
-    _fqn(written_store): {'queue': WRITTEN_STORE_QUEUE},
-    _fqn(send): {'queue': SEND_QUEUE}
+    _fqn(register_client): {'queue': config.REGISTER_CLIENT_QUEUE},
+    _fqn(index_received_email_for_mailbox): {'queue': config.MAILBOX_RECEIVED_QUEUE},
+    _fqn(index_sent_email_for_mailbox): {'queue': config.MAILBOX_SENT_QUEUE},
+    _fqn(inbound_store): {'queue': config.INBOUND_STORE_QUEUE},
+    _fqn(written_store): {'queue': config.WRITTEN_STORE_QUEUE},
+    _fqn(send): {'queue': config.SEND_QUEUE}
 }
 
 celery.conf.update(task_routes=task_routes)

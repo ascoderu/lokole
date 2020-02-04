@@ -59,8 +59,10 @@ clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
 clean-storage:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest ./clean.sh "$(SUFFIX)"
+	docker-compose exec api sh -c \
+    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete_containers --suffix "$(SUFFIX)"'
+	docker-compose exec api sh -c \
+    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete_queues --suffix "$(SUFFIX)"'
 
 build:
 	BUILD_TARGET=builder docker-compose build api && \
