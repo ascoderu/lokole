@@ -48,8 +48,8 @@ lint-shell:
   fi
 
 lint-helm:
-	helm lint --strict ./helm
-	mkdir -p ./k8s-temp && helm template ./helm --output-dir ./k8s-temp && kubeval -d k8s-temp --ignore-missing-schemas && rm -rf k8s-temp
+	helm lint --strict ./helm/opwen_cloudserver
+	mkdir -p ./k8s-temp && helm template ./helm/opwen_cloudserver --output-dir ./k8s-temp && kubeval -d k8s-temp --ignore-missing-schemas && rm -rf k8s-temp
 
 lint: lint-python lint-shell lint-swagger lint-docker lint-yaml lint-helm
 
