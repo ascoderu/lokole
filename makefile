@@ -87,7 +87,8 @@ start-devtools:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
 
 logs:
-	if [ "$(ALL)" = "true" ]; then \
+	if [ "$(CI)" = "true" ]; then \
+    docker-compose ps; \
     docker-compose ps --services | while read service; do \
       echo "==================== $$service ===================="; \
       docker-compose logs "$$service"; \
