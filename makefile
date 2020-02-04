@@ -49,7 +49,7 @@ lint-shell:
 
 lint-helm:
 	helm lint --strict ./helm/opwen_cloudserver
-	mkdir -p ./k8s-temp && helm template ./helm/opwen_cloudserver --output-dir ./k8s-temp && kubeval -d k8s-temp --ignore-missing-schemas && rm -rf k8s-temp
+	helm template ./helm/opwen_cloudserver > helm.yaml && kubeval --ignore-missing-schemas helm.yaml && rm helm.yaml
 
 lint: lint-python lint-shell lint-swagger lint-docker lint-yaml lint-helm
 
