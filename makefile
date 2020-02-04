@@ -61,6 +61,8 @@ clean:
 clean-storage:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest ./clean.sh "$(SUFFIX)"
+	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml exec api sh -c \
+    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete_queues'
 
 build:
 	BUILD_TARGET=builder docker-compose build api && \
