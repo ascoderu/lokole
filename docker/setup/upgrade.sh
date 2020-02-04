@@ -40,4 +40,4 @@ helm upgrade "${HELM_NAME}" \
   --set domain="${LOKOLE_DNS_NAME}" \
   --set version.imageRegistry="${IMAGE_REGISTRY}" \
   --set version.dockerTag="${DOCKER_TAG}" \
-  "${scriptdir}/helm"
+  "${scriptdir}/helm/opwen_cloudserver"

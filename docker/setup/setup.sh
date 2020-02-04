@@ -191,7 +191,7 @@ while :; do
     --set domain="${lokole_dns_name}" \
     --set version.imageRegistry="${k8simageregistry}" \
     --set version.dockerTag="${k8sdockertag}" \
-    "${scriptdir}/helm"
+    "${scriptdir}/helm/opwen_cloudserver"
 
   # shellcheck disable=SC2181
   if [[ "$?" -ne 0 ]]; then log "Intermittent error for ${helmname}"; sleep 30s; else break; fi
