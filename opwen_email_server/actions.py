@@ -121,8 +121,9 @@ class _IndexEmailForMailbox(_Action):
 
         for email_address in self._get_pivot(email):
             domain = get_domain(email_address)
-            index = f"{domain}/{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
-            self._mailbox_storage.store_text(index, 'indexed')
+            if domain.endswith(mailbox.MAILBOX_DOMAIN):
+                index = f"{domain}/{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
+                self._mailbox_storage.store_text(index, 'indexed')
 
         self.log_event(events.MAILBOX_EMAIL_INDEXED, {'folder': self._folder})  # noqa: E501  # yapf: disable
         return 'OK', 200
@@ -140,9 +141,7 @@ class IndexReceivedEmailForMailbox(_IndexEmailForMailbox):
 
     def _get_pivot(self, email: dict) -> Iterable[str]:
         for email_address in get_recipients(email):
-            domain = get_domain(email_address)
-            if domain.endswith(mailbox.MAILBOX_DOMAIN):
-                yield email_address
+            yield email_address
 
 
 class IndexSentEmailForMailbox(_IndexEmailForMailbox):
