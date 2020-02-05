@@ -20,9 +20,7 @@ from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_user_storage
-from opwen_email_server.integration.celery import index_received_email_for_mailbox
-from opwen_email_server.integration.celery import index_sent_email_for_mailbox
-from opwen_email_server.integration.celery import send
+from opwen_email_server.integration.celery import send_and_index_email
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import chunks
@@ -244,12 +242,6 @@ class NoSync(Sync):
         return []
 
 
-def _send_email(resource_id: str) -> None:
-    send.delay(resource_id)
-    index_sent_email_for_mailbox.delay(resource_id)
-    index_received_email_for_mailbox.delay(resource_id)
-
-
 class AzureIoc:
     @cached_property
     def email_store(self):
@@ -257,7 +249,7 @@ class AzureIoc:
             email_storage=get_email_storage(),
             mailbox_storage=get_mailbox_storage(),
             pending_storage=get_pending_storage(),
-            send_email=_send_email,
+            send_email=send_and_index_email,
         )
 
     @cached_property
