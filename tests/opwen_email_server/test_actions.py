@@ -176,7 +176,7 @@ class IndexSentEmailForMailboxTests(TestCase):
         email_id = '123'
         email = {
             'to': ['1@bar.lokole.ca', 'foo@gmail.com'], 'cc': ['2@baz.lokole.ca'], 'sent_at': '2019-10-26 22:47',
-            'from': 'foo@foo'
+            'from': 'foo@foo.lokole.ca'
         }
 
         self.email_storage.fetch_object.return_value = email
@@ -185,7 +185,8 @@ class IndexSentEmailForMailboxTests(TestCase):
 
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
-        self.mailbox_storage.store_text.assert_called_once_with('foo/foo@foo/sent/2019-10-26 22:47/123', 'indexed')
+        self.mailbox_storage.store_text.assert_called_once_with(
+            'foo.lokole.ca/foo@foo.lokole.ca/sent/2019-10-26 22:47/123', 'indexed')
 
     def _execute_action(self, *args, **kwargs):
         action = actions.IndexSentEmailForMailbox(
