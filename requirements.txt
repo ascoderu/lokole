@@ -7,7 +7,7 @@ beautifulsoup4==4.8.2
 cached-property==1.5.1
 click==7.0
 connexion[swagger-ui]==2.6.0
-environs==7.1.0
+environs==7.2.0
 msgpack==0.6.2
 python-http-client==3.2.4
 pyzmail36==1.0.4
