@@ -64,9 +64,9 @@ clean:
 
 clean-storage:
 	docker-compose exec api sh -c \
-    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete_containers --suffix "$(SUFFIX)"'
+    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"'
 	docker-compose exec api sh -c \
-    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete_queues --suffix "$(SUFFIX)"'
+    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"'
 
 build:
 	BUILD_TARGET=builder docker-compose build api && \
