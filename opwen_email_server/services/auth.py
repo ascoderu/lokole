@@ -194,5 +194,5 @@ class NoAuth(AzureAuth):
     def is_owner(self, domain: str, username: str) -> bool:
         return True
 
-    def domain_for(self, client_id: str) -> bool:
-        return True
+    def domain_for(self, client_id: str) -> str:
+        return 'service'
