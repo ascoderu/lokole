@@ -13,6 +13,7 @@ from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
+from opwen_email_server.integration.azure import get_no_auth
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.azure import get_user_storage
@@ -29,6 +30,12 @@ email_receive = ReceiveInboundEmail(
     auth=get_auth(),
     raw_email_storage=get_raw_email_storage(),
     next_task=inbound_store.delay,
+)
+
+service_request_email_receive = ReceiveInboundEmail(
+    auth=get_no_auth(),
+    raw_email_storage=get_raw_email_storage(),
+    next_tast=inbound_store.delay,
 )
 
 client_write = UploadClientEmails(
