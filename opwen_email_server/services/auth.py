@@ -188,3 +188,11 @@ class AzureAuth(LogMixin):
     @classmethod
     def _client_id_file(cls, client_id: str) -> str:
         return f'client_id/{client_id}'
+
+
+class NoAuth(AzureAuth):
+    def is_owner(self, domain: str, username: str) -> bool:
+        return True
+
+    def domain_for(self, client_id: str) -> bool:
+        return True
