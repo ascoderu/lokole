@@ -3,6 +3,7 @@ from celery import Celery
 from opwen_email_server import config
 from opwen_email_server.actions import IndexReceivedEmailForMailbox
 from opwen_email_server.actions import IndexSentEmailForMailbox
+from opwen_email_server.actions import ProcessServiceEmail
 from opwen_email_server.actions import RegisterClient
 from opwen_email_server.actions import SendOutboundEmails
 from opwen_email_server.actions import StoreInboundEmails
@@ -68,6 +69,17 @@ def inbound_store(resource_id: str) -> None:
         email_storage=get_email_storage(),
         pending_storage=get_pending_storage(),
         next_task=index_received_email_for_mailbox.delay,
+    )
+
+    action(resource_id)
+
+
+@celery.task(ignore_result=True)
+def process_service(resource_id: str) -> None:
+    action = ProcessServiceEmail(
+        raw_email_storage=get_raw_email_storage(),
+        email_storage=get_email_storage(),
+        next_task=send_and_index_email,
     )
 
     action(resource_id)

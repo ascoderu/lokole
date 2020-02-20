@@ -18,6 +18,7 @@ from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.azure import get_user_storage
 from opwen_email_server.integration.celery import inbound_store
+from opwen_email_server.integration.celery import process_service
 from opwen_email_server.integration.celery import register_client
 from opwen_email_server.integration.celery import written_store
 from opwen_email_server.services.auth import AnyOfBasicAuth
@@ -35,7 +36,7 @@ email_receive = ReceiveInboundEmail(
 service_request_email_receive = ReceiveInboundEmail(
     auth=get_no_auth(),
     raw_email_storage=get_raw_email_storage(),
-    next_tast=inbound_store.delay,
+    next_task=process_service,
 )
 
 client_write = UploadClientEmails(
