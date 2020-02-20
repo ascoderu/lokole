@@ -121,6 +121,7 @@ task_routes = {
     _fqn(register_client): {'queue': config.REGISTER_CLIENT_QUEUE},
     _fqn(index_received_email_for_mailbox): {'queue': config.MAILBOX_RECEIVED_QUEUE},
     _fqn(index_sent_email_for_mailbox): {'queue': config.MAILBOX_SENT_QUEUE},
+    _fqn(process_service): {'queue': config.PROCESS_SERVICE_QUEUE},
     _fqn(inbound_store): {'queue': config.INBOUND_STORE_QUEUE},
     _fqn(written_store): {'queue': config.WRITTEN_STORE_QUEUE},
     _fqn(send): {'queue': config.SEND_QUEUE}

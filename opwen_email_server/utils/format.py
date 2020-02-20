@@ -6,7 +6,7 @@ ECHO_ADRESS = 'echo@bot.lokole.ca'
 
 
 class EmailFormatter(LogMixin):
-    def format_echo_email(self, email: dict) -> dict:
+    def _format_echo_email(self, email: dict) -> dict:
         email['to'] = email['from']
         email['from'] = ECHO_ADRESS
         return email
