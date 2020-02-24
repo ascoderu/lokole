@@ -8,11 +8,11 @@ cached-property==1.5.1
 click==7.0
 connexion[swagger-ui]==2.6.0
 environs==7.2.0
-msgpack==0.6.2
-python-http-client==3.2.4
+msgpack==1.0.0
+python-http-client==3.2.5
 pyzmail36==1.0.4
-requests==2.22.0
-sendgrid==6.1.1
+requests==2.23.0
+sendgrid==6.1.2
 typing-extensions==3.7.4.1
 typing==3.7.4.1
 kombu==4.6.7
