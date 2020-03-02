@@ -16,7 +16,7 @@ sendgrid==6.1.2
 typing-extensions==3.7.4.1
 typing==3.7.4.1
 kombu==4.6.8
-celery==4.4.0
+celery==4.4.1
 xtarfile[zstd]==0.0.2
 azure-servicebus==0.50.2
 gunicorn==20.0.4
