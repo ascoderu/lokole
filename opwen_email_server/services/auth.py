@@ -190,7 +190,7 @@ class AzureAuth(LogMixin):
         return f'client_id/{client_id}'
 
 
-class NoAuth(AzureAuth):
+class NoAuth(LogMixin):
     def is_owner(self, domain: str, username: str) -> bool:
         return True
 
