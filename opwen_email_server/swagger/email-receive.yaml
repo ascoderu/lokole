@@ -39,7 +39,7 @@ paths:
   /echo:
 
     post:
-      operationId: opwen_email_server.integration.connexion.service_request_email_receive
+      operationId: opwen_email_server.mailers.echo.echo
       summary: Webhook listening for request for services emails via Sendgrid.
       consumes:
         - multipart/form-data

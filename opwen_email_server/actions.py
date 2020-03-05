@@ -239,38 +239,6 @@ class ReceiveInboundEmail(_Action):
         return sha256(email.encode('utf-8')).hexdigest()
 
 
-class ProcessServiceEmail(_Action):
-    def __init__(self,
-                 raw_email_storage: AzureTextStorage,
-                 email_storage: AzureObjectStorage,
-                 next_task: Callable[[str], None],
-                 email_parser: Callable[[str], dict] = None,
-                 email_formatter: Callable[[str], dict] = None):
-
-        self._raw_email_storage = raw_email_storage
-        self._next_task = next_task
-        self._email_parser = email_parser or MimeEmailParser()
-        self._email_formatter = email_formatter or EmailFormatter()
-
-    def _action(self, resource_id):  # type: ignore
-        try:
-            mime_email = self._raw_email_storage.fetch_text(resource_id)
-        except ObjectDoesNotExistError:
-            self.log_warning('Inbound email %s does not exist', resource_id)
-            return 'skipped', 202
-
-        email = self._email_parser(mime_email)
-        self._raw_email_storage.delete(resource_id)
-
-        formatted_email = self._email_formatter(email)
-        email_id = new_email_id(formatted_email)
-        formatted_email['_uid'] = email_id
-
-        self.email_storage.store_email(formatted_email, email_id)
-
-        self._next_task(email_id)
-
-
 class DownloadClientEmails(_Action):
     def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  pending_storage: AzureTextStorage):
