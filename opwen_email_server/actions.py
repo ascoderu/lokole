@@ -20,7 +20,6 @@ from opwen_email_server.utils.email_parser import ensure_has_sent_at
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
 from opwen_email_server.utils.email_parser import get_recipients
-from opwen_email_server.utils.format import EmailFormatter
 from opwen_email_server.utils.log import LogMixin
 from opwen_email_server.utils.serialization import from_base64
 from opwen_email_server.utils.serialization import from_jsonl_bytes

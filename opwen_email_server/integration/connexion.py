@@ -13,7 +13,6 @@ from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage
-from opwen_email_server.integration.azure import get_no_auth
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.azure import get_user_storage
