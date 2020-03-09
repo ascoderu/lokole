@@ -12,6 +12,6 @@ if [ -z "${DOTENV_SECRETS}" ]; then
   exec "$@"
 fi
 
-eval "$(find /run/secrets -maxdepth 1 -type f | grep "$(echo "${DOTENV_SECRETS}" | sed 's/;/\\|/g')" | xargs cat | grep -v '^#' | sed 's/^\([^=]\+\)=\(.*\)$/if [ -z "$\1" ]; then \1="\2"; export \1; fi/g')"
+eval "$(find /run/secrets -maxdepth 1 -type f | grep "$(echo "${DOTENV_SECRETS}" | sed 's/;/\\|/g')" | xargs cat | grep -v '^#' | sed 's/^\([^=]\+\)=\(.*\)$/\1="\2"; export \1;/g')"
 
 exec "$@"
