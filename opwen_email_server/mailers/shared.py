@@ -1,4 +1,5 @@
 from typing import Callable
+from typing import Dict
 
 from libcloud.storage.types import ObjectDoesNotExistError
 
@@ -14,12 +15,13 @@ class ProcessServiceEmail(_Action):
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
                  next_task: Callable[[str], None],
-                 email_formatter: Callable[[str], dict] = None,
+                 registry: Dict[str, Callable[[dict], dict]],
                  email_parser: Callable[[dict], dict] = None):
 
         self._raw_email_storage = raw_email_storage
+        self._email_storage = email_storage
         self._next_task = next_task
-        self._email_formatter = email_formatter
+        self._registry = registry
         self._email_parser = email_parser or MimeEmailParser()
 
     def _action(self, resource_id):  # type: ignore
@@ -31,11 +33,15 @@ class ProcessServiceEmail(_Action):
 
         email = self._email_parser(mime_email)
 
-        formatted_email = self._email_formatter(email)
-        email_id = new_email_id(formatted_email)
-        formatted_email['_uid'] = email_id
+        for address in email['to']:
+            mailer_service = self._registry[address]
+            formatted_email = mailer_service(email)
 
-        self.email_storage.store_email(formatted_email, email_id)
+            email_id = new_email_id(formatted_email)
+            formatted_email['_uid'] = email_id
+
+            self._email_storage.store_email(formatted_email, email_id)
+
+            self._next_task(email_id)
+
         self._raw_email_storage.delete(resource_id)
-
-        self._next_task(email_id)
