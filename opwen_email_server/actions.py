@@ -1,6 +1,7 @@
 from abc import ABC
 from hashlib import sha256
 from typing import Callable
+from typing import Dict
 from typing import Iterable
 from typing import Tuple
 from typing import Union
@@ -236,6 +237,43 @@ class ReceiveInboundEmail(_Action):
     @classmethod
     def _new_email_id(cls, email: str) -> str:
         return sha256(email.encode('utf-8')).hexdigest()
+
+
+class ProcessServiceEmail(_Action):
+    def __init__(self,
+                 raw_email_storage: AzureTextStorage,
+                 email_storage: AzureObjectStorage,
+                 next_task: Callable[[str], None],
+                 registry: Dict[str, Callable[[dict], dict]],
+                 email_parser: Callable[[dict], dict] = None):
+
+        self._raw_email_storage = raw_email_storage
+        self._email_storage = email_storage
+        self._next_task = next_task
+        self._registry = registry
+        self._email_parser = email_parser or MimeEmailParser()
+
+    def _action(self, resource_id):  # type: ignore
+        try:
+            mime_email = self._raw_email_storage.fetch_text(resource_id)
+        except ObjectDoesNotExistError:
+            self.log_warning('Inbound email %s does not exist', resource_id)
+            return 'skipped', 202
+
+        email = self._email_parser(mime_email)
+
+        for address in email['to']:
+            mailer_service = self._registry[address]
+            formatted_email = mailer_service(email)
+
+            email_id = new_email_id(formatted_email)
+            formatted_email['_uid'] = email_id
+
+            self._email_storage.store_email(formatted_email, email_id)
+
+            self._next_task(email_id)
+
+        self._raw_email_storage.delete(resource_id)
 
 
 class DownloadClientEmails(_Action):

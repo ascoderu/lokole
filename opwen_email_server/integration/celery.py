@@ -3,6 +3,7 @@ from celery import Celery
 from opwen_email_server import config
 from opwen_email_server.actions import IndexReceivedEmailForMailbox
 from opwen_email_server.actions import IndexSentEmailForMailbox
+from opwen_email_server.actions import ProcessServiceEmail
 from opwen_email_server.actions import RegisterClient
 from opwen_email_server.actions import SendOutboundEmails
 from opwen_email_server.actions import StoreInboundEmails
@@ -14,8 +15,7 @@ from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.azure import get_user_storage
-from opwen_email_server.mailers.registry import REGISTRY
-from opwen_email_server.mailers.shared import ProcessServiceEmail
+from opwen_email_server.mailers import REGISTRY
 from opwen_email_server.services.dns import SetupMxRecords
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
