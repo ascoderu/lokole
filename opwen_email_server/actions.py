@@ -266,12 +266,12 @@ class ProcessServiceEmail(_Action):
             mailer_service = self._registry[address]
             formatted_email = mailer_service(email)
 
-            email_id = new_email_id(formatted_email)
-            formatted_email['_uid'] = email_id
+            formatted_email_id = new_email_id(formatted_email)
+            formatted_email['_uid'] = formatted_email_id
 
-            self._email_storage.store_email(formatted_email, email_id)
+            self._email_storage.store_email(formatted_email, formatted_email_id)
 
-            self._next_task(email_id)
+            self._next_task(formatted_email_id)
 
         self._raw_email_storage.delete(resource_id)
 
