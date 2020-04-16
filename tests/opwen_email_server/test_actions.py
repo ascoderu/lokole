@@ -16,10 +16,10 @@ from tests.opwen_email_server.helpers import throw
 
 
 class ActionTests(TestCase):
-    @patch.object(actions._Action, '_telemetry_client')
-    @patch.object(actions._Action, '_telemetry_channel')
+    @patch.object(actions.Action, '_telemetry_client')
+    @patch.object(actions.Action, '_telemetry_channel')
     def test_logs_exception(self, mock_channel, mock_client):
-        class TestAction(actions._Action):
+        class TestAction(actions.Action):
             def _action(self):
                 int('not-a-number')
 
