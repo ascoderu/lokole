@@ -1,5 +1,6 @@
 from abc import ABC
 from hashlib import sha256
+from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Iterable
@@ -12,6 +13,7 @@ from opwen_email_server.constants import events
 from opwen_email_server.constants import mailbox
 from opwen_email_server.constants import sync
 from opwen_email_server.services.auth import AzureAuth
+from opwen_email_server.services.auth import NoAuth
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
@@ -213,7 +215,8 @@ class StoreWrittenClientEmails(_Action):
 
 
 class ReceiveInboundEmail(_Action):
-    def __init__(self, auth: AzureAuth, raw_email_storage: AzureTextStorage, next_task: Callable[[str], None]):
+    def __init__(self, auth: Union[AzureAuth, NoAuth], raw_email_storage: AzureTextStorage, next_task: Callable[[str],
+                                                                                                                None]):
 
         self._auth = auth
         self._raw_email_storage = raw_email_storage
@@ -244,7 +247,7 @@ class ProcessServiceEmail(_Action):
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
                  next_task: Callable[[str], None],
-                 registry: Dict[str, Callable[[dict], dict]],
+                 registry: Dict[str, Any],
                  email_parser: Callable[[dict], dict] = None):
 
         self._raw_email_storage = raw_email_storage

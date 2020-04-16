@@ -1,5 +1,6 @@
-from mailers import ECHO_ADDRESS
 from opwen_email_server.utils.log import LogMixin
+
+ECHO_ADDRESS = 'echo@bot.lokole.ca'
 
 
 class EchoEmailFormatter(LogMixin):
