@@ -12,7 +12,7 @@ msgpack==1.0.0
 python-http-client==3.2.7
 pyzmail36==1.0.4
 requests==2.23.0
-sendgrid==6.2.1
+sendgrid==6.2.2
 typing-extensions==3.7.4.2
 typing==3.7.4.1
 kombu==4.6.8
