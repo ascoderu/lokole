@@ -282,6 +282,8 @@ class ProcessServiceEmail(Action):
             self._next_task(formatted_email_id)
 
         self._raw_email_storage.delete(resource_id)
+        self.log_event(events.EMAILS_FORMATTED_FOR_CLIENT)  # noqa: E501  # yapf: disable
+        return 'OK', 200
 
 
 class DownloadClientEmails(Action):

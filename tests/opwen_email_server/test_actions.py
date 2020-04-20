@@ -318,6 +318,47 @@ class ReceiveInboundEmailTests(TestCase):
         return action(*args, **kwargs)
 
 
+class ProcessServiceEmailTests(TestCase):
+    def setUp(self):
+        self.raw_email_storage = Mock()
+        self.email_storage = Mock()
+        self.next_task = MagicMock()
+        self.registry = {'service@lokole.ca': (lambda email: email)}
+        self.email_parser = MagicMock()
+
+    def test_202(self):
+        resource_id = 'eb93fde9-0cc6-4339-b7d6-f6e838e78f1c'
+        self.raw_email_storage.fetch_text.side_effect = throw(ObjectDoesNotExistError(None, None, None))
+
+        _, status = self._execute_action(resource_id)
+        self.assertEqual(status, 202)
+
+    def test_200(self):
+        resource_id = 'eb93fde9-0cc6-4339-b7d6-f6e838e78f1c'
+        email = 'some-mime'
+        parsed_email = {
+            'to': ['service@lokole.ca', 'foo@test.com'], 'from': 'user@lokole.ca', 'sent_at': '2020-02-01 21:17'
+        }
+        self.raw_email_storage.return_value = email
+        self.email_parser.return_value = parsed_email
+
+        _, status = self._execute_action(resource_id)
+        self.assertEqual(status, 200)
+        self.email_storage.store_email.assert_called_once()
+        self.next_task.assert_called_once()
+
+    def _execute_action(self, *args, **kwargs):
+        action = actions.ProcessServiceEmail(
+            raw_email_storage=self.raw_email_storage,
+            email_storage=self.email_storage,
+            next_task=self.next_task,
+            registry=self.registry,
+            email_parser=self.email_parser,
+        )
+
+        return action(*args, **kwargs)
+
+
 class DownloadClientEmailsTests(TestCase):
     def setUp(self):
         self.auth = Mock()
