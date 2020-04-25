@@ -185,3 +185,5 @@ Adding a new language
   make compile-translations
 
 Or via `Transifex <https://www.transifex.com/ascoderu/opwen-webapp/dashboard/>`_.
+
+[ ~ Dependencies scanned by PyUp.io ~ ]
