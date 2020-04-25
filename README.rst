@@ -202,3 +202,5 @@ environment variables to the Docker setup script:
 The script will then provision a cluster in Azure Kubernetes Service and
 install the project via Helm. The secrets to connect to the provisioned
 cluster will be stored in the :code:`secrets` directory.
+
+[ ~ Dependencies scanned by PyUp.io ~ ]
