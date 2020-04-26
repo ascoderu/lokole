@@ -1,7 +1,7 @@
-worker_processes 1;
-
-error_log /var/log/nginx/error.log warn;
-pid /app/nginx.pid;
+user www-data;
+worker_processes {{NGINX_WORKERS}};
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
 
 events {
   worker_connections 1024;
@@ -16,65 +16,19 @@ http {
     '$status $body_bytes_sent "$http_referer" '
     '"$http_user_agent" "$http_x_forwarded_for"';
 
-  access_log /var/log/nginx/access.log main;
-
   sendfile on;
-
+  tcp_nopush on;
+  tcp_nodelay on;
   keepalive_timeout 65;
+  types_hash_max_size 2048;
 
-  upstream healthcheck_hosts {
-    server ${HOSTNAME_EMAIL_RECEIVE};
-    server ${HOSTNAME_CLIENT_METRICS};
-    server ${HOSTNAME_CLIENT_WRITE};
-    server ${HOSTNAME_CLIENT_READ};
-    server ${HOSTNAME_CLIENT_REGISTER};
-  }
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_prefer_server_ciphers on;
 
-  server {
-    listen ${PORT};
+  access_log /var/log/nginx/access.log main;
+  error_log /var/log/nginx/error.log warn;
 
-    resolver ${DNS_RESOLVER};
+  gzip on;
 
-    client_max_body_size 50M;
-
-    location = /favicon.ico {
-      root /static;
-    }
-
-    location = /robots.txt {
-      root /static;
-    }
-
-    location /healthcheck {
-      proxy_pass http://healthcheck_hosts;
-    }
-
-    location /web {
-      proxy_set_header Host $http_host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_pass http://${HOSTNAME_WEBAPP};
-    }
-
-    location /api/email/sendgrid {
-      proxy_pass http://${HOSTNAME_EMAIL_RECEIVE};
-    }
-
-    location /api/email/metrics {
-      proxy_pass http://${HOSTNAME_CLIENT_METRICS};
-    }
-
-    location /api/email/upload {
-      proxy_pass http://${HOSTNAME_CLIENT_WRITE};
-    }
-
-    location /api/email/download {
-      proxy_pass http://${HOSTNAME_CLIENT_READ};
-    }
-
-    location /api/email/register {
-      proxy_pass http://${HOSTNAME_CLIENT_REGISTER};
-    }
-  }
+  include /etc/nginx/sites-enabled/*;
 }

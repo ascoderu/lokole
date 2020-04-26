@@ -1,0 +1,68 @@
+upstream healthcheck_hosts {
+  server {{HOSTNAME_EMAIL_RECEIVE}};
+  server {{HOSTNAME_CLIENT_METRICS}};
+  server {{HOSTNAME_CLIENT_WRITE}};
+  server {{HOSTNAME_CLIENT_READ}};
+  server {{HOSTNAME_CLIENT_REGISTER}};
+}
+
+server {
+  listen {{PORT}};
+
+  {{#LETSENCRYPT_DOMAIN}}
+  server_name {{LETSENCRYPT_DOMAIN}};
+  listen [::]:443 ssl ipv6only=on; # managed by Certbot
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/mailserver.lokole.ca/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/mailserver.lokole.ca/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+  if ($scheme != "https") { return 301 https://$host$request_uri; } # managed by Certbot
+  {{/LETSENCRYPT_DOMAIN}}
+
+  {{#DNS_RESOLVER}}
+  resolver {{DNS_RESOLVER}};
+  {{/DNS_RESOLVER}}
+
+  client_max_body_size 50M;
+
+  location = /favicon.ico {
+    root {{STATIC_ROOT}}/static;
+  }
+
+  location = /robots.txt {
+    root {{STATIC_ROOT}}/static;
+  }
+
+  location /healthcheck {
+    proxy_pass http://healthcheck_hosts;
+  }
+
+  location /web {
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_pass http://{{HOSTNAME_WEBAPP}};
+  }
+
+  location /api/email/sendgrid {
+    proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
+  }
+
+  location /api/email/metrics {
+    proxy_pass http://{{HOSTNAME_CLIENT_METRICS}};
+  }
+
+  location /api/email/upload {
+    proxy_pass http://{{HOSTNAME_CLIENT_WRITE}};
+  }
+
+  location /api/email/download {
+    proxy_pass http://{{HOSTNAME_CLIENT_READ}};
+  }
+
+  location /api/email/register {
+    proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
+  }
+}

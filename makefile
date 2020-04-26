@@ -74,7 +74,6 @@ build:
 	docker-compose \
     -f docker-compose.yml \
     -f docker/docker-compose.dev.yml \
-    -f docker/docker-compose.secrets.yml \
     -f docker/docker-compose.test.yml \
     -f docker/docker-compose.tools.yml \
     build
@@ -85,9 +84,6 @@ start:
   else \
     docker-compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d --remove-orphans; \
   fi
-
-start-azure:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.secrets.yml up -d --remove-orphans
 
 start-devtools:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
@@ -107,7 +103,6 @@ stop:
 	docker-compose \
     -f docker-compose.yml \
     -f docker/docker-compose.dev.yml \
-    -f docker/docker-compose.secrets.yml \
     -f docker/docker-compose.test.yml \
     -f docker/docker-compose.tools.yml \
     down --volumes --timeout=5
@@ -142,7 +137,7 @@ kubeconfig:
     curl -sSfL "$(KUBECONFIG_URL)" -o "$(PWD)/kube-config"; \
   fi
 
-renew-cert: kubeconfig
+renew-cert-k8s: kubeconfig
 	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
@@ -150,7 +145,7 @@ renew-cert: kubeconfig
     /app/renew-cert.sh && \
   rm -f "$(PWD)/kube-config"
 
-deploy: kubeconfig
+deploy-k8s: kubeconfig
 	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
@@ -161,3 +156,14 @@ deploy: kubeconfig
     setup \
     /app/upgrade.sh && \
   rm -f "$(PWD)/kube-config"
+
+renew-cert:
+	echo "Skipping: handled by cron on the VM"
+
+deploy:
+	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+    -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \
+    -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
+    setup \
+    /app/upgrade.sh vm

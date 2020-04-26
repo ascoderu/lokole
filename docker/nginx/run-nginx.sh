@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-envsubst < /app/nginx.conf.template > /app/nginx.conf "$(env | sed -e 's/=.*//' -e 's/^/\$/g')"
+mo < /app/nginx.conf.template > /app/nginx.conf
+mo < /app/server.conf.template > /etc/nginx/sites-enabled/server.conf
 
 nginx -c "/app/nginx.conf" -p "${PWD}" -g "daemon off;"
