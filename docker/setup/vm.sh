@@ -2,7 +2,8 @@
 
 if [[ "$1" != "install" ]]; then
   cd /home/opwen/opwen-cloudserver || exit 99
-  git pull || exit 1
+  git fetch origin --prune || exit 1
+  git reset --hard origin/master || exit 1
   cd - || exit 99
   docker-compose -f /home/opwen/opwen-cloudserver/docker/docker-compose.prod.yml pull || exit 2
   docker-compose -f /home/opwen/opwen-cloudserver/docker/docker-compose.prod.yml up -d || exit 3

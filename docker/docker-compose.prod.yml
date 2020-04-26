@@ -19,6 +19,7 @@ x-shared-secret-environment:
     - ../secrets/sendgrid.env
   volumes:
     - /tmp:/tmp
+  restart: always
 
 services:
 
