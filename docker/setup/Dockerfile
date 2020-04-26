@@ -8,6 +8,7 @@ ENV NGINX_INGRESS_VERSION="0.3.7"
 
 RUN apk add -q --no-cache \
     jq=1.5-r2 \
+    sshpass=1.05-r0 \
     curl=7.59.0-r0 && \
   curl -sLfO "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
   tar xf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \

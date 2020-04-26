@@ -1,0 +1,41 @@
+version: '3.4'
+
+x-shared-secret-environment:
+  &shared-secret-environment
+  environment:
+    PORT: 8888
+    LOKOLE_STORAGE_PROVIDER: AZURE_BLOBS
+    LOKOLE_QUEUE_BROKER_SCHEME: azureservicebus
+    CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
+    CELERY_QUEUE_NAMES: all
+    TESTING_UI: "False"
+    LOKOLE_LOG_LEVEL: INFO
+    SERVER_WORKERS: 4
+    QUEUE_WORKERS: 5
+  env_file:
+    - ../secrets/azure.env
+    - ../secrets/cloudflare.env
+    - ../secrets/users.env
+    - ../secrets/sendgrid.env
+  volumes:
+    - /tmp:/tmp
+
+services:
+
+  webapp:
+    image: ascoderu/opwenwebapp:latest
+    <<: *shared-secret-environment
+    ports:
+      - 8080:8080
+
+  api:
+    image: ascoderu/opwenserver_app:latest
+    command: ["/app/docker/app/run-gunicorn.sh"]
+    <<: *shared-secret-environment
+    ports:
+      - 8888:8888
+
+  worker:
+    image: ascoderu/opwenserver_app:latest
+    command: ["/app/docker/app/run-celery.sh"]
+    <<: *shared-secret-environment
