@@ -23,17 +23,17 @@ http {
   keepalive_timeout 65;
 
   upstream healthcheck_hosts {
-    server ${HOSTNAME_EMAIL_RECEIVE};
-    server ${HOSTNAME_CLIENT_METRICS};
-    server ${HOSTNAME_CLIENT_WRITE};
-    server ${HOSTNAME_CLIENT_READ};
-    server ${HOSTNAME_CLIENT_REGISTER};
+    server {{HOSTNAME_EMAIL_RECEIVE}};
+    server {{HOSTNAME_CLIENT_METRICS}};
+    server {{HOSTNAME_CLIENT_WRITE}};
+    server {{HOSTNAME_CLIENT_READ}};
+    server {{HOSTNAME_CLIENT_REGISTER}};
   }
 
   server {
-    listen ${PORT};
+    listen {{PORT}};
 
-    resolver ${DNS_RESOLVER};
+    resolver {{DNS_RESOLVER}};
 
     client_max_body_size 50M;
 
@@ -54,27 +54,27 @@ http {
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_pass http://${HOSTNAME_WEBAPP};
+      proxy_pass http://{{HOSTNAME_WEBAPP}};
     }
 
     location /api/email/sendgrid {
-      proxy_pass http://${HOSTNAME_EMAIL_RECEIVE};
+      proxy_pass http://{{HOSTNAME_EMAIL_RECEIVE}};
     }
 
     location /api/email/metrics {
-      proxy_pass http://${HOSTNAME_CLIENT_METRICS};
+      proxy_pass http://{{HOSTNAME_CLIENT_METRICS}};
     }
 
     location /api/email/upload {
-      proxy_pass http://${HOSTNAME_CLIENT_WRITE};
+      proxy_pass http://{{HOSTNAME_CLIENT_WRITE}};
     }
 
     location /api/email/download {
-      proxy_pass http://${HOSTNAME_CLIENT_READ};
+      proxy_pass http://{{HOSTNAME_CLIENT_READ}};
     }
 
     location /api/email/register {
-      proxy_pass http://${HOSTNAME_CLIENT_REGISTER};
+      proxy_pass http://{{HOSTNAME_CLIENT_REGISTER}};
     }
   }
 }

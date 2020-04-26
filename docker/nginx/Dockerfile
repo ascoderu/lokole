@@ -1,5 +1,12 @@
+ARG PYTHON_VERSION=3.7
+FROM python:${PYTHON_VERSION} AS builder
+
+RUN curl -sSL https://git.io/get-mo -o /usr/bin/mo \
+  && chmod +x /usr/bin/mo
+
 FROM nginx:stable
 
+COPY --from=builder /usr/bin/mo /usr/bin/mo
 COPY docker/nginx/static /static
 COPY docker/nginx/nginx.conf.template /app/nginx.conf.template
 COPY docker/nginx/run-nginx.sh /app/run-nginx.sh
