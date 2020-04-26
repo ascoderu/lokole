@@ -33,6 +33,14 @@ http {
   server {
     listen {{PORT}};
 
+    {{#LETSENCRYPT_DOMAIN}}
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/{{LETSENCRYPT_DOMAIN}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{LETSENCRYPT_DOMAIN}}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    if ($scheme != "https") { return 301 https://$host$request_uri; }
+    {{/LETSENCRYPT_DOMAIN}}
+
     resolver {{DNS_RESOLVER}};
 
     client_max_body_size 50M;
