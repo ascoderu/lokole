@@ -49,6 +49,7 @@ services:
     ports:
       - ${APP_PORT}:8888
     environment:
+      NGINX_WORKERS: ${NGINX_WORKERS}
       DNS_RESOLVER: 127.0.0.11
       HOSTNAME_WEBAPP: webapp:8080
       HOSTNAME_CLIENT_METRICS: api:8080

@@ -1,4 +1,4 @@
-worker_processes 1;
+worker_processes {{NGINX_WORKERS}};
 
 error_log /var/log/nginx/error.log warn;
 pid /app/nginx.pid;
