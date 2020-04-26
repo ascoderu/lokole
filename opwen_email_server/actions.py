@@ -35,7 +35,7 @@ from opwen_email_server.utils.unique import new_email_id
 Response = Union[dict, Tuple[str, int]]
 
 
-class Action(ABC, LogMixin):
+class _Action(ABC, LogMixin):
     def __call__(self, *args, **kwargs) -> Response:
         try:
             return self._action(*args, **kwargs)
@@ -47,13 +47,13 @@ class Action(ABC, LogMixin):
         raise NotImplementedError  # pragma: no cover
 
 
-class Ping(Action):
+class Ping(_Action):
     # noinspection PyMethodMayBeStatic
     def _action(self):  # type: ignore
         return 'OK', 200
 
 
-class SendOutboundEmails(Action):
+class SendOutboundEmails(_Action):
     def __init__(self, email_storage: AzureObjectStorage, send_email: SendSendgridEmail):
 
         self._email_storage = email_storage
@@ -70,7 +70,7 @@ class SendOutboundEmails(Action):
         return 'OK', 200
 
 
-class StoreInboundEmails(Action):
+class StoreInboundEmails(_Action):
     def __init__(self,
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
@@ -114,7 +114,7 @@ class StoreInboundEmails(Action):
         return email_id
 
 
-class _IndexEmailForMailbox(Action):
+class _IndexEmailForMailbox(_Action):
     def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureTextStorage):
         self._email_storage = email_storage
         self._mailbox_storage = mailbox_storage
@@ -156,7 +156,7 @@ class IndexSentEmailForMailbox(_IndexEmailForMailbox):
             yield sender
 
 
-class StoreWrittenClientEmails(Action):
+class StoreWrittenClientEmails(_Action):
     def __init__(self, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  user_storage: AzureObjectStorage, next_task: Callable[[str], None]):
 
@@ -214,7 +214,7 @@ class StoreWrittenClientEmails(Action):
         return email
 
 
-class ReceiveInboundEmail(Action):
+class ReceiveInboundEmail(_Action):
     def __init__(self, auth: Union[AzureAuth, NoAuth], raw_email_storage: AzureTextStorage, next_task: Callable[[str],
                                                                                                                 None]):
 
@@ -242,7 +242,7 @@ class ReceiveInboundEmail(Action):
         return sha256(email.encode('utf-8')).hexdigest()
 
 
-class ProcessServiceEmail(Action):
+class ProcessServiceEmail(_Action):
     def __init__(self,
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
@@ -265,7 +265,7 @@ class ProcessServiceEmail(Action):
 
         email = self._email_parser(mime_email)
 
-        for address in email['to']:
+        for address in email.get('to', []):
             try:
                 mailer_service = self._registry[address]
             except KeyError:
@@ -286,7 +286,7 @@ class ProcessServiceEmail(Action):
         return 'OK', 200
 
 
-class DownloadClientEmails(Action):
+class DownloadClientEmails(_Action):
     def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  pending_storage: AzureTextStorage):
 
@@ -344,7 +344,7 @@ class DownloadClientEmails(Action):
             self._pending_storage.delete(f'{domain}/{email_id}')
 
 
-class UploadClientEmails(Action):
+class UploadClientEmails(_Action):
     def __init__(self, auth: AzureAuth, next_task: Callable[[str], None]):
 
         self._auth = auth
@@ -364,7 +364,7 @@ class UploadClientEmails(Action):
         return 'uploaded', 200
 
 
-class RegisterClient(Action):
+class RegisterClient(_Action):
     def __init__(self,
                  auth: AzureAuth,
                  client_storage: AzureObjectsStorage,
@@ -390,7 +390,7 @@ class RegisterClient(Action):
         return 'OK', 200
 
 
-class CreateClient(Action):
+class CreateClient(_Action):
     def __init__(self, auth: AzureAuth, task: Callable[[str, str], None]):
         self._auth = auth
         self._task = task
@@ -408,7 +408,7 @@ class CreateClient(Action):
         return 'accepted', 201
 
 
-class ListClients(Action):
+class ListClients(_Action):
     def __init__(self, auth: AzureAuth):
         self._auth = auth
 
@@ -421,7 +421,7 @@ class ListClients(Action):
         }
 
 
-class GetClient(Action):
+class GetClient(_Action):
     def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage):
         self._auth = auth
         self._client_storage = client_storage
@@ -448,7 +448,7 @@ class GetClient(Action):
         }
 
 
-class DeleteClient(Action):
+class DeleteClient(_Action):
     def __init__(self, auth: AzureAuth, delete_mailbox: Callable[[str, str], None],
                  delete_mx_records: Callable[[str], None], mailbox_storage: AzureTextStorage,
                  pending_storage: AzureTextStorage, user_storage: AzureObjectStorage):
@@ -487,7 +487,7 @@ class DeleteClient(Action):
             storage.delete(f'{domain}/{prefix}')
 
 
-class CalculateNumberOfUsersMetric(Action):
+class CalculateNumberOfUsersMetric(_Action):
     def __init__(self, auth: AzureAuth, user_storage: AzureObjectStorage):
         self._auth = auth
         self._user_storage = user_storage
@@ -503,7 +503,7 @@ class CalculateNumberOfUsersMetric(Action):
         }
 
 
-class CalculatePendingEmailsMetric(Action):
+class CalculatePendingEmailsMetric(_Action):
     def __init__(self, auth: AzureAuth, pending_storage: AzureTextStorage):
         self._auth = auth
         self._pending_storage = pending_storage
