@@ -19,12 +19,12 @@ class ActionTests(TestCase):
     @patch.object(actions._Action, '_telemetry_client')
     @patch.object(actions._Action, '_telemetry_channel')
     def test_logs_exception(self, mock_channel, mock_client):
-        class Test_Action(actions._Action):
+        class TestAction(actions._Action):
             def _action(self):
                 int('not-a-number')
 
         with self.assertRaises(ValueError):
-            action = Test_Action()
+            action = TestAction()
             action()
 
         mock_client.track_exception.assert_called_once_with()
