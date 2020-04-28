@@ -4,23 +4,6 @@ info:
   title: Opwen Cloudserver Email API.
   version: '0.1'
 
-x-parameters:
-  parameters: &PARAMS
-    - $ref: '#/parameters/ClientId'
-    - $ref: '#/parameters/SendgridEmail'
-    - $ref: '#/parameters/SendgridDkim'
-    - $ref: '#/parameters/SendgridTo'
-    - $ref: '#/parameters/SendgridCc'
-    - $ref: '#/parameters/SendgridFrom'
-    - $ref: '#/parameters/SendgridText'
-    - $ref: '#/parameters/SendgridSenderIp'
-    - $ref: '#/parameters/SendgridSpamReport'
-    - $ref: '#/parameters/SendgridEnvelope'
-    - $ref: '#/parameters/SendgridSubject'
-    - $ref: '#/parameters/SendgridSpamScore'
-    - $ref: '#/parameters/SendgridCharsets'
-    - $ref: '#/parameters/SendgridSpf'
-
 basePath: '/api/email/sendgrid'
 
 paths:
@@ -32,7 +15,21 @@ paths:
       summary: Webhook listening to emails received via Sendgrid.
       consumes:
         - multipart/form-data
-      parameters: *PARAMS
+      parameters:
+        - $ref: '#/parameters/ClientId'
+        - $ref: '#/parameters/SendgridEmail'
+        - $ref: '#/parameters/SendgridDkim'
+        - $ref: '#/parameters/SendgridTo'
+        - $ref: '#/parameters/SendgridCc'
+        - $ref: '#/parameters/SendgridFrom'
+        - $ref: '#/parameters/SendgridText'
+        - $ref: '#/parameters/SendgridSenderIp'
+        - $ref: '#/parameters/SendgridSpamReport'
+        - $ref: '#/parameters/SendgridEnvelope'
+        - $ref: '#/parameters/SendgridSubject'
+        - $ref: '#/parameters/SendgridSpamScore'
+        - $ref: '#/parameters/SendgridCharsets'
+        - $ref: '#/parameters/SendgridSpf'
       responses:
         200:
           description: The email was successfully received. No need to retry it.
@@ -46,7 +43,20 @@ paths:
       summary: Webhook listening for request for services emails via Sendgrid.
       consumes:
         - multipart/form-data
-      parameters: *PARAMS
+      parameters:
+        - $ref: '#/parameters/SendgridEmail'
+        - $ref: '#/parameters/SendgridDkim'
+        - $ref: '#/parameters/SendgridTo'
+        - $ref: '#/parameters/SendgridCc'
+        - $ref: '#/parameters/SendgridFrom'
+        - $ref: '#/parameters/SendgridText'
+        - $ref: '#/parameters/SendgridSenderIp'
+        - $ref: '#/parameters/SendgridSpamReport'
+        - $ref: '#/parameters/SendgridEnvelope'
+        - $ref: '#/parameters/SendgridSubject'
+        - $ref: '#/parameters/SendgridSpamScore'
+        - $ref: '#/parameters/SendgridCharsets'
+        - $ref: '#/parameters/SendgridSpf'
       responses:
         200:
           description: The email was succesfully received. No need to retry it.
