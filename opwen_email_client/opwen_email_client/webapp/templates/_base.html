@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% from 'macros/messages.html' import render_flashed_messages with context %}
+{% from 'macros/nav.html' import main_nav with context %}
+
+<html lang="{{ current_locale.language }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+  <title>{% block title %}{% endblock %}</title>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/flag-icon.min.css') }}">
+
+  {% block libs %}{% endblock %}
+  {% block style %}{% endblock %}
+</head>
+<body>
+  <div class="container">
+    {{ main_nav() }}
+
+    {{ render_flashed_messages() }}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  {% block scripts %}
+  <script>
+  window.flask_jinja_context__base = {
+    appRoot: "{{ app_root }}",
+    i8n: {
+      newEmails: "{{ _('You have new emails!') }}",
+      openMailbox: "{{ _('Open mailbox.') }}"
+    }
+  };
+  </script>
+  <script type="text/javascript" src="{{ 'js/_base.js' | asset_url }}"></script>
+  {% endblock %}
+</body>
+</html>

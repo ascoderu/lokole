@@ -1,0 +1,19 @@
+{% extends "_base_email.html" %}
+
+{% from 'macros/email.html' import email_display with context %}
+{% from 'macros/email.html' import email_search_form %}
+{% from 'macros/nav.html' import email_subnav with context %}
+
+{% block content %}{{ super() }}
+{{ email_subnav() }}
+
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+    {{ email_search_form() }}
+  </div>
+</div>
+
+<main>
+{{ email_display(emails, 'No emails matching query.' if request.args.get('query') else '') }}
+</main>
+{% endblock %}

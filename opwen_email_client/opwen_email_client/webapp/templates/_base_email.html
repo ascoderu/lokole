@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+
+{% block title %}
+{% if type == 'inbox' %}
+{{ _('Inbox | Email | Lokole') }}
+{% elif type == 'outbox' %}
+{{ _('Outbox | Email | Lokole') }}
+{% elif type == 'sent' %}
+{{ _('Sent | Email | Lokole') }}
+{% elif type == 'search' %}
+{{ _('Search | Email | Lokole') }}
+{% elif type == 'write' %}
+{{ _('Write | Email | Lokole') }}
+{% endif %}
+{% endblock %}
+
+{% block style %}{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ 'css/_base_email.css' | asset_url }}">
+{% endblock %}
+
+{% block libs %}{{ super() }}
+<script type="text/javascript" src="{{ url_for('static', filename='js/printThis.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.lazyload.min.js') }}"></script>
+{% endblock %}
+
+{% block scripts %}{{ super() }}
+<script type="text/javascript" src="{{ 'js/_base_email.js' | asset_url }}"></script>
+{% endblock %}

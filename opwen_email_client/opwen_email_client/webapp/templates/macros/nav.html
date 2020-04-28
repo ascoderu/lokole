@@ -1,0 +1,96 @@
+{% from 'macros/flag.html' import render_flag %}
+
+{% macro nav_link_security(endpoint, text, icon=None) %}
+<li class="{{ 'active' if request.url_rule.endpoint == 'security.%s' % endpoint else ''}}">
+  <a href="{{ url_for_security(endpoint) }}">
+    {% if icon %}<span class="fa fa-{{ icon }}" aria-hidden="true"></span> {% endif %}
+    {{ text }}
+  </a>
+</li>
+{% endmacro %}
+
+{% macro nav_link(endpoint, text, level, icon=None) %}
+<li class="{{ 'active' if request.url_rule.endpoint.split('_')[level] == endpoint.split('_')[level] else ''}}">
+  <a href="{{ url_for(endpoint) }}">
+    {% if icon %}<span class="fa fa-{{ icon }}" aria-hidden="true"></span> {% endif %}
+    {{ text }}
+  </a>
+</li>
+{% endmacro %}
+
+{% macro language_switcher() %}
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+    {{ render_flag(current_locale) }}
+    <span class="fa fa-caret-down" aria-hidden="true"></span>
+  </a>
+  <ul class="dropdown-menu">
+    {% for locale in locales %}
+    <li class="{{ 'active' if locale.language == current_locale.language else ''}}">
+      <a href="{{ url_for('language', locale=locale.language) }}">
+        {{ render_flag(locale) }} {{ locale.language_name | capitalize }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</li>
+{% endmacro %}
+
+{% macro main_nav() %}
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">{{ _('Toggle navigation') }}</span>
+        <span class="fa fa-bars" aria-hidden="true"></span>
+      </button>
+      <a class="navbar-brand" href="{{ url_for('home') }}">{{ _('Ascoderu') }}</a>
+    </div>
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="nav navbar-nav">
+        {{ nav_link('home', _('Home'), level=0, icon='home') }}
+        {{ nav_link('about', _('About'), level=0, icon='info-circle') }}
+        {{ nav_link('email_inbox', _('Email'), level=0, icon='envelope') }}
+        {{ nav_link('users', _('Users'), level=0, icon='users') }}
+        {{ nav_link('news', _('News'), level=0, icon='comments') }}
+        {% if current_user.is_admin and not local_only %}
+        {{ nav_link('settings', _('Settings'), level=0, icon='cog') }}
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {{ language_switcher() }}
+        {% if current_user.is_authenticated %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            {{ current_user.email }} <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            {% if can_change_password %}
+            <li>{{ nav_link_security('change_password', _('Change password'), icon='key') }}</li>
+            {% endif %}
+            <li>{{ nav_link_security('logout', _('Logout'), icon='sign-out') }}</li>
+          </ul>
+        </li>
+        {% else %}
+        {{ nav_link_security('login', _('Login')) }}
+        {% if can_register_user %}
+        {{ nav_link_security('register', _('Register')) }}
+        {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endmacro %}
+
+{% macro email_subnav() %}
+<ul class="nav nav-pills" id="email-subnav">
+  {{ nav_link('email_inbox', _('Inbox'), level=1) }}
+  {{ nav_link('email_sent', _('Sent'), level=1) }}
+  {{ nav_link('email_outbox', _('Outbox'), level=1) }}
+  {{ nav_link('email_new', _('Write email'), level=1) }}
+  {% if can_search_email %}
+  {{ nav_link('email_search', _('Search'), level=1) }}
+  {% endif %}
+</ul>
+{% endmacro %}

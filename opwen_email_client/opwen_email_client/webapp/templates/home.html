@@ -1,0 +1,47 @@
+{% extends "_base.html" %}
+
+{% block title %}{{ _('Home | Lokole') }}{% endblock %}
+
+{% block style %}{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ 'css/home.css' | asset_url }}">
+{% endblock %}
+
+{% block content %}{{ super() }}
+<div class="row">
+  <div class="col-sm-offset-3 col-sm-6">
+    <div class="jumbotron">
+      <main class="container text-center">
+        <h2>{{ _('Lokole') }}<br/>
+          <small>{{ _('Email for all') }}</small>
+        </h2>
+
+        <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-responsive center-block" id="lokole-logo" alt="{{ _('Lokole logo.') }}">
+
+        <p>
+          {{ _('Send and receive emails with unlimited attachments for free.') }}
+        </p>
+
+        <div>
+          {% if not current_user.is_authenticated %}
+          {% if can_register_user %}
+          <a class="btn btn-primary btn-lg" href="{{ url_for_security('register') }}">{{ _('Sign up') }}</a>
+          {% else %}
+          <a class="btn btn-primary btn-lg" href="{{ url_for_security('login') }}">{{ _('Login now') }}</a>
+          {% endif %}
+          {% else %}
+          <a class="btn btn-primary btn-lg" href="{{ url_for('email_inbox') }}">{{ _('Check your emails') }}</a>
+          {% endif %}
+          <a class="btn btn-default btn-lg" href="{{ url_for('about') }}">{{ _('Learn more') }}</a>
+          {% if not current_user.is_authenticated and can_register_user %}
+          <div>
+            <small>
+              {{ _('Already have an account?') }} <a href="{{ url_for_security('login') }}">{{ _('Login now') }}</a>.
+            </small>
+          </div>
+          {% endif %}
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+{% endblock %}

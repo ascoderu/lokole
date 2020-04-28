@@ -1,0 +1,50 @@
+language:
+  python
+
+addons:
+  apt:
+    packages:
+      - mobile-broadband-provider-info
+
+services:
+  - docker
+
+python:
+  - "3.5"
+  - "3.6"
+
+sudo: required
+
+env:
+  global:
+    - NVM_VERSION="0.34.0"
+    - NODE_VERSION="8.10.0"
+
+before_install:
+  - curl -o- "https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh" | bash
+  - . ~/.nvm/nvm.sh --no-use
+  - nvm install "$NODE_VERSION"
+  - nvm use "$NODE_VERSION"
+  - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+  - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+  - sudo apt-get update
+  - sudo apt-get install -y --no-install-recommends yarn
+
+script: make ci -e py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
+
+install:
+  - pip install codecov
+
+after_success:
+  - codecov
+
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+
+deploy:
+  - provider: script
+    script: make release -e py_env="$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION" -e VERSION="$TRAVIS_TAG"
+    on:
+      repo: ascoderu/opwen-webapp
+      tags: true
+      python: "3.6"

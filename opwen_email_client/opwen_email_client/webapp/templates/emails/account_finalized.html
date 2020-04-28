@@ -1,0 +1,20 @@
+<h2>{{ _('Welcome to your Lokole account!') }}</h2>
+
+{{ _(
+'With your account you can send and receive emails with unlimited attachments. '
+'You can learn more about how Lokole works'
+) }} <a href="{{ url_for('about') }}">{{ _('here') }}</a>.
+
+{{ _(
+'Your Lokole account is fully set up and your email address is:'
+) }} <b>{{ email }}</b>. {{ _(
+'Using this email address, you can talk to people from all over the world!'
+) }}
+
+{{ _(
+'If you have any questions about your Lokole account, please get in touch by '
+'replying to this message.'
+) }}
+
+{{ _('All the best.') }}
+{{ _('Your Lokole Team') }}

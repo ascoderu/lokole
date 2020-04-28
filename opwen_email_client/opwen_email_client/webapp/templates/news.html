@@ -1,0 +1,15 @@
+{% extends "_base.html" %}
+
+{% block title %}{{ _('News | Lokole') }}{% endblock %}
+
+{% from 'macros/email.html' import email_display with context %}
+
+{% block style %}{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ 'css/_base_email.css' | asset_url }}">
+{% endblock %}
+
+{% block content %}{{ super() }}
+<main>
+{{ email_display(emails, _('No news.'), show_actions=False, show_sent_at=False, show_sent_to=False, show_attachments=False) }}
+</main>
+{% endblock %}

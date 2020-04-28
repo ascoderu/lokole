@@ -1,0 +1,25 @@
+{% macro render_hidden_field(field) %}
+{{ field(class_='form-control hidden') }}
+{% endmacro %}
+
+{% macro render_field(field, text) %}
+<div class="form-group {{ 'has-error' if field.errors else ''}}">
+  {{ field.label(class_='control-label', text=text) }}
+  {{ field(class_='form-control') }}
+  {% if field.description %}
+  <small class="text-muted">{{ field.description }}</small>
+  {% endif %}
+
+  {% if field.errors %}
+  {% for error in field.errors %}
+  <span class="help-block">{{ error }}</span>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_button(field, text) %}
+<div class="form-group">
+  {{ field(class_='btn btn-primary', value=text) }}
+</div>
+{% endmacro %}
