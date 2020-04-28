@@ -62,6 +62,7 @@ services:
       - webapp
 
   statuspage:
+    image: ${DOCKER_REPO}/opwenstatuspage:${BUILD_TAG}
     build:
       context: .
       dockerfile: docker/statuspage/Dockerfile

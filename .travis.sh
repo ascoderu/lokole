@@ -39,9 +39,7 @@ case "$1" in
     ;;
 
   deploy)
-    if [[ "$TEST_MODE" = "local" ]]; then
-      make deploy
-    fi
+    make deploy
     ;;
 
   install)

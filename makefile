@@ -129,7 +129,9 @@ release-docker:
   ) done
 
 release-gh-pages:
-	docker cp "$(shell docker-compose images statuspage | grep statuspage | cut -f1 -d' '):/app/opwen-statuspage" ./build
+	docker container create --name statuspage "$(DOCKER_USERNAME)/opwenstatuspage:$(DOCKER_TAG)" && \
+  docker cp "statuspage:/app/opwen-statuspage" ./build && \
+  docker container rm statuspage
 
 release: release-docker release-gh-pages
 

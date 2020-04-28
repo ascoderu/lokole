@@ -43,6 +43,7 @@ deploy:
     on:  # yamllint disable rule:truthy
       repo: ascoderu/opwen-cloudserver
       tags: true
+      condition: $TEST_MODE = local
 
   - provider: pages
     skip-cleanup: true
@@ -51,3 +52,4 @@ deploy:
     on:  # yamllint disable rule:truthy
       repo: ascoderu/opwen-cloudserver
       tags: true
+      condition: $TEST_MODE = local
