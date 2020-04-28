@@ -5,6 +5,7 @@
 !docker/
 !helm/
 !opwen_email_server/
+!opwen_statuspage/
 !tests/
 !makefile
 !requirements*.txt

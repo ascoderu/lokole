@@ -29,6 +29,7 @@ case "$1" in
 
   before_deploy)
     echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+    make release
     ;;
 
   before_install)
@@ -39,7 +40,7 @@ case "$1" in
 
   deploy)
     if [[ "$TEST_MODE" = "local" ]]; then
-      make release deploy
+      make deploy
     fi
     ;;
 
