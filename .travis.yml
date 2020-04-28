@@ -43,3 +43,11 @@ deploy:
     on:  # yamllint disable rule:truthy
       repo: ascoderu/opwen-cloudserver
       tags: true
+
+  - provider: pages
+    skip-cleanup: true
+    github-token: $GITHUB_TOKEN
+    local-dir: build
+    on:  # yamllint disable rule:truthy
+      repo: ascoderu/opwen-cloudserver
+      tags: true

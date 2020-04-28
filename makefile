@@ -119,15 +119,19 @@ verify-build:
       wagoodman/dive "$$image" \
     || exit 1; done
 
-release:
+release-docker:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
     eval "$(shell find docker -type f -name 'Dockerfile' | while read dockerfile; do grep 'ARG ' "$$dockerfile" | sed 's/^ARG /export /g'; done)"; \
     export BUILD_TARGET="runtime"; \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
-    docker-compose build && \
-    docker-compose push; \
+    docker-compose build; \
   ) done
+
+release-gh-pages:
+	docker cp "$(shell docker-compose images statuspage | grep statuspage | cut -f1 -d' '):/app/opwen-statuspage" ./build
+
+release: release-docker release-gh-pages
 
 kubeconfig:
 	if [ -f "$(PWD)/secrets/kube-config" ]; then \
@@ -160,7 +164,14 @@ deploy-k8s: kubeconfig
 renew-cert:
 	echo "Skipping: handled by cron on the VM"
 
-deploy:
+deploy-docker:
+	for tag in "latest" "$(DOCKER_TAG)"; do ( \
+    export BUILD_TAG="$$tag"; \
+    export DOCKER_REPO="$(DOCKER_USERNAME)"; \
+    docker-compose push; \
+  ) done
+
+deploy: deploy-docker
 	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \

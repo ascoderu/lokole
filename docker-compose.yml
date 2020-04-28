@@ -61,6 +61,18 @@ services:
       - api
       - webapp
 
+  statuspage:
+    build:
+      context: .
+      dockerfile: docker/statuspage/Dockerfile
+      target: ${BUILD_TARGET}
+    ports:
+      - ${STATUSPAGE_PORT}:3000
+    environment:
+      PORT: 3000
+    depends_on:
+      - nginx
+
   webapp:
     image: ${DOCKER_REPO}/opwenwebapp:${BUILD_TAG}
     build:
