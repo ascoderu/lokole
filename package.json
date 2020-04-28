@@ -1,5 +1,5 @@
 {
-  "name": "opwen-webapp",
+  "name": "opwen-cloudserver",
   "version": "0.0.1",
   "description": " ",
   "author": "Clemens Wolff",
@@ -26,6 +26,10 @@
     "@bower_components/respond": "scottjehl/Respond#^1.4.2",
     "@bower_components/wysihtml5x": "Edicy/wysihtml5#0.4.13",
     "jquery-lazyload": "^1.9.7"
+  },
+  "scripts": {
+    "build": "grunt",
+    "lint": "standard \"opwen_email_client/webapp/static/js/**/*.js\""
   },
   "engines": {
     "node": ">= 8.10.0",

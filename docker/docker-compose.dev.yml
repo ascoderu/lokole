@@ -20,5 +20,10 @@ services:
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
 
+  webapp:
+    volumes:
+      - ./opwen_email_client:/app/opwen_email_client
+      - ./opwen_email_server:/app/opwen_email_server
+
 volumes:
   node_modules:

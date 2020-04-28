@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from glob import glob
+from os import getenv
 from os import remove
 from os.path import join
 from pathlib import Path
@@ -26,7 +27,10 @@ def devserver():
     templates_glob = join(templates_directory, '**', '*.html')
     reload_server_if_changed = glob(templates_glob, recursive=True)
 
-    app.run(debug=True, extra_files=reload_server_if_changed)  # nosec
+    port = int(getenv('PORT', '5000'))
+    host = getenv('HOST', '127.0.0.1')
+
+    app.run(debug=True, extra_files=reload_server_if_changed, host=host, port=port)  # nosec
 
 
 @manager.command

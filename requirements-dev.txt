@@ -9,5 +9,4 @@ responses==0.10.14
 bandit==1.6.2
 yamllint==1.23.0
 yapf==0.30.0
-opwen-email-client==0.5.11
 watchdog[watchmedo]==0.10.2

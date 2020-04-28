@@ -4,6 +4,7 @@
 !*.yml
 !docker/
 !helm/
+!opwen_email_client/
 !opwen_email_server/
 !opwen_statuspage/
 !tests/
@@ -11,3 +12,12 @@
 !requirements*.txt
 !setup.cfg
 !.travis.sh
+!install.py
+!manage.py
+!MANIFEST.in
+!setup.py
+!README.rst
+!package.json
+!yarn.lock
+!Gruntfile.js
+!babel.cfg

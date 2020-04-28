@@ -3,9 +3,9 @@ PY_ENV ?= ./venv
 .PHONY: venv tests
 default: ci
 
-venv: requirements.txt requirements-dev.txt
+venv: requirements.txt requirements-dev.txt requirements-webapp.txt
 	if [ ! -d $(PY_ENV) ]; then python3 -m venv $(PY_ENV) && $(PY_ENV)/bin/pip install -U pip wheel; fi
-	$(PY_ENV)/bin/pip install -r requirements.txt -r requirements-dev.txt
+	$(PY_ENV)/bin/pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt -r requirements-webapp.txt
 
 tests: venv
 	LOKOLE_LOG_LEVEL=CRITICAL $(PY_ENV)/bin/coverage run -m nose2 -v && \
@@ -19,11 +19,11 @@ lint-swagger: venv
   || exit 1; done
 
 lint-python: venv
-	$(PY_ENV)/bin/flake8 opwen_email_server
-	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server --virtual-env $(PY_ENV)
-	$(PY_ENV)/bin/yapf --recursive --parallel --diff opwen_email_server tests
-	$(PY_ENV)/bin/bandit --recursive opwen_email_server
-	$(PY_ENV)/bin/mypy opwen_email_server
+	$(PY_ENV)/bin/flake8 opwen_email_server opwen_email_client
+	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server opwen_email_client --virtual-env $(PY_ENV)
+	$(PY_ENV)/bin/yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
+	$(PY_ENV)/bin/bandit --recursive opwen_email_server opwen_email_client
+	$(PY_ENV)/bin/mypy opwen_email_server opwen_email_client
 
 lint-yaml: venv
 	find . -type f -regex '.*\.ya?ml' -not -path '$(PY_ENV)/*' | grep -v '^./helm/' | while read file; do \
@@ -119,6 +119,11 @@ verify-build:
       wagoodman/dive "$$image" \
     || exit 1; done
 
+release-pypi:
+	docker container create --name webapp "$(DOCKER_USERNAME)/opwenwebapp:$(DOCKER_TAG)" && \
+  docker cp "webapp:/app/dist" ./dist && \
+  docker container rm webapp
+
 release-docker:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
     eval "$(shell find docker -type f -name 'Dockerfile' | while read dockerfile; do grep 'ARG ' "$$dockerfile" | sed 's/^ARG /export /g'; done)"; \
@@ -133,7 +138,7 @@ release-gh-pages:
   docker cp "statuspage:/app/opwen-statuspage" ./build && \
   docker container rm statuspage
 
-release: release-docker release-gh-pages
+release: release-docker release-gh-pages release-pypi
 
 kubeconfig:
 	if [ -f "$(PWD)/secrets/kube-config" ]; then \
@@ -166,6 +171,13 @@ deploy-k8s: kubeconfig
 renew-cert:
 	echo "Skipping: handled by cron on the VM"
 
+deploy-pypi:
+	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+    -v "$(PWD)/dist:/dist" \
+    setup \
+    twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
+
 deploy-docker:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
     export BUILD_TAG="$$tag"; \
@@ -173,7 +185,7 @@ deploy-docker:
     docker-compose push; \
   ) done
 
-deploy: deploy-docker
+deploy: deploy-pypi deploy-docker
 	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \

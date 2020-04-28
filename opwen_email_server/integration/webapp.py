@@ -7,6 +7,7 @@ from typing import Union
 from cached_property import cached_property
 from flask_security import LoginForm
 from libcloud.storage.types import ObjectDoesNotExistError
+
 from opwen_email_client.domain.email.store import EmailStore
 from opwen_email_client.domain.email.sync import Sync
 from opwen_email_client.domain.email.user_store import User
@@ -14,7 +15,6 @@ from opwen_email_client.domain.email.user_store import UserReadStore
 from opwen_email_client.domain.email.user_store import UserStore
 from opwen_email_client.domain.email.user_store import UserWriteStore
 from opwen_email_client.webapp.config import AppConfig
-
 from opwen_email_server.constants import mailbox
 from opwen_email_server.integration.azure import get_email_storage
 from opwen_email_server.integration.azure import get_mailbox_storage

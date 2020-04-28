@@ -1,40 +1,61 @@
-FROM debian:buster
+ARG PYTHON_VERSION=3.7
+FROM python:${PYTHON_VERSION} AS builder
 
-# hadolint ignore=DL3009
-RUN apt-get update \
- && apt-get install --no-install-recommends -y python3=3.7.3-1 python3-pip=18.1-5 wget=1.20.1-1.1 \
- && pip3 install setuptools==45.1.0
-
-WORKDIR /app
-ARG LOKOLE_PORT
-ARG LOKOLE_CLIENT_VERSION
-ARG INSTALLER_VERSION=${LOKOLE_CLIENT_VERSION}
-ARG MAX_UPLOAD_SIZE_MB=1
-RUN wget -q "https://raw.githubusercontent.com/ascoderu/opwen-webapp/${INSTALLER_VERSION}/install.py" \
- && USER=root python3 install.py web LocalOnly \
-       --system_setup=no \
-       --reboot=no \
-       --wifi=no \
-       --admin=no \
-       --log_directory=- \
-       --app_root=/web \
-       --max_upload_size="${MAX_UPLOAD_SIZE_MB}" \
- && rm -rf /tmp/install.py install.py
-
-WORKDIR /lib
-COPY requirements.txt .
-RUN /app/lokole/venv/bin/pip install --no-cache-dir -r requirements.txt
-COPY opwen_email_server opwen_email_server
-COPY docker/client/sync-settings-from-env.sh .
+ARG NODE_VERSION=12.x
+ARG YARN_VERSION=1.22.4
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -fsSL "https://deb.nodesource.com/setup_${NODE_VERSION}" | bash \
+ && curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+ && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+ && apt-get install -y --no-install-recommends nodejs=12.16.2-1nodesource1 mobile-broadband-provider-info=20170903-1 \
+ && rm -rf /var/lib/apt/lists/* \
+ && npm install -g "yarn@${YARN_VERSION}"
 
 WORKDIR /app
-ENV PYTHONPATH=/lib
-ENV LOKOLE_IOC=opwen_email_server.integration.webapp.AzureIoc
-ENV OPWEN_EMAILS_PER_PAGE=5
-ENV OPWEN_CAN_REGISTER_USER=False
-ENV OPWEN_CAN_CHANGE_PASSWORD=False
-ENV OPWEN_CAN_SEARCH_EMAIL=False
 
-EXPOSE ${LOKOLE_PORT}
-ENTRYPOINT ["/lib/sync-settings-from-env.sh", "/app/lokole/state/settings.env"]
-CMD ["/usr/bin/supervisord", "--configuration=/etc/supervisor/supervisord.conf", "--nodaemon"]
+COPY package.json yarn.lock ./
+RUN yarn install
+
+COPY requirements-webapp.txt ./
+RUN pip install --no-cache-dir -r requirements-webapp.txt
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN yarn run lint \
+ && yarn run build
+
+ENV OPWEN_SESSION_KEY=changeme
+ENV OPWEN_SETTINGS=/app/docker/client/client.env
+
+CMD ["python", "/app/manage.py", "devserver"]
+
+FROM builder AS compiler
+
+ARG VERSION=0.0.0
+
+RUN pybabel extract -F babel.cfg -k lazy_gettext -o babel.pot opwen_email_client/webapp \
+ && pybabel compile -d opwen_email_client/webapp/translations
+
+RUN sed -i "s|^__version__ = '[^']*'|__version__ = '${VERSION}'|g" opwen_email_client/__init__.py \
+ && sed -i "s|^__version__ = '[^']*'|__version__ = '${VERSION}'|g" opwen_email_server/__init__.py \
+ && python setup.py sdist \
+ && cp "dist/opwen_email_client-${VERSION}.tar.gz" dist/pkg.tar.gz
+
+FROM python:${PYTHON_VERSION}-slim AS runtime
+
+# hadolint ignore=DL3010
+COPY --from=compiler /app/dist/pkg.tar.gz /app/pkg.tar.gz
+
+# hadolint ignore=DL3013
+RUN pip install --no-cache-dir "/app/pkg.tar.gz[opwen_email_server]" \
+ && rm -rf /tmp/pip-ephem-wheel-cache*
+
+COPY --from=compiler /app/docker/client/run-gunicorn.sh /app/run-gunicorn.sh
+COPY --from=compiler /app/docker/client/client.env /app/client.env
+
+ENV OPWEN_SESSION_KEY=changeme
+ENV OPWEN_SETTINGS=/app/client.env
+
+CMD ["/app/run-gunicorn.sh"]
