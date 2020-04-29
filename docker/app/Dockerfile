@@ -28,17 +28,25 @@ RUN wget -q https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_V
 
 WORKDIR /app
 
-COPY requirements*.txt ./
-COPY makefile .
-RUN make venv
-RUN pip wheel -r requirements.txt -w /deps
+COPY requirements-dev.txt ./
+RUN pip install --no-cache-dir -r requirements-dev.txt \
+ && rm -rf /tmp/pip-ephem-wheel-cache*
+
+COPY requirements-webapp.txt ./
+RUN pip install --no-cache-dir -r requirements-webapp.txt \
+ && rm -rf /tmp/pip-ephem-wheel-cache*
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt \
+ && pip wheel --no-cache-dir -r requirements.txt -w /deps \
+ && rm -rf /tmp/pip-ephem-wheel-cache*
 
 COPY . .
 
 ARG LOKOLE_SENDGRID_KEY=""
+ENV PY_ENV=/usr/local
 RUN make ci clean
 
-ENV PY_ENV=/app/venv
 ENV HOT_RELOAD="True"
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
@@ -53,11 +61,8 @@ RUN pip --no-cache-dir -q install /deps/*.whl
 USER opwen
 WORKDIR /app
 
-COPY --from=builder /app/docker/docker-entrypoint.sh ./docker/docker-entrypoint.sh
 COPY --from=builder /app/docker/app/run-celery.sh ./docker/app/run-celery.sh
 COPY --from=builder /app/docker/app/run-gunicorn.sh ./docker/app/run-gunicorn.sh
 COPY --from=builder /app/opwen_email_server ./opwen_email_server
 
 ENV PY_ENV=/usr/local
-
-ENTRYPOINT ["/app/docker/docker-entrypoint.sh"]

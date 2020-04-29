@@ -1,31 +1,27 @@
 PY_ENV ?= ./venv
 
-.PHONY: venv tests
-default: ci
+.PHONY: tests
+default: build
 
-venv: requirements.txt requirements-dev.txt requirements-webapp.txt
-	if [ ! -d $(PY_ENV) ]; then python3 -m venv $(PY_ENV) && $(PY_ENV)/bin/pip install -U pip wheel; fi
-	$(PY_ENV)/bin/pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt -r requirements-webapp.txt
-
-tests: venv
+tests:
 	LOKOLE_LOG_LEVEL=CRITICAL $(PY_ENV)/bin/coverage run -m nose2 -v && \
   $(PY_ENV)/bin/coverage xml && \
   $(PY_ENV)/bin/coverage report
 
-lint-swagger: venv
+lint-swagger:
 	find opwen_email_server/swagger -type f -name '*.yaml' | while read file; do \
     echo "==================== $$file ===================="; \
     $(PY_ENV)/bin/swagger-flex --source="$$file" \
   || exit 1; done
 
-lint-python: venv
+lint-python:
 	$(PY_ENV)/bin/flake8 opwen_email_server opwen_email_client
 	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server opwen_email_client --virtual-env $(PY_ENV)
 	$(PY_ENV)/bin/yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
 	$(PY_ENV)/bin/bandit --recursive opwen_email_server opwen_email_client
 	$(PY_ENV)/bin/mypy opwen_email_server opwen_email_client
 
-lint-yaml: venv
+lint-yaml:
 	find . -type f -regex '.*\.ya?ml' -not -path '$(PY_ENV)/*' | grep -v '^./helm/' | while read file; do \
     echo "==================== $$file ===================="; \
     $(PY_ENV)/bin/yamllint "$$file" \
