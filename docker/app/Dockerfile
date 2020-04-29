@@ -61,11 +61,8 @@ RUN pip --no-cache-dir -q install /deps/*.whl
 USER opwen
 WORKDIR /app
 
-COPY --from=builder /app/docker/docker-entrypoint.sh ./docker/docker-entrypoint.sh
 COPY --from=builder /app/docker/app/run-celery.sh ./docker/app/run-celery.sh
 COPY --from=builder /app/docker/app/run-gunicorn.sh ./docker/app/run-gunicorn.sh
 COPY --from=builder /app/opwen_email_server ./opwen_email_server
 
 ENV PY_ENV=/usr/local
-
-ENTRYPOINT ["/app/docker/docker-entrypoint.sh"]
