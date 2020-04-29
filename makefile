@@ -122,6 +122,7 @@ verify-build:
 release-pypi:
 	docker container create --name webapp "$(DOCKER_USERNAME)/opwenwebapp:$(DOCKER_TAG)" && \
   docker cp "webapp:/app/dist" ./dist && \
+  (mv ./dist/pkg.tar.gz "./dist/opwen_email_client-$(DOCKER_TAG).tar.gz" || true) && \
   docker container rm webapp
 
 release-docker:
@@ -176,7 +177,7 @@ deploy-pypi:
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/dist:/dist" \
     setup \
-    twine upload -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
+    twine upload --skip-existing -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
 
 deploy-docker:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \

@@ -14,14 +14,29 @@ fi
 
 case "$1" in
   after_failure)
+    if [[ -n "${TRAVIS_TAG}" ]]; then
+      echo "Skipping $1 for release" >&2
+      exit 0
+    fi
+
     make logs
     ;;
 
   after_script)
+    if [[ -n "${TRAVIS_TAG}" ]]; then
+      echo "Skipping $1 for release" >&2
+      exit 0
+    fi
+
     make clean-storage stop
     ;;
 
   after_success)
+    if [[ -n "${TRAVIS_TAG}" ]]; then
+      echo "Skipping $1 for release" >&2
+      exit 0
+    fi
+
     if [[ "$TEST_MODE" = "local" ]]; then
       bash <(curl -s https://codecov.io/bash)
     fi
@@ -43,10 +58,20 @@ case "$1" in
     ;;
 
   install)
+    if [[ -n "${TRAVIS_TAG}" ]]; then
+      echo "Skipping $1 for release" >&2
+      exit 0
+    fi
+
     make build verify-build
     ;;
 
   script)
+    if [[ -n "${TRAVIS_TAG}" ]]; then
+      echo "Skipping $1 for release" >&2
+      exit 0
+    fi
+
     if [[ "$TRAVIS_EVENT_TYPE" = "cron" ]]; then
       make renew-cert
       exit 0

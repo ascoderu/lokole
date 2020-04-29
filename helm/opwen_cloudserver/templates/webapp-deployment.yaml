@@ -21,6 +21,12 @@ spec:
       - name: webapp
         image: {{.Values.version.imageRegistry}}/opwenwebapp:{{.Values.version.dockerTag}}
         env:
+        - name: HOST
+          value: "0.0.0.0"
+        - name: WEBAPP_PORT
+          value: "8080"
+        - name: WEBAPP_WORKERS
+          value: "{{.Values.server.webappWorkers}}"
         {{ include "opwen.environment.shared" . }}
         ports:
         - containerPort: 8080

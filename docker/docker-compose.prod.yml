@@ -4,12 +4,15 @@ x-shared-secret-environment:
   &shared-secret-environment
   environment:
     PORT: 8888
+    HOST: 0.0.0.0
+    WEBAPP_PORT: 8080
     LOKOLE_STORAGE_PROVIDER: AZURE_BLOBS
     LOKOLE_QUEUE_BROKER_SCHEME: azureservicebus
     CONNEXION_SPEC: dir:/app/opwen_email_server/swagger
     CELERY_QUEUE_NAMES: all
     TESTING_UI: "False"
     LOKOLE_LOG_LEVEL: INFO
+    WEBAPP_WORKERS: 3
     SERVER_WORKERS: 4
     QUEUE_WORKERS: 5
   env_file:

@@ -27,7 +27,7 @@ def devserver():
     templates_glob = join(templates_directory, '**', '*.html')
     reload_server_if_changed = glob(templates_glob, recursive=True)
 
-    port = int(getenv('PORT', '5000'))
+    port = int(getenv('WEBAPP_PORT', '5000'))
     host = getenv('HOST', '127.0.0.1')
 
     app.run(debug=True, extra_files=reload_server_if_changed, host=host, port=port)  # nosec

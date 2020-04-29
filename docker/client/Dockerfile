@@ -46,10 +46,10 @@ RUN sed -i "s|^__version__ = '[^']*'|__version__ = '${VERSION}'|g" opwen_email_c
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
 # hadolint ignore=DL3010
-COPY --from=compiler /app/dist/pkg.tar.gz /app/pkg.tar.gz
+COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz
 
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir "/app/pkg.tar.gz[opwen_email_server]" \
+RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
 COPY --from=compiler /app/docker/client/run-gunicorn.sh /app/run-gunicorn.sh

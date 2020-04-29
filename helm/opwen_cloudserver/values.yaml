@@ -10,6 +10,7 @@ version:
 
 server:
   serverWorkers: 2
+  webappWorkers: 2
 
 worker:
   queueWorkers: 1

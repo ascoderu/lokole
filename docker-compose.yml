@@ -86,7 +86,7 @@ services:
       <<: *shared-app-environment
       OPWEN_EMAIL_SERVER_HOSTNAME: nginx:8888
       WEBAPP_WORKERS: ${WEBAPP_WORKERS}
-      PORT: "8080"
+      WEBAPP_PORT: "8080"
       HOST: "0.0.0.0"
     depends_on:
       - azurite
