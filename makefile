@@ -1,7 +1,7 @@
 PY_ENV ?= ./venv
 
 .PHONY: tests
-default: ci
+default: build
 
 tests:
 	LOKOLE_LOG_LEVEL=CRITICAL $(PY_ENV)/bin/coverage run -m nose2 -v && \
