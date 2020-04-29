@@ -1,0 +1,133 @@
+{% from 'macros/nav.html' import nav_link %}
+
+{% macro email_search_form() %}
+<form id="email-search-form" action="{{ url_for('email_search') }}" method="get">
+  <div class="input-group">
+    <input type="search" id="query" name="query" class="form-control" placeholder="{{ _('Write query...') }}" value="{{ request.args.get('query', '') }}">
+    <label class="sr-only" for="query">{{ _('Write query...') }}</label>
+    <div class="input-group-btn">
+      <button type="submit" class="btn btn-default" aria-describedby="search-button-label">
+        <span class="fa fa-search" aria-hidden="true"></span>
+        <span class="sr-only" id="search-button-label">{{ _('Search') }}</span>
+      </button>
+    </div>
+  </div>
+</form>
+{% endmacro %}
+
+{% macro email_display(emails, empty_text, show_actions=True, show_sent_to=True, show_sent_at=True, show_attachments=True) %}
+<div class="email-display">
+  <div class="panel-group" id="accordion">
+    {% for email in emails %}
+    <div class="panel panel-{{ 'default' if email['read'] else 'info' }} print-root" data-email_id="{{ email['_uid'] }}">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" class="email-row">
+            <div class="row">
+              {% if show_sent_to %}
+              <div class="col-sm-3">
+                <span class="email-sent-to">
+                  {% if email['from'] == current_user.email %}
+                    <span class="visible-print">{{ _('To: %(emails)s', emails=', '.join(email['to'])) }}</span>
+                    <span class="hidden-print">{{ email['to'] | join(', ') }}</span>
+                  {% else %}
+                    <span class="visible-print">{{ _('From: %(email)s', email=email['from']) }}</span>
+                    <span class="hidden-print">{{ email['from'] }}</span>
+                  {% endif %}
+                </span>
+              </div>
+              {% endif %}
+              <div class="col-sm-3">
+                <span class="visible-print">{{ _('Subject: %(subject)s', subject=email['subject']) }}</span>
+                <span class="email-subject hidden-print">{{ email['subject'] }}</span>
+              </div>
+              {% if show_sent_at %}
+              <div class="col-sm-2">
+                <span class="visible-print">{{ _('Sent at: %(date)s', date=email['sent_at']) }}</span>
+                <span class="email-sent-at hidden-print">{{ email['sent_at'] or '' }}</span>
+              </div>
+              {% endif %}
+              {% if show_attachments %}
+              <div class="col-sm-1 text-right">
+                {% if email['attachments'] %}
+                <span class="fa fa-paperclip hidden-print" aria-hidden="true"></span>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </a>
+        </h4>
+      </div>
+      <div id="collapse{{ loop.index }}" class="panel-collapse collapse">
+        <div class="panel-body">
+          {% if show_actions %}
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="btn-group email-actions hidden-print">
+                <a class="btn btn-default" title="{{ _('Reply') }}"
+                   href="{{ url_for('email_new', uid=email['_uid'], action='reply') }}">
+                  <span class="fa fa-reply" aria-hidden="true"></span>
+                </a>
+                <a class="btn btn-default" title="{{ _('Reply all') }}"
+                   href="{{ url_for('email_new', uid=email['_uid'], action='reply_all') }}">
+                  <span class="fa fa-reply-all" aria-hidden="true"></span>
+                </a>
+                <a class="btn btn-default" title="{{ _('Forward') }}"
+                   href="{{ url_for('email_new', uid=email['_uid'], action='forward') }}">
+                  <span class="fa fa-share" aria-hidden="true"></span>
+                </a>
+                <button class="btn btn-default print-trigger" title="{{ _('Print') }}">
+                  <span class="fa fa-print" aria-hidden="true"></span>
+                </button>
+                <a class="btn btn-default" title="{{ _('Delete') }}"
+                   href="{{ url_for('email_delete', email_uid=email['_uid']) }}">
+                  <span class="fa fa-trash-o" aria-hidden="true"></span>
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="row">
+            <div class="col-sm-12">
+              <span class="email-body">{{ email | render_body | safe }}</span>
+            </div>
+          </div>
+          {% if show_attachments %}
+          {% if email['attachments'] %}
+          <div class="row hidden-print">
+            <div class="col-sm-12">
+              <ul class="list-inline">
+                {% for attachment in email['attachments'] %}
+                <li>
+                  <a href="{{ url_for('download_attachment', email_id=email['_uid'], attachment_id=attachment['_uid']) }}">{{ attachment['filename'] }}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <i>{{ empty_text }}</i>
+    {% endfor %}
+  </div>
+
+  {% if has_prevpage or has_nextpage %}
+  <ul class=pagination>
+    <li class="{{ '' if has_prevpage else 'disabled' }}">
+      <a href="{{ url_for(request.endpoint, page=page-1, **request.args) if has_prevpage else ''}}" title="{{ _('Previous results') }}">
+        <span class="fa fa-chevron-left" aria-hidden="true"></span>
+      </a>
+    </li>
+    <li class="{{ '' if has_nextpage else 'disabled' }}">
+      <a href="{{ url_for(request.endpoint, page=page+1, **request.args) if has_nextpage else ''}}" title="{{ _('Next results') }}">
+        <span class="fa fa-chevron-right" aria-hidden="true"></span>
+      </a>
+    </li>
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}

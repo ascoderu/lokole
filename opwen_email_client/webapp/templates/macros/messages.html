@@ -1,0 +1,45 @@
+{% macro render_flashed_error(message) %}
+<div class="alert alert-danger" role="alert">
+  <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+  <span class="sr-only">{{ _('Error') }}:</span>
+  {{ message }}
+</div>
+{% endmacro %}
+
+{% macro render_flashed_info(message) %}
+<div class="alert alert-info" role="alert">
+  <span class="fa fa-info-circle" aria-hidden="true"></span>
+  <span class="sr-only">{{ _('Information') }}:</span>
+  {{ message }}
+</div>
+{% endmacro %}
+
+{% macro render_flashed_success(message) %}
+<div class="alert alert-success" role="alert">
+  <span class="fa fa-check-circle" aria-hidden="true"></span>
+  <span class="sr-only">{{ _('Success') }}:</span>
+  {{ message }}
+</div>
+{% endmacro %}
+
+{% macro render_flashed_message(category, message) %}
+{% if category == 'error' %}
+{{ render_flashed_error(message) }}
+{% elif category == 'info'  %}
+{{ render_flashed_info(message) }}
+{% elif category == 'success'  %}
+{{ render_flashed_success(message) }}
+{% endif %}
+{% endmacro %}
+
+{% macro render_flashed_messages() %}
+{%- with messages = get_flashed_messages(with_categories=true) -%}
+{% if messages %}
+  <ul class="flashes list-unstyled">
+    {% for category, message in messages %}
+    <li class="{{ category }}">{{ render_flashed_message(category, message) }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{%- endwith %}
+{% endmacro %}

@@ -1,0 +1,523 @@
+# French translations for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# Nzola Swasisa <nzola@ascoderu.ca>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1.1\n"
+"Report-Msgid-Bugs-To: nzola@ascoderu.ca\n"
+"POT-Creation-Date: 2017-05-14 12:34-0700\n"
+"PO-Revision-Date: 2017-05-17 22:01-0700\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.4.0\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 2.0.2\n"
+
+#: opwen_email_client/webapp/config.py:18
+msgid "Please log in to access this page."
+msgstr "Connectez-vous pour accéder à cette page."
+
+#: opwen_email_client/webapp/config.py:19
+msgid "You do not have permission to view this page."
+msgstr "Vous n'avez pas l'autorisation d'accéder à cette page."
+
+#: opwen_email_client/webapp/config.py:20
+msgid "Invalid password."
+msgstr "Mot de passe incorrect."
+
+#: opwen_email_client/webapp/config.py:21
+msgid "The password must have at least 6 characters."
+msgstr "Le mot de passe doit comporter au moins 6 caractères."
+
+#: opwen_email_client/webapp/config.py:22
+msgid "Email sent!"
+msgstr "Email envoyé!"
+
+#: opwen_email_client/webapp/config.py:23
+msgid "Invalid email address."
+msgstr "Adresse e-mail incorrecte."
+
+#: opwen_email_client/webapp/config.py:24
+msgid "Please specify a recipient."
+msgstr "Veuillez spécifier un destinataire."
+
+#: opwen_email_client/webapp/config.py:25
+msgid "You are now logged in."
+msgstr "Vous êtes connecté."
+
+#: opwen_email_client/webapp/config.py:26
+msgid "You have logged out successfully."
+msgstr "Vous vous êtes déconnecté avec succès!"
+
+#: opwen_email_client/webapp/config.py:27
+msgid "Welcome!"
+msgstr "Bienvenue !"
+
+#: opwen_email_client/webapp/config.py:28
+msgid "Please only use letters, numbers, dots and dashes."
+msgstr "Utilisez uniquement des lettres, des chiffres, des points et des tirets."
+
+#: opwen_email_client/webapp/config.py:29
+msgid "Your Lokole account has been created successfully!"
+msgstr "Votre compte Lokole a été créé avec succès!"
+
+#: opwen_email_client/webapp/config.py:30
+msgid "Your account has been suspended. Please contact your administrator."
+msgstr "Votre compte a été suspendu. Veuillez contacter votre administrateur."
+
+#: opwen_email_client/webapp/config.py:32
+msgid "Email synchronization completed."
+msgstr "La synchronisation des e-mails est terminée."
+
+#: opwen_email_client/webapp/config.py:33
+msgid "Unexpected error. Please contact your admin."
+msgstr "Erreur inattendue. Veuillez contacter votre administrateur."
+
+#: opwen_email_client/webapp/config.py:34
+msgid "This page does not exist."
+msgstr "Cette page n'existe pas."
+
+#: opwen_email_client/webapp/config.py:35
+msgid "This user does not exist."
+msgstr "Vous vous êtes déconnecté avec succès!"
+
+#: opwen_email_client/webapp/config.py:36
+msgid "The user was suspended."
+msgstr "L'utilisateur a été suspendu."
+
+#: opwen_email_client/webapp/config.py:37
+msgid "The user was un-suspended."
+msgstr "L'utilisateur n'a pas été suspendu."
+
+#: opwen_email_client/webapp/templates/about.html:45
+msgid "What is Lokole?"
+msgstr "Qu'est-ce que Lokole?"
+
+# Lokole est un projet de l'organisation Canadienne-Congolaise  à but non lucrative, Ascoderu qui permet aux communautés rurales d'accéder de manière économique et durable au réseau mondial de communications par courrier électronique. En tant que tel, Lokole est la contribution d'Ascoderu à l'Objectif 9 du développement durable des Nations Unies: réaliser une infrastructure mondiale de communication durable.
+#: opwen_email_client/webapp/templates/about.html:50
+msgid ""
+"Lokole is a project of the Canadian-Congolese non-profit organization Ascoderu "
+"that enables rural communities to cheaply and sustainably access the global "
+"communications network via email. As such, Lokole is Ascoderu's contribution "
+"to the United Nations Sustainable Development Goal 9: achieving global "
+"sustainable communications infrastructure."
+msgstr ""
+"Lokole est un projet de l'organisation Canadienne-Congolaise  à but non "
+"lucrative, Ascoderu qui permet aux communautés rurales d'accéder de manière "
+"économique et durable au réseau mondial de communications par courrier "
+"électronique. En tant que tel, Lokole est la contribution d'Ascoderu à "
+"l'Objectif 9 du développement durable des Nations Unies: réaliser une "
+"infrastructure mondiale de communication durable."
+
+#: opwen_email_client/webapp/templates/about.html:68
+msgid "How does it work?"
+msgstr "Comment cela fonctionne ?"
+
+#: opwen_email_client/webapp/templates/about.html:73
+msgid ""
+"The Lokole is a small device that creates a local network: the Lokole WiFi. "
+"You can connect to this network with any device: your phone, your tablet or "
+"your laptop. Once on the network, you access the Lokole website where you read "
+"and write emails via your Ascoderu account. Once per day, when the cost of "
+"bandwidth is cheapest the Lokole then transmits everyone's emails to the "
+"cloud. In this way, many people can pool their resources to make email "
+"available for everyone."
+msgstr ""
+"Lokole est un petit appareil qui crée un réseau local: le Lokole WiFi. Vous "
+"pouvez vous connecter à ce réseau avec n'importe quel appareil: votre "
+"téléphone, votre tablette ou votre ordinateur portable. Une fois sur le "
+"réseau, vous accédez au site Lokole où vous lisez et écris des emails via "
+"votre compte Ascoderu. Une fois par jour, lorsque le coût de la bande passante "
+"est plus économique, Lokole transmet les courriels de tous au nuage. De cette "
+"façon, de nombreuses personnes peuvent regrouper leurs ressources pour rendre "
+"les emails disponibles pour tous."
+
+#: opwen_email_client/webapp/templates/about.html:94
+msgid "Meet the team"
+msgstr "Rencontrez notre équipe"
+
+#: opwen_email_client/webapp/templates/about.html:121
+msgid "Founder"
+msgstr "Fondateur"
+
+#: opwen_email_client/webapp/templates/about.html:121
+msgid "CEO"
+msgstr "Président-directeur général"
+
+#: opwen_email_client/webapp/templates/about.html:122
+msgid ""
+"Nzola is a native of the DRC in Africa who now lives in Victoria, Canada. "
+"While being employed by the humanitarian organization Mission Aviation "
+"Fellowship in the Congo, Angola, Namibia, South Africa and Zambia for 19 "
+"years, Nzola developed expertise with communications devices and an acute "
+"understanding of the communication problems in rural sub-saharan Africa."
+msgstr ""
+"Nzola est originaire de République démocratique du Congo en Afrique, qui vit "
+"maintenant à Victoria, Canada. Tout en étant employé par l’organisation "
+"humanitaire Mission Aviation Fellowship au Congo, Angola, Namibie, Afrique du "
+"Sud et en Zambie pendant 19 ans, Nzola a développé une expertise avec les "
+"dispositifs de communication et une compréhension aiguë des problèmes de "
+"communication dans les zones rurales d’Afrique subsaharienne."
+
+#: opwen_email_client/webapp/templates/about.html:137
+msgid "Operations"
+msgstr "Opérations"
+
+#: opwen_email_client/webapp/templates/about.html:138
+msgid ""
+"Laura is a self-taught developer and passionate advocate for positive change "
+"and justice with a MSc in International Development. Laura has dedicated 10 "
+"years of her life supporting local and international NGOs. Before supporting "
+"Ascoderu, she worked at the British Columbia Council for International "
+"Cooperation (BCCIC) and for Amnesty International."
+msgstr ""
+"Laura est un développeur autodidacte et ardente, défenseuse du changement "
+"positif et de la justice avec une maîtrise en développement International. "
+"Laura a consacré 10 ans de sa vie, soutenir les ONG locales et "
+"internationales. Avant de soutenir Ascoderu, elle a travaillé pour le Conseil "
+"de la coopération international de la Colombie-Britannique (BCCIC) et "
+"d’Amnesty International."
+
+#: opwen_email_client/webapp/templates/about.html:153
+msgid "Development"
+msgstr "Développement"
+
+#: opwen_email_client/webapp/templates/about.html:154
+msgid ""
+"Clemens is a full-stack software developer who spent much of his life in Togo, "
+"Mali and Zambia and is now based in Vancouver, Canada. He honed his software "
+"chops working on large-scale projects at Amazon and Microsoft and on open-"
+"source projects such as the sharing platform yunity. Clemens now drives the "
+"development of all technical aspects of Ascoderu's projects."
+msgstr ""
+"Clemens est un développeur de logiciel complet qui a passé une grande partie "
+"de sa vie au Togo, au Mali et en Zambie et est maintenant basé à Vancouver, au "
+"Canada. Il a affiné ses trousses de logiciels travaillant sur des projets à "
+"grande échelle chez Amazon et Microsoft et sur des projets open source tels "
+"que la plate-forme de partage. Clemens dirige maintenant le développement de "
+"tous les aspects techniques des projets d'Ascoderu"
+
+#: opwen_email_client/webapp/templates/admin.html:4
+msgid "Registered accounts"
+msgstr "Comptes enregistrés"
+
+#: opwen_email_client/webapp/templates/admin.html:8
+#: opwen_email_client/webapp/templates/macros/nav.html:47
+msgid "Email"
+msgstr "Adresse électronique"
+
+#: opwen_email_client/webapp/templates/admin.html:9
+msgid "Last login"
+msgstr "Dernière connexion"
+
+#: opwen_email_client/webapp/templates/admin.html:10
+msgid "Action"
+msgstr "Action"
+
+#: opwen_email_client/webapp/templates/admin.html:24
+msgid "Suspend"
+msgstr "Suspendre"
+
+#: opwen_email_client/webapp/templates/admin.html:26
+msgid "Activate"
+msgstr "Activer"
+
+#: opwen_email_client/webapp/templates/admin.html:34
+msgid "Email status"
+msgstr "Etat des e-mails"
+
+#: opwen_email_client/webapp/templates/admin.html:36
+#, python-format
+msgid "The next sync will upload %(num)d email(s)."
+msgstr ""
+"What about this? \"La prochaine synchronization va a télécharger %(num)d "
+"email(s).\""
+
+#: opwen_email_client/webapp/templates/admin.html:38
+msgid "Sync now"
+msgstr "Synchroniser maintenant"
+
+#: opwen_email_client/webapp/templates/email.html:8
+msgid "No emails."
+msgstr "Pas de courrier électronique."
+
+#: opwen_email_client/webapp/templates/email_new.html:14
+#: opwen_email_client/webapp/templates/emails/forward.html:9
+msgid "To"
+msgstr "A"
+
+#: opwen_email_client/webapp/templates/email_new.html:15
+#: opwen_email_client/webapp/templates/emails/forward.html:11
+msgid "Cc"
+msgstr "Cc"
+
+#: opwen_email_client/webapp/templates/email_new.html:16
+msgid "Bcc"
+msgstr "Bcc"
+
+#: opwen_email_client/webapp/templates/email_new.html:18
+#: opwen_email_client/webapp/templates/emails/forward.html:8
+msgid "Subject"
+msgstr "Subject"
+
+#: opwen_email_client/webapp/templates/email_new.html:19
+msgid "Message"
+msgstr "Votre message"
+
+#: opwen_email_client/webapp/templates/email_new.html:20
+msgid "Attachments"
+msgstr "Pièces jointes"
+
+#: opwen_email_client/webapp/templates/email_new.html:21
+msgid "Send"
+msgstr "Envoyer"
+
+#: opwen_email_client/webapp/templates/email_new.html:34
+msgid "files selected"
+msgstr "Fichiers sélectionnés"
+
+#: opwen_email_client/webapp/templates/email_new.html:40
+msgid "Remove"
+msgstr "Supprimer"
+
+#: opwen_email_client/webapp/templates/email_new.html:41
+msgid "Choose files"
+msgstr "Choisissez vos fichiers"
+
+#: opwen_email_client/webapp/templates/email_new.html:61
+msgid "Bold"
+msgstr "Gras"
+
+#: opwen_email_client/webapp/templates/email_new.html:63
+msgid "Italic"
+msgstr "caractère italique"
+
+#: opwen_email_client/webapp/templates/email_new.html:65
+msgid "Underline"
+msgstr "Souligné"
+
+#: opwen_email_client/webapp/templates/email_new.html:71
+msgid "Un-ordered list"
+msgstr "Liste non ordonnée"
+
+#: opwen_email_client/webapp/templates/email_new.html:73
+msgid "Ordered list"
+msgstr "Liste ordonnée"
+
+#: opwen_email_client/webapp/templates/home.html:18
+msgid "Lokole"
+msgstr "Lokole"
+
+#: opwen_email_client/webapp/templates/home.html:19
+msgid "Email for all"
+msgstr "Email pour tous"
+
+#: opwen_email_client/webapp/templates/home.html:22
+msgid "Lokole logo."
+msgstr "Logo Lokole."
+
+#: opwen_email_client/webapp/templates/home.html:25
+msgid "Send and receive emails with unlimited attachments for free."
+msgstr ""
+"Envoyez et recevez des emails avec des pièces jointes illimitées gratuitement."
+
+#: opwen_email_client/webapp/templates/home.html:30
+msgid "Sign up"
+msgstr "Inscription"
+
+#: opwen_email_client/webapp/templates/home.html:32
+msgid "Check your emails"
+msgstr "Veuillez vérifier vos emails"
+
+#: opwen_email_client/webapp/templates/home.html:34
+msgid "Learn more"
+msgstr "En savoir plus"
+
+#: opwen_email_client/webapp/templates/home.html:38
+msgid "Already have an account?"
+msgstr "Vous avez déjà un compte ?"
+
+#: opwen_email_client/webapp/templates/home.html:38
+msgid "Login now"
+msgstr "Se connecter maintenant"
+
+#: opwen_email_client/webapp/templates/login.html:7
+#: opwen_email_client/webapp/templates/login.html:13
+#: opwen_email_client/webapp/templates/macros/nav.html:54
+msgid "Login"
+msgstr "Connexion"
+
+#: opwen_email_client/webapp/templates/login.html:11
+msgid "Enter your Ascoderu email address or account name"
+msgstr "Veuillez ecrire votre adresse e-mail ou votre nom d'utilisateur Ascoderu"
+
+#: opwen_email_client/webapp/templates/login.html:12
+msgid "Enter your password"
+msgstr "Entrez le mot de passe  ."
+
+#: opwen_email_client/webapp/templates/login.html:16
+msgid "Don't have an account?"
+msgstr "Vous n'avez pas encore de compte?"
+
+#: opwen_email_client/webapp/templates/login.html:17
+msgid "Register now!"
+msgstr "Veuillez vous enregistrer maintenant"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:55
+#: opwen_email_client/webapp/templates/register.html:8
+#: opwen_email_client/webapp/templates/register.html:16
+msgid "Register"
+msgstr "Veuillez vous enregistrer"
+
+#: opwen_email_client/webapp/templates/register.html:12
+msgid "Enter your name"
+msgstr "Inscrivez votre nom"
+
+#: opwen_email_client/webapp/templates/register.html:13
+msgid "Choose a password"
+msgstr "Choisissez un mot de passe"
+
+#: opwen_email_client/webapp/templates/register.html:14
+msgid "Repeat password"
+msgstr "Répéter le mot de passe"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:1
+msgid "Welcome to your Lokole account!"
+msgstr "Bienvenue sur votre compte Lokole!"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:3
+msgid ""
+"With your account you can send and receive emails with unlimited attachments. "
+"You can learn more about how Lokole works"
+msgstr ""
+"Avec votre compte, vous pouvez envoyer et recevoir des courriels avec des "
+"pièces jointes illimitées. Vous pouvez en savoir plus sur la façon dont Lokole "
+"fonctionne"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:6
+msgid "here"
+msgstr "ICI"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:8
+msgid "Your Lokole account is fully set up and your email address is:"
+msgstr ""
+"Votre compte Lokole est entièrement configuré et votre adresse électronique "
+"est:"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:10
+msgid "Using this email address, you can talk to people from all over the world!"
+msgstr ""
+"En utilisant cette adresse électronique, vous pouvez parler à des gens du "
+"monde entier!"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:14
+msgid ""
+"If you have any questions about your Lokole account, please get in touch by "
+"replying to this message."
+msgstr ""
+"Si vous avez des questions sur votre compte Lokole, contactez-nous en "
+"répondant à ce message."
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:19
+msgid "All the best."
+msgstr "Cordialement,"
+
+#: opwen_email_client/webapp/templates/emails/account_finalized.html:20
+msgid "Your Lokole Team"
+msgstr "Votre équipe Lokole"
+
+#: opwen_email_client/webapp/templates/emails/forward.html:3
+msgid "Forwarded message"
+msgstr "Message transféré"
+
+#: opwen_email_client/webapp/templates/emails/forward.html:4
+msgid "From"
+msgstr "De"
+
+#: opwen_email_client/webapp/templates/emails/forward.html:6
+msgid "Date"
+msgstr "Date"
+
+#: opwen_email_client/webapp/templates/macros/email.html:6
+#: opwen_email_client/webapp/templates/macros/nav.html:72
+msgid "Search"
+msgstr "Rechercher"
+
+#: opwen_email_client/webapp/templates/macros/email.html:75
+msgid "Reply"
+msgstr "Répondre"
+
+#: opwen_email_client/webapp/templates/macros/email.html:79
+msgid "Reply all"
+msgstr "Répondre à tous"
+
+#: opwen_email_client/webapp/templates/macros/email.html:83
+msgid "Forward"
+msgstr "Avancer"
+
+#: opwen_email_client/webapp/templates/macros/email.html:101
+msgid "Previous results"
+msgstr "Résultats précédent"
+
+#: opwen_email_client/webapp/templates/macros/email.html:106
+msgid "Next results"
+msgstr "Prochains résultats"
+
+#: opwen_email_client/webapp/templates/macros/messages.html:4
+msgid "Error"
+msgstr "Erreur"
+
+#: opwen_email_client/webapp/templates/macros/messages.html:12
+msgid "Information"
+msgstr "Information"
+
+#: opwen_email_client/webapp/templates/macros/messages.html:20
+msgid "Success"
+msgstr "Succès"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:38
+msgid "Toggle navigation"
+msgstr "Basculer la navigation"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:41
+msgid "Ascoderu"
+msgstr "Ascoderu"
+
+# Accueil
+#: opwen_email_client/webapp/templates/macros/nav.html:45
+msgid "Home"
+msgstr "Accueil"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:46
+msgid "About"
+msgstr "À propos"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:52
+msgid "Logout"
+msgstr "Se déconnecter"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:58
+msgid "Admin panel"
+msgstr "Panneau Administration"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:68
+msgid "Inbox"
+msgstr "courrierdarrivee"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:69
+msgid "Sent"
+msgstr "Email envoyé!"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:70
+msgid "Outbox"
+msgstr "Boîte d'envoi"
+
+#: opwen_email_client/webapp/templates/macros/nav.html:71
+msgid "Write email"
+msgstr "Écrire un email"

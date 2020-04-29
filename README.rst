@@ -5,6 +5,9 @@ Opwen cloudserver
 .. image:: https://travis-ci.org/ascoderu/opwen-cloudserver.svg?branch=master
   :target: https://travis-ci.org/ascoderu/opwen-cloudserver
 
+.. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
+  :target: https://pypi.python.org/pypi/opwen_email_client/
+
 .. image:: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/shield.svg
   :target: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/
 
@@ -15,19 +18,70 @@ Opwen cloudserver
 What's this?
 ------------
 
-This repository contains the source code for the Lokole cloud server. Its
-purpose is to connect the `application <https://github.com/ascoderu/opwen-webapp>`_
-running on the Lokole devices to the rest of the world. Lokole is a project
-by the Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_.
+This repository contains the source code for the Lokole project by the
+Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_. The Lokole
+project consists of two main parts: an email client and an email server.
 
-The server is implemented using `Connexion <https://jobs.zalando.com/tech/blog/crafting-effective-microservices-in-python/>`_
+The Lokole email client is a simple application that offers functionality like:
+
+1. Self-service creation of user accounts
+2. Read emails sent to the account
+3. Write emails including rich formatting
+4. Send attachments
+
+All emails are stored in a local SQLite database. Once per day, the emails that
+were written during the past 24 hours get exported from the database, stored in
+a JSON file, compressed and uploaded to a location on Azure Blob Storage. The
+Lokole Server picks up these JSON files, manages the actual mailboxes for the
+users on the Lokole and sends new emails back to the Lokole by using the same
+compressed file exchange format.
+
+The Lokole email application is intended to run on low-spec Raspberry Pi 3
+hardware (or similar). Read the "Production setup" section below for further
+information on how to set up the client devices.
+
+The Lokole email server is implemented using `Connexion <https://jobs.zalando.com/tech/blog/crafting-effective-microservices-in-python/>`_
 and has two main responsibilities:
 
 1. Receive emails from the internet that are addressed to Lokole users and
    forward them to the appropriate Lokole device.
 2. Send new emails created by Lokole users to the rest of the internet.
 
-More background information can be found in the `opwen-webapp README <https://github.com/ascoderu/opwen-webapp/blob/master/README.rst>`_.
+-------------------
+Why is this useful?
+-------------------
+
+Email is at the core of our modern life, letting us keep in touch with friends
+and family, connecting us to our businesses partners and fostering innovation
+through exchange of information.
+
+However, in many parts of the developing world, email access is not very
+wide-spread, usually because bandwidth costs are prohibitively high compared to
+local purchasing power. For example, in the Democratic Republic of the Congo
+(DRC) only 3% of the population have access to emails which leaves 75 million
+people unconnected.
+
+The Lokole is a project by the Canadian-Congolese non-profit `Ascoderu <https://ascoderu.ca>`_
+that aims to address this problem by tackling it from three perspectives:
+
+1. The Lokole is an email client that only uses bandwidth on a schedule. This
+   reduces the cost of service as bandwidth can now be purchased when the cost
+   is lowest. For example, in the DRC, $1 purchases only 65 MB of data during
+   peak hours. At night, however, the same amount of money buys 1 GB of data.
+
+2. The Lokole uses an efficient data exchange format plus compression so that
+   it uses minimal amounts of bandwidth, reducing the cost of service. All
+   expensive operations (e.g. creating and sending of emails with headers,
+   managing mailboxes, etc.) are performed on a server in a country where
+   bandwidth is cheap.
+
+3. The Lokole only uses bandwidth in batches. This means that the cost of
+   service can be spread over many people and higher savings from increased
+   compression ratios can be achieved. For example, individually purchasing
+   bandwidth for $1 to check emails is economically un-viable for most people
+   in the DRC. However, the same $1 can buy enough bandwidth to provide email
+   for hundreds of people via the Lokole. Spreading the cost in this way makes
+   email access sustainable for local communities.
 
 ---------------
 System overview
@@ -155,6 +209,7 @@ to initialize the required cloud resources.
   EOM
 
   cat > ${PWD}/secrets/users.env << EOM
+  OPWEN_SESSION_KEY={some secret for user session management}
   LOKOLE_REGISTRATION_USERNAME={some username for the registration endpoint}
   LOKOLE_REGISTRATION_PASSWORD={some password for the registration endpoint}
   EOM
@@ -195,5 +250,73 @@ environment variables to the Docker setup script:
 The script will then provision a cluster in Azure Kubernetes Service and
 install the project via Helm. The secrets to connect to the provisioned
 cluster will be stored in the :code:`secrets` directory.
+
+There is a `script <https://github.com/ascoderu/opwen-cloudserver/blob/master/install.py>`_
+to set up a new Lokole email client. The script will install the email app in this
+repository as well as standard infrastructure like nginx and gunicorn.
+The script will also make ready peripherals like the USB modem used for data
+exchange, and set up any required background jobs such as the email
+synchronization cron job.
+
+The setup script assumes that you have already set up:
+
+* 3 Azure Storage Accounts, general purpose: for the cloudserver to manage its
+  queues, tables and blobs.
+* 1 Azure Storage Account, blob storage: for the cloudserver and email app to
+  exchange email packages.
+* 1 Application Insights account: to collect logs from the cloudserver and
+  monitor its operations.
+* 1 SendGrid account: to send and receive emails in the cloudserver.
+
+The setup script is tested with hardware:
+
+* `Raspberry Pi 3 <https://www.raspberrypi.org/products/raspberry-pi-3-model-b/>`_
+  running Raspbian Jessie lite
+  `v2016-05-27 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2016-05-31/2016-05-27-raspbian-jessie-lite.zip>`_,
+  `v2017-01-11 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-01-10/2017-01-11-raspbian-jessie-lite.zip>`_,
+  `v2017-04-10 <https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-04-10/2017-04-10-raspbian-jessie-lite.zip>`_, and
+  `v2017-11-29 <http://vx2-downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-12-01/2017-11-29-raspbian-stretch-lite.zip>`_.
+
+* `Orange Pi Zero <http://www.orangepi.org/orangepizero/>`_
+  running `Armbian Ubuntu Xenial <https://dl.armbian.com/orangepizero/Ubuntu_xenial_default.7z>`_
+
+The setup script is also tested with USB modems:
+
+* `Huawei E303s-65 <http://consumer.huawei.com/cl/mobile-broadband/dongles/tech-specs/e303-cl.htm>`_
+* `Huawei E3131 <http://consumer.huawei.com/lk/mobile-broadband/dongles/tech-specs/e3131-lk.htm>`_
+* `Huawei MS2131i-8 <http://consumer.huawei.com/en/solutions/m2m-solutions/products/tech-specs/ms2131-en.htm>`_
+
+The setup script installs the latest version of the email app published to PyPI.
+New versions get automatically published to PyPI (via Travis) whenever a new
+`release <https://github.com/ascoderu/opwen-cloudserver/releases/new>`_ is created
+on Github.
+
+You can run the script on your client device like so:
+
+.. sourcecode :: sh
+
+  curl -fsO https://raw.githubusercontent.com/ascoderu/opwen-cloudserver/master/install.py && \
+  sudo python3 install.py <client-name> <sim-type> <sync-schedule> <registration-credentials>
+
+---------------------
+Adding a new language
+---------------------
+
+To translate Lokole to a new language, install Python, `Babel <https://babel.pocoo.org/>`_
+and a translation editor such as `poedit <https://poedit.net/>`_. Then follow the steps below.
+
+.. sourcecode :: sh
+
+  # set this to the ISO 639-1 language code for which you are adding the translation
+  export language=ln
+
+  # generate the translation file
+  pybabel init -i babel.pot -d opwen_email_client/webapp/translations -l "${language}"
+
+  # fill-in the translation file
+  poedit "opwen_email_client/webapp/translations/${language}/LC_MESSAGES/messages.po"
+
+  # finalize the translation file
+  pybabel compile -d opwen_email_client/webapp/translations
 
 [ ~ Dependencies scanned by PyUp.io ~ ]

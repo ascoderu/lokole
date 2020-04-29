@@ -1,0 +1,7 @@
+include requirements*.txt
+include README.rst
+include manage.py
+recursive-include opwen_email_client/webapp/static *
+recursive-include opwen_email_client/webapp/templates *.html
+recursive-include opwen_email_client/webapp/translations *.po
+recursive-include opwen_email_client/webapp/translations *.mo

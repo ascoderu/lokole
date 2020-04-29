@@ -42,7 +42,9 @@ class TransportTests(TestCase):
             )
 
     def test_all_celery_tasks_are_routed(self):
-        registered_celery_tasks = [task_name for task_name in app.tasks.keys() if not task_name.startswith('celery.')]
+        registered_celery_tasks = [
+            task_name for task_name in app.tasks.keys() if task_name.startswith('opwen_email_server.')
+        ]
 
         for task_name in registered_celery_tasks:
             self.assertIn(task_name, task_routes)

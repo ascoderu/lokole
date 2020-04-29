@@ -1,0 +1,17 @@
+{% macro render_flag(locale) %}
+
+{% set language_flag = locale.language %}
+{% if locale.language == 'en' %}
+  {% set language_flag = 'ca' %}
+{% endif %}
+{% if locale.language == 'sw' %}
+  {% set language_flag = 'tz' %}
+{% endif %}
+{% if locale.language == 'ln' %}
+  {% set language_flag = 'cd' %}
+{% endif %}
+
+<div class="flag-icon flag-icon-{{ language_flag }}"
+     title="{{ locale.language_name | capitalize }}"></div>
+{% endmacro %}
+

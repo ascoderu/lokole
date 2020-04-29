@@ -1,0 +1,11 @@
+{% extends "_base_email.html" %}
+
+{% from 'macros/email.html' import email_display with context %}
+{% from 'macros/nav.html' import email_subnav with context %}
+
+{% block content %}{{ super() }}
+{{ email_subnav() }}
+<main>
+{{ email_display(emails, _('No emails.')) }}
+</main>
+{% endblock %}

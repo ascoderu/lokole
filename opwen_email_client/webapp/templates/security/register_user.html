@@ -1,0 +1,29 @@
+{% extends '_base.html' %}
+
+{% from 'macros/form.html' import render_field %}
+{% from 'macros/form.html' import render_hidden_field %}
+{% from 'macros/form.html' import render_button %}
+
+{% block content %}{{ super() }}
+<h1>{{ _('Register') }}</h1>
+<form action="{{ url_for_security('register') }}" method="POST" name="register_user_form">
+  {{ register_user_form.hidden_tag() }}
+
+  {{ render_field(register_user_form.email, _('Enter your name')) }}
+  {{ render_field(register_user_form.password, _('Choose a password')) }}
+  {{ render_field(register_user_form.password_confirm, _('Repeat password')) }}
+  {{ render_hidden_field(register_user_form.timezone_offset_minutes) }}
+  {{ render_button(register_user_form.submit, _('Register')) }}
+</form>
+{% endblock %}
+
+{% block scripts %}{{ super() }}
+<script>
+window.flask_jinja_context__register = {
+  selectors: {
+    timezoneOffsetMinutesField: "#{{ register_user_form.timezone_offset_minutes.id }}"
+  }
+};
+</script>
+<script type="text/javascript" src="{{ 'js/register.js' | asset_url }}"></script>
+{% endblock %}

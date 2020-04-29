@@ -1,0 +1,14 @@
+<br>
+<br>
+{% if email.get('sent_at') and email.get('from') %}
+<div>---------- {{ _('On %(date)s, %(sender)s wrote:', date=email.get('sent_at'), sender=email.get('from')) }} ----------</div>
+{% elif email.get('sent_at') %}
+<div>---------- {{ _('In reply to email sent on %(date)s:', date=email.get('sent_at')) }} ----------</div>
+{% elif email.get('from') %}
+<div>---------- {{ _('In reply to email sent by %(sender)s:', sender=email.get('from')) }} ----------</div>
+{% else %}
+<div>---------- {{ _('In reply to:') }} ----------</div>
+{% endif %}
+<blockquote>
+{{ email.get('body', '') | replace('\n', '<br>') }}
+</blockquote>

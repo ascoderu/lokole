@@ -1,0 +1,9 @@
+@media only screen and (max-width: 768px) {
+  ul.wysihtml5-toolbar {
+    margin-bottom: 20px;
+  }
+
+  iframe.wysihtml5-sandbox {
+    padding-top: 25px !important;
+  }
+}
