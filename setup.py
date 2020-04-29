@@ -26,10 +26,10 @@ scripts = ['manage.py']
 setup(
     name=client_package,
     version=version,
-    author='Clemens Wolff',
-    author_email='clemens.wolff+pypi@gmail.com',
+    author='Ascoderu',
+    author_email='ascoderu.opwen@gmail.com',
     packages=find_packages(exclude=['tests*']),
-    url='https://github.com/ascoderu/opwen-cloudserver',
+    url='https://github.com/ascoderu/lokole',
     license='Apache Software License',
     description='Email client for the Lokole project: https://ascoderu.ca',
     long_description=long_description,

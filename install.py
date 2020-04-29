@@ -810,7 +810,7 @@ def cli():
     parser = ArgumentParser(description=__doc__)
 
     parser.add_argument('client_name', type=str.lower, help=(
-        'The name that should be assigned to the Opwen device '
+        'The name that should be assigned to the Lokole device '
         'that is being configured by this script. Usually this '
         'will be a name that is descriptive for the location '
         'where the device will be deployed. The client name '

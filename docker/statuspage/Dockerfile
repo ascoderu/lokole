@@ -18,6 +18,6 @@ RUN npm install -g serve@11.3.0
 
 WORKDIR /app
 
-COPY --from=compiler /app/opwen_statuspage/build ./opwen-statuspage/
+COPY --from=compiler /app/opwen_statuspage/build ./lokole/
 
 CMD ["serve", "-n", "."]

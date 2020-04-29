@@ -42,7 +42,7 @@ deploy:
     skip-cleanup: true
     script: ./.travis.sh deploy
     on:  # yamllint disable rule:truthy
-      repo: ascoderu/opwen-cloudserver
+      repo: ascoderu/lokole
       tags: true
       condition: $TEST_MODE = local
 
@@ -51,6 +51,6 @@ deploy:
     github-token: $GITHUB_TOKEN
     local-dir: build
     on:  # yamllint disable rule:truthy
-      repo: ascoderu/opwen-cloudserver
+      repo: ascoderu/lokole
       tags: true
       condition: $TEST_MODE = local

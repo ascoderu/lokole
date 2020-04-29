@@ -25,7 +25,7 @@ class Header extends React.PureComponent {
     return (
       <React.Fragment>
         <PageHeader
-          title="Opwen Status Dashboard"
+          title="Lokole Status Dashboard"
           avatar={
             settings.githubAvatarUrl != null
               ? { src: settings.githubAvatarUrl }

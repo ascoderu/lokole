@@ -136,7 +136,7 @@ release-docker:
 
 release-gh-pages:
 	docker container create --name statuspage "$(DOCKER_USERNAME)/opwenstatuspage:$(DOCKER_TAG)" && \
-  docker cp "statuspage:/app/opwen-statuspage" ./build && \
+  docker cp "statuspage:/app/lokole" ./build && \
   docker container rm statuspage
 
 release: release-docker release-gh-pages release-pypi

@@ -7,7 +7,7 @@ if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
   exit 0
 fi
 
-if [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/opwen-cloudserver" ]] && [[ "$TEST_MODE" = "live" ]]; then
+if [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/lokole" ]] && [[ "$TEST_MODE" = "live" ]]; then
   echo "Skipping live service CI for fork build" >&2
   exit 0
 fi

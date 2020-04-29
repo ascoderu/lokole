@@ -1,18 +1,18 @@
-=================
-Opwen cloudserver
-=================
+======
+Lokole
+======
 
-.. image:: https://travis-ci.org/ascoderu/opwen-cloudserver.svg?branch=master
-  :target: https://travis-ci.org/ascoderu/opwen-cloudserver
+.. image:: https://travis-ci.org/ascoderu/lokole.svg?branch=master
+  :target: https://travis-ci.org/ascoderu/lokole
 
 .. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
   :target: https://pypi.python.org/pypi/opwen_email_client/
 
-.. image:: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/shield.svg
-  :target: https://pyup.io/repos/github/ascoderu/opwen-cloudserver/
+.. image:: https://pyup.io/repos/github/ascoderu/lokole/shield.svg
+  :target: https://pyup.io/repos/github/ascoderu/lokole/
 
-.. image:: https://codecov.io/gh/ascoderu/opwen-cloudserver/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/ascoderu/opwen-cloudserver
+.. image:: https://codecov.io/gh/ascoderu/lokole/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/ascoderu/lokole
 
 ------------
 What's this?
@@ -130,8 +130,8 @@ Second, get the source code.
 
 .. sourcecode :: sh
 
-  git clone git@github.com:ascoderu/opwen-cloudserver.git
-  cd opwen-cloudserver
+  git clone git@github.com:ascoderu/lokole.git
+  cd lokole
 
 Third, build the project images. This will also verify your checkout by
 running the unit tests and other CI steps such as linting:
@@ -251,7 +251,7 @@ The script will then provision a cluster in Azure Kubernetes Service and
 install the project via Helm. The secrets to connect to the provisioned
 cluster will be stored in the :code:`secrets` directory.
 
-There is a `script <https://github.com/ascoderu/opwen-cloudserver/blob/master/install.py>`_
+There is a `script <https://github.com/ascoderu/lokole/blob/master/install.py>`_
 to set up a new Lokole email client. The script will install the email app in this
 repository as well as standard infrastructure like nginx and gunicorn.
 The script will also make ready peripherals like the USB modem used for data
@@ -288,14 +288,14 @@ The setup script is also tested with USB modems:
 
 The setup script installs the latest version of the email app published to PyPI.
 New versions get automatically published to PyPI (via Travis) whenever a new
-`release <https://github.com/ascoderu/opwen-cloudserver/releases/new>`_ is created
+`release <https://github.com/ascoderu/lokole/releases/new>`_ is created
 on Github.
 
 You can run the script on your client device like so:
 
 .. sourcecode :: sh
 
-  curl -fsO https://raw.githubusercontent.com/ascoderu/opwen-cloudserver/master/install.py && \
+  curl -fsO https://raw.githubusercontent.com/ascoderu/lokole/master/install.py && \
   sudo python3 install.py <client-name> <sim-type> <sync-schedule> <registration-credentials>
 
 ---------------------

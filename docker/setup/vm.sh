@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 if [[ "$1" != "install" ]]; then
-  cd /home/opwen/opwen-cloudserver || exit 99
+  cd /home/opwen/lokole || exit 99
   git fetch origin --prune || exit 1
   git reset --hard origin/master || exit 1
   cd - || exit 99
-  docker-compose -f /home/opwen/opwen-cloudserver/docker/docker-compose.prod.yml pull || exit 2
-  docker-compose -f /home/opwen/opwen-cloudserver/docker/docker-compose.prod.yml up -d || exit 3
+  docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml pull || exit 2
+  docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml up -d || exit 3
   exit 0
 fi
 
@@ -60,14 +60,14 @@ sudo chmod 0755 /etc/letsencrypt/{live,archive}
 # set up app
 # important: remember to scp the secrets to the vm manually
 #
-git clone https://github.com/ascoderu/opwen-cloudserver.git
-docker-compose -f opwen-cloudserver/docker/docker-compose.prod.yml pull
-docker-compose -f opwen-cloudserver/docker/docker-compose.prod.yml up -d
+git clone https://github.com/ascoderu/lokole.git
+docker-compose -f lokole/docker/docker-compose.prod.yml pull
+docker-compose -f lokole/docker/docker-compose.prod.yml up -d
 
 #
 # set up nginx
 #
-cat > opwen-cloudserver/secrets/nginx.env << EOM
+cat > lokole/secrets/nginx.env << EOM
 NGINX_WORKERS=auto
 HOSTNAME_WEBAPP=localhost:8080
 HOSTNAME_EMAIL_RECEIVE=localhost:8888
@@ -76,10 +76,10 @@ HOSTNAME_CLIENT_WRITE=localhost:8888
 HOSTNAME_CLIENT_READ=localhost:8888
 HOSTNAME_CLIENT_REGISTER=localhost:8888
 PORT=80
-STATIC_ROOT=/home/opwen/opwen-cloudserver/docker/nginx
+STATIC_ROOT=/home/opwen/lokole/docker/nginx
 LETSENCRYPT_DOMAIN=${hostname}
 EOM
 docker pull ascoderu/opwenserver_nginx
-docker run --env-file opwen-cloudserver/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/nginx.conf.template' | sudo tee /etc/nginx/nginx.conf
-docker run --env-file opwen-cloudserver/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/server.conf.template' | sudo tee /etc/nginx/sites-available/default
+docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/nginx.conf.template' | sudo tee /etc/nginx/nginx.conf
+docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/server.conf.template' | sudo tee /etc/nginx/sites-available/default
 sudo systemctl reload nginx

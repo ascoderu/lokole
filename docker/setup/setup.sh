@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ##
 ## This script sets up all the required Azure resources for the
-## opwen-cloudserver project. The script stores the secrets to
+## lokole project. The script stores the secrets to
 ## access the created resources in the folder /secrets as dotenv files.
 ##
 ## Required environment variables:
