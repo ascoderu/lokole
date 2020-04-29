@@ -1,10 +1,15 @@
 from opwen_email_server import config
 from opwen_email_server.services.auth import AzureAuth
+from opwen_email_server.services.auth import NoAuth
 from opwen_email_server.services.storage import AzureFileStorage
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import singleton
+
+
+def get_no_auth() -> NoAuth:
+    return NoAuth()
 
 
 @singleton

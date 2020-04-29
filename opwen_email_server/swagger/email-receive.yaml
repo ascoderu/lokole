@@ -36,6 +36,34 @@ paths:
         403:
           description: Request from unregistered client.
 
+  /service:
+
+    post:
+      operationId: opwen_email_server.integration.connexion.receive_service_email
+      summary: Webhook listening for request for services emails via Sendgrid.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - $ref: '#/parameters/SendgridEmail'
+        - $ref: '#/parameters/SendgridDkim'
+        - $ref: '#/parameters/SendgridTo'
+        - $ref: '#/parameters/SendgridCc'
+        - $ref: '#/parameters/SendgridFrom'
+        - $ref: '#/parameters/SendgridText'
+        - $ref: '#/parameters/SendgridSenderIp'
+        - $ref: '#/parameters/SendgridSpamReport'
+        - $ref: '#/parameters/SendgridEnvelope'
+        - $ref: '#/parameters/SendgridSubject'
+        - $ref: '#/parameters/SendgridSpamScore'
+        - $ref: '#/parameters/SendgridCharsets'
+        - $ref: '#/parameters/SendgridSpf'
+      responses:
+        200:
+          description: The email was succesfully received. No need to retry it.
+        403:
+          description: Error in receiving email.
+
+
 parameters:
 
   ClientId:

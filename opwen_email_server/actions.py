@@ -1,6 +1,8 @@
 from abc import ABC
 from hashlib import sha256
+from typing import Any
 from typing import Callable
+from typing import Dict
 from typing import Iterable
 from typing import Tuple
 from typing import Union
@@ -11,6 +13,7 @@ from opwen_email_server.constants import events
 from opwen_email_server.constants import mailbox
 from opwen_email_server.constants import sync
 from opwen_email_server.services.auth import AzureAuth
+from opwen_email_server.services.auth import NoAuth
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
@@ -212,7 +215,8 @@ class StoreWrittenClientEmails(_Action):
 
 
 class ReceiveInboundEmail(_Action):
-    def __init__(self, auth: AzureAuth, raw_email_storage: AzureTextStorage, next_task: Callable[[str], None]):
+    def __init__(self, auth: Union[AzureAuth, NoAuth], raw_email_storage: AzureTextStorage, next_task: Callable[[str],
+                                                                                                                None]):
 
         self._auth = auth
         self._raw_email_storage = raw_email_storage
@@ -236,6 +240,50 @@ class ReceiveInboundEmail(_Action):
     @classmethod
     def _new_email_id(cls, email: str) -> str:
         return sha256(email.encode('utf-8')).hexdigest()
+
+
+class ProcessServiceEmail(_Action):
+    def __init__(self,
+                 raw_email_storage: AzureTextStorage,
+                 email_storage: AzureObjectStorage,
+                 next_task: Callable[[str], None],
+                 registry: Dict[str, Any],
+                 email_parser: Callable[[dict], dict] = None):
+
+        self._raw_email_storage = raw_email_storage
+        self._email_storage = email_storage
+        self._next_task = next_task
+        self._registry = registry
+        self._email_parser = email_parser or MimeEmailParser()
+
+    def _action(self, resource_id):  # type: ignore
+        try:
+            mime_email = self._raw_email_storage.fetch_text(resource_id)
+        except ObjectDoesNotExistError:
+            self.log_warning('Inbound email %s does not exist', resource_id)
+            return 'skipped', 202
+
+        email = self._email_parser(mime_email)
+
+        for address in email.get('to', []):
+            try:
+                mailer_service = self._registry[address]
+            except KeyError:
+                self.log_warning('Skipping unknown mailer service: %s', address)
+                continue
+
+            formatted_email = mailer_service(email)
+
+            formatted_email_id = new_email_id(formatted_email)
+            formatted_email['_uid'] = formatted_email_id
+
+            self._email_storage.store_email(formatted_email, formatted_email_id)
+
+            self._next_task(formatted_email_id)
+
+        self._raw_email_storage.delete(resource_id)
+        self.log_event(events.EMAILS_FORMATTED_FOR_CLIENT)  # noqa: E501  # yapf: disable
+        return 'OK', 200
 
 
 class DownloadClientEmails(_Action):

@@ -3,6 +3,7 @@ from celery import Celery
 from opwen_email_server import config
 from opwen_email_server.actions import IndexReceivedEmailForMailbox
 from opwen_email_server.actions import IndexSentEmailForMailbox
+from opwen_email_server.actions import ProcessServiceEmail
 from opwen_email_server.actions import RegisterClient
 from opwen_email_server.actions import SendOutboundEmails
 from opwen_email_server.actions import StoreInboundEmails
@@ -14,6 +15,7 @@ from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
 from opwen_email_server.integration.azure import get_user_storage
+from opwen_email_server.mailers import REGISTRY
 from opwen_email_server.services.dns import SetupMxRecords
 from opwen_email_server.services.sendgrid import SendSendgridEmail
 from opwen_email_server.services.sendgrid import SetupSendgridMailbox
@@ -101,6 +103,18 @@ def send(resource_id: str) -> None:
     action(resource_id)
 
 
+@celery.task(ignore_result=True)
+def process_service_email(resource_id: str) -> None:
+    action = ProcessServiceEmail(
+        raw_email_storage=get_raw_email_storage(),
+        email_storage=get_email_storage(),
+        registry=REGISTRY,
+        next_task=send_and_index_email,
+    )
+
+    action(resource_id)
+
+
 def _fqn(task):
     return f'{__name__}.{task.__name__}'
 
@@ -109,6 +123,7 @@ task_routes = {
     _fqn(register_client): {'queue': config.REGISTER_CLIENT_QUEUE},
     _fqn(index_received_email_for_mailbox): {'queue': config.MAILBOX_RECEIVED_QUEUE},
     _fqn(index_sent_email_for_mailbox): {'queue': config.MAILBOX_SENT_QUEUE},
+    _fqn(process_service_email): {'queue': config.PROCESS_SERVICE_QUEUE},
     _fqn(inbound_store): {'queue': config.INBOUND_STORE_QUEUE},
     _fqn(written_store): {'queue': config.WRITTEN_STORE_QUEUE},
     _fqn(send): {'queue': config.SEND_QUEUE}
