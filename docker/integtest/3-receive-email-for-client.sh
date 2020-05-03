@@ -10,7 +10,11 @@ mkdir -p "${out_dir}"
 
 email_to_receive="${in_dir}/inbound-email.mime"
 
-client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
+if [[ -n "$1" ]]; then
+  client_id="$1"
+else
+  client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
+fi
 
 # workflow 2a: receive an email directed at one of the clients
 # this simulates sendgrid delivering an email to the service

@@ -55,6 +55,11 @@ integration-tests:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest
 
+test-emails:
+	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest \
+  ./3-receive-email-for-client.sh bdd640fb-0667-1ad1-1c80-317fa3b1799d
+
 clean:
 	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
 
