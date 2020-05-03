@@ -84,7 +84,6 @@ services:
         VERSION: ${BUILD_TAG}
     environment:
       <<: *shared-app-environment
-      OPWEN_EMAIL_SERVER_HOSTNAME: nginx:8888
       WEBAPP_WORKERS: ${WEBAPP_WORKERS}
       WEBAPP_PORT: "8080"
       HOST: "0.0.0.0"
