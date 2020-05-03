@@ -75,12 +75,14 @@ class AzureTextStorageTests(TestCase):
             def get_container(*args, **kwargs):
                 if not container['get_was_called']:
                     container['get_was_called'] = True
+                    # noinspection PyTypeChecker
                     raise ContainerDoesNotExistError(None, driver, self._container)
 
                 return container
 
-            driver.get_container.side_effect = get_container
+            # noinspection PyTypeChecker
             driver.create_container.side_effect = throw(ContainerAlreadyExistsError(None, driver, self._container))
+            driver.get_container.side_effect = get_container
 
             self.assertIs(self._storage._client._wrapped, container)
 
