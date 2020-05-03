@@ -12,6 +12,7 @@ services:
   api:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-gunicorn.sh"]
     environment:
+      PYTHONDONTWRITEBYTECODE: "1"
       LOKOLE_RANDOM_SEED: "42"
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
@@ -19,12 +20,15 @@ services:
   worker:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-celery.sh"]
     environment:
+      PYTHONDONTWRITEBYTECODE: "1"
       LOKOLE_RANDOM_SEED: "42"
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
 
   webapp:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/client/run-gunicorn.sh"]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
     volumes:
       - ./opwen_email_client:/app/opwen_email_client
       - ./opwen_email_server:/app/opwen_email_server
@@ -32,6 +36,7 @@ services:
   client:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/client/run-lokole.sh"]
     environment:
+      PYTHONDONTWRITEBYTECODE: "1"
       OPWEN_REMOTE_RESOURCE_CONTAINER: compressedpackages
       OPWEN_REMOTE_ACCOUNT_NAME: ${AZURITE_ACCOUNT}
       OPWEN_REMOTE_ACCOUNT_KEY: ${AZURITE_KEY}
