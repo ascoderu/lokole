@@ -30,3 +30,15 @@ az_storage() {
     --connection-string "$(az_connection_string)" \
   > /dev/null
 }
+
+wait_seconds() {
+  local seconds="$1"
+
+  printf 'Waiting' >&2
+  while [[ "${seconds}" -gt 0 ]]; do
+    printf '.' >&2
+    sleep 1
+    seconds="$((seconds - 1))"
+  done
+  echo >&2
+}

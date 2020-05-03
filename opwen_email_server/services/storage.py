@@ -11,6 +11,7 @@ from typing import Tuple
 
 from cached_property import cached_property
 from libcloud.storage.base import Container
+from libcloud.storage.base import Object
 from libcloud.storage.base import StorageDriver
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerAlreadyExistsError
@@ -35,6 +36,41 @@ Upload = Tuple[str, Iterable[dict], Callable[[dict], bytes]]
 Download = Tuple[str, Callable[[bytes], dict]]
 
 
+class _Container:
+    def __init__(self, wrapped: Container):
+        self._wrapped = wrapped
+
+    def get_object(self, object_name: str) -> Object:
+        return self._wrapped.get_object(object_name)
+
+    def iterate_objects(self, prefix: Optional[str] = None) -> Iterable[Object]:
+        return self._wrapped.iterate_objects(prefix)
+
+    def upload_object(self, file_path: str, object_name: str) -> Object:
+        return self._wrapped.upload_object(file_path, object_name)
+
+    def upload_object_via_stream(self, iterator: Iterator[bytes], object_name: str) -> Object:
+        return self._wrapped.upload_object_via_stream(iterator, object_name)
+
+
+class _CaseInsensitiveContainer(_Container):
+    def get_object(self, object_name: str) -> Object:
+        object_name = object_name.lower()
+        return super().get_object(object_name)
+
+    def iterate_objects(self, prefix: Optional[str] = None) -> Iterable[Object]:
+        prefix = prefix.lower() if prefix is not None else None
+        return super().iterate_objects(prefix)
+
+    def upload_object(self, file_path: str, object_name: str) -> Object:
+        object_name = object_name.lower()
+        return super().upload_object(file_path, object_name)
+
+    def upload_object_via_stream(self, iterator: Iterator[bytes], object_name: str) -> Object:
+        object_name = object_name.lower()
+        return super().upload_object_via_stream(iterator, object_name)
+
+
 class _BaseAzureStorage(LogMixin):
     def __init__(self,
                  account: str,
@@ -42,13 +78,15 @@ class _BaseAzureStorage(LogMixin):
                  container: str,
                  provider: str,
                  host: Optional[str] = None,
-                 secure: bool = True) -> None:
+                 secure: bool = True,
+                 case_sensitive: bool = True) -> None:
         self._account = account
         self._key = key
         self._container = container
         self._provider = getattr(Provider, provider)
         self._host = host or None
         self._secure = secure
+        self._case_sensitive = case_sensitive
 
     @cached_property
     def _driver(self) -> StorageDriver:
@@ -56,7 +94,7 @@ class _BaseAzureStorage(LogMixin):
         return driver(self._account, self._key, host=self._host, secure=self._secure)
 
     @cached_property
-    def _client(self) -> Container:
+    def _client(self) -> _Container:
         try:
             container = self._driver.get_container(self._container)
         except ContainerDoesNotExistError:
@@ -64,7 +102,7 @@ class _BaseAzureStorage(LogMixin):
                 container = self._driver.create_container(self._container)
             except ContainerAlreadyExistsError:
                 container = self._driver.get_container(self._container)
-        return container
+        return _Container(container) if self._case_sensitive else _CaseInsensitiveContainer(container)
 
     @property
     def _generated_suffix(self) -> str:
@@ -91,7 +129,7 @@ class _BaseAzureStorage(LogMixin):
             self.log_debug('deleted %s', resource_id)
 
     def iter(self, prefix: Optional[str] = None) -> Iterator[str]:
-        resources = self._driver.iterate_container_objects(self._client, prefix=prefix)
+        resources = self._client.iterate_objects(prefix=prefix)
 
         for resource in resources:
             resource_id = resource.name

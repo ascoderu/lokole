@@ -7,6 +7,10 @@ mkdir -p "${out_dir}"
 # shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
+declare -A num_emails_expected_for_client
+num_emails_expected_for_client[1]=2
+num_emails_expected_for_client[2]=1
+
 for i in 1 2; do
 
 client_id="$(jq -r '.client_id' < "${out_dir}/register${i}.json")"
@@ -29,7 +33,7 @@ az_storage download "${resource_container}" "${resource_id}" "${out_dir}/downloa
 tar xzf "${out_dir}/downloaded${i}.tar.gz" -C "${out_dir}"
 
 num_emails_actual="$(wc -l "${out_dir}/emails.jsonl" | cut -d' ' -f1)"
-num_emails_expected=1
+num_emails_expected="${num_emails_expected_for_client[${i}]}"
 
 if [[ "${num_emails_actual}" -ne "${num_emails_expected}" ]]; then
   echo "Got ${num_emails_actual} emails but expected ${num_emails_expected}" >&2
