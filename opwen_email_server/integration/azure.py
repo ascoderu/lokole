@@ -69,6 +69,7 @@ def get_user_storage() -> AzureObjectStorage:
         secure=config.TABLES_SECURE,
         container=config.CONTAINER_USERS,
         provider=config.STORAGE_PROVIDER,
+        case_sensitive=False,
     )
 
 
@@ -81,6 +82,7 @@ def get_mailbox_storage() -> AzureTextStorage:
         secure=config.BLOBS_SECURE,
         container=config.CONTAINER_MAILBOX,
         provider=config.STORAGE_PROVIDER,
+        case_sensitive=False,
     )
 
 

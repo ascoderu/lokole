@@ -26,3 +26,10 @@ http --check-status -f POST \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${email_to_receive}"
+
+# simulate delivery of another email
+http --check-status -f POST \
+  "http://nginx:8888/api/email/sendgrid/${client_id}" \
+  "dkim={@sendgrid.com : pass}" \
+  "SPF=pass" \
+  "email=@${in_dir}/inbound-email-2.mime"

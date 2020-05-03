@@ -27,7 +27,7 @@
               {% if show_sent_to %}
               <div class="col-sm-3">
                 <span class="email-sent-to">
-                  {% if email['from'] == current_user.email %}
+                  {% if email['from'].lower() == current_user.email.lower() %}
                     <span class="visible-print">{{ _('To: %(emails)s', emails=', '.join(email['to'])) }}</span>
                     <span class="hidden-print">{{ email['to'] | join(', ') }}</span>
                   {% else %}
