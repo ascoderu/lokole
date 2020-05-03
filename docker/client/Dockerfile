@@ -1,20 +1,23 @@
+ARG NODE_VERSION=12
 ARG PYTHON_VERSION=3.7
-FROM python:${PYTHON_VERSION} AS builder
-
-ARG NODE_VERSION=12.x
-ARG YARN_VERSION=1.22.4
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN curl -fsSL "https://deb.nodesource.com/setup_${NODE_VERSION}" | bash \
- && curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
- && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
- && apt-get install -y --no-install-recommends nodejs=12.16.2-1nodesource1 mobile-broadband-provider-info=20170903-1 \
- && rm -rf /var/lib/apt/lists/* \
- && npm install -g "yarn@${YARN_VERSION}"
+FROM node:${NODE_VERSION} AS yarn
 
 WORKDIR /app
 
 COPY package.json yarn.lock ./
 RUN yarn install
+
+COPY . .
+RUN yarn run lint \
+ && yarn run build
+
+FROM python:${PYTHON_VERSION} AS builder
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends mobile-broadband-provider-info=20170903-1 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
 
 COPY requirements-webapp.txt ./
 RUN pip install --no-cache-dir -r requirements-webapp.txt
@@ -22,9 +25,8 @@ RUN pip install --no-cache-dir -r requirements-webapp.txt
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY --from=yarn /app/opwen_email_client/webapp/static/ /app/opwen_email_client/webapp/static/
 COPY . .
-RUN yarn run lint \
- && yarn run build
 
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/client.env
