@@ -32,9 +32,16 @@ class Ioc:
         if AppConfig.TESTING:
             email_server_client = LocalEmailServerClient()
         else:
+            if AppConfig.EMAIL_SERVER_ENDPOINT:
+                endpoint = AppConfig.EMAIL_SERVER_ENDPOINT
+            elif AppConfig.EMAIL_SERVER_HOSTNAME:
+                endpoint = 'https://{}'.format(AppConfig.EMAIL_SERVER_HOSTNAME)
+            else:
+                endpoint = None
+
             email_server_client = HttpEmailServerClient(
                 compression=AppConfig.COMPRESSION,
-                hostname=AppConfig.EMAIL_SERVER_HOSTNAME,
+                endpoint=endpoint,
                 client_id=AppConfig.CLIENT_ID,
             )
 
@@ -44,6 +51,8 @@ class Ioc:
             compression=AppConfig.COMPRESSION,
             account_name=AppConfig.STORAGE_ACCOUNT_NAME,
             account_key=AppConfig.STORAGE_ACCOUNT_KEY,
+            account_host=AppConfig.STORAGE_ACCOUNT_HOST,
+            account_secure=AppConfig.STORAGE_ACCOUNT_SECURE,
             email_server_client=email_server_client,
             container=AppConfig.STORAGE_CONTAINER,
             provider=AppConfig.STORAGE_PROVIDER,

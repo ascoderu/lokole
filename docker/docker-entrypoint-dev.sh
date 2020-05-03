@@ -10,6 +10,7 @@ exec "${PY_ENV}/bin/watchmedo" \
   auto-restart \
   --debug-force-polling \
   --directory="${rootdir}/opwen_email_server" \
-  --pattern='*.py' \
+  --directory="${rootdir}/opwen_email_client" \
+  --pattern='*.py;*.html;*.js;*.css' \
   --recursive \
   -- "$@"

@@ -47,13 +47,15 @@ class AzureSync(Sync):
         Download(name=_attachments_file, optional=True, type_='attachment'),
     )
 
-    def __init__(self, container: str, serializer: Serializer, account_name: str, account_key: str,
-                 email_server_client: EmailServerClient, provider: str, compression: str):
+    def __init__(self, container: str, serializer: Serializer, account_name: str, account_key: str, account_host: str,
+                 account_secure: bool, email_server_client: EmailServerClient, provider: str, compression: str):
 
         self._container = container
         self._serializer = serializer
         self._account = account_name
         self._key = account_key
+        self._host = account_host
+        self._secure = account_secure
         self._email_server_client = email_server_client
         self._provider = getattr(Provider, provider)
         self._compression = compression
@@ -61,7 +63,7 @@ class AzureSync(Sync):
     @cached_property
     def _azure_client(self) -> Container:
         driver = get_driver(self._provider)
-        client = driver(self._account, self._key)
+        client = driver(self._account, self._key, host=self._host, secure=self._secure)
         return client.get_container(self._container)
 
     @classmethod

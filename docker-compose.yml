@@ -117,6 +117,25 @@ services:
       - azurite
       - rabbitmq
 
+  client:
+    image: ${DOCKER_REPO}/opwenwebapp:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+      target: ${BUILD_TARGET}
+      args:
+        VERSION: ${BUILD_TAG}
+    ports:
+      - ${CLIENT_PORT}:5000
+    environment:
+      LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
+      WEBAPP_WORKERS: ${WEBAPP_WORKERS}
+      QUEUE_WORKERS: ${QUEUE_WORKERS}
+      WEBAPP_PORT: "5000"
+      HOST: "0.0.0.0"
+      OPWEN_SETTINGS: /app/docker/client/client.env
+      OPWEN_EMAIL_SERVER_ENDPOINT: http://nginx:8888
+
   rabbitmq:
     image: rabbitmq:management-alpine
     environment:

@@ -27,6 +27,8 @@ class AzureSyncTests(TestCase):
                               email_server_client=self.email_server_client_mock,
                               account_key='mock',
                               account_name=self._root_folder,
+                              account_host=None,
+                              account_secure=True,
                               provider='LOCAL',
                               compression='gz',
                               serializer=JsonSerializer())
