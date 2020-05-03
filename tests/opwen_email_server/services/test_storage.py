@@ -26,6 +26,7 @@ from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_jsonl_bytes
 from opwen_email_server.utils.temporary import create_tempfilename
 from opwen_email_server.utils.temporary import removing
+from opwen_email_server.utils.unique import NewGuid
 from tests.opwen_email_server.helpers import throw
 
 
@@ -284,12 +285,15 @@ class AzureObjectsStorageTests(TestCase):
         self._folder = mkdtemp()
         self._container = 'container'
         mkdir(join(self._folder, self._container))
-        self._storage = AzureObjectsStorage(file_storage=AzureFileStorage(
-            account=self._folder,
-            key='unused',
-            container=self._container,
-            provider='LOCAL',
-        ))
+        self._storage = AzureObjectsStorage(
+            file_storage=AzureFileStorage(
+                account=self._folder,
+                key='unused',
+                container=self._container,
+                provider='LOCAL',
+            ),
+            resource_id_source=NewGuid(0),
+        )
 
     def tearDown(self):
         rmtree(self._folder)

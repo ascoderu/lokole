@@ -6,10 +6,16 @@ from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import singleton
+from opwen_email_server.utils.unique import NewGuid
 
 
 def get_no_auth() -> NoAuth:
     return NoAuth()
+
+
+@singleton
+def get_guid_source() -> NewGuid:
+    return NewGuid(config.RANDOM_SEED)
 
 
 @singleton
@@ -26,14 +32,17 @@ def get_auth() -> AzureAuth:
 
 @singleton
 def get_client_storage() -> AzureObjectsStorage:
-    return AzureObjectsStorage(file_storage=AzureFileStorage(
-        account=config.CLIENT_STORAGE_ACCOUNT,
-        key=config.CLIENT_STORAGE_KEY,
-        host=config.CLIENT_STORAGE_HOST,
-        secure=config.CLIENT_STORAGE_SECURE,
-        container=config.CONTAINER_CLIENT_PACKAGES,
-        provider=config.STORAGE_PROVIDER,
-    ))
+    return AzureObjectsStorage(
+        file_storage=AzureFileStorage(
+            account=config.CLIENT_STORAGE_ACCOUNT,
+            key=config.CLIENT_STORAGE_KEY,
+            host=config.CLIENT_STORAGE_HOST,
+            secure=config.CLIENT_STORAGE_SECURE,
+            container=config.CONTAINER_CLIENT_PACKAGES,
+            provider=config.STORAGE_PROVIDER,
+        ),
+        resource_id_source=get_guid_source(),
+    )
 
 
 @singleton

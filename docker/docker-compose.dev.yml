@@ -12,11 +12,15 @@ services:
 
   api:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-gunicorn.sh"]
+    environment:
+      LOKOLE_RANDOM_SEED: "42"
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
 
   worker:
     command: ["/app/docker/docker-entrypoint-dev.sh", "/app/docker/app/run-celery.sh"]
+    environment:
+      LOKOLE_RANDOM_SEED: "42"
     volumes:
       - ./opwen_email_server:/app/opwen_email_server
 

@@ -4,6 +4,8 @@ from opwen_email_server.utils.string import urlsafe
 
 env = Env()
 
+RANDOM_SEED = env.int('LOKOLE_RANDOM_SEED', None)
+
 STORAGE_PROVIDER = env('LOKOLE_STORAGE_PROVIDER', 'AZURE_BLOBS')
 
 BLOBS_ACCOUNT = env('LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME', '')
