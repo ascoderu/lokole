@@ -277,7 +277,7 @@ class ProcessServiceEmail(_Action):
             formatted_email_id = new_email_id(formatted_email)
             formatted_email['_uid'] = formatted_email_id
 
-            self._email_storage.store_email(formatted_email, formatted_email_id)
+            self._email_storage.store_object(formatted_email_id, formatted_email)
 
             self._next_task(formatted_email_id)
 

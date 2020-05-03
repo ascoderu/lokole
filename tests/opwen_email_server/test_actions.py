@@ -344,7 +344,7 @@ class ProcessServiceEmailTests(TestCase):
 
         _, status = self._execute_action(resource_id)
         self.assertEqual(status, 200)
-        self.email_storage.store_email.assert_called_once()
+        self.email_storage.store_object.assert_called_once()
         self.next_task.assert_called_once()
 
     def _execute_action(self, *args, **kwargs):
