@@ -26,7 +26,7 @@ before_script: |
     export AZURITE_KEY="$TEST_AZURE_STORAGE_KEY"
     export AZURITE_HOST=""
     export AZURITE_SECURE="True"
-    export TEST_STEP_DELAY="90s"
+    export TEST_STEP_DELAY=90
   else
     export REGISTRATION_CREDENTIALS="admin:password"
     export LOKOLE_QUEUE_BROKER_SCHEME="amqp"
