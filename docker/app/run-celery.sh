@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 if [[ "${CELERY_QUEUE_NAMES}" = "all" ]]; then
-  CELERY_QUEUE_NAMES="$("${PY_ENV}/bin/python" -m opwen_email_server.integration.cli print-queues --separator=,)"
+  CELERY_QUEUE_NAMES="$(python -m opwen_email_server.integration.cli print-queues --separator=,)"
 fi
 
-"${PY_ENV}/bin/celery" \
+exec celery \
   --app="opwen_email_server.integration.celery" \
   worker \
   --without-gossip \

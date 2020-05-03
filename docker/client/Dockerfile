@@ -34,7 +34,6 @@ COPY . .
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
 ENV HOT_RELOAD="True"
-ENV PY_ENV=/usr/local
 
 FROM builder AS compiler
 
@@ -63,4 +62,3 @@ COPY --from=compiler /app/docker/client/client.env /app/docker/client/client.env
 
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
-ENV PY_ENV=/usr/local

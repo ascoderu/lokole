@@ -1,55 +1,4 @@
-PY_ENV ?= ./venv
-
-.PHONY: tests
 default: build
-
-tests:
-	LOKOLE_LOG_LEVEL=CRITICAL $(PY_ENV)/bin/coverage run -m nose2 -v && \
-  $(PY_ENV)/bin/coverage xml && \
-  $(PY_ENV)/bin/coverage report
-
-lint-swagger:
-	find opwen_email_server/swagger -type f -name '*.yaml' | while read file; do \
-    echo "==================== $$file ===================="; \
-    $(PY_ENV)/bin/swagger-flex --source="$$file" \
-  || exit 1; done
-
-lint-python:
-	$(PY_ENV)/bin/flake8 opwen_email_server opwen_email_client
-	$(PY_ENV)/bin/isort --check-only --recursive opwen_email_server opwen_email_client --virtual-env $(PY_ENV)
-	$(PY_ENV)/bin/yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
-	$(PY_ENV)/bin/bandit --recursive opwen_email_server opwen_email_client
-	$(PY_ENV)/bin/mypy opwen_email_server opwen_email_client
-
-lint-yaml:
-	find . -type f -regex '.*\.ya?ml' -not -path '$(PY_ENV)/*' | grep -v '^./helm/' | while read file; do \
-    echo "==================== $$file ===================="; \
-    $(PY_ENV)/bin/yamllint "$$file" \
-  || exit 1; done
-
-lint-docker:
-	if command -v hadolint >/dev/null; then \
-    find . -type f -name Dockerfile -not -path '$(PY_ENV)/*' | while read file; do \
-      echo "==================== $$file ===================="; \
-      hadolint "$$file" \
-    || exit 1; done \
-  fi
-
-lint-shell:
-	if command -v shellcheck >/dev/null; then \
-    find . -type f -name '*.sh' -not -path '$(PY_ENV)/*' | while read file; do \
-      echo "==================== $$file ===================="; \
-      shellcheck "$$file" \
-    || exit 1; done \
-  fi
-
-lint-helm:
-	helm lint --strict ./helm/opwen_cloudserver
-	helm template ./helm/opwen_cloudserver > helm.yaml && kubeval --ignore-missing-schemas helm.yaml && rm helm.yaml
-
-lint: lint-python lint-shell lint-swagger lint-docker lint-yaml lint-helm
-
-ci: tests lint
 
 integration-tests:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
@@ -60,14 +9,9 @@ test-emails:
   docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest \
   ./3-receive-email-for-client.sh bdd640fb-0667-1ad1-1c80-317fa3b1799d
 
-clean:
-	find . -name '__pycache__' -type d -print0 | xargs -0 rm -rf
-
 clean-storage:
-	docker-compose exec api sh -c \
-    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"'
-	docker-compose exec api sh -c \
-    '"$${PY_ENV}/bin/python" -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"'
+	docker-compose exec api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
+	docker-compose exec api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
 
 build:
 	BUILD_TARGET=builder docker-compose build api && \

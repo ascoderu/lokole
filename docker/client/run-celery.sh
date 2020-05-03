@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-exec "${PY_ENV}/bin/celery" \
+exec celery \
   --app=opwen_email_client.webapp.tasks \
   worker \
   --loglevel="${LOKOLE_LOG_LEVEL}" \

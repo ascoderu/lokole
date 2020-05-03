@@ -44,8 +44,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY . .
 
 ARG LOKOLE_SENDGRID_KEY=""
-ENV PY_ENV=/usr/local
-RUN make ci clean
+RUN ./docker/app/ci.sh
 
 ENV HOT_RELOAD="True"
 
@@ -64,5 +63,3 @@ WORKDIR /app
 COPY --from=builder /app/docker/app/run-celery.sh ./docker/app/run-celery.sh
 COPY --from=builder /app/docker/app/run-gunicorn.sh ./docker/app/run-gunicorn.sh
 COPY --from=builder /app/opwen_email_server ./opwen_email_server
-
-ENV PY_ENV=/usr/local

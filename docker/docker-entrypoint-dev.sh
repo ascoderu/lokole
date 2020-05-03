@@ -6,7 +6,7 @@ fi
 
 rootdir="$(readlink -f "$(dirname "$0")/..")"
 
-exec "${PY_ENV}/bin/watchmedo" \
+exec watchmedo \
   auto-restart \
   --debug-force-polling \
   --directory="${rootdir}/opwen_email_server" \
