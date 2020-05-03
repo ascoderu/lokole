@@ -29,7 +29,7 @@ COPY --from=yarn /app/opwen_email_client/webapp/static/ /app/opwen_email_client/
 COPY . .
 
 ENV OPWEN_SESSION_KEY=changeme
-ENV OPWEN_SETTINGS=/app/docker/client/client.env
+ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
 
 CMD ["python", "/app/manage.py", "devserver"]
 
@@ -55,9 +55,9 @@ RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
 COPY --from=compiler /app/docker/client/run-gunicorn.sh /app/docker/client/run-gunicorn.sh
-COPY --from=compiler /app/docker/client/client.env /app/docker/client/client.env
+COPY --from=compiler /app/docker/client/webapp.env /app/docker/client/webapp.env
 
 ENV OPWEN_SESSION_KEY=changeme
-ENV OPWEN_SETTINGS=/app/docker/client/client.env
+ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
 
 CMD ["/app/docker/client/run-gunicorn.sh"]
