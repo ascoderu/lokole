@@ -40,6 +40,9 @@ class SuffixedStringFieldTests(Base.FieldTests):
     def test_does_not_add_suffix_when_existing(self):
         self.verify_field('foobar', 'foobar')
 
+    def test_lowercases_value(self):
+        self.verify_field('BAZ', 'bazbar')
+
 
 class HtmlTextAreaFieldTests(Base.FieldTests):
     def create_field(self):

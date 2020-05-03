@@ -99,7 +99,10 @@ class SuffixedStringField(StringField):
         return self._ensure_suffix(value)
 
     def _ensure_suffix(self, value: str) -> str:
-        if value and not value.endswith(self._suffix):
-            return value + self._suffix
-        else:
+        if not value:
             return value
+
+        if not value.endswith(self._suffix):
+            value = value + self._suffix
+
+        return value.lower()
