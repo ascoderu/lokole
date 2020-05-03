@@ -3,7 +3,6 @@ version: '3.4'
 services:
 
   statuspage:
-    command: ["npm", "start"]
     environment:
       CHOKIDAR_USEPOLLING: "true"
     volumes:
