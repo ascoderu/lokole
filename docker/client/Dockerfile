@@ -54,10 +54,10 @@ COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz
 RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
-COPY --from=compiler /app/docker/client/run-gunicorn.sh /app/run-gunicorn.sh
-COPY --from=compiler /app/docker/client/client.env /app/client.env
+COPY --from=compiler /app/docker/client/run-gunicorn.sh /app/docker/client/run-gunicorn.sh
+COPY --from=compiler /app/docker/client/client.env /app/docker/client/client.env
 
 ENV OPWEN_SESSION_KEY=changeme
-ENV OPWEN_SETTINGS=/app/client.env
+ENV OPWEN_SETTINGS=/app/docker/client/client.env
 
-CMD ["/app/run-gunicorn.sh"]
+CMD ["/app/docker/client/run-gunicorn.sh"]
