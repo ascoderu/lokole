@@ -49,9 +49,9 @@
   version "3.7.3"
   resolved "https://codeload.github.com/aFarkas/html5shiv/tar.gz/ed28c56c071bddfe7d635ad88995674957a016be"
 
-"@bower_components/jquery@jquery/jquery-dist#^3.1.0":
-  version "3.4.1"
-  resolved "https://codeload.github.com/jquery/jquery-dist/tar.gz/15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
+"@bower_components/jquery@jquery/jquery-dist#^3.5.0":
+  version "3.5.0"
+  resolved "https://codeload.github.com/jquery/jquery-dist/tar.gz/1fd78cd729742aa26f64783f9188e169e41f194e"
 
 "@bower_components/printThis@jasonday/printThis#^1.9.0":
   version "1.15.0"
@@ -1158,9 +1158,9 @@ jquery-lazyload@^1.9.7:
   integrity sha1-mYKziMUzwLYRIUs8WqoLn+3gcfc=
 
 "jquery@>= 1.9.0", jquery@>=1.11:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
-  integrity sha512-36+AdBzCL+y6qjw5Tx7HgzeGCzC81MDDgaUP8ld2zhx58HdqXGoBd+tHdrBMiyjGQs0Hxs/MLZTu/eHNJJuWPw==
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.0.tgz#9980b97d9e4194611c36530e7dc46a58d7340fc9"
+  integrity sha512-Xb7SVYMvygPxbFMpTFQiHh1J7HClEaThguL15N/Gg37Lri/qKyhRGZYzHRyLH8Stq3Aow0LsHO2O2ci86fCrNQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
