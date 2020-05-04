@@ -29,7 +29,6 @@ from opwen_email_server.utils.serialization import from_jsonl_bytes
 from opwen_email_server.utils.serialization import to_base64
 from opwen_email_server.utils.serialization import to_jsonl_bytes
 from opwen_email_server.utils.string import is_lowercase
-from opwen_email_server.utils.unique import new_client_id
 from opwen_email_server.utils.unique import new_email_id
 
 Response = Union[dict, Tuple[str, int]]
@@ -365,18 +364,14 @@ class UploadClientEmails(_Action):
 
 
 class RegisterClient(_Action):
-    def __init__(self,
-                 auth: AzureAuth,
-                 client_storage: AzureObjectsStorage,
-                 setup_mailbox: Callable[[str, str], None],
-                 setup_mx_records: Callable[[str], None],
-                 client_id_source: Callable[[], str] = None):
+    def __init__(self, auth: AzureAuth, client_storage: AzureObjectsStorage, setup_mailbox: Callable[[str, str], None],
+                 setup_mx_records: Callable[[str], None], client_id_source: Callable[[], str]):
 
         self._auth = auth
         self._client_storage = client_storage
         self._setup_mailbox = setup_mailbox
         self._setup_mx_records = setup_mx_records
-        self._client_id_source = client_id_source or new_client_id
+        self._client_id_source = client_id_source
 
     def _action(self, domain, owner):  # type: ignore
         client_id = self._client_id_source()

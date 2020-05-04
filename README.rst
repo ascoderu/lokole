@@ -140,7 +140,7 @@ running the unit tests and other CI steps such as linting:
 
   make build
 
-You can now run the application stack; code changes will be hot reloaded:
+You can now run the application stack:
 
 .. sourcecode :: sh
 
@@ -162,7 +162,12 @@ in the integration tests folder and can be run via:
   make build start
 
   # in another terminal, run the integration tests
-  make integration-tests
+  # the integration tests also serve the purpose of
+  # seeding the system with some test data
+  # you can access the email service at http://localhost:8080
+  # you can access the email client at http://localhost:5000
+  # you can access the status page at http://localhost:3000
+  make integration-tests test-emails
 
   # finally, tear down the services
   make stop

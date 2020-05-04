@@ -28,6 +28,7 @@ services:
 
   webapp:
     image: ascoderu/opwenwebapp:latest
+    command: ["/app/docker/client/run-gunicorn.sh"]
     <<: *shared-secret-environment
     ports:
       - 8080:8080

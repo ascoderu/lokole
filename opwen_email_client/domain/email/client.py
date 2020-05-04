@@ -19,14 +19,14 @@ class EmailServerClient(metaclass=ABCMeta):
 
 
 class HttpEmailServerClient(EmailServerClient):
-    def __init__(self, compression: str, hostname: str, client_id: str):
+    def __init__(self, compression: str, endpoint: str, client_id: str):
         self._compression = compression
-        self._hostname = hostname
+        self._endpoint = endpoint
         self._client_id = client_id
 
     @property
     def _base_url(self) -> str:
-        return 'https://{hostname}/api/email'.format(hostname=self._hostname)
+        return '{endpoint}/api/email'.format(endpoint=self._endpoint)
 
     @property
     def _upload_url(self) -> str:

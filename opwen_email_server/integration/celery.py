@@ -11,6 +11,7 @@ from opwen_email_server.actions import StoreWrittenClientEmails
 from opwen_email_server.integration.azure import get_auth
 from opwen_email_server.integration.azure import get_client_storage
 from opwen_email_server.integration.azure import get_email_storage
+from opwen_email_server.integration.azure import get_guid_source
 from opwen_email_server.integration.azure import get_mailbox_storage
 from opwen_email_server.integration.azure import get_pending_storage
 from opwen_email_server.integration.azure import get_raw_email_storage
@@ -38,6 +39,7 @@ def register_client(domain: str, owner: str) -> None:
             secret=config.DNS_SECRET,
             provider=config.DNS_PROVIDER,
         ),
+        client_id_source=get_guid_source(),
     )
 
     action(domain, owner)
