@@ -2,6 +2,7 @@
 !.env
 !.yamllint
 !*.yml
+!.prettierignore
 !docker/
 !helm/
 !opwen_email_client/

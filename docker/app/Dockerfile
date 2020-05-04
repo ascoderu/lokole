@@ -41,9 +41,19 @@ RUN pip install --no-cache-dir -r requirements.txt \
  && pip wheel --no-cache-dir -r requirements.txt -w /deps \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
-COPY . .
-
 ARG LOKOLE_SENDGRID_KEY=""
+COPY ./opwen_email_server ./opwen_email_server/
+COPY ./opwen_email_client ./opwen_email_client/
+COPY ./tests ./tests/
+COPY setup.cfg ./
+RUN flake8 opwen_email_server opwen_email_client
+RUN isort --check-only --recursive opwen_email_server opwen_email_client
+RUN yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
+RUN bandit --recursive opwen_email_server opwen_email_client
+RUN mypy opwen_email_server opwen_email_client
+RUN coverage run -m nose2 -v && coverage xml && coverage report
+
+COPY . .
 RUN ./docker/app/ci.sh
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
