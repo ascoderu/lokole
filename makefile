@@ -18,17 +18,12 @@ build:
   docker-compose run --no-deps --rm api cat coverage.xml > coverage.xml
 	docker-compose \
     -f docker-compose.yml \
-    -f docker/docker-compose.dev.yml \
     -f docker/docker-compose.test.yml \
     -f docker/docker-compose.tools.yml \
     build
 
 start:
-	if [ "$(CI)" = "true" ]; then \
-    docker-compose up -d; \
-  else \
-    docker-compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d --remove-orphans; \
-  fi
+	docker-compose up -d --remove-orphans
 
 start-devtools:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
@@ -47,7 +42,6 @@ logs:
 stop:
 	docker-compose \
     -f docker-compose.yml \
-    -f docker/docker-compose.dev.yml \
     -f docker/docker-compose.test.yml \
     -f docker/docker-compose.tools.yml \
     down --volumes --timeout=5

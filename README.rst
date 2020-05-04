@@ -140,7 +140,7 @@ running the unit tests and other CI steps such as linting:
 
   make build
 
-You can now run the application stack; code changes will be hot reloaded:
+You can now run the application stack:
 
 .. sourcecode :: sh
 

@@ -46,8 +46,6 @@ COPY . .
 ARG LOKOLE_SENDGRID_KEY=""
 RUN ./docker/app/ci.sh
 
-ENV HOT_RELOAD="True"
-
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
 RUN groupadd -r opwen \

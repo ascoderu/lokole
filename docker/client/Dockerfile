@@ -33,7 +33,6 @@ COPY . .
 
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
-ENV HOT_RELOAD="True"
 
 FROM builder AS compiler
 

@@ -29,6 +29,9 @@ x-shared-app-environment:
   LOKOLE_CLIENT_AZURE_STORAGE_HOST: ${AZURITE_HOST}
   LOKOLE_CLIENT_AZURE_STORAGE_SECURE: ${AZURITE_SECURE}
 
+  PYTHONDONTWRITEBYTECODE: "1"
+  LOKOLE_RANDOM_SEED: "42"
+
 x-shared-app-build:
   &shared-app-build
   image: ${DOCKER_REPO}/opwenserver_app:${BUILD_TAG}
@@ -72,6 +75,7 @@ services:
     command: ["npm", "start"]
     environment:
       PORT: 3000
+      CHOKIDAR_USEPOLLING: "true"
     depends_on:
       - nginx
 
@@ -131,6 +135,7 @@ services:
       - ${CLIENT_PORT}:5000
     command: ["/app/docker/client/run-lokole.sh"]
     environment:
+      PYTHONDONTWRITEBYTECODE: "1"
       LOKOLE_LOG_LEVEL: ${LOKOLE_LOG_LEVEL}
       WEBAPP_WORKERS: ${WEBAPP_WORKERS}
       QUEUE_WORKERS: ${QUEUE_WORKERS}
@@ -138,6 +143,15 @@ services:
       HOST: "0.0.0.0"
       OPWEN_SETTINGS: /app/docker/client/client.env
       OPWEN_EMAIL_SERVER_ENDPOINT: http://nginx:8888
+      OPWEN_REMOTE_RESOURCE_CONTAINER: compressedpackages
+      OPWEN_REMOTE_ACCOUNT_NAME: ${AZURITE_ACCOUNT}
+      OPWEN_REMOTE_ACCOUNT_KEY: ${AZURITE_KEY}
+      OPWEN_REMOTE_ACCOUNT_HOST: ${AZURITE_HOST}
+      OPWEN_REMOTE_ACCOUNT_SECURE: ${AZURITE_SECURE}
+      OPWEN_CLIENT_NAME: developer1
+      OPWEN_CLIENT_ID: bdd640fb-0667-1ad1-1c80-317fa3b1799d
+      LOKOLE_ADMIN_NAME: admin
+      LOKOLE_ADMIN_PASSWORD: lokole1Admin
 
   rabbitmq:
     image: rabbitmq:management-alpine
