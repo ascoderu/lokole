@@ -42,6 +42,7 @@ def print_queues(separator):
             config.REGISTER_CLIENT_QUEUE,
             config.INBOUND_STORE_QUEUE,
             config.WRITTEN_STORE_QUEUE,
+            config.PROCESS_SERVICE_QUEUE,
             config.SEND_QUEUE,
             config.MAILBOX_RECEIVED_QUEUE,
             config.MAILBOX_SENT_QUEUE,
