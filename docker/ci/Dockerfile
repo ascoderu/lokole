@@ -26,8 +26,8 @@ RUN wget -q https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_V
   && rm kubeval-linux-amd64.tar.gz \
   && kubeval --version
 
-ARG YAMLLINT_VERSION=1.23.0
-RUN pip install --no-cache-dir "yamllint==${YAMLLINT_VERSION}"
+COPY docker/ci/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /app
 

@@ -6,10 +6,10 @@ RUN apk add -q --no-cache \
     jq=1.5-r2 \
     util-linux=2.28-r3
 
-RUN pip3 install --no-cache-dir --upgrade pip==19.2.3 && \
-  pip3 install --no-cache-dir httpie==1.0.2
-
 WORKDIR /app
+
+COPY docker/integtest/requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY .env .
 COPY docker/integtest/ ./

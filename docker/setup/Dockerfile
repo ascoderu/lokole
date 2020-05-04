@@ -18,7 +18,8 @@ RUN apk add -q --no-cache \
   az aks install-cli --client-version "${KUBECTL_VERSION}" && \
   mkdir /secrets
 
-RUN pip install --no-cache-dir twine==3.1.1
+COPY docker/setup/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY helm /app/helm
 COPY docker/setup/* /app/
