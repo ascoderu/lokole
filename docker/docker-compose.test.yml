@@ -16,3 +16,9 @@ services:
       TEST_STEP_DELAY: ${TEST_STEP_DELAY}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  ci:
+    image: ${DOCKER_REPO}/opwenserver_ci:${BUILD_TAG}
+    build:
+      context: .
+      dockerfile: docker/ci/Dockerfile
