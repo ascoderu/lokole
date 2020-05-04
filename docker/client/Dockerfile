@@ -7,7 +7,8 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install
 
-COPY . .
+COPY Gruntfile.js .prettierignore ./
+COPY opwen_email_client/webapp/static opwen_email_client/webapp/static
 RUN yarn run lint \
  && yarn run build
 
@@ -28,11 +29,11 @@ RUN pip install --no-cache-dir -r requirements-webapp.txt
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY --from=yarn /app/opwen_email_client/webapp/static/ /app/opwen_email_client/webapp/static/
-COPY . .
-
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
+
+COPY --from=yarn /app/opwen_email_client/webapp/static/ /app/opwen_email_client/webapp/static/
+COPY . .
 
 FROM builder AS compiler
 
