@@ -97,9 +97,23 @@ class SetupMxRecordsTests(TestCase):
                 Zone(id='1', domain='foo.com', type='master', ttl=1, driver=mock_driver),
                 Zone(id='2', domain='my-zone', type='master', ttl=1, driver=mock_driver),
             ]
-            mock_driver.create_record.side_effect = throw(LibcloudError(None, mock_driver))
+            mock_driver.create_record.side_effect = throw(
+                LibcloudError('81057: The record already exists.', mock_driver))
 
             action('my-domain.my-zone')
 
             self.assertEqual(mock_driver.iterate_zones.call_count, 1)
             self.assertEqual(mock_driver.create_record.call_count, 1)
+
+    def test_throws_when_error_is_unknown(self):
+        action = SetupMxRecords('my-user', 'my-key', provider='CLOUDFLARE')
+
+        with patch.object(action, '_driver', new_callable=PropertyMock) as mock_driver:
+            mock_driver.iterate_zones.return_value = [
+                Zone(id='1', domain='foo.com', type='master', ttl=1, driver=mock_driver),
+                Zone(id='2', domain='my-zone', type='master', ttl=1, driver=mock_driver),
+            ]
+            mock_driver.create_record.side_effect = throw(LibcloudError('Some unknown error', mock_driver))
+
+            with self.assertRaises(LibcloudError):
+                action('my-domain.my-zone')

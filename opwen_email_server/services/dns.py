@@ -58,7 +58,9 @@ class SetupMxRecords(_MxRecords):
                 type=RecordType.MX,
                 data=MX_RECORD,
             )
-        except LibcloudError:
+        except LibcloudError as ex:
+            if 'record already exists' not in ex.value:
+                raise ex
             self.log_warning('MX records for client %s.%s already exist', client_name, zone.domain)
         else:
             self.log_info('Set up MX records for client %s.%s', client_name, zone.domain)
