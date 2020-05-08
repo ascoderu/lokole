@@ -11,5 +11,6 @@ scriptdir="$(dirname "$0")"
 "${scriptdir}/3-receive-email-for-client.sh" && wait_seconds "${TEST_STEP_DELAY}"
 "${scriptdir}/4-client-downloads-emails.sh"
 "${scriptdir}/5-assert-on-results.sh"
+"${scriptdir}/6-receive-service-email.sh"
 
 rm -rf "${scriptdir}/files/test.out"
