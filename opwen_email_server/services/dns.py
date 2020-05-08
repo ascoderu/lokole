@@ -57,6 +57,7 @@ class SetupMxRecords(_MxRecords):
                 name=client_name,
                 type=RecordType.MX,
                 data=MX_RECORD,
+                extra={'priority': 0},
             )
         except LibcloudError as ex:
             if 'record already exists' not in ex.value:
