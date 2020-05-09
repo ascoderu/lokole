@@ -140,6 +140,16 @@ class ConvertImgUrlToBase64Tests(TestCase):
         self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/png;')
 
     @mock_responses.activate
+    def test_format_inline_images_with_query_string(self):
+        url = 'http://test-url.png?foo=bar&baz=qux'
+        self.givenTestImage(url=url, content_type='')
+        input_email = {'body': f'<div><h3>test image</h3><img src="{url}"/></div>'}
+
+        output_email = email_parser.format_inline_images(input_email, self.fail_if_called)
+
+        self.assertStartsWith(output_email['body'], '<div><h3>test image</h3><img src="data:image/png;')
+
+    @mock_responses.activate
     @patch.object(email_parser, 'Image')
     def test_handles_exceptions_when_processing_image(self, mock_pil):
         mock_pil.open.side_effect = throw(IOError())
@@ -213,13 +223,13 @@ class ConvertImgUrlToBase64Tests(TestCase):
                          f'times but got {actual_count}')
 
     @classmethod
-    def givenTestImage(cls, content_type='image/png', status=200):
+    def givenTestImage(cls, content_type='image/png', status=200, url='http://test-url.png'):
         with open(join(TEST_DATA_DIRECTORY, 'test_image.png'), 'rb') as image:
             image_bytes = image.read()
 
         mock_responses.add(
             mock_responses.GET,
-            'http://test-url.png',
+            url,
             content_type=content_type,
             body=image_bytes,
             status=status,
