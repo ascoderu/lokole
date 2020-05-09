@@ -227,7 +227,6 @@ class AzureEmailStore(EmailStore, LogMixin):
                 continue
 
             self._mailbox_storage.delete(f"{domain}/{email_address}/{folder}/{email['sent_at']}/{uid}")
-            self._email_storage.delete(uid)
 
     def _mark_sent(self, uids: Iterable[str]):
         pass
