@@ -39,7 +39,7 @@ class _Action(ABC, LogMixin):
         try:
             return self._action(*args, **kwargs)
         except Exception as ex:
-            self.log_exception(ex, 'error in action %s', self.__class__.__name__)
+            self.log_exception(ex, '%s(args=%r, kwargs=%r)', self.__class__.__name__, args, kwargs)
             raise ex
 
     def _action(self, *args, **kwargs) -> Response:
