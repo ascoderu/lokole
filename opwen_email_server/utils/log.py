@@ -1,12 +1,8 @@
 from logging import CRITICAL
 from logging import DEBUG
 from logging import INFO
-from logging import NOTSET
 from logging import WARNING
-from logging import Formatter
-from logging import Handler
 from logging import Logger
-from logging import StreamHandler
 from logging import getLogger
 from typing import Any
 from typing import Iterable
@@ -17,15 +13,10 @@ from applicationinsights.channel import AsynchronousQueue
 from applicationinsights.channel import AsynchronousSender
 from applicationinsights.channel import NullSender
 from applicationinsights.channel import TelemetryChannel
-from applicationinsights.logging import LoggingHandler
 from cached_property import cached_property
 
 from opwen_email_server.config import APPINSIGHTS_HOST
 from opwen_email_server.config import APPINSIGHTS_KEY
-from opwen_email_server.config import APPINSIGHTS_LOG_LEVEL
-from opwen_email_server.config import LOG_LEVEL
-from opwen_email_server.constants.logging import APPINSIGHTS
-from opwen_email_server.constants.logging import STDERR
 from opwen_email_server.utils.collections import append
 from opwen_email_server.utils.collections import singleton
 
@@ -42,29 +33,8 @@ class LogMixin:
     _telemetry_key = APPINSIGHTS_KEY or '00000000-0000-0000-0000-000000000000'
 
     @cached_property
-    def _default_log_handlers(self) -> Iterable[Handler]:
-        handlers = []
-
-        stderr = StreamHandler()
-        stderr.setFormatter(Formatter(STDERR))
-        stderr.setLevel(LOG_LEVEL)
-        handlers.append(stderr)
-
-        appinsights = LoggingHandler(self._telemetry_key, telemetry_channel=self._telemetry_channel)
-        appinsights.setFormatter(Formatter(APPINSIGHTS))
-        appinsights.setLevel(APPINSIGHTS_LOG_LEVEL)
-        handlers.append(appinsights)
-
-        return handlers
-
-    @cached_property
     def _logger(self) -> Logger:
-        log = getLogger(self.__class__.__name__)
-        log.setLevel(NOTSET)
-        log.propagate = False
-        for handler in self._default_log_handlers:
-            log.addHandler(handler)
-        return log
+        return getLogger('gunicorn.error')
 
     @cached_property
     def _telemetry_client(self) -> TelemetryClient:
