@@ -6,6 +6,10 @@
 !docker/
 !helm/
 !opwen_email_client/
+opwen_email_client/webapp/static/css/*.min.css
+opwen_email_client/webapp/static/flags/
+opwen_email_client/webapp/static/fonts/
+opwen_email_client/webapp/static/js/*.min.js
 !opwen_email_server/
 !opwen_statuspage/
 !tests/
