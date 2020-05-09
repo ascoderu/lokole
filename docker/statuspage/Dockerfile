@@ -13,7 +13,7 @@ FROM builder AS compiler
 RUN npm run build
 RUN printf '{"scripts":{"start":"serve -n ."}}' > package-prod.json
 
-FROM node:${NODE_VERSION} AS runtime
+FROM node:${NODE_VERSION}-slim AS runtime
 
 RUN npm install -g serve@11.3.0
 
