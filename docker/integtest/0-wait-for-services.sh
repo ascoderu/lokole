@@ -75,7 +75,23 @@ wait_for_webapp() {
   exit 4
 }
 
+wait_for_client() {
+  local i
+
+  for i in $(seq 1 "${max_retries}"); do
+    if curl -fs "http://client:5000/healthcheck/ping" >/dev/null; then
+      log "Client is running"
+      return
+    fi
+    log "Waiting for client (${i}/${max_retries})"
+    sleep "${polling_interval_seconds}s"
+  done
+
+  exit 5
+}
+
 wait_for_rabbitmq
 wait_for_appinsights
 wait_for_api
 wait_for_webapp
+wait_for_client
