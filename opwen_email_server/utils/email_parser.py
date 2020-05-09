@@ -145,7 +145,7 @@ def ensure_has_sent_at(email: dict):
 def _get_image_type(response: Response, url: str) -> Optional[str]:
     content_type = response.headers.get('Content-Type')
     if not content_type:
-        content_type = guess_type(url)[0]
+        content_type = guess_type(url.split('?')[0])[0]
     return content_type
 
 
