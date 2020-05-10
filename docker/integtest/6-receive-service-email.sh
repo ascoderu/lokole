@@ -8,7 +8,7 @@ mkdir -p "${out_dir}"
 # shellcheck disable=SC1090
 . "${scriptdir}/utils.sh"
 
-email_to_receive="${in_dir}/inbound-email.mime"
+email_to_receive="${in_dir}/service-email.mime"
 
 
 #receive an email directed at the service endpoint

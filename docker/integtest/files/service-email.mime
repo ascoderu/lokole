@@ -1,0 +1,27 @@
+Received: by mx0028p1mdw1.sendgrid.net with SMTP id Yt3NEnbnLU Mon, 13 Feb 2017 06:25:41 +0000 (UTC)
+Received: from mail-yw0-f176.google.com (mail-yw0-f176.google.com [209.85.161.176]) by mx0028p1mdw1.sendgrid.net (Postfix) with ESMTPS id C726D640B63; Mon, 13 Feb 2017 06:25:41 +0000 (UTC)
+Received: by mail-yw0-f176.google.com with SMTP id w75so45612320ywg.1; Sun, 12 Feb 2017 22:25:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025; h=mime-version:from:date:message-id:subject:to; bh=ViHLGS6kOdo9Q9CkDDSSSS3bgKuN0a+UXhwMw06ak4Q=; b=f3WGzjgLe0tPG2edhiHxiCEZatThUga/qJFnWZNyY4lEVjRM9l3qn1BZ4ITawT9tDK LS6qFx//6in7u0rV0YKoa8TfScUFOpPHGCmq1Wxdp7mrWP7GDuCOz3LzyXQsrBe/erGy YEjAVU876sWJ109mcMcmbgOL1SD3d4ak+8GVBSC8oMKPj5XWZsET7WmsonhKf5PHE9IW eJHKqdOkxiPbmDutVx7uS1Bi5u4d9UYPhgxFwAK9lWyJ/Esw6yffjlrUvmQCPibSCxRv o979yY6FyJXDJ82l4ErntcOloFNpzWZ89WkRhb1aBLUoZs3402s6D3wC0ljpmvneIAkw 3D6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20161025; h=x-gm-message-state:mime-version:from:date:message-id:subject:to; bh=ViHLGS6kOdo9Q9CkDDSSSS3bgKuN0a+UXhwMw06ak4Q=; b=sWY7uU6kK3dg62wVuxcLsRYLg3eGcoLuoLjL0Ju/sl9rGqSDxVc2saIS0ThfUaHlfZ g1zvF+rBoxa7v9jk7MhEw3izW01WXDMm0w2JGc1QLTo3ZM2xW9Clss63R3ZtNKabuyhd 77NHAgbarmQGW5XuqwS1Fy0NMWHkAlLsZd2AnkNb6gCI/VHCCv/oem19bWvNWwRTPBYE cQDPJfzRiUzRPNZPLtlL5ybd2yyb4lcuG+2QoQV8uxPsKS4eDOjNmM76UWZ9s/Ul/mR+ Qbyui7suOO0vPy8GFJHPV9X2ffLqesafTAetCj3LClCdLIdfQDaK86mmVHOT6zldeCTa HH6Q==
+X-Gm-Message-State: AMke39n2h/OZU6fwgOdDltzsKqISVbe3ez6t19OeVrg2sT3pDRhSSQiIcwGzKjdWOD/oX96rQlTi0O9t9yhUfA==
+X-Received: by 10.129.81.4 with SMTP id f4mr15409224ywb.239.1486967141412; Sun, 12 Feb 2017 22:25:41 -0800 (PST)
+MIME-Version: 1.0
+Received: by 10.129.156.139 with HTTP; Sun, 12 Feb 2017 22:25:01 -0800 (PST)
+From: Clemens Wolff <clemens.wolff@gmail.com>
+Date: Sun, 12 Feb 2017 22:25:01 -0800
+Message-ID: <CAL79TcnjhV5PinZVY8Y3QEoNNcSa9uuNU5N3EP-gqcYPFfuHLA@mail.gmail.com>
+Subject: Service Email
+To: echo@bot.lokole.ca,
+Content-Type: multipart/alternative; boundary=001a1146392641b94705486384bf
+
+--001a1146392641b94705486384bf
+Content-Type: text/plain; charset=UTF-8
+
+This is an email that should be echoed.
+
+--001a1146392641b94705486384bf
+Content-Type: text/html; charset=UTF-8
+
+<div dir="ltr">Body of the message.</div>
+
+--001a1146392641b94705486384bf--

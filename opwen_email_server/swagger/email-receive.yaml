@@ -60,6 +60,8 @@ paths:
       responses:
         200:
           description: The email was succesfully received. No need to retry it.
+        400:
+          description: Malformed email.
         403:
           description: Error in receiving email.
 

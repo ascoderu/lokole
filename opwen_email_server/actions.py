@@ -222,6 +222,9 @@ class ReceiveInboundEmail(_Action):
         self._next_task = next_task
 
     def _action(self, client_id=None, email=None, **sendgrid_args):  # type: ignore
+        if email is None:
+            return 'email cannot be None', 400
+
         domain = self._auth.domain_for(client_id)
         if not domain:
             self.log_event(events.UNREGISTERED_CLIENT, {'client_id': client_id})  # noqa: E501  # yapf: disable
