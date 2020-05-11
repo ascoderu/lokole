@@ -40,8 +40,7 @@ The Lokole email application is intended to run on low-spec Raspberry Pi 3
 hardware (or similar). Read the "Production setup" section below for further
 information on how to set up the client devices.
 
-The Lokole email server is implemented using `Connexion <https://jobs.zalando.com/tech/blog/crafting-effective-microservices-in-python/>`_
-and has two main responsibilities:
+The Lokole email server has two main responsibilities:
 
 1. Receive emails from the internet that are addressed to Lokole users and
    forward them to the appropriate Lokole device.
@@ -104,6 +103,19 @@ System overview
   :align: center
   :alt: Overview of the Lokole client email download flow
   :target: https://swimlanes.io/u/_QqT0iQx8
+
+Below is a list of some of the key technologies used in the Lokole project:
+
+- `Connexion <https://jobs.zalando.com/tech/blog/crafting-effective-microservices-in-python/>`_ is the web framework for the Lokole email server API.
+- `Flask <https://flask.palletsprojects.com/>`_ is the web framework for the Lokole email client application.
+- `Dnsmasq <http://www.thekelleys.org.uk/dnsmasq/doc.html>`_ and `hostapd <https://w1.fi/hostapd/>`_ are used to set up a WiFi access point on the Lokole device via which the Lokole email client application is accessed.
+- `WvDial <https://wiki.debian.org/Wvdial>`_ is used to access the internet on the Lokole device to synchronize emails with the Lokole email server.
+- `Celery <http://www.celeryproject.org/>`_ is used to run background workers of the Lokole email server in `Azure ServiceBus <https://azure.microsoft.com/en-us/services/service-bus/>`_ (production) or `RabbitMQ <https://www.rabbitmq.com/>`_ (development). Celery is also used to run background workers and scheduled tasks on the Lokole email client application in `SQLAlchemy <https://www.sqlalchemy.org/>`_.
+- `Libcloud <https://libcloud.apache.org/>`_ is used to store emails in `Azure Storage <https://azure.microsoft.com/en-us/services/storage/>`_ (production) or `Azurite <https://github.com/Azure/Azurite>`_ (development).
+- `Sendgrid Inbound Parse <https://sendgrid.com/docs/for-developers/parsing-email/setting-up-the-inbound-parse-webhook/>`_ is used to receive emails from email providers and forward them to the Lokole email server. `Sendgrid Web API v3 <https://github.com/sendgrid/sendgrid-python>`_ is used to deliver emails from the Lokole email server to email providers. The MX records for Sendgrid are automatically generated via `Cloudflare API v4 <https://api.cloudflare.com/>`_.
+- `Github API v4 <https://developer.github.com/v4/>`_ is used to authenticate interactive calls to the Lokole email server API such as registering new clients or managing existing clients. Authorization is managed by Github team memberships on the Ascoderu organization. Management operations are exposed via the Lokole status page which is implemented in `React <https://reactjs.org/>`_ with `Ant Design <https://ant.design/docs/react/introduce>`_.
+- `Travis CI <https://travis-ci.org/ascoderu/lokole>`_ is used to verify pull requests and deploy updates to production.
+- [ ~ Dependencies scanned by PyUp.io ~ ]
 
 --------------------
 Data exchange format
@@ -335,5 +347,3 @@ and a translation editor such as `poedit <https://poedit.net/>`_. Then follow th
 
   # finalize the translation file
   pybabel compile -d opwen_email_client/webapp/translations
-
-[ ~ Dependencies scanned by PyUp.io ~ ]
