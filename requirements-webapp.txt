@@ -25,7 +25,7 @@ passlib==1.7.2
 python-crontab==2.4.2
 requests==2.23.0
 typing==3.7.4.1
-tzlocal==2.0.0
+tzlocal==2.1
 watchdog==0.10.2
 xtarfile[zstd]==0.0.2
 Pillow==7.1.2
