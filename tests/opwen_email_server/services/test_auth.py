@@ -6,10 +6,11 @@ from unittest.mock import Mock
 from responses import mock as mock_responses
 
 from opwen_email_server.constants import github
-from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.auth import AnyOfBasicAuth
+from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.auth import BasicAuth
 from opwen_email_server.services.auth import GithubBasicAuth
+from opwen_email_server.services.auth import NoAuth
 from opwen_email_server.services.storage import AzureObjectStorage
 from tests.opwen_email_server.helpers import MockResponses
 
@@ -201,3 +202,25 @@ class AzureAuthTests(TestCase):
         self.assertIsNotNone(self._auth.domain_for('client'))
         self._auth.delete('client', 'domain')
         self.assertIsNone(self._auth.domain_for('client'))
+
+
+class NoAuthTests(TestCase):
+    def setUp(self):
+        self._auth = NoAuth()
+
+    def test_does_not_validate_owner(self):
+        self._auth.insert('client', 'domain', 'owner')
+        self.assertTrue(self._auth.is_owner('domain', 'owner'))
+        self.assertTrue(self._auth.is_owner('domain', 'unknown-user'))
+        self.assertTrue(self._auth.is_owner('unknown-domain', 'owner'))
+
+    def test_delete_has_no_effect(self):
+        self._auth.insert('client', 'domain', 'owner')
+        self.assertIsNotNone(self._auth.domain_for('client'))
+        self._auth.delete('client', 'domain')
+        self.assertIsNotNone(self._auth.domain_for('client'))
+
+    def test_lists_no_domains(self):
+        self._auth.insert('client1', 'domain1', 'owner1')
+        self._auth.insert('client2', 'domain2', 'owner2')
+        self.assertEqual(self._auth.domains(), [])

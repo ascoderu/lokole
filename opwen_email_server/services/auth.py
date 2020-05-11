@@ -131,11 +131,31 @@ class GithubBasicAuth(LogMixin):
             cursor = edges[-1]['cursor']
 
 
-class AzureAuth(LogMixin):
+class Auth:
+    def insert(self, client_id: str, domain: str, owner: str) -> None:
+        raise NotImplementedError  # pragma: no cover
+
+    def delete(self, client_id: str, domain: str) -> bool:
+        raise NotImplementedError  # pragma: no cover
+
+    def is_owner(self, domain: str, username: str) -> bool:
+        raise NotImplementedError  # pragma: no cover
+
+    def client_id_for(self, domain: str) -> Optional[str]:
+        raise NotImplementedError  # pragma: no cover
+
+    def domain_for(self, client_id: str) -> Optional[str]:
+        raise NotImplementedError  # pragma: no cover
+
+    def domains(self) -> Iterable[str]:
+        raise NotImplementedError  # pragma: no cover
+
+
+class AzureAuth(Auth, LogMixin):
     def __init__(self, storage: AzureObjectStorage) -> None:
         self._storage = storage
 
-    def insert(self, client_id: str, domain: str, owner: str):
+    def insert(self, client_id: str, domain: str, owner: str) -> None:
         auth = {'client_id': client_id, 'owner': owner, 'domain': domain}
         self._storage.store_object(self._client_id_file(client_id), auth)
         self._storage.store_object(self._domain_file(domain), auth)
@@ -190,9 +210,25 @@ class AzureAuth(LogMixin):
         return f'client_id/{client_id}'
 
 
-class NoAuth(LogMixin):
+class NoAuth(Auth):
+    def __init__(self, client_id: str = 'service', domain: str = 'service'):
+        self._client_id = client_id
+        self._domain = domain
+
+    def insert(self, client_id: str, domain: str, owner: str) -> None:
+        pass
+
+    def delete(self, client_id: str, domain: str) -> bool:
+        return False
+
+    def client_id_for(self, domain: str) -> Optional[str]:
+        return self._client_id
+
+    def domains(self) -> Iterable[str]:
+        return []
+
     def is_owner(self, domain: str, username: str) -> bool:
         return True
 
     def domain_for(self, client_id: str) -> str:
-        return 'service'
+        return self._domain

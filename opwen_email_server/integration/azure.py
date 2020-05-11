@@ -1,4 +1,5 @@
 from opwen_email_server import config
+from opwen_email_server.services.auth import Auth
 from opwen_email_server.services.auth import AzureAuth
 from opwen_email_server.services.auth import NoAuth
 from opwen_email_server.services.storage import AzureFileStorage
@@ -19,7 +20,7 @@ def get_guid_source() -> NewGuid:
 
 
 @singleton
-def get_auth() -> AzureAuth:
+def get_auth() -> Auth:
     return AzureAuth(storage=AzureObjectStorage(
         account=config.TABLES_ACCOUNT,
         key=config.TABLES_KEY,
