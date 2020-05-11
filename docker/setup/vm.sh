@@ -7,6 +7,7 @@ if [[ "$1" != "install" ]]; then
   cd - || exit 99
   docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml pull || exit 2
   docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml up -d || exit 3
+  docker system prune -a -f
   exit 0
 fi
 
