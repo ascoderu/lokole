@@ -21,14 +21,17 @@ def get_guid_source() -> NewGuid:
 
 @singleton
 def get_auth() -> Auth:
-    return AzureAuth(storage=AzureObjectStorage(
-        account=config.TABLES_ACCOUNT,
-        key=config.TABLES_KEY,
-        host=config.TABLES_HOST,
-        secure=config.TABLES_SECURE,
-        container=config.CONTAINER_AUTH,
-        provider=config.STORAGE_PROVIDER,
-    ))
+    return AzureAuth(
+        storage=AzureObjectStorage(
+            account=config.TABLES_ACCOUNT,
+            key=config.TABLES_KEY,
+            host=config.TABLES_HOST,
+            secure=config.TABLES_SECURE,
+            container=config.CONTAINER_AUTH,
+            provider=config.STORAGE_PROVIDER,
+        ),
+        sudo_scope=config.REGISTRATION_SUDO_TEAM,
+    )
 
 
 @singleton

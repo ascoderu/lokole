@@ -127,8 +127,9 @@ class Auth:
 
 
 class AzureAuth(Auth, LogMixin):
-    def __init__(self, storage: AzureObjectStorage) -> None:
+    def __init__(self, storage: AzureObjectStorage, sudo_scope: str) -> None:
         self._storage = storage
+        self._sudo_scope = sudo_scope
 
     def insert(self, client_id: str, domain: str, owner: dict) -> None:
         auth = {'client_id': client_id, 'owner': owner['name'], 'domain': domain}
@@ -137,6 +138,9 @@ class AzureAuth(Auth, LogMixin):
         self.log_info('Registered client %s at domain %s', client_id, domain)
 
     def is_owner(self, domain: str, user: dict) -> bool:
+        if self._sudo_scope in user.get('scopes', []):
+            return True
+
         try:
             auth = self._storage.fetch_object(self._domain_file(domain))
         except ObjectDoesNotExistError:

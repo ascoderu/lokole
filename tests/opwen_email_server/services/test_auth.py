@@ -152,7 +152,7 @@ class AzureAuthTests(TestCase):
             container='auth',
             provider='LOCAL',
         )
-        self._auth = AzureAuth(storage=self._storage)
+        self._auth = AzureAuth(storage=self._storage, sudo_scope='sudo')
 
     def tearDown(self):
         rmtree(self._folder)
@@ -177,6 +177,12 @@ class AzureAuthTests(TestCase):
         self.assertIsNotNone(self._auth.domain_for('client'))
         self._auth.delete('client', 'domain')
         self.assertIsNone(self._auth.domain_for('client'))
+
+    def test_is_owner_with_sudo(self):
+        self._auth.insert('client', 'domain', {'name': 'owner'})
+        self.assertFalse(self._auth.is_owner('domain', {'name': 'user'}))
+        self.assertTrue(self._auth.is_owner('domain', {'name': 'owner'}))
+        self.assertTrue(self._auth.is_owner('domain', {'name': 'sudo', 'scopes': ['sudo']}))
 
 
 class NoAuthTests(TestCase):
