@@ -12,6 +12,8 @@ opwen_email_client/webapp/static/fonts/
 opwen_email_client/webapp/static/js/*.min.js
 !opwen_email_server/
 !opwen_statuspage/
+opwen_statuspage/build/
+opwen_statuspage/node_modules/
 !tests/
 !makefile
 !requirements*.txt
