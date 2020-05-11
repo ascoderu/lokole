@@ -1,7 +1,5 @@
-from typing import Callable
-from typing import Dict
 from typing import Iterable
-from typing import List
+from typing import Iterator
 from typing import Optional
 
 from libcloud.storage.types import ObjectDoesNotExistError
@@ -12,19 +10,6 @@ from opwen_email_server.constants import events
 from opwen_email_server.constants import github
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.utils.log import LogMixin
-
-
-class AnyOfBasicAuth(LogMixin):
-    def __init__(self, auths: Iterable[Callable[[str, str, Optional[List[str]]], Optional[Dict[str, str]]]]):
-        self._auths = list(auths)
-
-    def __call__(self, username, password, required_scopes=None):
-        for auth in self._auths:
-            user = auth(username, password, required_scopes)
-            if user is not None:
-                return user
-
-        return None
 
 
 class BasicAuth(LogMixin):
@@ -45,44 +30,31 @@ class BasicAuth(LogMixin):
             self.log_event(events.BAD_PASSWORD, {'username': username})  # noqa: E501  # yapf: disable
             return None
 
-        if not self._has_scopes(user, required_scopes):
-            self.log_event(events.MISSING_SCOPES, {'username': username})  # noqa: E501  # yapf: disable
-            return None
+        scopes = user.get('scopes', [])
 
-        return {'sub': username}
-
-    @classmethod
-    def _has_scopes(cls, user, required_scopes) -> bool:
-        if not required_scopes:
-            return True
-
-        return set(required_scopes).issubset(user.get('scopes', []))
+        return {'sub': {'name': username, 'scopes': scopes}, 'scope': scopes}
 
 
-class GithubBasicAuth(LogMixin):
-    def __init__(self, organization: str, team: str, page_size: int = 50):
+class GithubAuth(LogMixin):
+    def __init__(self, organization: str, page_size: int = 50):
         self._organization = organization
-        self._team = team
         self._page_size = page_size
 
-    def __call__(self, username, password, required_scopes=None):
-        if not username or not password or not self._organization or not self._team:
+    def __call__(self, access_token, required_scopes=None):
+        if not access_token or not self._organization:
             return None
 
         try:
-            team_members = self._fetch_team_members(access_token=password)
-            user_exists = any(username == team_member for team_member in team_members)
+            query = self._query_github(access_token)
+            login = next(query)
+            scopes = list(query)
         except RequestException:
-            self.log_event(events.BAD_PASSWORD, {'username': username})  # noqa: E501  # yapf: disable
+            self.log_event(events.BAD_PASSWORD, {'username': 'access_token'})  # noqa: E501  # yapf: disable
             return None
 
-        if not user_exists:
-            self.log_event(events.UNKNOWN_USER, {'username': username})  # noqa: E501  # yapf: disable
-            return None
+        return {'sub': {'name': login, 'scopes': scopes}, 'scope': scopes}
 
-        return {'sub': username}
-
-    def _fetch_team_members(self, access_token: str) -> Iterable[str]:
+    def _query_github(self, access_token: str) -> Iterator[str]:
         cursor = None
 
         while True:
@@ -90,15 +62,16 @@ class GithubBasicAuth(LogMixin):
                 url=github.GRAPHQL_URL,
                 json={
                     'query': '''
-                        query($organization:String!, $team:String!, $cursor:String, $first:Int!) {
-                            organization(login:$organization) {
-                                team(slug:$team) {
-                                    members(after:$cursor, first:$first, orderBy:{ field:LOGIN, direction:DESC }) {
+                        query($organization:String!, $cursor:String, $first:Int!) {
+                            viewer {
+                                login
+                                organization(login:$organization) {
+                                    teams(after:$cursor, first:$first, orderBy:{ field:NAME, direction:DESC }) {
                                         edges {
                                             cursor
                                         }
                                         nodes {
-                                            login
+                                            slug
                                         }
                                     }
                                 }
@@ -107,7 +80,6 @@ class GithubBasicAuth(LogMixin):
                     ''',
                     'variables': {
                         'organization': self._organization,
-                        'team': self._team,
                         'cursor': cursor,
                         'first': self._page_size,
                     },
@@ -118,12 +90,15 @@ class GithubBasicAuth(LogMixin):
             )
             response.raise_for_status()
 
-            members = response.json()['data']['organization']['team']['members']
-            nodes = members['nodes']
-            edges = members['edges']
+            viewer = response.json()['data']['viewer']
+            teams = viewer['organization']['teams']
+            nodes = teams['nodes']
+            edges = teams['edges']
 
-            for member in nodes:
-                yield member['login']
+            yield viewer['login']
+
+            for team in nodes:
+                yield team['slug']
 
             if len(nodes) < self._page_size:
                 break
@@ -131,24 +106,48 @@ class GithubBasicAuth(LogMixin):
             cursor = edges[-1]['cursor']
 
 
-class AzureAuth(LogMixin):
-    def __init__(self, storage: AzureObjectStorage) -> None:
-        self._storage = storage
+class Auth:
+    def insert(self, client_id: str, domain: str, owner: dict) -> None:
+        raise NotImplementedError  # pragma: no cover
 
-    def insert(self, client_id: str, domain: str, owner: str):
-        auth = {'client_id': client_id, 'owner': owner, 'domain': domain}
+    def delete(self, client_id: str, domain: str) -> bool:
+        raise NotImplementedError  # pragma: no cover
+
+    def is_owner(self, domain: str, user: dict) -> bool:
+        raise NotImplementedError  # pragma: no cover
+
+    def client_id_for(self, domain: str) -> Optional[str]:
+        raise NotImplementedError  # pragma: no cover
+
+    def domain_for(self, client_id: str) -> Optional[str]:
+        raise NotImplementedError  # pragma: no cover
+
+    def domains(self) -> Iterable[str]:
+        raise NotImplementedError  # pragma: no cover
+
+
+class AzureAuth(Auth, LogMixin):
+    def __init__(self, storage: AzureObjectStorage, sudo_scope: str) -> None:
+        self._storage = storage
+        self._sudo_scope = sudo_scope
+
+    def insert(self, client_id: str, domain: str, owner: dict) -> None:
+        auth = {'client_id': client_id, 'owner': owner['name'], 'domain': domain}
         self._storage.store_object(self._client_id_file(client_id), auth)
         self._storage.store_object(self._domain_file(domain), auth)
         self.log_info('Registered client %s at domain %s', client_id, domain)
 
-    def is_owner(self, domain: str, username: str) -> bool:
+    def is_owner(self, domain: str, user: dict) -> bool:
+        if self._sudo_scope in user.get('scopes', []):
+            return True
+
         try:
             auth = self._storage.fetch_object(self._domain_file(domain))
         except ObjectDoesNotExistError:
             self.log_warning('Unrecognized domain %s', domain)
             return False
 
-        return auth.get('owner') == username
+        return auth.get('owner') == user['name']
 
     def delete(self, client_id: str, domain: str) -> bool:
         self._storage.delete(self._domain_file(domain))
@@ -190,9 +189,25 @@ class AzureAuth(LogMixin):
         return f'client_id/{client_id}'
 
 
-class NoAuth(LogMixin):
-    def is_owner(self, domain: str, username: str) -> bool:
+class NoAuth(Auth):
+    def __init__(self, client_id: str = 'service', domain: str = 'service'):
+        self._client_id = client_id
+        self._domain = domain
+
+    def insert(self, client_id: str, domain: str, owner: dict) -> None:
+        pass
+
+    def delete(self, client_id: str, domain: str) -> bool:
+        return False
+
+    def client_id_for(self, domain: str) -> Optional[str]:
+        return self._client_id
+
+    def domains(self) -> Iterable[str]:
+        return []
+
+    def is_owner(self, domain: str, user: dict) -> bool:
         return True
 
     def domain_for(self, client_id: str) -> str:
-        return 'service'
+        return self._domain

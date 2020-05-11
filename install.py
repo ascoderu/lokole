@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Script to set up a Debian Linux based system as a Lokole client."""
 from argparse import ArgumentParser
-from base64 import b64encode
 from json import dumps
 from json import loads
 from logging import StreamHandler
@@ -421,13 +420,11 @@ class ModemSetup(Setup):
 
 class ClientSetup(Setup):
     def _run(self):
-        request_auth = b64encode(self.args.registration_credentials.encode('ascii')).decode('ascii')
-
         create_request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
         create_request = Request(self.client_url_create)
         create_request.add_header('Content-Type', 'application/json; charset=utf-8')
         create_request.add_header('Content-Length', str(len(create_request_payload)))
-        create_request.add_header('Authorization', 'Basic {}'.format(request_auth))
+        create_request.add_header('Authorization', 'Bearer {}'.format(self.args.registration_credentials))
 
         try:
             with urlopen(create_request, create_request_payload):  # nosec
@@ -440,7 +437,7 @@ class ClientSetup(Setup):
 
         while True:
             get_request = Request(self.client_url_details)
-            get_request.add_header('Authorization', 'Basic {}'.format(request_auth))
+            get_request.add_header('Authorization', 'Bearer {}'.format(self.args.registration_credentials))
             try:
                 with urlopen(get_request) as response:  # nosec
                     response_body = response.read().decode('utf-8')
@@ -476,6 +473,9 @@ class ClientSetup(Setup):
 
     @property
     def is_enabled(self):
+        if ':' in self.args.registration_credentials:
+            self.abort('Registration credential should be set to Github access token, not username and password')
+
         return self.args.sim_type != 'LocalOnly'
 
 
@@ -826,8 +826,7 @@ def cli():
         'Example: "34 * * * *" for once per hour at the 34th minute.'
     ))
     parser.add_argument('registration_credentials', nargs='?', help=(
-        'Username and password (separated by a colon ":") for '
-        'registering with the Lokole server.'
+        'Github access token for registering with the Lokole server.'
     ))
     parser.add_argument('--app_root', default=getenv('OPWEN_APP_ROOT', ''), help=(
         'The URL prefix at which the app will be accessible.'

@@ -9,6 +9,16 @@ log() {
   echo "$@" >&2
 }
 
+authenticated_request() {
+  local endpoint="$1"; shift
+
+  if [[ "${REGISTRATION_CREDENTIALS}" =~ ^[^:]+:.*$ ]]; then
+    curl -fs "${endpoint}" -u "${REGISTRATION_CREDENTIALS}" "$@"
+  else
+    curl -fs "${endpoint}" -H "Authorization: Bearer ${REGISTRATION_CREDENTIALS}" "$@"
+  fi
+}
+
 az_connection_string() {
   if [[ -z "${AZURITE_HOST}" ]]; then
     echo "AccountName=${AZURITE_ACCOUNT};AccountKey=${AZURITE_KEY};"
