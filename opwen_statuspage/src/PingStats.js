@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Icon, List, Statistic, notification } from 'antd';
+import { Card, Icon, List, Statistic } from 'antd';
 import axios from 'axios';
+import ErrorNotification from './ErrorNotification';
 import Grid from './Grid';
 
 const colors = {
@@ -26,10 +27,10 @@ class PingStat extends React.Component {
     try {
       await axios.get(serverEndpoint);
       pingSuccess = true;
-    } catch (e) {
-      notification.error({
+    } catch (exception) {
+      ErrorNotification({
         message: 'Unable to ping server',
-        description: (e.response && e.response.data) || e.message,
+        exception,
       });
       pingSuccess = false;
     }

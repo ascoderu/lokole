@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Empty, List, Popconfirm, notification } from 'antd';
+import { Card, Empty, List, Popconfirm } from 'antd';
 import axios from 'axios';
 import Button from './Button';
+import ErrorNotification from './ErrorNotification';
 import Grid from './Grid';
 
 class ClientCard extends React.Component {
@@ -149,10 +150,10 @@ class ClientStats extends React.Component {
     try {
       const response = await this._client.get('/api/email/register/');
       clients = response.data.clients.sort();
-    } catch (e) {
-      notification.error({
+    } catch (exception) {
+      ErrorNotification({
         message: 'Unable to fetch clients',
-        description: (e.response && e.response.data) || e.message,
+        exception,
       });
     }
 
@@ -167,10 +168,10 @@ class ClientStats extends React.Component {
       await this._client
         .delete(`/api/email/register/${domain}`)
         .then(this._fetchClients);
-    } catch (e) {
-      notification.error({
+    } catch (exception) {
+      ErrorNotification({
         message: `Unable to delete client ${domain}`,
-        description: (e.response && e.response.data) || e.message,
+        exception,
       });
     }
   };
@@ -181,10 +182,10 @@ class ClientStats extends React.Component {
         `/api/email/metrics/pending/${domain}`
       );
       return response.data.pending_emails;
-    } catch (e) {
-      notification.error({
+    } catch (exception) {
+      ErrorNotification({
         message: `Unable to fetch pending emails for client ${domain}`,
-        description: (e.response && e.response.data) || e.message,
+        exception,
       });
       return null;
     }
@@ -196,10 +197,10 @@ class ClientStats extends React.Component {
         `/api/email/metrics/users/${domain}`
       );
       return response.data.users;
-    } catch (e) {
-      notification.error({
+    } catch (exception) {
+      ErrorNotification({
         message: `Unable to fetch number of users for client ${domain}`,
-        description: (e.response && e.response.data) || e.message,
+        exception,
       });
       return null;
     }
