@@ -21,9 +21,8 @@ from opwen_email_server.integration.celery import inbound_store
 from opwen_email_server.integration.celery import process_service_email
 from opwen_email_server.integration.celery import register_client
 from opwen_email_server.integration.celery import written_store
-from opwen_email_server.services.auth import AnyOfBasicAuth
 from opwen_email_server.services.auth import BasicAuth
-from opwen_email_server.services.auth import GithubBasicAuth
+from opwen_email_server.services.auth import GithubAuth
 from opwen_email_server.services.dns import DeleteMxRecords
 from opwen_email_server.services.sendgrid import DeleteSendgridMailbox
 
@@ -86,14 +85,10 @@ metrics_pending = CalculatePendingEmailsMetric(
     pending_storage=get_pending_storage(),
 )
 
-basic_auth = AnyOfBasicAuth(auths=[
-    BasicAuth(users={
-        config.REGISTRATION_USERNAME: {'password': config.REGISTRATION_PASSWORD},
-    }),
-    GithubBasicAuth(
-        organization=config.REGISTRATION_GITHUB_ORGANIZATION,
-        team=config.REGISTRATION_GITHUB_TEAM,
-    ),
-])
+basic_auth = BasicAuth(users={
+    config.REGISTRATION_USERNAME: {'password': config.REGISTRATION_PASSWORD},
+})
+
+github_auth = GithubAuth(organization=config.REGISTRATION_GITHUB_ORGANIZATION)
 
 healthcheck = Ping()

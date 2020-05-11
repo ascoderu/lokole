@@ -15,7 +15,7 @@ wait_for_client() {
   local i
 
   for i in $(seq 1 "${max_retries}"); do
-    if curl -fs -u "${REGISTRATION_CREDENTIALS}" "http://nginx:8888/api/email/register/developer${client}.lokole.ca" | tee "${out_dir}/register${client}.json"; then
+    if authenticated_request "http://nginx:8888/api/email/register/developer${client}.lokole.ca" | tee "${out_dir}/register${client}.json"; then
       log "Client ${client} is registered"
       return
     fi
@@ -28,48 +28,48 @@ wait_for_client() {
 
 # workflow 3: register a new client called "developer"
 # normally this endpoint would be called during a new lokole device setup
-curl -fs \
+authenticated_request \
+  "http://nginx:8888/api/email/register/" \
   -H "Content-Type: application/json" \
-  -u "${REGISTRATION_CREDENTIALS}" \
-  -d '{"domain":"developer1.lokole.ca"}' \
-  "http://nginx:8888/api/email/register/"
+  -d '{"domain":"developer1.lokole.ca"}'
 
 wait_for_client 1
 
 # registering a client with bad credentials should fail
-if curl -fs \
-  -H "Content-Type: application/json" \
-  -u "baduser:badpassword" \
-  -d '{"domain":"hacker.lokole.ca"}' \
+if REGISTRATION_CREDENTIALS="baduser:badpassword" authenticated_request \
   "http://nginx:8888/api/email/register/" \
-; then echo "Was able to register a client with bad credentials" >&2; exit 4; fi
+  -H "Content-Type: application/json" \
+  -d '{"domain":"hacker.lokole.ca"}' \
+; then echo "Was able to register a client with bad basic auth credentials" >&2; exit 4; fi
+
+if REGISTRATION_CREDENTIALS="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" authenticated_request \
+  "http://nginx:8888/api/email/register/" \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"hacker.lokole.ca"}' \
+; then echo "Was able to register a client with bad bearer credentials" >&2; exit 4; fi
 
 # also register another client to simulate multi-client emails
-curl -fs \
+authenticated_request \
+  "http://nginx:8888/api/email/register/" \
   -H "Content-Type: application/json" \
-  -u "${REGISTRATION_CREDENTIALS}" \
-  -d '{"domain":"developer2.lokole.ca"}' \
-  "http://nginx:8888/api/email/register/"
+  -d '{"domain":"developer2.lokole.ca"}'
 
 wait_for_client 2
 
 # after creating a client, creating the same one again should fail but we should be able to delete it
-curl -fs \
+authenticated_request \
+  "http://nginx:8888/api/email/register/" \
   -H "Content-Type: application/json" \
-  -u "${REGISTRATION_CREDENTIALS}" \
-  -d '{"domain":"developer3.lokole.ca"}' \
-  "http://nginx:8888/api/email/register/"
+  -d '{"domain":"developer3.lokole.ca"}'
 
 wait_for_client 3
 
-if curl -fs \
-  -H "Content-Type: application/json" \
-  -u "${REGISTRATION_CREDENTIALS}" \
-  -d '{"domain":"developer3.lokole.ca"}' \
+if authenticated_request \
   "http://nginx:8888/api/email/register/" \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"developer3.lokole.ca"}' \
 ; then echo "Was able to register a duplicate client" >&2; exit 5; fi
 
-curl -fs \
-  -u "${REGISTRATION_CREDENTIALS}" \
-  -X DELETE \
-  "http://nginx:8888/api/email/register/developer3.lokole.ca"
+authenticated_request \
+  "http://nginx:8888/api/email/register/developer3.lokole.ca" \
+  -X DELETE

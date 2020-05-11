@@ -22,6 +22,7 @@ paths:
             $ref: '#/definitions/RegistrationInfos'
       security:
         - basic: []
+        - github: ['lokole-registration']
 
     post:
       operationId: opwen_email_server.integration.connexion.client_create
@@ -39,6 +40,7 @@ paths:
           description: The supplied client already exists.
       security:
         - basic: []
+        - github: ['lokole-registration']
 
   '/{domain}':
 
@@ -62,6 +64,7 @@ paths:
           description: The supplied client does not exist.
       security:
         - basic: []
+        - github: ['lokole-registration']
 
     delete:
       operationId: opwen_email_server.integration.connexion.client_delete
@@ -79,11 +82,19 @@ paths:
           description: The supplied client does not exist.
       security:
         - basic: []
+        - github: ['lokole-registration']
 
 securityDefinitions:
   basic:
     type: basic
     x-basicInfoFunc: opwen_email_server.integration.connexion.basic_auth
+  github:
+    type: oauth2
+    flow: implicit
+    authorizationUrl: https://github.com/login/oauth/authorize
+    x-tokenInfoFunc: opwen_email_server.integration.connexion.github_auth
+    scopes:
+      lokole-registration: User has permissions to register Lokole clients
 
 parameters:
 

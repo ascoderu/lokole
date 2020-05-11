@@ -26,6 +26,7 @@ paths:
           description: The client does not belong to the user.
       security:
         - basic: []
+        - github: ['lokole-registration']
 
   '/users/{domain}':
 
@@ -45,11 +46,19 @@ paths:
           description: The client does not belong to the user.
       security:
         - basic: []
+        - github: ['lokole-registration']
 
 securityDefinitions:
   basic:
     type: basic
     x-basicInfoFunc: opwen_email_server.integration.connexion.basic_auth
+  github:
+    type: oauth2
+    flow: implicit
+    authorizationUrl: https://github.com/login/oauth/authorize
+    x-tokenInfoFunc: opwen_email_server.integration.connexion.github_auth
+    scopes:
+      lokole-registration: User has permissions to register Lokole clients
 
 parameters:
 

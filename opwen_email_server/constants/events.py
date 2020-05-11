@@ -8,7 +8,6 @@ NEW_CLIENT_REGISTERED = 'new_client_registered'  # type: Final
 UNREGISTERED_CLIENT = 'unregistered_client'  # type: Final
 UNKNOWN_USER = 'unknown_user'  # type: Final
 BAD_PASSWORD = 'bad_password'  # type: Final  # nosec
-MISSING_SCOPES = 'missing_scopes'  # type: Final
 UNKNOWN_COMPRESSION_FORMAT = 'unknown_compression_format'  # type: Final
 EMAILS_DELIVERED_TO_CLIENT = 'emails_delivered_to_client'  # type: Final
 EMAILS_FORMATTED_FOR_CLIENT = 'emails_formatted_for_client'  # type: Final
