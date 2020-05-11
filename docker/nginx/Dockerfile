@@ -8,8 +8,7 @@ FROM nginx:stable
 
 COPY --from=builder /usr/bin/mo /usr/bin/mo
 COPY docker/nginx/static /static
-COPY docker/nginx/nginx.conf.template /app/nginx.conf.template
-COPY docker/nginx/server.conf.template /app/server.conf.template
+COPY docker/nginx/*.mustache /app/
 COPY docker/nginx/run-nginx.sh /app/run-nginx.sh
 
 RUN mkdir -p /var/cache/nginx /etc/nginx/modules-enabled /etc/nginx/sites-enabled \
