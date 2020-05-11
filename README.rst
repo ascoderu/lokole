@@ -87,11 +87,23 @@ that aims to address this problem by tackling it from three perspectives:
 System overview
 ---------------
 
-.. image:: https://user-images.githubusercontent.com/1086421/50498160-5eed3500-0a0c-11e9-888b-830140cd2986.png
+.. image:: https://static.swimlanes.io/23added12f9ab7faa03ac6d1c6bdc733.png
   :width: 800
   :align: center
-  :alt: Overview of the Lokole system
-  :target: https://user-images.githubusercontent.com/1086421/50498160-5eed3500-0a0c-11e9-888b-830140cd2986.png
+  :alt: Overview of the Lokole client registration flow
+  :target: https://swimlanes.io/u/SfWS0LVYu
+
+.. image:: https://static.swimlanes.io/b070c40083a3f67ede3e49fa9cd25933.png
+  :width: 800
+  :align: center
+  :alt: Overview of the Lokole client email upload flow
+  :target: https://swimlanes.io/u/hub7TEZgp
+
+.. image:: https://static.swimlanes.io/3dc4b74d377eb3094dc83fc1da9dfe84.png
+  :width: 800
+  :align: center
+  :alt: Overview of the Lokole client email download flow
+  :target: https://swimlanes.io/u/_QqT0iQx8
 
 --------------------
 Data exchange format
