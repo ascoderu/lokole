@@ -289,3 +289,13 @@ class FormatAttachedFilesTests(TestCase):
 
         self.assertNotEqual(input_content, output_content)
         self.assertEqual(input_filename, output_filename)
+
+
+class DescendingCountTests(TestCase):
+    def test_descending_count_correct(self):
+        sent_at = '2020-02-01 21:09'
+        input_email = {'sent_at': sent_at}
+
+        sent_at_timestamp = email_parser.descending_timestamp(input_email['sent_at'])
+
+        self.assertEqual(sent_at_timestamp, 519408660)

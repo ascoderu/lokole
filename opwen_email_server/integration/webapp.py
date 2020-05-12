@@ -24,6 +24,7 @@ from opwen_email_server.integration.celery import send_and_index_email
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.collections import chunks
+from opwen_email_server.utils.email_parser import descending_timestamp
 from opwen_email_server.utils.email_parser import ensure_has_sent_at
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_recipients
@@ -226,7 +227,9 @@ class AzureEmailStore(EmailStore, LogMixin):
             else:
                 continue
 
-            self._mailbox_storage.delete(f"{domain}/{email_address}/{folder}/{email['sent_at']}/{uid}")
+            desc_prefix = descending_timestamp(email['sent_at'])
+
+            self._mailbox_storage.delete(f"{domain}/{email_address}/{folder}/{desc_prefix} {email['sent_at']}/{uid}")
 
     def _mark_sent(self, uids: Iterable[str]):
         pass

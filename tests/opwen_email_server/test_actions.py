@@ -152,10 +152,10 @@ class IndexReceivedEmailForMailboxTests(TestCase):
 
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
-        self.mailbox_storage.store_text.assert_any_call('bar.lokole.ca/1@bar.lokole.ca/received/2019-10-26 22:47/123',
-                                                        'indexed')
-        self.mailbox_storage.store_text.assert_any_call('baz.lokole.ca/2@baz.lokole.ca/received/2019-10-26 22:47/123',
-                                                        'indexed')
+        self.mailbox_storage.store_text.assert_any_call(
+            'bar.lokole.ca/1@bar.lokole.ca/received/527869980 2019-10-26 22:47/123', 'indexed')
+        self.mailbox_storage.store_text.assert_any_call(
+            'baz.lokole.ca/2@baz.lokole.ca/received/527869980 2019-10-26 22:47/123', 'indexed')
         self.assertEqual(self.mailbox_storage.store_text.call_count, 2)
 
     def _execute_action(self, *args, **kwargs):
@@ -186,7 +186,7 @@ class IndexSentEmailForMailboxTests(TestCase):
         self.assertEqual(status, 200)
         self.email_storage.fetch_object.assert_called_once_with(email_id)
         self.mailbox_storage.store_text.assert_called_once_with(
-            'foo.lokole.ca/foo@foo.lokole.ca/sent/2019-10-26 22:47/123', 'indexed')
+            'foo.lokole.ca/foo@foo.lokole.ca/sent/527869980 2019-10-26 22:47/123', 'indexed')
 
     def _execute_action(self, *args, **kwargs):
         action = actions.IndexSentEmailForMailbox(
