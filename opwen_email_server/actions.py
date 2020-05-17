@@ -125,7 +125,7 @@ class _IndexEmailForMailbox(_Action):
             domain = get_domain(email_address)
             desc_prefix = descending_timestamp(email['sent_at'])
             if domain.endswith(mailbox.MAILBOX_DOMAIN):
-                index = f"{domain}/{email_address}/{self._folder}/{desc_prefix} {email['sent_at']}/{resource_id}"
+                index = f"{domain}/{email_address}/{self._folder}/{desc_prefix}/{resource_id}"
                 self._mailbox_storage.store_text(index, 'indexed')
 
         self.log_event(events.MAILBOX_EMAIL_INDEXED, {'folder': self._folder})  # noqa: E501  # yapf: disable

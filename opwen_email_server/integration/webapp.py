@@ -229,7 +229,7 @@ class AzureEmailStore(EmailStore, LogMixin):
 
             desc_prefix = descending_timestamp(email['sent_at'])
 
-            self._mailbox_storage.delete(f"{domain}/{email_address}/{folder}/{desc_prefix} {email['sent_at']}/{uid}")
+            self._mailbox_storage.delete(f"{domain}/{email_address}/{folder}/{desc_prefix}/{uid}")
 
     def _mark_sent(self, uids: Iterable[str]):
         pass

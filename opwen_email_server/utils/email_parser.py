@@ -226,8 +226,8 @@ def format_inline_images(email: dict, on_error: Callable) -> dict:
     return new_email
 
 
-def descending_timestamp(email_sent_at: str) -> int:
-    return int(mailbox.FUTURE_TIMESTAMP - datetime.fromisoformat(email_sent_at).timestamp())
+def descending_timestamp(email_sent_at: str) -> str:
+    return str(mailbox.FUTURE_TIMESTAMP - int(datetime.fromisoformat(email_sent_at).timestamp()))
 
 
 class MimeEmailParser(LogMixin):
