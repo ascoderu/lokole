@@ -292,16 +292,17 @@ class FormatAttachedFilesTests(TestCase):
 
 
 class DescendingTimestampTests(TestCase):
-    def test_descending_count_correct(self):
+    def test_descending_timestamp_correct(self):
         sent_at = '2020-02-01 21:09'
 
         sent_at_timestamp = email_parser.descending_timestamp(sent_at)
 
         self.assertEqual(sent_at_timestamp, '519408660')
 
-    def test_descending_count_ordering(self):
+    def test_descending_timestamp_ordering(self):
         multiple_sent_at = ['2020-02-01 21:09', '2020-02-01 22:09']
 
-        sent_at_order = sorted([email_parser.descending_timestamp(email) for email in multiple_sent_at])
+        sorted_email_timestamp = sorted(
+            [email_parser.descending_timestamp(date_time) for date_time in multiple_sent_at])
 
-        self.assertEqual(sent_at_order, ['519405060', '519408660'])
+        self.assertEqual(sorted_email_timestamp, ['519405060', '519408660'])
