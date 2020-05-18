@@ -26,6 +26,14 @@ RUN wget -q https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_V
   && rm kubeval-linux-amd64.tar.gz \
   && kubeval --version
 
+ARG SHFMT_VERSION=3.1.1
+RUN wget -q https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64 \
+  && mv shfmt_v${SHFMT_VERSION}_linux_amd64 shfmt \
+  && cp shfmt /usr/local/bin \
+  && rm shfmt \
+  && chmod +x /usr/local/bin/shfmt \
+  && shfmt -version
+
 COPY docker/ci/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
