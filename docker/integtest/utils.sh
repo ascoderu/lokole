@@ -2,7 +2,7 @@
 set -eo pipefail
 
 get_container() {
-  docker ps --format  '{{.Names}}' | grep "$1"
+  docker ps --format '{{.Names}}' | grep "$1"
 }
 
 log() {
@@ -10,7 +10,8 @@ log() {
 }
 
 authenticated_request() {
-  local endpoint="$1"; shift
+  local endpoint="$1"
+  shift
 
   if [[ "${REGISTRATION_CREDENTIALS}" =~ ^[^:]+:.*$ ]]; then
     curl -fs "${endpoint}" -u "${REGISTRATION_CREDENTIALS}" "$@"
@@ -38,7 +39,7 @@ az_storage() {
     --name "${blob}" \
     --container-name "${container}" \
     --connection-string "$(az_connection_string)" \
-  > /dev/null
+    >/dev/null
 }
 
 wait_seconds() {

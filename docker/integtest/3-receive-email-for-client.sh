@@ -13,7 +13,7 @@ email_to_receive="${in_dir}/inbound-email.mime"
 if [[ -n "$1" ]]; then
   client_id="$1"
 else
-  client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
+  client_id="$(jq -r '.client_id' <"${out_dir}/register1.json")"
 fi
 
 # workflow 2a: receive an email directed at one of the clients

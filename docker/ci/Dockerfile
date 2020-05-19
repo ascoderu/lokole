@@ -68,3 +68,5 @@ RUN helm lint --strict ./helm/opwen_cloudserver \
  && helm template ./helm/opwen_cloudserver > helm.yaml \
  && kubeval --ignore-missing-schemas helm.yaml \
  && rm helm.yaml
+
+RUN shfmt -d -i 2 -ci .
