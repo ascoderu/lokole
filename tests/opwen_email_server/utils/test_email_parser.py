@@ -289,3 +289,62 @@ class FormatAttachedFilesTests(TestCase):
 
         self.assertNotEqual(input_content, output_content)
         self.assertEqual(input_filename, output_filename)
+
+
+class DescendingTimestampTests(TestCase):
+    def test_descending_timestamp_correct(self):
+        sent_at = '2020-02-01 21:09'
+
+        sent_at_timestamp = email_parser.descending_timestamp(sent_at)
+
+        self.assertEqual(sent_at_timestamp, '519408660')
+
+    def test_descending_timestamp_order_by_year(self):
+        january_2020 = '2020-01-01 22:09'
+        january_2021 = '2021-01-01 22:09'
+
+        january_2020_timestamp = email_parser.descending_timestamp(january_2020)
+        january_2021_timestamp = email_parser.descending_timestamp(january_2021)
+
+        timestamp_ordering = sorted([january_2020_timestamp, january_2021_timestamp])
+        self.assertEqual(timestamp_ordering, [january_2021_timestamp, january_2020_timestamp])
+
+    def test_descending_timestamp_order_by_month(self):
+        january = '2020-01-01 22:09'
+        february = '2020-02-02 22:09'
+
+        january_timestamp = email_parser.descending_timestamp(january)
+        february_timestamp = email_parser.descending_timestamp(february)
+
+        timestamp_ordering = sorted([january_timestamp, february_timestamp])
+        self.assertEqual(timestamp_ordering, [february_timestamp, january_timestamp])
+
+    def test_descending_timestamp_order_by_day(self):
+        january_1st = '2020-01-01 22:09'
+        january_2nd = '2020-01-02 22:09'
+
+        january_1_timestamp = email_parser.descending_timestamp(january_1st)
+        january_2_timestamp = email_parser.descending_timestamp(january_2nd)
+
+        timestamp_ordering = sorted([january_1_timestamp, january_2_timestamp])
+        self.assertEqual(timestamp_ordering, [january_2_timestamp, january_1_timestamp])
+
+    def test_descending_timestamp_order_by_hour(self):
+        january_1st_22h09m = '2020-01-01 22:09'
+        january_1st_23h09m = '2020-01-01 23:09'
+
+        january_22h09m_timestamp = email_parser.descending_timestamp(january_1st_22h09m)
+        january_23h09m_timestamp = email_parser.descending_timestamp(january_1st_23h09m)
+
+        timestamp_ordering = sorted([january_22h09m_timestamp, january_23h09m_timestamp])
+        self.assertEqual(timestamp_ordering, [january_23h09m_timestamp, january_22h09m_timestamp])
+
+    def test_descending_timestamp_order_by_minute(self):
+        january_1st_22h09m = '2020-01-01 22:09'
+        january_1st_22h11m = '2020-01-01 22:11'
+
+        january_22h09m_timestamp = email_parser.descending_timestamp(january_1st_22h09m)
+        january_22h11m_timestamp = email_parser.descending_timestamp(january_1st_22h11m)
+
+        timestamp_ordering = sorted([january_22h09m_timestamp, january_22h11m_timestamp])
+        self.assertEqual(timestamp_ordering, [january_22h11m_timestamp, january_22h09m_timestamp])
