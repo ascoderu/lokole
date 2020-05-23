@@ -10,7 +10,6 @@ mkdir -p "${out_dir}"
 
 email_to_receive="${in_dir}/service-email.mime"
 
-
 #receive an email directed at the service endpoint
 http --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/service" \

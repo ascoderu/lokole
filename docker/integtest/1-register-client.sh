@@ -40,13 +40,19 @@ if REGISTRATION_CREDENTIALS="baduser:badpassword" authenticated_request \
   "http://nginx:8888/api/email/register/" \
   -H "Content-Type: application/json" \
   -d '{"domain":"hacker.lokole.ca"}' \
-; then echo "Was able to register a client with bad basic auth credentials" >&2; exit 4; fi
+  ; then
+  echo "Was able to register a client with bad basic auth credentials" >&2
+  exit 4
+fi
 
 if REGISTRATION_CREDENTIALS="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" authenticated_request \
   "http://nginx:8888/api/email/register/" \
   -H "Content-Type: application/json" \
   -d '{"domain":"hacker.lokole.ca"}' \
-; then echo "Was able to register a client with bad bearer credentials" >&2; exit 4; fi
+  ; then
+  echo "Was able to register a client with bad bearer credentials" >&2
+  exit 4
+fi
 
 # also register another client to simulate multi-client emails
 authenticated_request \
@@ -68,7 +74,10 @@ if authenticated_request \
   "http://nginx:8888/api/email/register/" \
   -H "Content-Type: application/json" \
   -d '{"domain":"developer3.lokole.ca"}' \
-; then echo "Was able to register a duplicate client" >&2; exit 5; fi
+  ; then
+  echo "Was able to register a duplicate client" >&2
+  exit 5
+fi
 
 authenticated_request \
   "http://nginx:8888/api/email/register/developer3.lokole.ca" \

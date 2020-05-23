@@ -42,7 +42,7 @@ required_file() {
 generate_identifier() {
   local length="$1"
 
-  < /dev/urandom tr -dc 'a-z0-9' | head -c"${length}"
+  tr </dev/urandom -dc 'a-z0-9' | head -c"${length}"
 }
 
 get_dotenv() {
