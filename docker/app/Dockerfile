@@ -16,7 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt \
  && pip wheel --no-cache-dir -r requirements.txt -w /deps \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
-ARG LOKOLE_SENDGRID_KEY=""
 COPY ./opwen_email_server ./opwen_email_server/
 COPY ./opwen_email_client ./opwen_email_client/
 COPY ./tests ./tests/
