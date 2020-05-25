@@ -15,7 +15,7 @@ wait_for_client() {
   local i
 
   for i in $(seq 1 "${max_retries}"); do
-    if authenticated_request "http://nginx:8888/api/email/register/developer${client}.lokole.ca" | tee "${out_dir}/register${client}.json"; then
+    if authenticated_request "http://nginx:8888/api/email/register/developer${client}.lokole.ca" >"${out_dir}/register${client}.json"; then
       log "Client ${client} is registered"
       return
     fi
