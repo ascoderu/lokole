@@ -43,7 +43,6 @@ case "$1" in
     ;;
 
   before_deploy)
-    echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
     make release
     ;;
 

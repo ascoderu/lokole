@@ -119,7 +119,8 @@ deploy-pypi:
     twine upload --skip-existing -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
 
 deploy-docker:
-	for tag in "latest" "$(DOCKER_TAG)"; do ( \
+	echo "$(DOCKER_PASSWORD)" | docker login --username "$(DOCKER_USERNAME)" --password-stdin && \
+  for tag in "latest" "$(DOCKER_TAG)"; do ( \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
     docker-compose push; \
