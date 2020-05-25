@@ -43,6 +43,9 @@ case "$1" in
     ;;
 
   before_deploy)
+    git remote add ghp "https://${GITHUB_AUTH_TOKEN}@github.com/ascoderu/lokole.git"
+    git config --local user.name "Deployment Bot (from Travis CI)"
+    git config --local user.email "deploy@travis-ci.org"
     make release
     ;;
 
