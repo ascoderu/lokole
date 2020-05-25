@@ -66,7 +66,6 @@ release-pypi:
 
 release-docker:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
-    eval "$(shell find docker -type f -name 'Dockerfile' | while read dockerfile; do grep 'ARG ' "$$dockerfile" | sed 's/^ARG /export /g'; done)"; \
     export BUILD_TARGET="runtime"; \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
@@ -112,21 +111,22 @@ renew-cert:
 	echo "Skipping: handled by cron on the VM"
 
 deploy-pypi:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/dist:/dist" \
     setup \
     twine upload --skip-existing -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
 
 deploy-docker:
-	for tag in "latest" "$(DOCKER_TAG)"; do ( \
+	@echo "$(DOCKER_PASSWORD)" | docker login --username "$(DOCKER_USERNAME)" --password-stdin && \
+  for tag in "latest" "$(DOCKER_TAG)"; do ( \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
     docker-compose push; \
   ) done
 
 deploy: deploy-pypi deploy-docker
-	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \
     -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
