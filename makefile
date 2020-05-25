@@ -110,6 +110,14 @@ deploy-k8s: kubeconfig
 renew-cert:
 	echo "Skipping: handled by cron on the VM"
 
+deploy-gh-pages:
+	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+    -v "$(PWD)/build:/app/build" \
+    -v "$(PWD)/.git:/app/.git" \
+    setup \
+    ghp-import --push --force --remote ghp --branch gh-pages --message "Update" /app/build
+
 deploy-pypi:
 	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
@@ -125,7 +133,7 @@ deploy-docker:
     docker-compose push; \
   ) done
 
-deploy: deploy-pypi deploy-docker
+deploy: deploy-pypi deploy-gh-pages deploy-docker
 	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \
