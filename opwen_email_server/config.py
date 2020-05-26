@@ -59,8 +59,9 @@ REGISTRATION_SUDO_TEAM = env('LOKOLE_REGISTRATION_SUDO_TEAM', 'lokole-sudo')
 MAX_WIDTH_IMAGES = env.int('LOKOLE_MAX_WIDTH_EMAIL_IMAGES', 200)
 MAX_HEIGHT_IMAGES = env.int('LOKOLE_MAX_HEIGHT_EMAIL_IMAGES', 200)
 
-if env('LOKOLE_QUEUE_BROKER_SCHEME', '') == 'azureservicebus':
-    QUEUE_BROKER = 'azureservicebus://{username}:{password}@{host}'.format(
+if env('LOKOLE_QUEUE_BROKER_SCHEME', ''):
+    QUEUE_BROKER = '{scheme}://{username}:{password}@{host}'.format(
+        scheme=env('LOKOLE_QUEUE_BROKER_SCHEME', ''),
         username=urlsafe(env('LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME')),
         password=urlsafe(env('LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY')),
         host=urlsafe(env('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE')))

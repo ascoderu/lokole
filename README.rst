@@ -2,9 +2,6 @@
 Lokole
 ======
 
-.. image:: https://travis-ci.org/ascoderu/lokole.svg?branch=master
-  :target: https://travis-ci.org/ascoderu/lokole
-
 .. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
   :target: https://pypi.python.org/pypi/opwen_email_client/
 
