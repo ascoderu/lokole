@@ -1,4 +1,4 @@
-name: Integration tests (local)
+name: Local integration tests
 
 on:
   pull_request:
@@ -18,9 +18,7 @@ jobs:
             -e BUILD_TARGET=runtime \
             -e REGISTRATION_CREDENTIALS=admin:password \
             -e LOKOLE_QUEUE_BROKER_SCHEME=amqp \
-            build verify-build start integration-tests
-      - run: bash <(curl -s https://codecov.io/bash)
-        if: ${{ success() }}
+            build start integration-tests
       - run: make status
         if: ${{ failure() }}
       - run: make stop

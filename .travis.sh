@@ -60,7 +60,7 @@ case "$1" in
       exit 0
     fi
 
-    make build verify-build
+    make ci build verify-build
     ;;
 
   script)

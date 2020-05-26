@@ -1,3 +1,5 @@
+SHELL := bash -o pipefail
+
 default: build
 
 .travis.env: .travis.env.gpg
@@ -20,14 +22,14 @@ clean-storage:
 	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
 	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
 
+ci:
+	BUILD_TARGET=builder docker-compose build && \
+  docker-compose run --rm --no-deps api ./docker/app/run-ci.sh ----coverage-xml---- | tee coverage.xml && \
+  sed -i '1,/----coverage-xml----/d' coverage.xml && \
+  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build ci
+
 build:
-	BUILD_TARGET=builder docker-compose build api && \
-  docker-compose run --no-deps --rm api cat coverage.xml > coverage.xml
-	docker-compose \
-    -f docker-compose.yml \
-    -f docker/docker-compose.test.yml \
-    -f docker/docker-compose.tools.yml \
-    build
+	docker-compose build
 
 start:
 	docker-compose up -d --remove-orphans

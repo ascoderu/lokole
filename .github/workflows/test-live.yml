@@ -1,4 +1,4 @@
-name: Integration tests (live)
+name: Live integration tests
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ jobs:
             -e AZURITE_HOST="" \
             -e AZURITE_SECURE="True" \
             -e TEST_STEP_DELAY=90 \
-            build verify-build start integration-tests
+            build start integration-tests
       - run: make status
         if: ${{ failure() }}
       - run: make clean-storage stop
