@@ -1,0 +1,27 @@
+name: Integration tests (local)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make \
+            -e BUILD_TARGET=runtime \
+            -e REGISTRATION_CREDENTIALS=admin:password \
+            -e LOKOLE_QUEUE_BROKER_SCHEME=amqp \
+            build verify-build start integration-tests
+      - run: bash <(curl -s https://codecov.io/bash)
+        if: ${{ success() }}
+      - run: make status
+        if: ${{ failure() }}
+      - run: make stop
+        if: ${{ always() }}

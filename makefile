@@ -1,5 +1,12 @@
 default: build
 
+.travis.env: .travis.env.gpg
+	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .travis.env.gpg >.travis.env
+
+github-env: .travis.env
+	@echo "::set-env name=SUFFIX::$(shell cat /proc/sys/kernel/random/uuid)"
+	@sed 's/=/::/' <.travis.env | sed 's/^export /::set-env name=/'
+
 integration-tests:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest
@@ -10,8 +17,8 @@ test-emails:
   ./3-receive-email-for-client.sh bdd640fb-0667-1ad1-1c80-317fa3b1799d
 
 clean-storage:
-	docker-compose exec api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
-	docker-compose exec api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
+	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
+	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
 
 build:
 	BUILD_TARGET=builder docker-compose build api && \
@@ -28,16 +35,15 @@ start:
 start-devtools:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
 
+status:
+	docker-compose ps; \
+  docker-compose ps --services | while read service; do \
+    echo "==================== $$service ===================="; \
+    docker-compose logs "$$service"; \
+  done
+
 logs:
-	if [ "$(CI)" = "true" ]; then \
-    docker-compose ps; \
-    docker-compose ps --services | while read service; do \
-      echo "==================== $$service ===================="; \
-      docker-compose logs "$$service"; \
-    done \
-  else \
-    docker-compose logs --follow --tail=100; \
-  fi
+	docker-compose logs --follow --tail=100
 
 stop:
 	docker-compose \

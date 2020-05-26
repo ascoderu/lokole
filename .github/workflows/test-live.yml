@@ -1,0 +1,35 @@
+name: Integration tests (live)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: make github-env
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - run: |
+          make \
+            -e BUILD_TARGET=runtime \
+            -e REGISTRATION_CREDENTIALS="$GITHUB_AUTH_TOKEN" \
+            -e LOKOLE_QUEUE_BROKER_SCHEME=azureservicebus \
+            -e LOKOLE_RESOURCE_SUFFIX="$SUFFIX" \
+            -e APPINSIGHTS_INSTRUMENTATIONKEY="$SUFFIX" \
+            -e AZURITE_ACCOUNT="$TEST_AZURE_STORAGE_ACCOUNT" \
+            -e AZURITE_KEY="$TEST_AZURE_STORAGE_KEY" \
+            -e AZURITE_HOST="" \
+            -e AZURITE_SECURE="True" \
+            -e TEST_STEP_DELAY=90 \
+            build verify-build start integration-tests
+      - run: make status
+        if: ${{ failure() }}
+      - run: make clean-storage stop
+        if: ${{ always() }}
