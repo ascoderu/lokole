@@ -20,3 +20,4 @@ celery==4.4.2
 xtarfile[zstd]==0.0.2
 azure-servicebus==0.50.2
 gunicorn==20.0.4
+wikipedia==1.4.0
