@@ -2,7 +2,6 @@ language: minimal
 
 env:
   matrix:
-    - TEST_MODE=live
     - TEST_MODE=local
 
 services:
@@ -12,11 +11,10 @@ before_install: ./.travis.sh before_install
 install: ./.travis.sh install
 
 before_script: |
-  gpg --decrypt --batch --passphrase "$GPG_PASSPHRASE" .travis.env.gpg > .travis.env
+  make .travis.env
   . .travis.env
 
   export SUFFIX="$(cat /proc/sys/kernel/random/uuid)"
-  export CI=true
   export BUILD_TARGET=runtime
   export DOCKER_TAG="$TRAVIS_TAG"
 

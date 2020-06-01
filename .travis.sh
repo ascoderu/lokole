@@ -2,13 +2,8 @@
 
 set -eo pipefail
 
-if [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ "$TEST_MODE" = "live" ]]; then
-  echo "Skipping live service CI for branch build" >&2
-  exit 0
-fi
-
-if [[ "$TRAVIS_PULL_REQUEST_SLUG" != "ascoderu/lokole" ]] && [[ "$TEST_MODE" = "live" ]]; then
-  echo "Skipping live service CI for fork build" >&2
+if [[ -z "${TRAVIS_TAG}" ]]; then
+  echo "Skipping CI (only processing releases)" >&2
   exit 0
 fi
 
@@ -19,7 +14,7 @@ case "$1" in
       exit 0
     fi
 
-    make logs
+    make status
     ;;
 
   after_script)
@@ -65,7 +60,7 @@ case "$1" in
       exit 0
     fi
 
-    make build verify-build
+    make ci build verify-build
     ;;
 
   script)

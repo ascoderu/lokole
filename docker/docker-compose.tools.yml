@@ -6,7 +6,7 @@ services:
     image: mher/flower:latest
     depends_on:
       - rabbitmq
-    command: ["--address=0.0.0.0", "--port=5555", "--broker=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq"]
+    command: ["--address=0.0.0.0", "--port=5555", "--broker=amqp://${LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME}:${LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY}@rabbitmq"]
     ports:
       - ${FLOWER_PORT}:5555
 
