@@ -133,30 +133,6 @@ if [[ "${DEPLOY_COMPUTE}" != "no" ]]; then
 
   az aks get-credentials --name "${k8sname}"
 
-  log "Setting up helm in cluster ${k8sname}"
-
-  kubectl apply -f- <<<"
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tiller
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: tiller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: tiller
-    namespace: kube-system
-"
-  helm_init
-
   log "Setting up cert-manager v${CERT_MANAGER_VERSION} in cluster ${k8sname}"
 
   kubectl apply -f "https://raw.githubusercontent.com/jetstack/cert-manager/v${CERT_MANAGER_VERSION}/deploy/manifests/00-crds.yaml"

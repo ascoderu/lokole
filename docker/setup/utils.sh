@@ -71,5 +71,5 @@ use_resource_group() {
 }
 
 helm_init() {
-  helm init --history-max 200 --service-account tiller --node-selectors "beta.kubernetes.io/os=linux" --wait
+  helm init --history-max 200 --node-selectors "beta.kubernetes.io/os=linux" --wait
 }
