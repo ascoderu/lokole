@@ -1,4 +1,4 @@
-name: Live integration tests
+name: CI
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - synchronize
 
 jobs:
-  build:
+  test-live:
     runs-on: ubuntu-18.04
 
     steps:
@@ -33,3 +33,33 @@ jobs:
         if: ${{ failure() }}
       - run: make clean-storage stop
         if: ${{ always() }}
+
+  test-local:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make \
+            -e BUILD_TARGET=runtime \
+            -e REGISTRATION_CREDENTIALS=admin:password \
+            -e LOKOLE_QUEUE_BROKER_SCHEME=amqp \
+            build start integration-tests
+      - run: make status
+        if: ${{ failure() }}
+      - run: make stop
+        if: ${{ always() }}
+
+  test-unit:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make \
+            -e BUILD_TARGET=runtime \
+            -e LOKOLE_SENDGRID_KEY= \
+            -e LOKOLE_QUEUE_BROKER_SCHEME= \
+            ci build verify-build
+      - run: bash <(curl -s https://codecov.io/bash)
+        if: ${{ success() }}

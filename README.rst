@@ -2,6 +2,9 @@
 Lokole
 ======
 
+.. image:: https://github.com/ascoderu/lokole/workflows/CI/badge.svg
+  :target: https://github.com/ascoderu/lokole/actions
+
 .. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
   :target: https://pypi.python.org/pypi/opwen_email_client/
 
