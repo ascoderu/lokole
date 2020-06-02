@@ -2,12 +2,12 @@ SHELL := bash -o pipefail
 
 default: build
 
-.travis.env: .travis.env.gpg
-	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .travis.env.gpg >.travis.env
+.github.env: .github.env.gpg
+	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .github.env.gpg >.github.env
 
-github-env: .travis.env
+github-env: .github.env
 	@echo "::set-env name=SUFFIX::$(shell cat /proc/sys/kernel/random/uuid)"
-	@sed 's/=/::/' <.travis.env | sed 's/^export /::set-env name=/'
+	@sed 's/=/::/' <.github.env | sed 's/^export /::set-env name=/'
 
 integration-tests:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
@@ -80,7 +80,12 @@ release-docker:
     docker-compose build; \
   ) done
 
-release-gh-pages:
+gh-pages-remote:
+	@git remote add ghp "https://$(GITHUB_AUTH_TOKEN)@github.com/ascoderu/lokole.git" && \
+  git config --local user.name "Deployment Bot (from Github Actions)" && \
+  git config --local user.email "deploy@ascoderu.ca"
+
+release-gh-pages: gh-pages-remote
 	docker container create --name statuspage "$(DOCKER_USERNAME)/opwenstatuspage:$(DOCKER_TAG)" && \
   docker cp "statuspage:/app/lokole" ./build && \
   docker container rm statuspage

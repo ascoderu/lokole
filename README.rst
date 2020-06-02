@@ -114,7 +114,7 @@ Below is a list of some of the key technologies used in the Lokole project:
 - `Libcloud <https://libcloud.apache.org/>`_ is used to store emails in `Azure Storage <https://azure.microsoft.com/en-us/services/storage/>`_ (production) or `Azurite <https://github.com/Azure/Azurite>`_ (development).
 - `Sendgrid Inbound Parse <https://sendgrid.com/docs/for-developers/parsing-email/setting-up-the-inbound-parse-webhook/>`_ is used to receive emails from email providers and forward them to the Lokole email server. `Sendgrid Web API v3 <https://github.com/sendgrid/sendgrid-python>`_ is used to deliver emails from the Lokole email server to email providers. The MX records for Sendgrid are automatically generated via `Cloudflare API v4 <https://api.cloudflare.com/>`_.
 - `Github API v4 <https://developer.github.com/v4/>`_ is used to authenticate interactive calls to the Lokole email server API such as registering new clients or managing existing clients. Authorization is managed by Github team memberships on the Ascoderu organization. Management operations are exposed via the Lokole status page which is implemented in `React <https://reactjs.org/>`_ with `Ant Design <https://ant.design/docs/react/introduce>`_.
-- `Travis CI <https://travis-ci.org/ascoderu/lokole>`_ is used to verify pull requests and deploy updates to production.
+- `Github Actions <https://github.com/ascoderu/lokole/actions>`_ are used to verify pull requests and deploy updates to production.
 - [ ~ Dependencies scanned by PyUp.io ~ ]
 
 --------------------

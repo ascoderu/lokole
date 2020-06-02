@@ -17,7 +17,6 @@ opwen_statuspage/node_modules/
 !tests/
 !requirements*.txt
 !setup.cfg
-!.travis.sh
 !install.py
 !manage.py
 !MANIFEST.in
