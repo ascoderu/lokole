@@ -12,7 +12,7 @@ RUN wget -q -O /tmp/shellcheck.tar.xz "https://storage.googleapis.com/shellcheck
   && rm /tmp/shellcheck.tar.xz \
   && shellcheck --version
 
-ARG HELM_VERSION=2.16.1
+ARG HELM_VERSION=3.2.1
 RUN wget -q "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
   && tar xf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
   && mv "linux-amd64/helm" /usr/local/bin/helm \
