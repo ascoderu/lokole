@@ -42,9 +42,10 @@ class WikipediaEmailFormatter(LogMixin):
             body = ''
             download_link = self._get_download_link(wiki_page.url)
             pdf_file = get(download_link)
-            email['attachments'] = [{'filename': subject + '.pdf',
-                                     'content': b64encode(pdf_file.content),
-                                     }]
+            email['attachments'] = email['attachments'] = [{
+                'filename': subject + '.pdf',
+                'content': b64encode(pdf_file.content),
+            }]
 
         email['to'] = [email['from']]
         email['from'] = WIKIPEDIA_ADDRESS
