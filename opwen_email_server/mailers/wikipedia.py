@@ -20,7 +20,7 @@ class WikipediaEmailFormatter(LogMixin):
         self._now = now
 
     def _get_download_link(self, url: str) -> str:
-        split_url = urlparse(url)
+        parsed_url = urlparse(url)
         return parsed_url.scheme + '://' + parsed_url.netloc + '/api/rest_v1/page/pdf/' + parsed_url.path.split('/')[-1]
 
     def __call__(self, email: dict) -> dict:
