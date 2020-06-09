@@ -1,9 +1,9 @@
 from base64 import b64encode
 from datetime import datetime
 from typing import Callable
+from urllib.parse import urlparse
 
 from requests import get
-from urllib.parse import urlparse
 from wikipedia import languages
 from wikipedia import page
 from wikipedia import set_lang
