@@ -33,8 +33,8 @@ class WikipediaEmailFormatter(LogMixin):
         try:
             wiki_page = page(email['body'])
         except DisambiguationError as e:
-            subject = "Suggested Searches"
-            body = "Multiple results found. Try again with the following: \n{}".format('\n'.join(e.options))
+            subject = 'Suggested Searches'
+            body = 'Multiple results found. Try again with the following: \n{}'.format('\n'.join(e.options))
         except PageError:
             subject = 'No results'
             body = 'No results found for: {}'.format(email['body'])
@@ -43,7 +43,7 @@ class WikipediaEmailFormatter(LogMixin):
             body = ''
             download_link = self._get_download_link(wiki_page.url)
             pdf_file = get(download_link)
-            email['attachments'] = email['attachments'] = [{
+            email['attachments'] = [{
                 'filename': subject + '.pdf',
                 'content': b64encode(pdf_file.content),
             }]
