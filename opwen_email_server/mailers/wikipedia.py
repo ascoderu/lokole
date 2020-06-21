@@ -1,12 +1,10 @@
 from base64 import b64encode
 from datetime import datetime
+from typing import Any
 from typing import Callable
 from urllib.parse import urlparse
 
 from requests import get
-from wikipedia import languages
-from wikipedia import page
-from wikipedia import set_lang
 from wikipedia.exceptions import DisambiguationError
 from wikipedia.exceptions import PageError
 
@@ -16,8 +14,15 @@ WIKIPEDIA_ADDRESS = 'wikipedia@bot.lokole.ca'
 
 
 class WikipediaEmailFormatter(LogMixin):
-    def __init__(self, now: Callable[[], datetime] = datetime.utcnow):
+    def __init__(self,
+                 languages: Callable[[], dict],
+                 language_setter: Callable[[str], None],
+                 page_fetch: Callable[['str'], Any],
+                 now: Callable[[], datetime] = datetime.utcnow):
         self._now = now
+        self._languages = languages
+        self._language_setter = language_setter
+        self._page_fetch = page_fetch
 
     def _get_download_link(self, url: str) -> str:
         parsed_url = urlparse(url)
@@ -25,13 +30,13 @@ class WikipediaEmailFormatter(LogMixin):
 
     def __call__(self, email: dict) -> dict:
         language = email['subject']
-        if language in languages():
-            set_lang(language)
+        if language in self._languages():
+            self._language_setter(language)
         else:
-            set_lang('en')
+            self._language_setter('en')
 
         try:
-            wiki_page = page(email['body'])
+            wiki_page = self._page_fetch(email['body'])
         except DisambiguationError as e:
             subject = 'Suggested Searches'
             body = 'Multiple results found. Try again with the following: \n{}'.format('\n'.join(e.options))

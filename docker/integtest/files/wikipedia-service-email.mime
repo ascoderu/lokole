@@ -7,7 +7,7 @@ X-Gm-Message-State: AMke39n2h/OZU6fwgOdDltzsKqISVbe3ez6t19OeVrg2sT3pDRhSSQiIcwGz
 X-Received: by 10.129.81.4 with SMTP id f4mr15409224ywb.239.1486967141412; Sun, 12 Feb 2017 22:25:41 -0800 (PST)
 MIME-Version: 1.0
 Received: by 10.129.156.139 with HTTP; Sun, 12 Feb 2017 22:25:01 -0800 (PST)
-From: Clemens Wolff <clemens.wolff@gmail.com>
+From: Clemens Wolff <clemens@developer1.lokole.ca>
 Date: Sun, 12 Feb 2017 22:25:01 -0800
 Message-ID: <CAL79TcnjhV5PinZVY8Y3QEoNNcSa9uuNU5N3EP-gqcYPFfuHLA@mail.gmail.com>
 Subject: jp
@@ -22,6 +22,6 @@ linear regression
 --001a1146392641b94705486384bf
 Content-Type: text/html; charset=UTF-8
 
-<div dir="ltr">Body of the message.</div>
+<div dir="ltr">linear regression.</div>
 
 --001a1146392641b94705486384bf--
