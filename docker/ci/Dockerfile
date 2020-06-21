@@ -34,6 +34,12 @@ RUN wget -q https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfm
   && chmod +x /usr/local/bin/shfmt \
   && shfmt -version
 
+ARG MINIKUBE_VERSION=1.11.0
+RUN curl -Lo minikube https://github.com/kubernetes/minikube/releases/download/v${MINIKUBE_VERSION}/minikube-darwin-amd64 \
+  && chmod +x minikube \
+  && mv minikube /usr/local/bin \
+  && minikube version
+
 COPY docker/ci/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
