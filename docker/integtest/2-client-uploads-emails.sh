@@ -23,4 +23,4 @@ az_storage upload "${resource_container}" "${resource_id}" "${emails_to_send}"
 curl -fs \
   -H "Content-Type: application/json" \
   -d '{"resource_id":"'"${resource_id}"'"}' \
-  "http://nginx:8888/api/email/upload/${client_id}"
+  "http://${INTEGTEST_HOST}/api/email/upload/${client_id}"

@@ -22,7 +22,7 @@ for i in 1 2; do
   # will package up the emails and store them on the shared blob storage
   curl -fs \
     -H "Accept: application/json" \
-    "http://nginx:8888/api/email/download/${client_id}" |
+    "http://${INTEGTEST_HOST}/api/email/download/${client_id}" |
     tee "${out_dir}/download${i}.json"
 
   resource_id="$(jq -r '.resource_id' <"${out_dir}/download${i}.json")"

@@ -49,7 +49,7 @@ wait_for_api() {
   local i
 
   for i in $(seq 1 "${max_retries}"); do
-    if curl -fs "http://nginx:8888/healthcheck/ping" >/dev/null; then
+    if curl -fs "http://${INTEGTEST_HOST}/healthcheck/ping" >/dev/null; then
       log "Api is running"
       return
     fi
@@ -64,7 +64,7 @@ wait_for_webapp() {
   local i
 
   for i in $(seq 1 "${max_retries}"); do
-    if curl -fs "http://nginx:8888/web/healthcheck/ping" >/dev/null; then
+    if curl -fs "http://${INTEGTEST_HOST}/web/healthcheck/ping" >/dev/null; then
       log "Webapp is running"
       return
     fi

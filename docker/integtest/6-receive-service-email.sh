@@ -12,7 +12,7 @@ email_to_receive="${in_dir}/service-email.mime"
 
 #receive an email directed at the service endpoint
 http --ignore-stdin --check-status -f POST \
-  "http://nginx:8888/api/email/sendgrid/service" \
+  "http://${INTEGTEST_HOST}/api/email/sendgrid/service" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${email_to_receive}"

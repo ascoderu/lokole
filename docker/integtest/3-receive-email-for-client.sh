@@ -19,21 +19,21 @@ fi
 # workflow 2a: receive an email directed at one of the clients
 # this simulates sendgrid delivering an email to the service
 http --ignore-stdin --check-status -f POST \
-  "http://nginx:8888/api/email/sendgrid/${client_id}" \
+  "http://${INTEGTEST_HOST}/api/email/sendgrid/${client_id}" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${email_to_receive}"
 
 # simulate delivery of the same email to the second mailbox
 http --ignore-stdin --check-status -f POST \
-  "http://nginx:8888/api/email/sendgrid/${client_id}" \
+  "http://${INTEGTEST_HOST}/api/email/sendgrid/${client_id}" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${email_to_receive}"
 
 # simulate delivery of another email
 http --ignore-stdin --check-status -f POST \
-  "http://nginx:8888/api/email/sendgrid/${client_id}" \
+  "http://${INTEGTEST_HOST}/api/email/sendgrid/${client_id}" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${in_dir}/inbound-email-2.mime"
