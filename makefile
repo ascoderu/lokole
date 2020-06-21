@@ -22,11 +22,17 @@ clean-storage:
 	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
 	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
 
-minikube:
+start-minikube:
 	docker run minikube start --driver=hyperkit
 
+share-docker-registry-for-minikube:
+	docker run kubectl create -f kube-registry.yaml
+	kubectl port-forward --namespace kube-system \ 
+	$(kubectl get po -n kube-system | grep kube-registry-v0 | \awk '{print $1;}') 5000:5000
+
 ci:
-	minikube
+	start-minikube
+	share-docker-registry-for-minikube
 	BUILD_TARGET=builder docker-compose build && \
   docker-compose run --rm --no-deps api ./docker/app/run-ci.sh ----coverage-xml---- | tee coverage.xml && \
   sed -i '1,/----coverage-xml----/d' coverage.xml && \
@@ -76,6 +82,11 @@ release-pypi:
   (mv ./dist/pkg.tar.gz "./dist/opwen_email_client-$(DOCKER_TAG).tar.gz" || true) && \
   docker container rm webapp
 
+release-docker-for-ci:
+	docker container create --name webappforci "$(DOCKER_USERNAME)/opwenwebappforci:$(DOCKER_TAG)" && \
+	docker cp "webapp:/app/dist" ./dist && \
+	docker container rm webappforci
+
 release-docker:
 	for tag in "latest" "$(DOCKER_TAG)"; do ( \
     export BUILD_TARGET="runtime"; \
@@ -94,7 +105,7 @@ release-gh-pages: gh-pages-remote
   docker cp "statuspage:/app/lokole" ./build && \
   docker container rm statuspage
 
-release: release-docker release-gh-pages release-pypi
+release: release-docker release-gh-pages release-pypi release-docker-for-ci
 
 kubeconfig:
 	if [ -f "$(PWD)/secrets/kube-config" ]; then \
@@ -142,6 +153,14 @@ deploy-pypi:
     setup \
     twine upload --skip-existing -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
 
+deploy-docker-for-ci:
+	@echo "$(DOCKER_PASSWORD)" | docker login --username "$(DOCKER_USERNAME)" --password-stdin && \
+  for tag in "latest" "$(DOCKER_TAG)"; do ( \
+    export BUILD_TAG="$$tag"; \
+    export DOCKER_REPO="$(DOCKER_USERNAME)"; \
+    docker-compose push; \
+  ) done
+
 deploy-docker:
 	@echo "$(DOCKER_PASSWORD)" | docker login --username "$(DOCKER_USERNAME)" --password-stdin && \
   for tag in "latest" "$(DOCKER_TAG)"; do ( \
@@ -150,7 +169,7 @@ deploy-docker:
     docker-compose push; \
   ) done
 
-deploy: deploy-pypi deploy-gh-pages deploy-docker
+deploy: deploy-pypi deploy-gh-pages deploy-docker deploy-docker-for-ci
 	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \
