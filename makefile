@@ -22,7 +22,11 @@ clean-storage:
 	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
 	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
 
+minikube:
+	docker run minikube start --driver=hyperkit
+
 ci:
+	minikube
 	BUILD_TARGET=builder docker-compose build && \
   docker-compose run --rm --no-deps api ./docker/app/run-ci.sh ----coverage-xml---- | tee coverage.xml && \
   sed -i '1,/----coverage-xml----/d' coverage.xml && \
