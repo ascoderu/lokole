@@ -18,7 +18,7 @@ http --ignore-stdin --check-status -f POST \
   "SPF=pass" \
   "email=@${echo_email_to_receive}"
 
-http --check-status -f POST \
+http --ignore-stdin --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/service" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
