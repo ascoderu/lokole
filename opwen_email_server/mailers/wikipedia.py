@@ -1,10 +1,10 @@
 from base64 import b64encode
 from datetime import datetime
-from typing import Any
 from typing import Callable
 from urllib.parse import urlparse
 
 from requests import get
+from wikipedia import WikipediaPage
 from wikipedia import languages
 from wikipedia import page
 from wikipedia import set_lang
@@ -20,7 +20,7 @@ class WikipediaEmailFormatter(LogMixin):
     def __init__(self,
                  languages_getter: Callable[[], dict] = languages,
                  language_setter: Callable[[str], None] = set_lang,
-                 page_fetch: Callable[['str'], Any] = page,
+                 page_fetch: Callable[[str], WikipediaPage] = page,
                  now: Callable[[], datetime] = datetime.utcnow):
         self._now = now
         self._languages = languages_getter
