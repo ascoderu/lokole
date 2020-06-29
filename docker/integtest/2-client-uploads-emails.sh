@@ -11,8 +11,8 @@ mkdir -p "${out_dir}"
 emails_to_send="${in_dir}/client-emails.tar.gz"
 tar -czf "${emails_to_send}" -C "${in_dir}" emails.jsonl zzusers.jsonl
 
-client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
-resource_container="$(jq -r '.resource_container' < "${out_dir}/register1.json")"
+client_id="$(jq -r '.client_id' <"${out_dir}/register1.json")"
+resource_container="$(jq -r '.resource_container' <"${out_dir}/register1.json")"
 resource_id="$(uuidgen).tar.gz"
 
 # workflow 1: send emails written on the client to the world

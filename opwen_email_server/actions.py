@@ -18,6 +18,7 @@ from opwen_email_server.services.storage import AzureObjectsStorage
 from opwen_email_server.services.storage import AzureObjectStorage
 from opwen_email_server.services.storage import AzureTextStorage
 from opwen_email_server.utils.email_parser import MimeEmailParser
+from opwen_email_server.utils.email_parser import descending_timestamp
 from opwen_email_server.utils.email_parser import ensure_has_sent_at
 from opwen_email_server.utils.email_parser import get_domain
 from opwen_email_server.utils.email_parser import get_domains
@@ -122,8 +123,9 @@ class _IndexEmailForMailbox(_Action):
 
         for email_address in self._get_pivot(email):
             domain = get_domain(email_address)
+            desc_prefix = descending_timestamp(email['sent_at'])
             if domain.endswith(mailbox.MAILBOX_DOMAIN):
-                index = f"{domain}/{email_address}/{self._folder}/{email['sent_at']}/{resource_id}"
+                index = f"{domain}/{email_address}/{self._folder}/{desc_prefix}/{resource_id}"
                 self._mailbox_storage.store_text(index, 'indexed')
 
         self.log_event(events.MAILBOX_EMAIL_INDEXED, {'folder': self._folder})  # noqa: E501  # yapf: disable

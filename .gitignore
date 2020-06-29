@@ -15,6 +15,7 @@ htmlcov/
 dive.log
 
 serviceprincipal.json
+.github.env
 
 node_modules/
 opwen_email_client/webapp/static/css/*.min.css

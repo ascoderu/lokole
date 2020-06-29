@@ -42,7 +42,7 @@ required_file() {
 generate_identifier() {
   local length="$1"
 
-  < /dev/urandom tr -dc 'a-z0-9' | head -c"${length}"
+  tr </dev/urandom -dc 'a-z0-9' | head -c"${length}"
 }
 
 get_dotenv() {
@@ -71,5 +71,5 @@ use_resource_group() {
 }
 
 helm_init() {
-  helm init --history-max 200 --service-account tiller --node-selectors "beta.kubernetes.io/os=linux" --wait
+  helm init --history-max 200 --node-selectors "beta.kubernetes.io/os=linux" --wait
 }

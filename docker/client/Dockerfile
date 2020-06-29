@@ -14,10 +14,6 @@ RUN yarn run lint \
 
 FROM python:${PYTHON_VERSION} AS builder
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends mobile-broadband-provider-info=20170903-1 \
- && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 COPY requirements-dev.txt ./

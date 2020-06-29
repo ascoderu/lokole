@@ -12,7 +12,7 @@ echo_email_to_receive="${in_dir}/echo-service-email.mime"
 wikipedia_email_to_receive="${in_dir}/wikipedia-service-email.mime"
 
 #receive an email directed at the service endpoint
-http --check-status -f POST \
+http --ignore-stdin --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/service" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \

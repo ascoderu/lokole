@@ -13,26 +13,26 @@ email_to_receive="${in_dir}/inbound-email.mime"
 if [[ -n "$1" ]]; then
   client_id="$1"
 else
-  client_id="$(jq -r '.client_id' < "${out_dir}/register1.json")"
+  client_id="$(jq -r '.client_id' <"${out_dir}/register1.json")"
 fi
 
 # workflow 2a: receive an email directed at one of the clients
 # this simulates sendgrid delivering an email to the service
-http --check-status -f POST \
+http --ignore-stdin --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/${client_id}" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${email_to_receive}"
 
 # simulate delivery of the same email to the second mailbox
-http --check-status -f POST \
+http --ignore-stdin --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/${client_id}" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \
   "email=@${email_to_receive}"
 
 # simulate delivery of another email
-http --check-status -f POST \
+http --ignore-stdin --check-status -f POST \
   "http://nginx:8888/api/email/sendgrid/${client_id}" \
   "dkim={@sendgrid.com : pass}" \
   "SPF=pass" \

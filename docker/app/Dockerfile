@@ -1,6 +1,10 @@
 ARG PYTHON_VERSION=3.7
 FROM python:${PYTHON_VERSION} AS builder
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends mobile-broadband-provider-info=20170903-1 \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY requirements-dev.txt ./
@@ -15,18 +19,6 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
  && pip wheel --no-cache-dir -r requirements.txt -w /deps \
  && rm -rf /tmp/pip-ephem-wheel-cache*
-
-ARG LOKOLE_SENDGRID_KEY=""
-COPY ./opwen_email_server ./opwen_email_server/
-COPY ./opwen_email_client ./opwen_email_client/
-COPY ./tests ./tests/
-COPY setup.cfg ./
-RUN flake8 opwen_email_server opwen_email_client
-RUN isort --check-only --recursive opwen_email_server opwen_email_client
-RUN yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
-RUN bandit --recursive opwen_email_server opwen_email_client
-RUN mypy opwen_email_server opwen_email_client
-RUN coverage run -m nose2 -v && coverage xml && coverage report
 
 COPY . .
 

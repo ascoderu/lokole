@@ -15,10 +15,8 @@ opwen_email_client/webapp/static/js/*.min.js
 opwen_statuspage/build/
 opwen_statuspage/node_modules/
 !tests/
-!makefile
 !requirements*.txt
 !setup.cfg
-!.travis.sh
 !install.py
 !manage.py
 !MANIFEST.in

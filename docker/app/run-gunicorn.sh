@@ -5,7 +5,7 @@ declare -a api_spec_paths
 case "${CONNEXION_SPEC}" in
   file:*)
     specs="${CONNEXION_SPEC:5}"
-    IFS="," read -r -a api_spec_paths <<< "${specs}"
+    IFS="," read -r -a api_spec_paths <<<"${specs}"
     ;;
   dir:*)
     specs="${CONNEXION_SPEC:4}"

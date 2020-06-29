@@ -12,7 +12,7 @@ RUN wget -q -O /tmp/shellcheck.tar.xz "https://storage.googleapis.com/shellcheck
   && rm /tmp/shellcheck.tar.xz \
   && shellcheck --version
 
-ARG HELM_VERSION=2.16.1
+ARG HELM_VERSION=3.2.1
 RUN wget -q "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
   && tar xf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
   && mv "linux-amd64/helm" /usr/local/bin/helm \
@@ -25,6 +25,14 @@ RUN wget -q https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_V
   && cp kubeval /usr/local/bin \
   && rm kubeval-linux-amd64.tar.gz \
   && kubeval --version
+
+ARG SHFMT_VERSION=3.1.1
+RUN wget -q https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64 \
+  && mv shfmt_v${SHFMT_VERSION}_linux_amd64 shfmt \
+  && cp shfmt /usr/local/bin \
+  && rm shfmt \
+  && chmod +x /usr/local/bin/shfmt \
+  && shfmt -version
 
 COPY docker/ci/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -60,3 +68,5 @@ RUN helm lint --strict ./helm/opwen_cloudserver \
  && helm template ./helm/opwen_cloudserver > helm.yaml \
  && kubeval --ignore-missing-schemas helm.yaml \
  && rm helm.yaml
+
+RUN shfmt -d -i 2 -ci .

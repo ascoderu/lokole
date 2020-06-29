@@ -1,0 +1,21 @@
+name: CD
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  release:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: make github-env
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - run: |
+          make \
+            -e BUILD_TARGET=runtime \
+            -e DOCKER_TAG="$GITHUB_REF" \
+            release deploy

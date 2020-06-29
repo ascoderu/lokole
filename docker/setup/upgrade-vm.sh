@@ -26,4 +26,4 @@ required_env "${scriptname}" "LOKOLE_DNS_NAME"
 
 log "Upgrading VM ${LOKOLE_DNS_NAME}"
 
-exec sshpass -p "${LOKOLE_VM_PASSWORD}" ssh -o StrictHostKeyChecking=no "opwen@${LOKOLE_DNS_NAME}" < "${scriptdir}/vm.sh"
+exec sshpass -p "${LOKOLE_VM_PASSWORD}" ssh -o StrictHostKeyChecking=no "opwen@${LOKOLE_DNS_NAME}" <"${scriptdir}/vm.sh"
