@@ -54,7 +54,7 @@ class WikipediaServiceTests(TestCase):
             self.assertEqual('Linear regression.pdf', result_email['attachments'][0]['filename'])
 
     def _execute_format(self, *args, **kwargs):
-        format = WikipediaEmailFormatter(languages=self.languages,
+        format = WikipediaEmailFormatter(languages_getter=self.languages,
                                          language_setter=self.language_setter,
                                          page_fetch=self.page_fetch)
 

@@ -5,6 +5,9 @@ from typing import Callable
 from urllib.parse import urlparse
 
 from requests import get
+from wikipedia import languages
+from wikipedia import page
+from wikipedia import set_lang
 from wikipedia.exceptions import DisambiguationError
 from wikipedia.exceptions import PageError
 
@@ -15,12 +18,12 @@ WIKIPEDIA_ADDRESS = 'wikipedia@bot.lokole.ca'
 
 class WikipediaEmailFormatter(LogMixin):
     def __init__(self,
-                 languages: Callable[[], dict],
-                 language_setter: Callable[[str], None],
-                 page_fetch: Callable[['str'], Any],
+                 languages_getter: Callable[[], dict] = languages,
+                 language_setter: Callable[[str], None] = set_lang,
+                 page_fetch: Callable[['str'], Any] = page,
                  now: Callable[[], datetime] = datetime.utcnow):
         self._now = now
-        self._languages = languages
+        self._languages = languages_getter
         self._language_setter = language_setter
         self._page_fetch = page_fetch
 
