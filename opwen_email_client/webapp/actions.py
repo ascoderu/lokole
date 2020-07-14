@@ -134,7 +134,7 @@ class SendWelcomeEmail(object):
         self._email_store.create([{
             'sent_at': self._time.strftime("%Y-%m-%d %H:%M"),
             'to': [self._to],
-            'from': 'info@ascoderu.ca',
+            'from': 'info@team.lokole.ca',
             'subject': i8n.WELCOME,
             'body': email_body,
         }])
