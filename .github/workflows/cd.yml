@@ -17,5 +17,5 @@ jobs:
       - run: |
           make \
             -e BUILD_TARGET=runtime \
-            -e DOCKER_TAG="$GITHUB_REF" \
+            -e DOCKER_TAG="${GITHUB_REF##*/}" \
             release deploy
