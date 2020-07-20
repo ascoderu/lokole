@@ -13,9 +13,9 @@ RUN apk add -q --no-cache \
   && tar xf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
   && mv "linux-amd64/helm" /usr/local/bin/helm \
   && chmod +x /usr/local/bin/helm \
-  && rm -rf "linux-amd64" "helm-v${HELM_VERSION}-linux-amd64.tar.gz"
-  az aks install-cli --client-version "${KUBECTL_VERSION}" && \
-  mkdir /secrets
+  && rm -rf "linux-amd64" "helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+  && az aks install-cli --client-version "${KUBECTL_VERSION}" \
+  && mkdir /secrets
 
 COPY docker/setup/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
