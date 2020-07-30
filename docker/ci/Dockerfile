@@ -6,7 +6,7 @@ RUN wget -q -O /usr/bin/hadolint "https://github.com/hadolint/hadolint/releases/
   && chmod +x /usr/bin/hadolint \
   && hadolint --version
 
-ARG SHELLCHECK_VERSION=v0.7.0
+ARG SHELLCHECK_VERSION=v0.7.1
 RUN wget -q -O /tmp/shellcheck.tar.xz "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" \
   && tar -xJf /tmp/shellcheck.tar.xz -C /usr/bin --strip-components=1 "shellcheck-${SHELLCHECK_VERSION}/shellcheck" \
   && rm /tmp/shellcheck.tar.xz \
