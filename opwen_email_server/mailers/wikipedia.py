@@ -1,4 +1,3 @@
-from base64 import b64encode
 from datetime import datetime
 from typing import Callable
 from urllib.parse import urlparse
@@ -53,7 +52,7 @@ class WikipediaEmailFormatter(LogMixin):
             pdf_file = get(download_link)
             email['attachments'] = [{
                 'filename': subject + '.pdf',
-                'content': b64encode(pdf_file.content),
+                'content': pdf_file.content,
             }]
 
         email['to'] = [email['from']]
