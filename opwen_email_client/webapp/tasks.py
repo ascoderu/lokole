@@ -1,3 +1,6 @@
+from socket import create_connection
+from socket import gethostbyname
+
 from celery import Celery
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
@@ -36,16 +39,28 @@ def sync(*args, **kwargs):
         user_store=webapp.ioc.user_store,
     )
 
-    start_internet_connection = StartInternetConnection(
-        state_dir=AppConfig.STATE_BASEDIR,
-        modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
-        sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-        sim_type=AppConfig.SIM_TYPE,
-    )
+    def check_connection():
+        try:
+            host = gethostbyname(AppConfig.STORAGE_ACCOUNT_HOST)
+            with create_connection((host, 80)):
+                return True
+        except OSError:
+            pass
+        return False
 
-    if AppConfig.SIM_TYPE != 'LocalOnly':
-        with start_internet_connection():
-            sync_emails()
+    if check_connection():
+        sync_emails()
+    else:
+        start_internet_connection = StartInternetConnection(
+            state_dir=AppConfig.STATE_BASEDIR,
+            modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
+            sim_config_dir=AppConfig.SIM_CONFIG_DIR,
+            sim_type=AppConfig.SIM_TYPE,
+            )
+
+        if AppConfig.SIM_TYPE != 'LocalOnly':
+            with start_internet_connection():
+                sync_emails()
 
 
 # noinspection PyUnusedLocal
