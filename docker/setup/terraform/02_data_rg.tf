@@ -17,7 +17,7 @@ resource "random_id" "randomId" {
     resource_group = azurerm_resource_group.vm.name
   }
   
-  byte_length = 8
+  byte_length = 3
 }
 
 # Create server table storage account if it doesn't exist

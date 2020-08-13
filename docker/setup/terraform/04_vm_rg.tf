@@ -116,7 +116,7 @@ resource "azurerm_network_interface_security_group_association" "vm" {
 }
 
 # Generate random text for a unique storage account name
-resource "random_id" "randomId" {
+resource "random_id" "randomVmId" {
   keepers = {
     # Generate a new ID only when a new resource group is defined
     resource_group = azurerm_resource_group.vm.name
@@ -128,7 +128,7 @@ resource "random_id" "randomId" {
 #! Verify whether this is necessary
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "vm" {
-  name                        = "diag${random_id.randomId.hex}"
+  name                        = "diag${random_id.randomVmId.hex}"
   location                    = azurerm_resource_group.vm.location
   resource_group_name         = azurerm_resource_group.vm.name
   account_tier                = "Standard"
