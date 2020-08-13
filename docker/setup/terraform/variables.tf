@@ -1,6 +1,6 @@
 variable "RESOURCE_GROUP_NAME" {
   type        = string
-  default     = "opwenTest"
+  default     = "opwen"
   description = "The prefix which should be used for all resources in this application."
 }
 
@@ -33,6 +33,7 @@ variable "location" {
 variable "vmName" {
   type        = string
   default     = "opwenvm"
+  description = "The name of Virtual Machine resource group."
 }
 
 variable "appinsightsName" {
@@ -43,21 +44,25 @@ variable "appinsightsName" {
 variable "clientBlobsName" {
   type        = string
   default     = "opwenclient"
+  description = "The name of the client Blobs storage account within the Data resource group."
 }
 
 variable "serverBlobsName" {
   type        = string
   default     = "opwenserverblobs"
+  description = "The name of the server Blobs storage account within the Data resource group."
 }
 
 variable "serverTablesName" {
   type        = string
   default     = "opwenservertables"
+  description = "The name of the server Tables storage account within the Data resource group."
 }
 
 variable "serverQueuesName" {
   type        = string
   default     = "opwenserverqueues"
+  description = "The name of the server Queues Service Bus Namespace within the Data resource group."
 }
 
 variable "serverQueuesSasName" {

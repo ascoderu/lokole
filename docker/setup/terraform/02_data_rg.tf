@@ -20,10 +20,9 @@ resource "random_id" "randomId" {
   byte_length = 8
 }
 
-#TODO: data-template.json indicates encryption, cannot find on terraform.
 # Create server table storage account if it doesn't exist
 resource "azurerm_storage_account" "serverTablesName" {
-  name                      = var.serverTablesName
+  name                      = "${var.serverTablesName}${random_id.randomId.hex}"
   resource_group_name       = azurerm_resource_group.data.name
   location                  = azurerm_resource_group.data.location
   account_kind              = "Storage"
@@ -34,8 +33,8 @@ resource "azurerm_storage_account" "serverTablesName" {
 
   network_rules {
     default_action = "Allow"
-    bypass          = ["AzureServices"]
-    ip_rules        = []     
+    bypass         = ["AzureServices"]
+    ip_rules       = []     
   }
 
   tags = {}
@@ -43,7 +42,7 @@ resource "azurerm_storage_account" "serverTablesName" {
 
 # Create server blob storage account if it doesn't exist
 resource "azurerm_storage_account" "serverBlobsName" {
-  name                      = var.serverBlobsName
+  name                      = "${var.serverBlobsName}${random_id.randomId.hex}"
   resource_group_name       = azurerm_resource_group.data.name
   location                  = azurerm_resource_group.data.location
   account_kind              = "Storage"
@@ -54,8 +53,8 @@ resource "azurerm_storage_account" "serverBlobsName" {
 
   network_rules {
     default_action = "Allow"
-    bypass          = ["AzureServices"]
-    ip_rules        = []     
+    bypass         = ["AzureServices"]
+    ip_rules       = []     
   }
 
   tags = {}
@@ -63,7 +62,7 @@ resource "azurerm_storage_account" "serverBlobsName" {
 
 # Create client blob storage account if it doesn't exist
 resource "azurerm_storage_account" "clientBlobsName" {
-  name                      = var.clientBlobsName
+  name                      = "${var.clientBlobsName}${random_id.randomId.hex}"
   resource_group_name       = azurerm_resource_group.data.name
   location                  = azurerm_resource_group.data.location
   account_kind              = "Storage"
@@ -74,8 +73,8 @@ resource "azurerm_storage_account" "clientBlobsName" {
 
   network_rules {
     default_action = "Allow"
-    bypass          = ["AzureServices"]
-    ip_rules        = []     
+    bypass         = ["AzureServices"]
+    ip_rules       = []     
   }
 
   tags = {}
@@ -182,13 +181,13 @@ resource "azurerm_servicebus_queue" "serverQueueSendgridMime" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
@@ -201,13 +200,13 @@ resource "azurerm_servicebus_queue" "serverQueueEmailSend" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
@@ -220,19 +219,17 @@ resource "azurerm_servicebus_queue" "serverQueueClientPackage" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
 
-#! Verify these Queue items aren't populated automatically. It seems they are.
-#! https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions
 resource "azurerm_servicebus_queue" "mailboxreceived" {
   name                = "mailboxreceived"
   resource_group_name = azurerm_resource_group.data.name
@@ -241,13 +238,13 @@ resource "azurerm_servicebus_queue" "mailboxreceived" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
@@ -260,13 +257,13 @@ resource "azurerm_servicebus_queue" "mailboxsent" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
@@ -279,13 +276,13 @@ resource "azurerm_servicebus_queue" "register" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
@@ -298,13 +295,13 @@ resource "azurerm_servicebus_queue" "service" {
 
   # Optional Values
   lock_duration                           = "PT1M"
-  requires_duplicate_detection          = false
+  requires_duplicate_detection            = false
   requires_session                        = false
   default_message_ttl                     = "P14D"
   dead_lettering_on_message_expiration    = false
   duplicate_detection_history_time_window = "PT10M"
   max_delivery_count                      = 10
-  status                           = "Active"
+  status                                  = "Active"
   enable_partitioning                     = false
   enable_express                          = false
 }
