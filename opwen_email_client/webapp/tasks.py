@@ -1,6 +1,3 @@
-from socket import create_connection
-from socket import gethostbyname
-
 from celery import Celery
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
@@ -10,6 +7,7 @@ from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
 from opwen_email_client.webapp.actions import UpdateCode
 from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.util.network import check_connection
 
 app = Celery(__name__, broker=AppConfig.CELERY_BROKER_URL)
 app.conf.beat_schedule_filename = AppConfig.CELERY_BEAT_SCHEDULE_FILENAME
@@ -39,16 +37,7 @@ def sync(*args, **kwargs):
         user_store=webapp.ioc.user_store,
     )
 
-    def check_connection():
-        try:
-            host = gethostbyname(AppConfig.STORAGE_ACCOUNT_HOST)
-            with create_connection((host, 80)):
-                return True
-        except OSError:
-            pass
-        return False
-
-    if check_connection():
+    if check_connection(AppConfig.STORAGE_ACCOUNT_HOST, 80):
         sync_emails()
     else:
         start_internet_connection = StartInternetConnection(
@@ -56,7 +45,7 @@ def sync(*args, **kwargs):
             modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
             sim_config_dir=AppConfig.SIM_CONFIG_DIR,
             sim_type=AppConfig.SIM_TYPE,
-            )
+        )
 
         if AppConfig.SIM_TYPE != 'LocalOnly':
             with start_internet_connection():
