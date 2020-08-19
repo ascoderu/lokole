@@ -2,12 +2,12 @@ from celery import Celery
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 
+from opwen_email_client.util.network import check_connection
 from opwen_email_client.webapp.actions import RestartApp
 from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
 from opwen_email_client.webapp.actions import UpdateCode
 from opwen_email_client.webapp.config import AppConfig
-from opwen_email_client.util.network import check_connection
 
 app = Celery(__name__, broker=AppConfig.CELERY_BROKER_URL)
 app.conf.beat_schedule_filename = AppConfig.CELERY_BEAT_SCHEDULE_FILENAME
