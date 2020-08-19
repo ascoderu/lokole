@@ -2,6 +2,7 @@ from celery import Celery
 from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 
+from opwen_email_client.util.network import check_connection
 from opwen_email_client.webapp.actions import RestartApp
 from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
@@ -36,16 +37,19 @@ def sync(*args, **kwargs):
         user_store=webapp.ioc.user_store,
     )
 
-    start_internet_connection = StartInternetConnection(
-        state_dir=AppConfig.STATE_BASEDIR,
-        modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
-        sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-        sim_type=AppConfig.SIM_TYPE,
-    )
+    if check_connection(AppConfig.STORAGE_ACCOUNT_HOST, 80):
+        sync_emails()
+    else:
+        start_internet_connection = StartInternetConnection(
+            state_dir=AppConfig.STATE_BASEDIR,
+            modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
+            sim_config_dir=AppConfig.SIM_CONFIG_DIR,
+            sim_type=AppConfig.SIM_TYPE,
+        )
 
-    if AppConfig.SIM_TYPE != 'LocalOnly':
-        with start_internet_connection():
-            sync_emails()
+        if AppConfig.SIM_TYPE != 'LocalOnly':
+            with start_internet_connection():
+                sync_emails()
 
 
 # noinspection PyUnusedLocal
