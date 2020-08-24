@@ -13,7 +13,7 @@ python-http-client==3.3.0
 pyzmail36==1.0.4
 requests==2.24.0
 sendgrid==6.4.6
-typing-extensions==3.7.4.2
+typing-extensions==3.7.4.3
 typing==3.7.4.3
 kombu==4.6.11  # pyup: ignore
 celery==4.4.7
