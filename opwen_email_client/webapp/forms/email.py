@@ -86,7 +86,7 @@ class NewEmailForm(FlaskForm):
         form['attachments'] = list(_attachments_as_dict(attachments))
         return form
 
-    def _populate(self, email_store: EmailStore):
+    def _populate(self, user, email_store: EmailStore):
         pass
 
     @classmethod
@@ -124,13 +124,13 @@ class NewEmailForm(FlaskForm):
         return user.email in actors
 
     @classmethod
-    def from_request(cls, email_store: EmailStore):
+    def from_request(cls, user, email_store: EmailStore):
         action_name = request.args.get('action')
         form = cls._new_instance_for(action_name)
         if not form:
             return None
 
-        form._populate(email_store)
+        form._populate(user, email_store)
 
         return form
 
@@ -139,7 +139,7 @@ class ToEmailForm(NewEmailForm):
     action_name = 'to'
 
     # noinspection PyUnusedLocal
-    def _populate(self, email_store: EmailStore):
+    def _populate(self, user, email_store: EmailStore):
         if not self.to.data:
             self.to.data = request.args.get('to', '')
 
@@ -147,7 +147,7 @@ class ToEmailForm(NewEmailForm):
 class ReplyEmailForm(NewEmailForm):
     action_name = 'reply'
 
-    def _populate(self, email_store: EmailStore):
+    def _populate(self, user, email_store: EmailStore):
         email = self._get_reference_email(email_store)
         if not email:
             return
@@ -165,13 +165,21 @@ class ReplyEmailForm(NewEmailForm):
 class ReplyAllEmailForm(NewEmailForm):
     action_name = 'reply_all'
 
-    def _populate(self, email_store: EmailStore):
+    def _populate(self, user, email_store: EmailStore):
         email = self._get_reference_email(email_store)
         if not email:
             return
 
         if not self.to.data:
-            self.to.data = _join_emails(email.get('from'), *email.get('cc', []))
+            self.to.data = _join_emails(email.get('from'))
+
+        if not self.cc.data:
+            self.cc.data = _join_emails(*[
+                email_address for email_address in chain(
+                    email.get('to', []),
+                    email.get('cc', []),
+                ) if email_address != user.email
+            ])
 
         if not self.subject.data:
             self.subject.data = 'Re: {}'.format(email.get('subject', ''))
@@ -183,7 +191,7 @@ class ReplyAllEmailForm(NewEmailForm):
 class ForwardEmailForm(NewEmailForm):
     action_name = 'forward'
 
-    def _populate(self, email_store: EmailStore):
+    def _populate(self, user, email_store: EmailStore):
         email = self._get_reference_email(email_store)
         if not email:
             return
