@@ -6,7 +6,7 @@ scriptdir="$(dirname "$0")"
 cd "${scriptdir}/../.."
 
 flake8 opwen_email_server opwen_email_client
-isort --check-only --recursive opwen_email_server opwen_email_client
+isort --check-only opwen_email_server opwen_email_client
 yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
 bandit --recursive opwen_email_server opwen_email_client
 mypy opwen_email_server opwen_email_client
