@@ -311,9 +311,9 @@ The setup script is tested with hardware:
 
 The setup script is also tested with USB modems:
 
-* `Huawei E303s-65 <http://consumer.huawei.com/cl/mobile-broadband/dongles/tech-specs/e303-cl.htm>`_
-* `Huawei E3131 <http://consumer.huawei.com/lk/mobile-broadband/dongles/tech-specs/e3131-lk.htm>`_
-* `Huawei MS2131i-8 <http://consumer.huawei.com/en/solutions/m2m-solutions/products/tech-specs/ms2131-en.htm>`_
+* `Huawei E303s-65 <https://www.aliexpress.com/item/4000961436981.html>`_
+* `Huawei E3131 <https://www.aliexpress.com/item/32404274659.html>`_
+* `Huawei MS2131i-8 <https://www.aliexpress.com/item/32964337576.html>`_
 
 The setup script installs the latest version of the email app published to PyPI.
 New versions get automatically published to PyPI (via Travis) whenever a new
