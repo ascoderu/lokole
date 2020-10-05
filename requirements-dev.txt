@@ -1,6 +1,6 @@
-flake8==3.8.3
+flake8==3.8.4
 flex==6.14.1
-isort==5.5.3
+isort==5.5.4
 PyAMQP==0.1.0.7
 lockfile==0.12.2
 mypy==0.782
