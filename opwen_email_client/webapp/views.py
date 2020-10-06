@@ -27,11 +27,17 @@ from opwen_email_client.webapp.actions import SendWelcomeEmail
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.forms.email import NewEmailForm
+from opwen_email_client.webapp.forms.register import RegisterForm
 from opwen_email_client.webapp.forms.settings import SettingsForm
 from opwen_email_client.webapp.security import login_required
 from opwen_email_client.webapp.session import Session
 from opwen_email_client.webapp.session import track_history
 
+
+@app.before_first_request
+def check_client_registration() -> Response:
+    if AppConfig.CLIENT_ID is None and AppConfig.SIM_TYPE != 'LocalOnly':
+        return redirect(url_for('home'))
 
 @app.route(AppConfig.APP_ROOT + '/favicon.ico')
 def favicon() -> Response:
@@ -276,6 +282,19 @@ def settings() -> Response:
         return redirect(url_for('settings'))
 
     return _view('settings.html', form=SettingsForm.from_config(), num_pending=email_store.num_pending())
+
+
+@app.route(AppConfig.APP_ROOT + '/admin/register', methods=['GET', 'POST'])
+@track_history
+def register() -> Response:
+    if not current_user.is_admin:
+        abort(403)
+
+    form = RegisterForm()
+    if form.validate_on_submit():
+        return redirect(url_for('home'))
+
+    return _view('client_register.html', form=form)
 
 
 @app.route(AppConfig.APP_ROOT + '/admin/suspend/<userid>')
