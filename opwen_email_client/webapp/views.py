@@ -149,8 +149,9 @@ def email_delete(email_uid: str) -> Response:
 @track_history
 def email_new() -> Response:
     email_store = app.ioc.email_store
+    user = current_user
 
-    form = NewEmailForm.from_request(email_store)
+    form = NewEmailForm.from_request(user, email_store)
     if form is None:
         return abort(404)
 
