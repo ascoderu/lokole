@@ -9,7 +9,7 @@ Flask-Security==3.0.0
 Flask-Testing==0.8.0
 Flask-WTF==0.14.3
 Flask==1.1.2
-SQLAlchemy==1.3.19
+SQLAlchemy==1.3.20
 WTForms==2.3.3
 email-validator==1.1.1
 Werkzeug==0.16.1  # pyup: ignore
@@ -28,4 +28,4 @@ typing==3.7.4.3
 tzlocal==2.1
 watchdog==0.10.3
 xtarfile[zstd]==0.0.4
-Pillow==7.2.0
+Pillow==8.0.0
