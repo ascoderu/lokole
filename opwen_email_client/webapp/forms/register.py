@@ -62,7 +62,7 @@ class RegisterForm(FlaskForm):
         path = path.absolute()
         parent = path.parent
         parent.mkdir(parents=True, exist_ok=True)
-        is_in_home = parent.parts[:3] == home_prefix.parts
+        is_in_home = parent.parts[:3] == home.parts
         if is_in_home:
             home_parts = parent.parts[3:]
             for part in home_parts:

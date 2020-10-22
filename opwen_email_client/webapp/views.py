@@ -288,7 +288,7 @@ def register() -> Response:
     form = RegisterForm()
     if form.validate_on_submit():
         form.register()
-        flash(i8n.CLENT_REGISTERED, category='success')
+        flash(i8n.CLIENT_REGISTERED, category='success')
         return redirect(url_for('home'))
 
     return _view('register.html', form=form)
