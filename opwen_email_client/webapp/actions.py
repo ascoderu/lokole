@@ -1,13 +1,20 @@
 from contextlib import contextmanager
 from importlib import import_module
+from json import dumps
+from json import loads
 from logging import Logger
+from logging import getLogger
 from pathlib import Path
 from subprocess import check_call  # nosec
 from subprocess import check_output  # nosec
 from sys import executable
 from time import sleep
+from typing import List
 from typing import Mapping
 from typing import Optional
+from urllib.error import HTTPError
+from urllib.request import Request
+from urllib.request import urlopen
 
 from cached_property import cached_property
 from flask import render_template
@@ -223,3 +230,65 @@ class StartInternetConnection(object):
         finally:
             if connection is not None:
                 connection.terminate()
+
+class ClientRegister(object):
+    def __init__(self, client_name: str, username: str, access_token: str, logger: Logger):
+        self._client_name = client_name
+        self._github_username = username
+        self._github_access_token = access_token
+        self._log = logger or getLogger(__name__)
+
+    @property
+    def client_domain(self):
+        return '{}.{}'.format(self._client_name, 'lokole.ca')
+
+    @property
+    def client_url_create(self):
+        return 'https://{}/api/email/register/'.format('mailserver.lokole.ca')
+
+    @property
+    def client_url_details(self):
+        return 'https://{}/api/email/register/{}'.format('mailserver.lokole.ca', self.client_domain)
+
+    def __call__(self):
+        create_request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
+        create_request = Request(self.client_url_create)
+        create_request.add_header('Content-Type', 'application/json; charset=utf-8')
+        create_request.add_header('Content-Length', str(len(create_request_payload)))
+        create_request.add_header('Authorization', 'Bearer {}'.format(self._github_access_token))
+
+        try:
+            with urlopen(create_request, create_request_payload):  # nosec
+                pass
+        except HTTPError as ex:
+            self._log.exception('Unable to register client {client_name}: [{status_code}] {message}'.format(
+                client_name=self._client_name,
+                status_code = ex.code,
+                message=ex.read().decode('utf-8').strip()
+            ))
+
+        while(True):
+            get_request = Request(self.client_url_details)
+            get_request.add_header('Authorization', 'Bearer {}'.format(self._github_access_token))
+
+            try:
+                with urlopen(get_request) as response:  # nosec
+                    response_body = response.read().decode('utf-8')
+            except HTTPError as ex:
+                if ex.code != 404:
+                    self._log.exception('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
+                        client_name=self.args.client_name,
+                        status_code=ex.code,
+                        message=ex.read().decode('utf-8').strip()
+                    ))
+                sleep(2)
+            else:
+                client_info = loads(response_body)
+                break
+
+        return {
+            'OPWEN_CLIENT_ID': client_info['client_id'],
+            'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
+            'OPWEN_REMOTE_ACCOUNT_KEY': client_info['storage_key'],
+            'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
+        }

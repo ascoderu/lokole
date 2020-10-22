@@ -5,7 +5,6 @@ from os import path
 from typing import Iterable
 from typing import Optional
 
-from babel import Locale
 from flask import Response
 from flask import abort
 from flask import flash
@@ -16,11 +15,11 @@ from flask import request
 from flask import send_file
 from flask import send_from_directory
 from flask import url_for
+
+from babel import Locale
 from flask_cors import cross_origin
 from flask_login import current_user
 from flask_security.utils import hash_password
-from passlib.pwd import genword
-
 from opwen_email_client.webapp import app
 from opwen_email_client.webapp import tasks
 from opwen_email_client.webapp.actions import SendWelcomeEmail
@@ -32,12 +31,13 @@ from opwen_email_client.webapp.forms.settings import SettingsForm
 from opwen_email_client.webapp.security import login_required
 from opwen_email_client.webapp.session import Session
 from opwen_email_client.webapp.session import track_history
+from passlib.pwd import genword
 
 
 @app.before_first_request
 def check_client_registration() -> Response:
     if AppConfig.CLIENT_ID is None and AppConfig.SIM_TYPE != 'LocalOnly':
-        return redirect(url_for('home'))
+        return redirect(url_for('register'))
 
 @app.route(AppConfig.APP_ROOT + '/favicon.ico')
 def favicon() -> Response:
@@ -292,9 +292,11 @@ def register() -> Response:
 
     form = RegisterForm()
     if form.validate_on_submit():
+        form.register()
+        flash(i8n.CLENT_REGISTERED, category='success')
         return redirect(url_for('home'))
 
-    return _view('client_register.html', form=form)
+    return _view('register.html', form=form)
 
 
 @app.route(AppConfig.APP_ROOT + '/admin/suspend/<userid>')
