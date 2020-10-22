@@ -34,11 +34,6 @@ from opwen_email_client.webapp.session import track_history
 from passlib.pwd import genword
 
 
-@app.before_first_request
-def check_client_registration() -> Response:
-    if AppConfig.CLIENT_ID is None and AppConfig.SIM_TYPE != 'LocalOnly':
-        return redirect(url_for('register'))
-
 @app.route(AppConfig.APP_ROOT + '/favicon.ico')
 def favicon() -> Response:
     return send_from_directory(
@@ -469,6 +464,12 @@ def _emails_view(emails: Iterable[dict], page: int, template: str = 'email.html'
                  has_prevpage=page > 1,
                  has_nextpage=len(emails) == AppConfig.EMAILS_PER_PAGE,
                  **kwargs)
+
+
+@app.before_first_request
+def check_client_registration() -> Response:
+    if not AppConfig.CLIENT_ID and AppConfig.SIM_TYPE != 'LocalOnly':
+        return redirect(url_for('register'))
 
 
 def _view(template: str, **kwargs) -> Response:
