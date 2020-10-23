@@ -66,8 +66,8 @@ class RegisterForm(FlaskForm):
         if is_in_home:
             home_parts = parent.parts[3:]
             for part in home_parts:
-                home_prefix /= part
-                chown(str(home_prefix), user, user)
+                home /= part
+                chown(str(home), user, user)
         return str(path)
 
     def _write_settings_to_file(self, path, client_settings, client_details):

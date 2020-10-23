@@ -24,7 +24,7 @@ class ImageDimensions(object):
 # noinspection PyPep8Naming
 class i8n(object):
     SETTINGS_UPDATED = _('Settings updated! If required, the app will restart soon to reflect the changes.')
-    CLIENT_REGISTERED =_('Client has been registered. The app will restart soon to complete the process')
+    CLIENT_REGISTERED = _('Client has been registered. The app will restart soon to complete the process')
     LOGIN_REQUIRED = _('Please log in to access this page.')
     UNAUTHORIZED = _('You do not have permission to view this page.')
     INVALID_PASSWORD = _('Invalid password.')

@@ -9,7 +9,6 @@ from subprocess import check_call  # nosec
 from subprocess import check_output  # nosec
 from sys import executable
 from time import sleep
-from typing import List
 from typing import Mapping
 from typing import Optional
 from urllib.error import HTTPError
@@ -231,6 +230,7 @@ class StartInternetConnection(object):
             if connection is not None:
                 connection.terminate()
 
+
 class ClientRegister(object):
     def __init__(self, client_name: str, username: str, access_token: str, logger: Logger):
         self._client_name = client_name
@@ -263,7 +263,7 @@ class ClientRegister(object):
         except HTTPError as ex:
             self._log.exception('Unable to register client {client_name}: [{status_code}] {message}'.format(
                 client_name=self._client_name,
-                status_code = ex.code,
+                status_code=ex.code,
                 message=ex.read().decode('utf-8').strip()
             ))
 
