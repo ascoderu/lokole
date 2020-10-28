@@ -84,3 +84,23 @@ variable "serverQueueEmailSend" {
   type    = string
   default = "send"
 }
+
+variable "k8s_version" {
+  description = "Version of Kubernetes to use"
+  default = "1.12.7"
+}
+
+variable "KUBERNETES_NODE_SKU" {
+  description = "Azure VM type"
+  default = "Standard_D2"
+}
+
+variable "os_type" {
+  description = "OS type for agents: Windows or Linux"
+  default = "Linux"
+}
+
+variable "os_disk_size" {
+  description = "OS disk size in GB"
+  default = "30"
+}
