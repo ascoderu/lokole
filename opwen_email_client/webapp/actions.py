@@ -5,15 +5,15 @@ from json import loads
 from logging import Logger
 from logging import getLogger
 from pathlib import Path
+from requests.exceptions import HTTPError
+from requests import get
+from requests import post
 from subprocess import check_call  # nosec
 from subprocess import check_output  # nosec
 from sys import executable
 from time import sleep
 from typing import Mapping
 from typing import Optional
-from urllib.error import HTTPError
-from urllib.request import Request
-from urllib.request import urlopen
 
 from cached_property import cached_property
 from flask import render_template
@@ -252,14 +252,13 @@ class ClientRegister(object):
 
     def __call__(self):
         create_request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
-        create_request = Request(self.client_url_create)
-        create_request.add_header('Content-Type', 'application/json; charset=utf-8')
-        create_request.add_header('Content-Length', str(len(create_request_payload)))
-        create_request.add_header('Authorization', 'Bearer {}'.format(self._github_access_token))
+        create_headers = {'Content-Type': 'application/json',
+                   'Content-Length': str(len(create_request_payload)),
+                   'Authorization': 'Bearer {}'.format(self._github_access_token)}
 
+        response = post(self.client_url_create, data=create_request_payload, headers=create_headers)
         try:
-            with urlopen(create_request, create_request_payload):  # nosec
-                pass
+            response.raise_for_status()
         except HTTPError as ex:
             self._log.exception('Unable to register client {client_name}: [{status_code}] {message}'.format(
                 client_name=self._client_name,
@@ -268,22 +267,22 @@ class ClientRegister(object):
             ))
 
         while(True):
-            get_request = Request(self.client_url_details)
-            get_request.add_header('Authorization', 'Bearer {}'.format(self._github_access_token))
+            get_headers = {'Authorization': 'Bearer {}'.format(self._github_access_token)}
+
+            get_response = get(self.client_url_details, headers=get_headers)
+            if get_response.status_code == 404:
+                continue
 
             try:
-                with urlopen(get_request) as response:  # nosec
-                    response_body = response.read().decode('utf-8')
+                get_response.raise_for_status()
             except HTTPError as ex:
-                if ex.code != 404:
-                    self._log.exception('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
-                        client_name=self.args.client_name,
-                        status_code=ex.code,
-                        message=ex.read().decode('utf-8').strip()
-                    ))
-                sleep(2)
+                self._log.exception('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
+                    client_name=self._client_name,
+                    status_code=get_response.status_code,
+                    message=ex.read().decode('utf-8').strip()
+                ))
             else:
-                client_info = loads(response_body)
+                client_info = loads(get_response.text)
                 break
 
         return {

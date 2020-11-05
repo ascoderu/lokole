@@ -1,15 +1,17 @@
+from os import getenv
 from os import getuid
 from pathlib import Path
 from pwd import getpwuid
 from shutil import chown
 
 from flask_wtf import FlaskForm
+from wtforms import StringField
+from wtforms import SubmitField
+
 from opwen_email_client.webapp.actions import ClientRegister
 from opwen_email_client.webapp.actions import RestartApp
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import root_domain
-from wtforms import StringField
-from wtforms import SubmitField
 
 
 class RegisterForm(FlaskForm):
@@ -36,9 +38,8 @@ class RegisterForm(FlaskForm):
 
     def _fetch_settings(self):
         if AppConfig.RESTART_PATHS:
-            restart_paths_list = []
-            for key, value in AppConfig.RESTART_PATHS.items():
-                restart_paths_list.append('{}={}'.format(key, value))
+            restart_paths_list = ['{}={}'.format(key, value) for (key, value) in
+                                    AppConfig.RESTART_PATHS.items()]
             restart_path = ','.join(restart_paths_list)
         else:
             restart_path = ''
@@ -56,10 +57,9 @@ class RegisterForm(FlaskForm):
         }
 
     def _setup_path(self):
-        user = getpwuid(getuid()).pw_name
-        home = Path('/') / 'home' / user
-        path = Path('lokole/state/settings.env')
-        path = path.absolute()
+        home = Path.home()
+        user = home.parts[-1]
+        path = (Path(getenv('LOKOLE_STATE_DIRECTORY', 'lokole/state')) / 'settings.env').absolute()
         parent = path.parent
         parent.mkdir(parents=True, exist_ok=True)
         is_in_home = parent.parts[:3] == home.parts
@@ -71,12 +71,10 @@ class RegisterForm(FlaskForm):
         return str(path)
 
     def _write_settings_to_file(self, path, client_settings, client_details):
-        client_settings_list = []
-        for key, value in client_settings.items():
-            client_settings_list.append('{}={}'.format(key, value))
-        client_details_list = []
-        for key, value in client_details.items():
-            client_details_list.append('{}={}'.format(key, value))
+        client_settings_list = ['{}={}'.format(key, value) for (key, value) in
+                                client_settings.items()]
+        client_details_list = ['{}={}'.format(key, value) for (key, value) in
+                                client_details.items()]
 
         with open(path, 'w') as fobj:
             fobj.write('\n'.join(client_settings_list))
