@@ -287,7 +287,7 @@ def register() -> Response:
 
     form = RegisterForm()
     if form.validate_on_submit():
-        form.register()
+        form.register_client()
         flash(i8n.CLIENT_REGISTERED, category='success')
         return redirect(url_for('home'))
 

@@ -5,7 +5,6 @@ from logging import Logger
 from pathlib import Path
 from requests.exceptions import HTTPError
 from requests import get
-from requests import post
 from subprocess import check_call  # nosec
 from subprocess import check_output  # nosec
 from sys import executable
@@ -248,8 +247,7 @@ class ClientRegister(object):
 
     def _fetch_settings(self):
         if AppConfig.RESTART_PATHS:
-            restart_paths_list = ['{}={}'.format(key, value) for (key, value) in
-                                    AppConfig.RESTART_PATHS.items()]
+            restart_paths_list = ['{}={}'.format(key, value) for (key, value) in AppConfig.RESTART_PATHS.items()]
             restart_path = ','.join(restart_paths_list)
         else:
             restart_path = ''
@@ -267,17 +265,14 @@ class ClientRegister(object):
         }
 
     def _write_settings_to_file(self, client_settings, client_details):
-        client_settings_list = ['{}={}'.format(key, value) for (key, value) in
-                                client_settings.items()]
-        client_details_list = ['{}={}'.format(key, value) for (key, value) in
-                                client_details.items()]
+        client_settings_list = ['{}={}'.format(key, value) for (key, value) in client_settings.items()]
+        client_details_list = ['{}={}'.format(key, value) for (key, value) in client_details.items()]
 
         with open(self._path, 'w') as fobj:
             fobj.write('\n'.join(client_settings_list))
             fobj.write('\n'.join(client_details_list))
 
     def __call__(self):
-
         while(True):
             get_headers = {'Authorization': 'Bearer {}'.format(self._github_access_token)}
 
@@ -291,8 +286,7 @@ class ClientRegister(object):
                 self._log.exception('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
                     client_name=self._client_name,
                     status_code=get_response.status_code,
-                    message=ex.read().decode('utf-8').strip()
-                ))
+                    message=ex.read().decode('utf-8').strip()))
             else:
                 client_info = loads(get_response.text)
                 break
