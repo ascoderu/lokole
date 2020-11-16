@@ -1,4 +1,4 @@
-Babel==2.8.0
+Babel==2.9.0
 Flask-BabelEx==0.9.4
 Flask-Caching==1.9.0
 Flask-Cors==3.0.9
@@ -23,7 +23,7 @@ gunicorn==20.0.4
 mkwvconf==0.1.1
 passlib==1.7.4
 python-crontab==2.5.1
-requests==2.24.0
+requests==2.25.0
 typing==3.7.4.3
 tzlocal==2.1
 watchdog==0.10.3
