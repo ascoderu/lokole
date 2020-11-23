@@ -6,8 +6,8 @@ default: build
 	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .github.env.gpg >.github.env
 
 github-env: .github.env
-	@echo "::set-env name=SUFFIX::$(shell cat /proc/sys/kernel/random/uuid)"
-	@sed 's/=/::/' <.github.env | sed 's/^export /::set-env name=/'
+	@echo "SUFFIX=$(shell cat /proc/sys/kernel/random/uuid)" >"$(GITHUB_ENV)"
+	@sed 's/^export //' <.github.env >"$(GITHUB_ENV)"
 
 integration-tests:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
