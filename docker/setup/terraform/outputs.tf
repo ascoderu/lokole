@@ -53,3 +53,25 @@ output "Shared Access Policy PrimaryKey" {
 #     "type": "string",
 #     "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules', variables('serverQueuesName'), variables('serverQueuesSasName')), '2017-04-01').primaryKey]"
 # }
+
+
+# The following is output:
+# cat >/secrets/azure.env <<EOF
+# RESOURCE_GROUP=${RESOURCE_GROUP_NAME}
+# LOKOLE_EMAIL_SERVER_APPINSIGHTS_KEY=$(jq -r .properties.outputs.appinsightsKey.value /tmp/deployment.json)
+# LOKOLE_CLIENT_AZURE_STORAGE_KEY=$(jq -r .properties.outputs.clientBlobsKey.value /tmp/deployment.json)
+# LOKOLE_CLIENT_AZURE_STORAGE_NAME=$(jq -r .properties.outputs.clientBlobsName.value /tmp/deployment.json)
+# LOKOLE_CLIENT_AZURE_STORAGE_HOST=
+# LOKOLE_CLIENT_AZURE_STORAGE_SECURE=True
+# LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY=$(jq -r .properties.outputs.serverBlobsKey.value /tmp/deployment.json)
+# LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME=$(jq -r .properties.outputs.serverBlobsName.value /tmp/deployment.json)
+# LOKOLE_EMAIL_SERVER_AZURE_BLOBS_HOST=
+# LOKOLE_EMAIL_SERVER_AZURE_BLOBS_SECURE=True
+# LOKOLE_EMAIL_SERVER_AZURE_TABLES_KEY=$(jq -r .properties.outputs.serverTablesKey.value /tmp/deployment.json)
+# LOKOLE_EMAIL_SERVER_AZURE_TABLES_NAME=$(jq -r .properties.outputs.serverTablesName.value /tmp/deployment.json)
+# LOKOLE_EMAIL_SERVER_AZURE_TABLES_HOST=
+# LOKOLE_EMAIL_SERVER_AZURE_TABLES_SECURE=True
+# LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE=$(jq -r .properties.outputs.serverQueuesName.value /tmp/deployment.json)
+# LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME=$(jq -r .properties.outputs.serverQueuesSasName.value /tmp/deployment.json)
+# LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY=$(jq -r .properties.outputs.serverQueuesSasKey.value /tmp/deployment.json)
+# EOF

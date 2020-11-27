@@ -146,33 +146,6 @@ resource "azurerm_servicebus_namespace_authorization_rule" "data" {
   manage              = true
 }
 
-#! Verify if this one is created automatically
-# resource "azurerm_servicebus_namespace_authorization_rule" "data" {
-#     name                = "RootManageSharedAccessKey"
-#     namespace_name      = "${azurerm_servicebus_namespace.data.name}"
-#     resource_group_name = "${azurerm_resource_group.data.name}"
-#     send                = true
-#     listen              = true
-#     manage              = true
-# }
-
-#! Verify if this one is created automatically
-# resource "azurerm_servicebus_topic" "data" {
-#     name                = "${var.RESOURCE_GROUP_NAME}-sbtopic"
-#     resource_group_name = "${azurerm_resource_group.data.name}"
-#     namespace_name      = "${azurerm_servicebus_namespace.data.name}"
-#     enable_partitioning = true
-# }
-
-#! Verify if this one is created automatically
-# resource "azurerm_servicebus_subscription" "data" {
-#     name                = "${var.RESOURCE_GROUP_NAME}-sbsubscription"
-#     resource_group_name = "${azurerm_resource_group.data.name}"
-#     namespace_name      = "${azurerm_servicebus_namespace.data.name}"
-#     topic_name          = "${azurerm_servicebus_topic.data.name}"
-#     max_delivery_count  = 1
-# }
-
 resource "azurerm_servicebus_queue" "serverQueueSendgridMime" {
   name                = var.serverQueueSendgridMime
   resource_group_name = azurerm_resource_group.data.name
