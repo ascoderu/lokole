@@ -84,7 +84,7 @@ resource "azurerm_network_security_group" "vm" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  # TODO: Add other security rules
+  # Verify other security rules
   # Inbound: HTTPS / HTTP / AllowVnetInbound / AllowAzureLoadBalancerInBound / DenyAllInBound
   # Outbound: AllowVnetOutBound / AllowInternetOutBound / DenyAllOutBound
 
