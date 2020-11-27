@@ -14,6 +14,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{secrets.SP_PASSWORD}}
       ARM_SUBSCRIPTION_ID: ${{secrets.SUBSCRIPTION_ID}}
       ARM_TENANT_ID: ${{secrets.SP_TENANT}}
+      AZURE_STORAGE_ACCOUNT: "tstate31414"
       TF_ACTION_WORKING_DIR: "./docker/setup/terraform"
 
     steps:
