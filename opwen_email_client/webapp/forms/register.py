@@ -1,5 +1,4 @@
 from os import getenv
-from json import dumps
 from pathlib import Path
 from shutil import chown
 
@@ -7,9 +6,11 @@ from flask_wtf import FlaskForm
 from requests import post
 from wtforms import StringField
 from wtforms import SubmitField
+from wtforms.validators import ValidationError
 
+from opwen_email_client.webapp.config import AppConfig
+from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.tasks import register
-
 
 class RegisterForm(FlaskForm):
 
@@ -26,15 +27,13 @@ class RegisterForm(FlaskForm):
         name = self.client_name.data.strip()
         token = self.github_token.data.strip()
 
+        endpoint = AppConfig.EMAIL_SERVER_ENDPOINT or 'mailserver.lokole.ca'
         client_domain = '{}.{}'.format(name, 'lokole.ca')
-        client_create_url = 'https://{}/api/email/register/'.format('mailserver.lokole.ca')
-        create_request_payload = dumps({'domain': client_domain}).encode('utf-8')
-        create_headers = {'Content-Type': 'application/json',
-                          'Content-Length': str(len(create_request_payload)),
-                          'Authorization': 'Bearer {}'.format(token)}
+        client_create_url = 'https://{}/api/email/register/'.format(endpoint)
 
-        response = post(client_create_url, data=create_request_payload, headers=create_headers)
-        response.raise_for_status()
+        response = post(client_create_url, json={'domain': client_domain}, headers={'Authorization': 'Bearer {}'.format(token)})
+        if response.status != 200:
+            raise ValidationError(i8n.FAILED_REGISTRATION)
         register.delay(name, token, path)
 
     def _setup_path(self):

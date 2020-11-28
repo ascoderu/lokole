@@ -242,10 +242,14 @@ class ClientRegister(object):
         return '{}.{}'.format(self._client_name, 'lokole.ca')
 
     @property
-    def client_url_details(self):
-        return 'https://{}/api/email/register/{}'.format('mailserver.lokole.ca', self.client_domain)\
+    def server_endpoint(self):
+        return AppConfig.EMAIL_SERVER_ENDPOINT or 'mailserver.lokole.ca'
 
-    def _fetch_settings(self):
+    @property
+    def client_url_details(self):
+        return 'https://{}/api/email/register/{}'.format(self.server_endpoint, self.client_domain)
+
+    def _format_settings(self):
         if AppConfig.RESTART_PATHS:
             restart_paths_list = ['{}={}'.format(key, value) for (key, value) in AppConfig.RESTART_PATHS.items()]
             restart_path = ','.join(restart_paths_list)
@@ -258,22 +262,20 @@ class ClientRegister(object):
             'OPWEN_SESSION_KEY': AppConfig.SECRET_KEY,
             'OPWEN_MAX_UPLOAD_SIZE_MB': AppConfig.MAX_UPLOAD_SIZE_MB,
             'OPWEN_SIM_TYPE': AppConfig.SIM_TYPE,
-            'OPWEN_EMAIL_SERVER_HOSTNAME': AppConfig.EMAIL_SERVER_HOSTNAME,
+            'OPWEN_EMAIL_SERVER_HOSTNAME': self.server_endpoint,
             'OPWEN_CLIENT_NAME': self.client_name.data.strip(),
             'OPWEN_ROOT_DOMAIN': root_domain,
             'OPWEN_RESTART_PATH': restart_path,
         }
 
-    def _write_settings_to_file(self, client_settings, client_details):
-        client_settings_list = ['{}={}'.format(key, value) for (key, value) in client_settings.items()]
-        client_details_list = ['{}={}'.format(key, value) for (key, value) in client_details.items()]
+    def _write_settings_to_file(self, client_values):
+        client_values_list = ['{}={}'.format(key, value) for (key, value) in client_values.items()]
 
         with open(self._path, 'w') as fobj:
-            fobj.write('\n'.join(client_settings_list))
-            fobj.write('\n'.join(client_details_list))
+            fobj.write('\n'.join(client_values_list))
 
     def __call__(self):
-        while(True):
+        while True:
             get_headers = {'Authorization': 'Bearer {}'.format(self._github_access_token)}
 
             get_response = get(self.client_url_details, headers=get_headers)
@@ -291,7 +293,7 @@ class ClientRegister(object):
                 client_info = loads(get_response.text)
                 break
 
-        opwen_settings = self._fetch_settings()
+        opwen_settings = self._format_settings()
         registration_details = {
             'OPWEN_CLIENT_ID': client_info['client_id'],
             'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
@@ -299,4 +301,4 @@ class ClientRegister(object):
             'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
         }
 
-        self._write_settings_to_file(opwen_settings, registration_details)
+        self._write_settings_to_file({**opwen_settings, **registration_details})

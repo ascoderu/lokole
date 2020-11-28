@@ -45,6 +45,7 @@ class i8n(object):
     SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _('The syntax is: "minute hour day-of-month month day-of-week". '
                                          'Use "*" for any value or "," to separate multiple values '
                                          'or "-" to define a range of values or "/" for step values.')
+    FAILED_REGISTRATION = _('Registration failed. Please try again.')
     UNEXPECTED_ERROR = _('Unexpected error. Please contact your administrator.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
     USER_DOES_NOT_EXIST = _('This user does not exist.')
