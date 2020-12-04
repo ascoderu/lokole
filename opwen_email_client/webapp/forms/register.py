@@ -12,6 +12,7 @@ from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
 from opwen_email_client.webapp.tasks import register
 
+
 class RegisterForm(FlaskForm):
 
     client_name = StringField()
@@ -31,7 +32,9 @@ class RegisterForm(FlaskForm):
         client_domain = '{}.{}'.format(name, 'lokole.ca')
         client_create_url = 'https://{}/api/email/register/'.format(endpoint)
 
-        response = post(client_create_url, json={'domain': client_domain}, headers={'Authorization': 'Bearer {}'.format(token)})
+        response = post(client_create_url,
+                        json={'domain': client_domain},
+                        headers={'Authorization': 'Bearer {}'.format(token)})
         if response.status != 200:
             raise ValidationError(i8n.FAILED_REGISTRATION)
         register.delay(name, token, path)
