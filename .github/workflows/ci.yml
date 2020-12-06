@@ -72,8 +72,10 @@ jobs:
       ARM_CLIENT_SECRET: ${{secrets.SP_PASSWORD}}
       ARM_SUBSCRIPTION_ID: ${{secrets.SUBSCRIPTION_ID}}
       ARM_TENANT_ID: ${{secrets.SP_TENANT}}
-      AZURE_STORAGE_ACCOUNT: "tstate31414"
-      TF_ACTION_WORKING_DIR: "./docker/setup/terraform"
+    
+    defaults:
+      run:
+        working-directory: "./docker/setup/terraform"
 
     steps:
       - uses: actions/checkout@v2
@@ -83,9 +85,6 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-
-      - name: Terraform Format
-        run: terraform fmt -check
 
       - name: Terraform Plan
         run: terraform plan
