@@ -35,11 +35,10 @@ RUN wget -q https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfm
   && shfmt -version
 
 ARG TERRAFORM_VERSION=0.13.5
-RUN wget -q https://github.com/hashicorp/terraform/archive/v${TERRAFORM_VERSION}.tar.gz \
-  && tar xf v${TERRAFORM_VERSION}.tar.gz \
-  && mv terraform-${TERRAFORM_VERSION} terraform \
+RUN wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+  && unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
   && cp terraform /usr/local/bin \
-  && rm v${TERRAFORM_VERSION}.tar.gz \
+  && rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
   && terraform --version
 
 COPY docker/ci/requirements.txt ./
