@@ -64,15 +64,3 @@ variable "serverQueueEmailSend" {
   type    = string
   default = "send"
 }
-
-variable "os_type" {
-  type    = string
-  description = "OS type for agents: Windows or Linux"
-  default = "Linux"
-}
-
-variable "os_disk_size" {
-  type    = string
-  description = "OS disk size in GB"
-  default = "30"
-}

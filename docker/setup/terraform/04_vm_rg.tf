@@ -10,8 +10,6 @@ resource "azurerm_resource_group" "vm" {
   tags = {}
 }
 
-#! Current infra uses port 24 on vnet, azure docs indicate to use 16 and 24 on subnet
-# https://docs.microsoft.com/en-us/azure/developer/terraform/create-linux-virtual-machine-with-infrastructure
 # Create virtual network
 resource "azurerm_virtual_network" "vm" {
   name                 = "vm-vnet"
@@ -84,15 +82,11 @@ resource "azurerm_network_security_group" "vm" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  # Verify other security rules
-  # Inbound: HTTPS / HTTP / AllowVnetInbound / AllowAzureLoadBalancerInBound / DenyAllInBound
-  # Outbound: AllowVnetOutBound / AllowInternetOutBound / DenyAllOutBound
 
   tags = {}
 }
 
 # Create network interface
-# https://www.terraform.io/docs/providers/azurerm/r/network_interface.html
 resource "azurerm_network_interface" "vm" {
   name                      = "vm-nic"
   location                  = azurerm_resource_group.vm.location
@@ -125,7 +119,6 @@ resource "random_id" "randomVmId" {
   byte_length = 8
 }
 
-#! Verify whether this is necessary
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "vm" {
   name                        = "diag${random_id.randomVmId.hex}"
@@ -157,8 +150,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     name                 = "vm-disk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
-    # disk_size must exceed that of the image of the vm if declared explicitly.
-    # disk_size_gb         = 30
   }
 
   source_image_reference {

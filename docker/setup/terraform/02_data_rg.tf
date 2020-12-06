@@ -28,16 +28,6 @@ resource "azurerm_storage_account" "serverTablesName" {
   account_kind              = "Storage"
   account_tier              = "Standard"
   account_replication_type  = "GRS"
-  allow_blob_public_access  = true
-  enable_https_traffic_only = false
-
-  network_rules {
-    default_action = "Allow"
-    bypass         = ["AzureServices"]
-    ip_rules       = []     
-  }
-
-  tags = {}
 }
 
 # Create server blob storage account if it doesn't exist
@@ -48,16 +38,6 @@ resource "azurerm_storage_account" "serverBlobsName" {
   account_kind              = "Storage"
   account_tier              = "Standard"
   account_replication_type  = "GRS"
-  allow_blob_public_access  = true
-  enable_https_traffic_only = false
-
-  network_rules {
-    default_action = "Allow"
-    bypass         = ["AzureServices"]
-    ip_rules       = []     
-  }
-
-  tags = {}
 }
 
 # Create client blob storage account if it doesn't exist
@@ -68,16 +48,6 @@ resource "azurerm_storage_account" "clientBlobsName" {
   account_kind              = "Storage"
   account_tier              = "Standard"
   account_replication_type  = "GRS"
-  allow_blob_public_access  = true
-  enable_https_traffic_only = false
-
-  network_rules {
-    default_action = "Allow"
-    bypass         = ["AzureServices"]
-    ip_rules       = []     
-  }
-
-  tags = {}
 }
 
 resource "azurerm_storage_container" "clientsauth" {
@@ -150,19 +120,7 @@ resource "azurerm_servicebus_queue" "serverQueueSendgridMime" {
   name                = var.serverQueueSendgridMime
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
-  max_size_in_megabytes = 5120
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
+  max_size_in_megabytes = 512
 }
 
 resource "azurerm_servicebus_queue" "serverQueueEmailSend" {
@@ -170,18 +128,6 @@ resource "azurerm_servicebus_queue" "serverQueueEmailSend" {
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
   max_size_in_megabytes = 5120
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
 }
 
 resource "azurerm_servicebus_queue" "serverQueueClientPackage" {
@@ -189,18 +135,6 @@ resource "azurerm_servicebus_queue" "serverQueueClientPackage" {
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
   max_size_in_megabytes = 5120
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
 }
 
 resource "azurerm_servicebus_queue" "mailboxreceived" {
@@ -208,18 +142,6 @@ resource "azurerm_servicebus_queue" "mailboxreceived" {
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
   max_size_in_megabytes = 1024
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
 }
 
 resource "azurerm_servicebus_queue" "mailboxsent" {
@@ -227,18 +149,6 @@ resource "azurerm_servicebus_queue" "mailboxsent" {
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
   max_size_in_megabytes = 1024
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
 }
 
 resource "azurerm_servicebus_queue" "register" {
@@ -246,18 +156,6 @@ resource "azurerm_servicebus_queue" "register" {
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
   max_size_in_megabytes = 1024
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
 }
 
 resource "azurerm_servicebus_queue" "service" {
@@ -265,16 +163,4 @@ resource "azurerm_servicebus_queue" "service" {
   resource_group_name = azurerm_resource_group.data.name
   namespace_name      = azurerm_servicebus_namespace.data.name
   max_size_in_megabytes = 1024
-
-  # Optional Values
-  lock_duration                           = "PT1M"
-  requires_duplicate_detection            = false
-  requires_session                        = false
-  default_message_ttl                     = "P14D"
-  dead_lettering_on_message_expiration    = false
-  duplicate_detection_history_time_window = "PT10M"
-  max_delivery_count                      = 10
-  status                                  = "Active"
-  enable_partitioning                     = false
-  enable_express                          = false
 }
