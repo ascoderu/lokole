@@ -3,8 +3,6 @@ from importlib import import_module
 from json import loads
 from logging import Logger
 from pathlib import Path
-from requests.exceptions import HTTPError
-from requests import get
 from subprocess import check_call  # nosec
 from subprocess import check_output  # nosec
 from sys import executable
@@ -14,6 +12,8 @@ from typing import Optional
 
 from cached_property import cached_property
 from flask import render_template
+from requests import get
+from requests.exceptions import HTTPError
 
 from opwen_email_client.domain import sim
 from opwen_email_client.domain.email.store import EmailStore
