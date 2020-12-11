@@ -34,7 +34,6 @@ from opwen_email_client.webapp.session import Session
 from opwen_email_client.webapp.session import track_history
 
 
-
 @app.route(AppConfig.APP_ROOT + '/favicon.ico')
 def favicon() -> Response:
     return send_from_directory(
