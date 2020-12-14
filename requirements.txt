@@ -12,7 +12,7 @@ msgpack==1.0.1
 python-http-client==3.3.1
 pyzmail36==1.0.4
 requests==2.25.0
-sendgrid==6.4.7
+sendgrid==6.4.8
 typing-extensions==3.7.4.3
 typing==3.7.4.3
 kombu==4.6.11  # pyup: ignore
