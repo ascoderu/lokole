@@ -27,5 +27,5 @@ requests==2.25.1
 typing==3.7.4.3
 tzlocal==2.1
 watchdog==2.0.0
-xtarfile[zstd]==0.0.4
+xtarfile[zstd]==0.1.0
 Pillow==8.0.1
