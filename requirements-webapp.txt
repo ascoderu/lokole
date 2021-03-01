@@ -28,4 +28,4 @@ typing==3.7.4.3
 tzlocal==2.1
 watchdog==2.0.2
 xtarfile[zstd]==0.1.0
-Pillow==8.0.1
+Pillow==8.1.0
