@@ -28,10 +28,17 @@ required_file "${scriptname}" "/secrets/cloudflare.env"
 
 log "Setting up DNS mapping ${LOKOLE_SERVER_IP} to ${LOKOLE_DNS_NAME}"
 
-cloudflare_zone="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_ZONE')"
 cloudflare_user="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_USER')"
 cloudflare_key="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_KEY')"
-cloudflare_dns_api="https://api.cloudflare.com/client/v4/zones/${cloudflare_zone}/dns_records"
+
+cloudflare_zone_api="https://api.cloudflare.com/client/v4/zones"
+lokole_zone_name="${LOKOLE_DNS_NAME#*.}"
+cloudflare_zone_id="$(curl -sX GET "${cloudflare_zone_api}?name=${lokole_zone_name}" \
+  -H "X-Auth-Email: ${cloudflare_user}" \
+  -H "X-Auth-Key: ${cloudflare_key}" |
+  jq -r '.result[0].id')"
+
+cloudflare_dns_api="${cloudflare_zone_api}/${cloudflare_zone_id}/dns_records"
 
 cloudflare_cname_id="$(curl -sX GET "${cloudflare_dns_api}?type=A&name=${LOKOLE_DNS_NAME}" \
   -H "X-Auth-Email: ${cloudflare_user}" \

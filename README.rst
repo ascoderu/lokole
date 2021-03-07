@@ -248,9 +248,8 @@ to initialize the required cloud resources.
   EOM
 
   cat > ${PWD}/secrets/cloudflare.env << EOM
-  LOKOLE_CLOUDFLARE_USER={the cloudflare user you created earlier}
-  LOKOLE_CLOUDFLARE_KEY={the cloudflare key you created earlier}
-  LOKOLE_CLOUDFLARE_ZONE={the cloudflare zone you created earlier}
+  LOKOLE_CLOUDFLARE_USER={your cloudflare user account email address}
+  LOKOLE_CLOUDFLARE_KEY={your cloudflare global api key}
   EOM
 
   cat > ${PWD}/secrets/users.env << EOM
