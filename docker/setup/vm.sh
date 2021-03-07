@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 if [[ "$1" != "install" ]]; then
-  cd /home/opwen/lokole || exit 99
+  cd ~/lokole || exit 99
   git fetch origin --prune || exit 1
   git reset --hard origin/master || exit 1
   cd - || exit 99
-  docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml pull || exit 2
-  docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml up -d || exit 3
+  docker-compose -f ~/lokole/docker/docker-compose.prod.yml pull || exit 2
+  docker-compose -f ~/lokole/docker/docker-compose.prod.yml up -d || exit 3
   docker system prune -a -f
   exit 0
 fi

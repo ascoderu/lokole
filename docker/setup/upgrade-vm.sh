@@ -4,6 +4,7 @@
 ##
 ## Required environment variables:
 ##
+##   LOKOLE_VM_USERNAME
 ##   LOKOLE_VM_PASSWORD
 ##   LOKOLE_DNS_NAME
 ##
@@ -17,6 +18,7 @@ scriptname="${BASH_SOURCE[0]}"
 # verify inputs
 #
 
+required_env "${scriptname}" "LOKOLE_VM_USERNAME"
 required_env "${scriptname}" "LOKOLE_VM_PASSWORD"
 required_env "${scriptname}" "LOKOLE_DNS_NAME"
 
@@ -26,4 +28,4 @@ required_env "${scriptname}" "LOKOLE_DNS_NAME"
 
 log "Upgrading VM ${LOKOLE_DNS_NAME}"
 
-exec sshpass -p "${LOKOLE_VM_PASSWORD}" ssh -o StrictHostKeyChecking=no "opwen@${LOKOLE_DNS_NAME}" <"${scriptdir}/vm.sh"
+exec sshpass -p "${LOKOLE_VM_PASSWORD}" ssh -o StrictHostKeyChecking=no "${LOKOLE_VM_USERNAME}@${LOKOLE_DNS_NAME}" <"${scriptdir}/vm.sh"

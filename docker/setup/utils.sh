@@ -45,6 +45,12 @@ generate_identifier() {
   tr </dev/urandom -dc 'a-z0-9' | head -c"${length}"
 }
 
+generate_password() {
+  local length="$1"
+
+  LC_ALL=C tr </dev/urandom -dc '_A-Z-a-z-0-9' | head -c"${length}"
+}
+
 get_dotenv() {
   local dotenvfile="$1"
   local variable="$2"
