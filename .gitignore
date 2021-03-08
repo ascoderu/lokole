@@ -16,6 +16,7 @@ dive.log
 
 serviceprincipal.json
 .github.env
+gpg-passphrase.txt
 
 node_modules/
 opwen_email_client/webapp/static/css/*.min.css
