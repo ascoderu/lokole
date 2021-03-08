@@ -81,6 +81,6 @@ STATIC_ROOT=/home/opwen/lokole/docker/nginx
 LETSENCRYPT_DOMAIN=${hostname}
 EOM
 docker pull ascoderu/opwenserver_nginx
-docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/nginx.conf.template' | sudo tee /etc/nginx/nginx.conf
-docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/server.conf.template' | sudo tee /etc/nginx/sites-available/default
+docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/nginx.conf.mustache' | sudo tee /etc/nginx/nginx.conf
+docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/server.conf.mustache' | sudo tee /etc/nginx/sites-available/default
 sudo systemctl reload nginx
