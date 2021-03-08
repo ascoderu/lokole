@@ -12,6 +12,11 @@ wait_for_rabbitmq() {
   local rabbitmq
   local i
 
+  if [[ "${LIVE}" = "True" ]]; then
+    log "Skipping waiting for rabbitmq for live test"
+    return
+  fi
+
   rabbitmq="$(get_container rabbitmq)"
 
   for i in $(seq 1 "${max_retries}"); do
@@ -27,6 +32,11 @@ wait_for_rabbitmq() {
 
 wait_for_appinsights() {
   local i
+
+  if [[ "${LIVE}" = "True" ]]; then
+    log "Skipping waiting for appinsights for live test"
+    return
+  fi
 
   for i in $(seq 1 "${max_retries}"); do
     if [[ \

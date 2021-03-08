@@ -14,6 +14,7 @@ services:
       AZURITE_KEY: ${AZURITE_KEY}
       AZURITE_HOST: ${AZURITE_HOST}
       TEST_STEP_DELAY: ${TEST_STEP_DELAY}
+      LIVE: ${LIVE}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
