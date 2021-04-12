@@ -13,7 +13,7 @@ SQLAlchemy==1.4.7
 WTForms==2.3.3
 email-validator==1.1.2
 Werkzeug==0.16.1  # pyup: ignore
-apache-libcloud==3.2.0
+apache-libcloud==3.3.1
 bcrypt==3.2.0
 beautifulsoup4==4.9.3
 cached-property==1.5.2
