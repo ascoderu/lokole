@@ -8,4 +8,4 @@ nose2[coverage_plugin]==0.10.0
 responses==0.13.2
 bandit==1.7.0
 yapf==0.31.0
-watchdog[watchmedo]==0.10.4
+watchdog[watchmedo]==2.0.3
