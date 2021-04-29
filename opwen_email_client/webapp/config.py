@@ -24,6 +24,7 @@ class ImageDimensions(object):
 # noinspection PyPep8Naming
 class i8n(object):
     SETTINGS_UPDATED = _('Settings updated! If required, the app will restart soon to reflect the changes.')
+    CLIENT_REGISTERED = _('Client has been registered. The app will restart soon to complete the process')
     LOGIN_REQUIRED = _('Please log in to access this page.')
     UNAUTHORIZED = _('You do not have permission to view this page.')
     INVALID_PASSWORD = _('Invalid password.')
@@ -44,6 +45,7 @@ class i8n(object):
     SYNC_SCHEDULE_SYNTAX_DESCRIPTION = _('The syntax is: "minute hour day-of-month month day-of-week". '
                                          'Use "*" for any value or "," to separate multiple values '
                                          'or "-" to define a range of values or "/" for step values.')
+    FAILED_REGISTRATION = _('Registration failed. Please try again.')
     UNEXPECTED_ERROR = _('Unexpected error. Please contact your administrator.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
     USER_DOES_NOT_EXIST = _('This user does not exist.')

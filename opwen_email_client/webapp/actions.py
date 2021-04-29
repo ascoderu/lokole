@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from importlib import import_module
+from json import loads
 from logging import Logger
 from pathlib import Path
 from subprocess import check_call  # nosec
@@ -11,6 +12,8 @@ from typing import Optional
 
 from cached_property import cached_property
 from flask import render_template
+from requests import get
+from requests.exceptions import HTTPError
 
 from opwen_email_client.domain import sim
 from opwen_email_client.domain.email.store import EmailStore
@@ -24,7 +27,9 @@ from opwen_email_client.domain.modem import modem_is_setup
 from opwen_email_client.domain.modem import setup_modem
 from opwen_email_client.domain.sim import dialup
 from opwen_email_client.util.os import backup
+from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.config import i8n
+from opwen_email_client.webapp.config import root_domain
 
 
 class SyncEmails(object):
@@ -223,3 +228,77 @@ class StartInternetConnection(object):
         finally:
             if connection is not None:
                 connection.terminate()
+
+
+class ClientRegister(object):
+    def __init__(self, client_name: str, access_token: str, path: str, logger: Logger):
+        self._client_name = client_name
+        self._github_access_token = access_token
+        self._settings_path = path
+        self._log = logger
+
+    @property
+    def client_domain(self):
+        return '{}.{}'.format(self._client_name, 'lokole.ca')
+
+    @property
+    def server_endpoint(self):
+        return AppConfig.EMAIL_SERVER_ENDPOINT or 'mailserver.lokole.ca'
+
+    @property
+    def client_url_details(self):
+        return 'https://{}/api/email/register/{}'.format(self.server_endpoint, self.client_domain)
+
+    def _format_settings(self):
+        if AppConfig.RESTART_PATHS:
+            restart_paths_list = ['{}={}'.format(key, value) for (key, value) in AppConfig.RESTART_PATHS.items()]
+            restart_path = ','.join(restart_paths_list)
+        else:
+            restart_path = ''
+
+        return {
+            'OPWEN_APP_ROOT': AppConfig.APP_ROOT,
+            'OPWEN_STATE_DIRECTORY': AppConfig.STATE_BASEDIR,
+            'OPWEN_SESSION_KEY': AppConfig.SECRET_KEY,
+            'OPWEN_MAX_UPLOAD_SIZE_MB': AppConfig.MAX_UPLOAD_SIZE_MB,
+            'OPWEN_SIM_TYPE': AppConfig.SIM_TYPE,
+            'OPWEN_EMAIL_SERVER_HOSTNAME': self.server_endpoint,
+            'OPWEN_CLIENT_NAME': self.client_name.data.strip(),
+            'OPWEN_ROOT_DOMAIN': root_domain,
+            'OPWEN_RESTART_PATH': restart_path,
+        }
+
+    def _write_settings_to_file(self, client_values):
+        client_values_list = ['{}={}'.format(key, value) for (key, value) in client_values.items()]
+
+        with open(self._path, 'w') as fobj:
+            fobj.write('\n'.join(client_values_list))
+
+    def __call__(self):
+        while True:
+            get_headers = {'Authorization': 'Bearer {}'.format(self._github_access_token)}
+
+            get_response = get(self.client_url_details, headers=get_headers)
+            if get_response.status_code == 404:
+                continue
+
+            try:
+                get_response.raise_for_status()
+            except HTTPError as ex:
+                self._log.exception('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
+                    client_name=self._client_name,
+                    status_code=get_response.status_code,
+                    message=ex.read().decode('utf-8').strip()))
+            else:
+                client_info = loads(get_response.text)
+                break
+
+        opwen_settings = self._format_settings()
+        registration_details = {
+            'OPWEN_CLIENT_ID': client_info['client_id'],
+            'OPWEN_REMOTE_ACCOUNT_NAME': client_info['storage_account'],
+            'OPWEN_REMOTE_ACCOUNT_KEY': client_info['storage_key'],
+            'OPWEN_REMOTE_RESOURCE_CONTAINER': client_info['resource_container'],
+        }
+
+        self._write_settings_to_file({**opwen_settings, **registration_details})

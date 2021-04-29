@@ -3,6 +3,7 @@ from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 
 from opwen_email_client.util.network import check_connection
+from opwen_email_client.webapp.actions import ClientRegister
 from opwen_email_client.webapp.actions import RestartApp
 from opwen_email_client.webapp.actions import StartInternetConnection
 from opwen_email_client.webapp.actions import SyncEmails
@@ -74,3 +75,18 @@ def update(*args, **kwargs):
             update_code()
 
         restart_app()
+
+
+@app.task(ignore_result=True)
+def register(name, token, path, **kwargs):
+    client_register = ClientRegister(
+        client_name=name,
+        access_token=token,
+        path=path,
+        logger=log,
+    )
+
+    restart_app = RestartApp(restart_paths=AppConfig.RESTART_PATHS)
+
+    client_register()
+    restart_app()

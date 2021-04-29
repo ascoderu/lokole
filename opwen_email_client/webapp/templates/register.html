@@ -1,0 +1,31 @@
+{% extends "_base.html" %}
+
+{% block title %}{{ _('Register | Lokole') }}{% endblock %}
+
+{% from 'macros/form.html' import render_field %}
+{% from 'macros/form.html' import render_button %}
+
+{% block libs %}{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ 'css/settings.css' | asset_url }}">
+{% endblock %}
+
+{% block content %}{{ super() }}
+<main>
+<form action="{{ url_for('register') }}" method="post" name="{{ form.name }}" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+
+  <fieldset>
+
+    {{ render_field(form.client_name) }}
+
+    {{ render_field(form.github_username) }}
+
+    {{ render_field(form.github_token) }}
+
+  </fieldset>
+
+  {{ render_button(form.submit, _('Register new client')) }}
+</form>
+</main>
+
+{% endblock %}
