@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 if [[ "$1" != "install" ]]; then
-  cd /home/opwen/lokole || exit 99
+  cd ~/lokole || exit 99
   git fetch origin --prune || exit 1
   git reset --hard origin/master || exit 1
   cd - || exit 99
-  docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml pull || exit 2
-  docker-compose -f /home/opwen/lokole/docker/docker-compose.prod.yml up -d || exit 3
+  docker-compose -f ~/lokole/docker/docker-compose.prod.yml pull || exit 2
+  docker-compose -f ~/lokole/docker/docker-compose.prod.yml up -d || exit 3
   docker system prune -a -f
   exit 0
 fi
@@ -81,6 +81,6 @@ STATIC_ROOT=/home/opwen/lokole/docker/nginx
 LETSENCRYPT_DOMAIN=${hostname}
 EOM
 docker pull ascoderu/opwenserver_nginx
-docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/nginx.conf.template' | sudo tee /etc/nginx/nginx.conf
-docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/server.conf.template' | sudo tee /etc/nginx/sites-available/default
+docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/nginx.conf.mustache' | sudo tee /etc/nginx/nginx.conf
+docker run --env-file lokole/secrets/nginx.env --rm ascoderu/opwenserver_nginx sh -c 'mo < /app/server.conf.mustache' | sudo tee /etc/nginx/sites-available/default
 sudo systemctl reload nginx

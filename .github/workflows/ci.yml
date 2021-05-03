@@ -28,6 +28,7 @@ jobs:
             -e AZURITE_HOST="" \
             -e AZURITE_SECURE="True" \
             -e TEST_STEP_DELAY=90 \
+            -e LIVE="True" \
             build start integration-tests
       - run: make status
         if: ${{ failure() }}

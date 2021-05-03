@@ -232,7 +232,12 @@ Integration setup
 
 The project uses Sendgrid, so to emulate a full production environment,
 follow these `Sendgrid setup instructions <https://sendgrid.com/free/>`_ to
-create a free account and take note of you API key for sending emails.
+create a free account, authenticate your domain, and create an API key with
+at least Inbound Parse and Mail Send permissions.
+
+The project uses Cloudflare to automate DNS management whenever new Lokole
+clients are set up. Create an account, set your domain to be managed by
+Cloudflare and look up the `Cloudflare Global API Key <https://dash.cloudflare.com/profile/api-tokens>`_.
 
 The project also makes use of a number of Azure services such as Blobs,
 Tables, Queues, Application Insights, and so forth. To set up all the
@@ -248,9 +253,8 @@ to initialize the required cloud resources.
   EOM
 
   cat > ${PWD}/secrets/cloudflare.env << EOM
-  LOKOLE_CLOUDFLARE_USER={the cloudflare user you created earlier}
-  LOKOLE_CLOUDFLARE_KEY={the cloudflare key you created earlier}
-  LOKOLE_CLOUDFLARE_ZONE={the cloudflare zone you created earlier}
+  LOKOLE_CLOUDFLARE_USER={your cloudflare user account email address}
+  LOKOLE_CLOUDFLARE_KEY={your cloudflare global api key}
   EOM
 
   cat > ${PWD}/secrets/users.env << EOM
@@ -259,7 +263,8 @@ to initialize the required cloud resources.
   LOKOLE_REGISTRATION_PASSWORD={some password for the registration endpoint}
   EOM
 
-  docker-compose run --rm \
+  docker-compose -f ./docker-compose.yml -f ./docker/docker-compose.setup.yml build setup
+  docker-compose -f ./docker-compose.yml -f ./docker/docker-compose.setup.yml run --rm \
     -e SP_APPID={appId field of your service principal} \
     -e SP_PASSWORD={password field of your service principal} \
     -e SP_TENANT={tenant field of your service principal} \
@@ -282,6 +287,9 @@ To set up a production-ready deployment of the system, follow the development
 setup scripts described above, but additionally also pass the following
 environment variables to the Docker setup script:
 
+- :code:`DEPLOY_COMPUTE`: Must be set to :code:`k8s` to toggle the Kubernetes
+  deployment mode.
+
 - :code:`KUBERNETES_RESOURCE_GROUP_NAME`: The resource group into which to
   provision the Azure Kubernetes Service cluster.
 
@@ -295,6 +303,19 @@ environment variables to the Docker setup script:
 The script will then provision a cluster in Azure Kubernetes Service and
 install the project via Helm. The secrets to connect to the provisioned
 cluster will be stored in the :code:`secrets` directory.
+
+As an alternative to the Kubnernets deployment, a Virtual Machine may also be
+provisioned to run the services by passing the following environment variables
+to the Docker setup script:
+
+- :code:`DEPLOY_COMPUTE`: Must be set to :code:`vm` to toggle the Virtual
+  Machine deployment mode.
+
+- :code:`VM_RESOURCE_GROUP_NAME`: The resource group into which to
+  provision the Azure Virtual Machine.
+
+- :code:`VM_SKU`: The type of VMs to provision into the cluster.
+  This should be one of the supported `Linux VM sizes <https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes>`_.
 
 There is a `script <https://github.com/ascoderu/lokole/blob/master/install.py>`_
 to set up a new Lokole email client. The script will install the email app in this

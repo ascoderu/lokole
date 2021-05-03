@@ -44,6 +44,9 @@ MAILBOX_SENT_QUEUE = f'mailboxsent{resource_suffix}'
 SENDGRID_MAX_RETRIES = env.int('LOKOLE_SENDGRID_MAX_RETRIES', 20)
 SENDGRID_RETRY_INTERVAL_SECONDS = env.float('LOKOLE_SENDGRID_RETRY_INTERVAL_SECONDS', 5)
 SENDGRID_KEY = env('LOKOLE_SENDGRID_KEY', '')
+
+# TODO: switch to Cloudflare API Token with only Zone.DNS permissions
+# needs https://github.com/apache/libcloud/pull/1564 to be released
 DNS_ACCOUNT = env('LOKOLE_CLOUDFLARE_USER', '')
 DNS_SECRET = env('LOKOLE_CLOUDFLARE_KEY', '')
 DNS_PROVIDER = env('LOKOLE_DNS_PROVIDER', 'CLOUDFLARE')

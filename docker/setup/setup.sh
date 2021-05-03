@@ -18,6 +18,9 @@
 ##   SERVICE_BUS_SKU
 ##   STORAGE_ACCOUNT_SKU
 ##
+##   VM_RESOURCE_GROUP_NAME
+##   VM_SKU
+##
 ##   KUBERNETES_RESOURCE_GROUP_NAME
 ##   KUBERNETES_IMAGE_REGISTRY
 ##   KUBERNETES_DOCKER_TAG
@@ -103,7 +106,66 @@ fi
 #
 # create production deployment
 #
-if [[ "${DEPLOY_COMPUTE}" != "no" ]]; then
+
+lokole_dns_name="${LOKOLE_DNS_NAME:-mailserver.lokole.ca}"
+
+if [[ "${DEPLOY_COMPUTE}" = "vm" ]]; then
+
+  if [[ -z "${VM_RESOURCE_GROUP_NAME}" ]] || [[ -z "${VM_SKU}" ]]; then
+    log "Skipping production deployment to VM since VM_RESOURCE_GROUP_NAME, or VM_SKU are not set"
+    exit 0
+  fi
+
+  vmname="opwenvm$(generate_identifier 8)"
+  vmpassword="$(generate_password 64)"
+  vmusername='opwen'
+
+  log "Creating VM ${vmname}"
+
+  use_resource_group "${VM_RESOURCE_GROUP_NAME}"
+
+  az vm create \
+    --name "${vmname}" \
+    --image 'Canonical:UbuntuServer:18.04-LTS:latest' \
+    --size "${VM_SKU}" \
+    --authentication-type 'password' \
+    --admin-username "${vmusername}" \
+    --admin-password "${vmpassword}" \
+    >/tmp/vm.json
+
+  az vm open-port \
+    --name "${vmname}" \
+    --port 80 \
+    --priority 300 \
+    >/dev/null
+
+  az vm open-port \
+    --name "${vmname}" \
+    --port 443 \
+    --priority 400 \
+    >/dev/null
+
+  vmip="$(jq -r .publicIpAddress /tmp/vm.json)"
+
+  LOKOLE_SERVER_IP="${vmip}" LOKOLE_DNS_NAME="${lokole_dns_name}" ./setup-dns.sh
+
+  log "Done setting up VM."
+  log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  log "!! Remember to run the steps in vm.sh to complete the setup !!"
+  log "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+  container_name="secrets-${vmname}"
+
+  cat >/secrets/vmdeployment.env <<EOF
+RESOURCE_GROUP=${VM_RESOURCE_GROUP_NAME}
+APP_IP=${vmip}
+LOKOLE_DNS_NAME=${lokole_dns_name}
+LOKOLE_VM_PASSWORD=${vmpassword}
+LOKOLE_VM_USERNAME=${vmusername}
+EOF
+fi
+
+if [[ "${DEPLOY_COMPUTE}" = "k8s" ]]; then
 
   if [[ -z "${KUBERNETES_RESOURCE_GROUP_NAME}" ]] || [[ -z "${KUBERNETES_NODE_COUNT}" ]] || [[ -z "${KUBERNETES_NODE_SKU}" ]] || [[ -z "${KUBERNETES_VERSION}" ]]; then
     log "Skipping production deployment to kubernetes since KUBERNETES_RESOURCE_GROUP_NAME, KUBERNETES_NODE_COUNT, or KUBERNETES_NODE_SKU, or KUBERNETES_VERSION are not set"
@@ -159,7 +221,6 @@ if [[ "${DEPLOY_COMPUTE}" != "no" ]]; then
 
   k8simageregistry="${KUBERNETES_IMAGE_REGISTRY:-ascoderu}"
   k8sdockertag="${KUBERNETES_DOCKER_TAG:-latest}"
-  lokole_dns_name="${LOKOLE_DNS_NAME:-mailserver.lokole.ca}"
 
   while :; do
     helm install \
@@ -188,39 +249,17 @@ if [[ "${DEPLOY_COMPUTE}" != "no" ]]; then
   cp ~/.ssh/id_rsa.pub /secrets/kube-id_rsa.pub
   cp ~/.ssh/id_rsa /secrets/kube-id_rsa
 
-  log "Setting up DNS for ${ingressip}"
-
-  cloudflare_zone="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_ZONE')"
-  cloudflare_user="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_USER')"
-  cloudflare_key="$(get_dotenv '/secrets/cloudflare.env' 'LOKOLE_CLOUDFLARE_KEY')"
-  cloudflare_dns_api="https://api.cloudflare.com/client/v4/zones/${cloudflare_zone}/dns_records"
-
-  cloudflare_cname_id="$(curl -sX GET "${cloudflare_dns_api}?type=A&name=${lokole_dns_name}" \
-    -H "X-Auth-Email: ${cloudflare_user}" \
-    -H "X-Auth-Key: ${cloudflare_key}" |
-    jq -r '.result[0].id')"
-
-  if [[ -n "${cloudflare_cname_id}" ]] && [[ ${cloudflare_cname_id} != "null" ]]; then
-    curl -sX PUT "${cloudflare_dns_api}/${cloudflare_cname_id}" \
-      -H "X-Auth-Email: ${cloudflare_user}" \
-      -H "X-Auth-Key: ${cloudflare_key}" \
-      -H "Content-Type: application/json" \
-      -d '{"type":"A","name":"'"${lokole_dns_name}"'","content":"'"${ingressip}"'","ttl":1,"proxied":false}'
-  else
-    curl -sX POST "${cloudflare_dns_api}" \
-      -H "X-Auth-Email: ${cloudflare_user}" \
-      -H "X-Auth-Key: ${cloudflare_key}" \
-      -H "Content-Type: application/json" \
-      -d '{"type":"A","name":"'"${lokole_dns_name}"'","content":"'"${ingressip}"'","ttl":1,"proxied":false}'
-  fi
+  LOKOLE_SERVER_IP="${ingressip}" LOKOLE_DNS_NAME="${lokole_dns_name}" ./setup-dns.sh
 
   ./renew-cert.sh
+
+  container_name="secrets-${k8sname}"
 
   cat >/secrets/kubedeployment.env <<EOF
 RESOURCE_GROUP=${KUBERNETES_RESOURCE_GROUP_NAME}
 HELM_NAME=${helmname}
 APP_IP=${ingressip}
-APP_DNS=${lokole_dns_name}
+LOKOLE_DNS_NAME=${lokole_dns_name}
 EOF
 fi
 
@@ -228,13 +267,16 @@ fi
 # backup secrets
 #
 
-storage_account="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME')"
-storage_key="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY')"
-container_name="secrets-${k8sname}"
+if [[ -n "${container_name}" ]]; then
 
-log "Backing up secrets to ${storage_account}/${container_name}"
+  storage_account="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_NAME')"
+  storage_key="$(get_dotenv '/secrets/azure.env' 'LOKOLE_EMAIL_SERVER_AZURE_BLOBS_KEY')"
 
-az storage container create --name "${container_name}" \
-  --account-name="${storage_account}" --account-key="${storage_key}"
-az storage blob upload-batch --destination "${container_name}" --source "/secrets" \
-  --account-name="${storage_account}" --account-key="${storage_key}"
+  log "Backing up secrets to ${storage_account}/${container_name}"
+
+  az storage container create --name "${container_name}" \
+    --account-name="${storage_account}" --account-key="${storage_key}"
+  az storage blob upload-batch --destination "${container_name}" --source "/secrets" \
+    --account-name="${storage_account}" --account-key="${storage_key}"
+
+fi
