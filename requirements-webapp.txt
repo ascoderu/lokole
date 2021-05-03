@@ -26,6 +26,6 @@ python-crontab==2.5.1
 requests==2.25.0
 typing==3.7.4.3
 tzlocal==2.1
-watchdog==0.10.4
+watchdog==2.0.3
 xtarfile[zstd]==0.0.4
 Pillow==8.0.1
