@@ -1,6 +1,6 @@
 Babel==2.9.1
 Flask-BabelEx==0.9.4
-Flask-Caching==1.9.0
+Flask-Caching==1.10.1
 Flask-Cors==3.0.9
 Flask-Migrate==2.5.3
 Flask-SQLAlchemy==2.4.4
