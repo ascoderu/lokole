@@ -9,7 +9,7 @@ Flask-Security==3.0.0
 Flask-Testing==0.8.1
 Flask-WTF==0.14.3
 Flask==1.1.2
-SQLAlchemy==1.3.20
+SQLAlchemy==1.4.12
 WTForms==2.3.3
 email-validator==1.1.2
 Werkzeug==0.16.1  # pyup: ignore
