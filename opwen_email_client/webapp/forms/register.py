@@ -35,14 +35,14 @@ class RegisterForm(FlaskForm):
         response = post(client_create_url,
                         json={'domain': client_domain},
                         headers={'Authorization': 'Bearer {}'.format(token)})
-        if response.status != 200:
+        if response.status_code != 200:
             raise ValidationError(i8n.FAILED_REGISTRATION)
         register.delay(name, token, path)
 
     def _setup_path(self):
         home = Path.home()
         user = home.parts[-1]
-        path = (Path(getenv('LOKOLE_STATE_DIRECTORY', 'lokole/state')) / 'settings.env').absolute()
+        path = (Path(getenv('OPWEN_STATE_DIRECTORY', 'lokole/state')) / 'settings.env').absolute()
         parent = path.parent
         parent.mkdir(parents=True, exist_ok=True)
         is_in_home = parent.parts[:3] == home.parts
