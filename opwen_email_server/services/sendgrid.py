@@ -107,17 +107,18 @@ class SendSendgridEmail(LogMixin):
         # so that the email still gets routed back to the original client
         # ...this is a pretty ugly hack and the real fix is to change the logic of
         # how we sign up users on clients to use the new format {user}-{client}@{domain}
-        from_email = email['from']
-        user, client_domain = from_email.split('@')
-        client_domain_parts = client_domain.split('.')
-        if len(client_domain_parts) == 3:
-            client = client_domain_parts[0]
-            domain = '.'.join(client_domain_parts[1:])
-            mail.from_email = Email('{}-{}@{}'.format(user, client, domain))
-            mail.reply_to = Email(from_email)
-        else:
-            mail.from_email = Email(from_email)
-        self.log_debug('added from to email %s', email_id)
+        from_email = email.get('from')
+        if from_email:
+            user, client_domain = from_email.split('@')
+            client_domain_parts = client_domain.split('.')
+            if len(client_domain_parts) == 3:
+                client = client_domain_parts[0]
+                domain = '.'.join(client_domain_parts[1:])
+                mail.from_email = Email('{}-{}@{}'.format(user, client, domain))
+                mail.reply_to = Email(from_email)
+            else:
+                mail.from_email = Email(from_email)
+            self.log_debug('added from to email %s', email_id)
 
         for i, attachment in enumerate(email.get('attachments', [])):
             mail.add_attachment(self._create_attachment(attachment))

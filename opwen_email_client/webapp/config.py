@@ -67,7 +67,7 @@ class AppConfig(object):
     SQLALCHEMY_MIGRATE_REPO = path.join(STATE_BASEDIR, 'app.migrate')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    SECRET_KEY = env('OPWEN_SESSION_KEY', None)
+    SECRET_KEY = env('OPWEN_SESSION_KEY', 'NoSecret')
 
     CELERY_SQLITE_PATH = path.join(STATE_BASEDIR, 'celery.sqlite3')
     CELERY_BROKER_URL = env('CELERY_BROKER_URL', 'sqlalchemy+sqlite:///' + CELERY_SQLITE_PATH)
