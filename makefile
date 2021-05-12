@@ -149,6 +149,7 @@ deploy-docker:
 deploy: deploy-pypi deploy-gh-pages deploy-docker
 	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
   docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+    -e LOKOLE_VM_USERNAME="$(LOKOLE_VM_USERNAME)" \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \
     -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
     setup \
