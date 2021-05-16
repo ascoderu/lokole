@@ -38,7 +38,7 @@ def sync(*args, **kwargs):
         user_store=webapp.ioc.user_store,
     )
 
-    if check_connection(AppConfig.STORAGE_ACCOUNT_HOST, 80):
+    if check_connection(AppConfig.EMAIL_SERVER_HOSTNAME, 80):
         sync_emails()
     else:
         start_internet_connection = StartInternetConnection(
