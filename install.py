@@ -481,7 +481,7 @@ class ClientSetup(Setup):
 
 class WebappSetup(Setup):
     packages = (
-        'bcrypt',
+        'python3-bcrypt',
         'libffi-dev',
         'libssl-dev',
         'libjpeg-dev',
