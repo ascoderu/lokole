@@ -263,7 +263,7 @@ class ClientRegister(object):
             'OPWEN_MAX_UPLOAD_SIZE_MB': AppConfig.MAX_UPLOAD_SIZE_MB,
             'OPWEN_SIM_TYPE': AppConfig.SIM_TYPE,
             'OPWEN_EMAIL_SERVER_HOSTNAME': self.server_endpoint,
-            'OPWEN_CLIENT_NAME': self.client_name.data.strip(),
+            'OPWEN_CLIENT_NAME': self._client_name,
             'OPWEN_ROOT_DOMAIN': root_domain,
             'OPWEN_RESTART_PATH': restart_path,
         }
@@ -271,7 +271,7 @@ class ClientRegister(object):
     def _write_settings_to_file(self, client_values):
         client_values_list = ['{}={}'.format(key, value) for (key, value) in client_values.items()]
 
-        with open(self._path, 'w') as fobj:
+        with open(self._settings_path, 'w') as fobj:
             fobj.write('\n'.join(client_values_list))
 
     def __call__(self):

@@ -35,7 +35,7 @@ class RegisterForm(FlaskForm):
         response = post(client_create_url,
                         json={'domain': client_domain},
                         headers={'Authorization': 'Bearer {}'.format(token)})
-        if response.status_code != 200:
+        if response.status_code != 201:
             raise ValidationError(i8n.FAILED_REGISTRATION)
         register.delay(name, token, path)
 
