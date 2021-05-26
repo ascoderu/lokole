@@ -46,6 +46,7 @@ class i8n(object):
                                          'Use "*" for any value or "," to separate multiple values '
                                          'or "-" to define a range of values or "/" for step values.')
     FAILED_REGISTRATION = _('Registration failed. Please try again.')
+    REGISTER_AFTER_LOGIN = _('You are now logged in. Register a Lokole client now by filling in the fields')
     UNEXPECTED_ERROR = _('Unexpected error. Please contact your administrator.')
     PAGE_DOES_NOT_EXIST = _('This page does not exist.')
     USER_DOES_NOT_EXIST = _('This user does not exist.')

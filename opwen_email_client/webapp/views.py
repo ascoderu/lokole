@@ -208,8 +208,12 @@ def login_complete() -> Response:
     if current_language:
         Session.store_current_language(current_language)
 
-    flash(i8n.LOGGED_IN, category='success')
-    return redirect(url_for('home'))
+    if current_user.is_admin and (not AppConfig.CLIENT_ID) and (AppConfig.SIM_TYPE != 'LocalOnly'):
+        flash(i8n.REGISTER_AFTER_LOGIN, category='success')
+        return redirect(url_for('register'))
+    else:
+        flash(i8n.LOGGED_IN, category='success')
+        return redirect(url_for('home'))
 
 
 @app.route(AppConfig.APP_ROOT + '/user/logout/complete')
@@ -465,12 +469,6 @@ def _emails_view(emails: Iterable[dict], page: int, template: str = 'email.html'
                  has_prevpage=page > 1,
                  has_nextpage=len(emails) == AppConfig.EMAILS_PER_PAGE,
                  **kwargs)
-
-
-@app.before_first_request
-def check_client_registration() -> Response:
-    if not AppConfig.CLIENT_ID and AppConfig.SIM_TYPE != 'LocalOnly':
-        return redirect(url_for('register'))
 
 
 def _view(template: str, **kwargs) -> Response:
