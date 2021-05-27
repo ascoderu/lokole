@@ -1,6 +1,5 @@
 from os import getenv
 from pathlib import Path
-from shutil import chown
 
 from flask_wtf import FlaskForm
 from requests import post
