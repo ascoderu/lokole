@@ -19,5 +19,5 @@ kombu==4.6.11  # pyup: ignore
 celery==4.4.7  # pyup: ignore
 xtarfile[zstd]==0.0.4
 azure-servicebus==0.50.3
-gunicorn==20.0.4
+gunicorn==20.1.0
 wikipedia==1.4.0
