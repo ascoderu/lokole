@@ -5,7 +5,7 @@ PyAMQP==0.1.0.7
 lockfile==0.12.2
 mypy==0.910
 nose2[coverage_plugin]==0.10.0
-responses==0.12.1
+responses==0.13.4
 bandit==1.6.2
 yapf==0.30.0
 watchdog[watchmedo]==0.10.4
