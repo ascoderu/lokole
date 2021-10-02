@@ -8,9 +8,6 @@ Lokole
 .. image:: https://img.shields.io/pypi/v/opwen_email_client.svg
   :target: https://pypi.python.org/pypi/opwen_email_client/
 
-.. image:: https://pyup.io/repos/github/ascoderu/lokole/shield.svg
-  :target: https://pyup.io/repos/github/ascoderu/lokole/
-
 .. image:: https://codecov.io/gh/ascoderu/lokole/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/ascoderu/lokole
 
@@ -100,7 +97,6 @@ Below is a list of some of the key technologies used in the Lokole project:
 - `Sendgrid Inbound Parse <https://sendgrid.com/docs/for-developers/parsing-email/setting-up-the-inbound-parse-webhook/>`_ is used to receive emails from email providers and forward them to the Lokole email server. `Sendgrid Web API v3 <https://github.com/sendgrid/sendgrid-python>`_ is used to deliver emails from the Lokole email server to email providers. The MX records for Sendgrid are automatically generated via `Cloudflare API v4 <https://api.cloudflare.com/>`_.
 - `Github API v4 <https://developer.github.com/v4/>`_ is used to authenticate interactive calls to the Lokole email server API such as registering new clients or managing existing clients. Authorization is managed by Github team memberships on the Ascoderu organization. Management operations are exposed via the Lokole status page which is implemented in `React <https://reactjs.org/>`_ with `Ant Design <https://ant.design/docs/react/introduce>`_.
 - `Github Actions <https://github.com/ascoderu/lokole/actions>`_ are used to verify pull requests and deploy updates to production.
-- [ ~ Dependencies scanned by PyUp.io ~ ]
 
 The diagram below shows the technologies in the context of the system as well as their interactions:
 

@@ -1,4 +1,4 @@
-FROM microsoft/azure-cli:2.0.32
+FROM mcr.microsoft.com/azure-cli:2.0.32
 
 ARG HELM_VERSION="3.2.1"
 ARG KUBECTL_VERSION="1.14.8"
