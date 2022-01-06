@@ -16,7 +16,7 @@ sendgrid==6.4.7
 typing-extensions==3.7.4.3
 typing==3.7.4.3
 kombu==4.6.11  # pyup: ignore
-celery==4.4.7  # pyup: ignore
+celery==5.2.2  # pyup: ignore
 xtarfile[zstd]==0.0.4
 azure-servicebus==0.50.3
 gunicorn==20.0.4
