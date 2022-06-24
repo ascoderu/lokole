@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 from flask_testing import TestCase
 
 from opwen_email_client.webapp.config import AppConfig
-from opwen_email_client.webapp.ioc import create_app
+from opwen_email_client.webapp import app
 
 
 class TestConfig(AppConfig):
@@ -33,5 +33,4 @@ class Base(object):
             super()._post_teardown()
 
         def create_app(self):
-            app = create_app(self.app_config)
             return app
