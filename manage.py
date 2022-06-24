@@ -6,7 +6,7 @@ from os.path import join
 from pathlib import Path
 from threading import Event
 
-from flask_migrate import MigrateCommand
+from flask_migrate import Migrate
 from flask_script import Manager
 from flask_security.utils import hash_password
 from watchdog.events import FileSystemEvent
@@ -18,7 +18,7 @@ from opwen_email_client.webapp.actions import RestartAppComponent
 from opwen_email_client.webapp.config import AppConfig
 
 manager = Manager(app)
-manager.add_command('db', MigrateCommand)
+manager.add_command('db', Migrate)
 
 
 @manager.command

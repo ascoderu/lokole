@@ -3,8 +3,8 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm.exc import NoResultFound
 
 
 def create_database(uri: str, base):
