@@ -9,7 +9,7 @@ Flask-Security==3.0.0
 Flask-Testing==0.8.1
 Flask-WTF==1.0.1
 Flask==2.1.2
-SQLAlchemy==1.4.38
+SQLAlchemy==1.4.39
 WTForms==3.0.1
 email-validator==1.2.1
 Werkzeug==2.1.2
