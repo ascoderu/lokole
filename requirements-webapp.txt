@@ -13,6 +13,7 @@ SQLAlchemy==1.4.38
 WTForms==3.0.1
 email-validator==1.2.1
 Werkzeug==2.1.2
+fasteners==0.17.3
 apache-libcloud==3.6.0
 bcrypt==3.2.2
 beautifulsoup4==4.11.1
