@@ -19,10 +19,10 @@ serviceprincipal.json
 gpg-passphrase.txt
 
 node_modules/
-opwen_email_client/webapp/static/css/*.min.css
-opwen_email_client/webapp/static/js/*.min.js
-opwen_email_client/webapp/static/fonts
-opwen_email_client/webapp/static/flags
+#opwen_email_client/webapp/static/css/*.min.css
+#opwen_email_client/webapp/static/js/*.min.js
+#opwen_email_client/webapp/static/fonts
+#opwen_email_client/webapp/static/flags
 
 venv/
 requirements.txt.out
