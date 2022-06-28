@@ -42,8 +42,8 @@ def restarter(directory):
 
 
 @managesbp.cli.command('createadmin')
-@click.argument('name')
-@click.argument('password')
+@click.option('--name', required=True)
+@click.option('--password', required=True)
 def createadmin(name, password):
     user_datastore = app.ioc.user_store
     email = '{}@{}'.format(name, AppConfig.CLIENT_EMAIL_HOST)
