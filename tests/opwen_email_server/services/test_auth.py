@@ -2,7 +2,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from connexion.decorators.security import validate_scope
+from connexion.security.security_handler_factory import AbstractSecurityHandlerFactory
 from responses import mock as mock_responses
 
 from opwen_email_server.constants import github
@@ -76,7 +76,7 @@ class GithubAuthTests(TestCase):
 
         self.assertIsNotNone(user)
         self.assertEqual(user['sub']['name'], 'user')
-        self.assertFalse(validate_scope(['team2'], user['scope']))
+        self.assertFalse(AbstractSecurityHandlerFactory.validate_scope(['team2'], user['scope']))
 
     @mock_responses.activate
     def test_with_bad_password(self):
@@ -140,7 +140,7 @@ class GithubAuthTests(TestCase):
 
         self.assertIsNotNone(user)
         self.assertEqual(user['sub']['name'], 'user')
-        self.assertTrue(validate_scope(['team3'], user['scope']))
+        self.assertTrue(AbstractSecurityHandlerFactory.validate_scope(['team3'], user['scope']))
 
 
 class AzureAuthTests(TestCase):
