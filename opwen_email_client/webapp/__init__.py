@@ -7,7 +7,6 @@ from opwen_email_client.webapp.commands import managesbp
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.ioc import _new_ioc
 from opwen_email_client.webapp.cache import cache
-from opwen_email_client.webapp.forms.login import LoginForm
 from opwen_email_client.webapp.forms.login import RegisterForm
 from opwen_email_client.webapp.security import security
 from opwen_email_client.webapp.mkwvconf import blueprint as mkwvconf
