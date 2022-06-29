@@ -12,6 +12,7 @@ msgpack==1.0.4
 python-http-client==3.3.7
 pyzmail36 @ git+https://github.com/mabuelhagag/pyzmail.git@hotfix/remove_depracated_2to3#subdirectory=pyzmail
 requests==2.28.1
+types-requests==2.28.0  # http://mypy-lang.blogspot.com/2021/06/mypy-0900-released.html
 sendgrid==6.9.7
 typing-extensions==4.2.0
 typing==3.7.4.3
