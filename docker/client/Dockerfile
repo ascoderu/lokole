@@ -45,6 +45,11 @@ RUN sed -i "s|^__version__ = '[^']*'|__version__ = '${VERSION}'|g" opwen_email_c
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
+# Install git for pip requirements using git
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git \
+ && rm -rf /var/lib/apt/lists/*
+
 # hadolint ignore=DL3010
 COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz
 
@@ -54,7 +59,6 @@ RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
 
 COPY --from=compiler /app/docker/client/run-*.sh /app/docker/client/
 COPY --from=compiler /app/docker/client/*.env /app/docker/client/
-COPY --from=compiler /app/manage.py /app/
 
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
