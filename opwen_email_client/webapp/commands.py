@@ -3,15 +3,15 @@ from pathlib import Path
 from threading import Event
 
 import click
-from flask_security.utils import hash_password
+from flask import Blueprint
 from flask import current_app as app
-from watchdog.events import FileSystemEventHandler, FileSystemEvent
+from flask_security.utils import hash_password
+from watchdog.events import FileSystemEvent
+from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 from opwen_email_client.webapp.actions import RestartAppComponent
 from opwen_email_client.webapp.config import AppConfig
-
-from flask import Blueprint
 
 managesbp = Blueprint('manage', __name__)
 

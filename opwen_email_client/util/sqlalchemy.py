@@ -2,8 +2,8 @@ from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
 
 
