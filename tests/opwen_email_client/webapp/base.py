@@ -23,7 +23,9 @@ class TestConfig(AppConfig):
 
 
 class Base(object):
+
     class AppTests(TestCase):
+
         def _pre_setup(self):
             self.app_config = TestConfig()
             super()._pre_setup()

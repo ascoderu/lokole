@@ -4,6 +4,7 @@ from opwen_email_server.utils import unique
 
 
 class NewEmailIdTests(TestCase):
+
     def test_unique(self):
         id1 = unique.new_email_id({'from': 'foo'})
         id2 = unique.new_email_id({'from': 'bar'})
@@ -15,6 +16,7 @@ class NewEmailIdTests(TestCase):
 
 
 class NewGuidTests(TestCase):
+
     def test_is_unique(self):
         new_client_id = unique.NewGuid()
 

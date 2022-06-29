@@ -32,11 +32,13 @@ from opwen_email_server.utils.log import LogMixin
 
 
 class AzureRole:
+
     def __init__(self):
         raise NotImplementedError
 
 
 class AzureUser(User):
+
     def __init__(self, **data):
         super().__setattr__('_data', data)
 
@@ -74,6 +76,7 @@ class AzureUser(User):
 
 
 class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
+
     def __init__(self, user_storage: AzureObjectStorage):
         UserReadStore.__init__(self, user_model=AzureUser, role_model=AzureRole)
         UserWriteStore.__init__(self, db=None)
@@ -127,6 +130,7 @@ class AzureUserStore(UserStore, UserReadStore, UserWriteStore):
 
 
 class AzureEmailStore(EmailStore, LogMixin):
+
     def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureTextStorage,
                  pending_storage: AzureTextStorage, send_email: Callable[[str], None]):
         super().__init__(restricted=None)
@@ -239,6 +243,7 @@ class AzureEmailStore(EmailStore, LogMixin):
 
 
 class NoSync(Sync):
+
     def upload(self, items: Iterable, users: Iterable[User]) -> Iterable[str]:
         return []
 
@@ -247,6 +252,7 @@ class NoSync(Sync):
 
 
 class AzureIoc:
+
     @cached_property
     def email_store(self):
         return AzureEmailStore(

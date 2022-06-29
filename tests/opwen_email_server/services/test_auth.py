@@ -15,6 +15,7 @@ from tests.opwen_email_server.helpers import MockResponses
 
 
 class BasicAuthTests(TestCase):
+
     def setUp(self):
         self._auth = BasicAuth({
             'user1': {'password': 'pass', 'scopes': {'scope1', 'scopeA'}},
@@ -41,6 +42,7 @@ class BasicAuthTests(TestCase):
 
 
 class GithubAuthTests(TestCase):
+
     def setUp(self):
         self._auth = GithubAuth(organization='organization', page_size=2)
 
@@ -144,6 +146,7 @@ class GithubAuthTests(TestCase):
 
 
 class AzureAuthTests(TestCase):
+
     def setUp(self):
         self._folder = mkdtemp()
         self._storage = AzureObjectStorage(
@@ -186,6 +189,7 @@ class AzureAuthTests(TestCase):
 
 
 class NoAuthTests(TestCase):
+
     def setUp(self):
         self._auth = NoAuth()
 

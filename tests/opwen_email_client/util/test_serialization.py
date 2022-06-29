@@ -10,7 +10,9 @@ from opwen_email_client.util.serialization import Serializer
 
 
 class Base(object):
+
     class SerializerTests(TestCase, metaclass=ABCMeta):
+
         @abstractmethod
         def create_serializer(self) -> Serializer:
             raise NotImplementedError
@@ -32,5 +34,6 @@ class Base(object):
 
 
 class JsonSerializerTests(Base.SerializerTests):
+
     def create_serializer(self):
         return JsonSerializer()

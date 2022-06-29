@@ -10,6 +10,7 @@ from opwen_email_client.util.os import subdirectories
 
 
 class ReplaceLineTests(TestCase):
+
     def test_replaces_line(self):
         fobj = NamedTemporaryFile('w+', delete=False)
         try:
@@ -26,11 +27,13 @@ class ReplaceLineTests(TestCase):
 
 
 class SubdirectoriesTests(TestCase):
+
     def test_handles_missing_directory(self):
         self.assertEqual(len(list(subdirectories('/does-not-exist'))), 0)
 
 
 class BackupTests(TestCase):
+
     def test_backup_without_file(self):
         path = '/does/not/exist.txt'
         backup_path = backup(path, suffix='.old')

@@ -17,6 +17,7 @@ from wtforms.validators import ValidationError
 
 
 class CronSchedule:
+
     def __init__(self, message=None):
         self.message = message
 
@@ -33,6 +34,7 @@ class CronSchedule:
 
 
 class Emails(Regexp):
+
     def __init__(self, email_address_delimiter, message=None):
         self.validate_hostname = HostnameValidation(require_tld=True)
         self.email_address_delimiter = email_address_delimiter
@@ -85,6 +87,7 @@ class HtmlTextAreaField(TextAreaField):
 
 
 class SuffixedStringField(StringField):
+
     def __init__(self, suffix: str = '', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._suffix = suffix

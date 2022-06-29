@@ -25,7 +25,9 @@ def resetdb():
 @managesbp.cli.command("restarter")
 @click.option('-d', '--directory', required=True)
 def restarter(directory):
+
     class Restarter(FileSystemEventHandler):
+
         def on_created(self, event: FileSystemEvent):
             restart = RestartAppComponent(restart_path=event.src_path)
             restart()

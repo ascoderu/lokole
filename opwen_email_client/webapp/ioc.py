@@ -13,6 +13,7 @@ from opwen_email_client.webapp.login import FlaskLoginUserStore
 
 
 class Ioc:
+
     @cached_property
     def email_store(self):
         return SqliteEmailStore(

@@ -8,6 +8,7 @@ from opwen_email_server import config
 
 
 class ConfigTests(TestCase):
+
     def test_queue_broker(self):
         envs = {
             'LOKOLE_QUEUE_BROKER_URL': 'foo://bar',
@@ -40,7 +41,8 @@ class ConfigTests(TestCase):
 
         for constant, value in get_constants(config):
             if constant.startswith('CONTAINER_') and not match(acceptable_container_name, value):
-                self.fail(f'config {constant} is invalid: {value}, ' f'should be {acceptable_container_name}')
+                self.fail(f'config {constant} is invalid: {value}, '
+                          f'should be {acceptable_container_name}')
 
 
 def get_constants(container):

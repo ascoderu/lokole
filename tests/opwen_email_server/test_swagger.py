@@ -8,6 +8,7 @@ from flex.exceptions import ValidationError
 
 
 class SwaggerTests(TestCase):
+
     def test_is_valid(self):
         swagger_directory = Path(opwen_email_server.__file__).parent / 'swagger'
         for swagger_file in swagger_directory.glob('*.yaml'):

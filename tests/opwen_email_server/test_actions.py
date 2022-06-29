@@ -16,10 +16,13 @@ from tests.opwen_email_server.helpers import throw
 
 
 class ActionTests(TestCase):
+
     @patch.object(actions._Action, '_telemetry_client')
     @patch.object(actions._Action, '_telemetry_channel')
     def test_logs_exception(self, mock_channel, mock_client):
+
         class TestAction(actions._Action):
+
             def _action(self):
                 int('not-a-number')
 
@@ -32,6 +35,7 @@ class ActionTests(TestCase):
 
 
 class PingTests(TestCase):
+
     def test_200(self):
         action = actions.Ping()
         message, status = action()
@@ -39,6 +43,7 @@ class PingTests(TestCase):
 
 
 class SendOutboundEmailsTests(TestCase):
+
     def setUp(self):
         self.email_storage = Mock()
         self.send_email = MagicMock()
@@ -79,6 +84,7 @@ class SendOutboundEmailsTests(TestCase):
 
 
 class StoreInboundEmailsTests(TestCase):
+
     def setUp(self):
         self.raw_email_storage = Mock()
         self.email_storage = Mock()
@@ -135,6 +141,7 @@ class StoreInboundEmailsTests(TestCase):
 
 
 class IndexReceivedEmailForMailboxTests(TestCase):
+
     def setUp(self):
         self.email_storage = Mock()
         self.mailbox_storage = Mock()
@@ -168,6 +175,7 @@ class IndexReceivedEmailForMailboxTests(TestCase):
 
 
 class IndexSentEmailForMailboxTests(TestCase):
+
     def setUp(self):
         self.email_storage = Mock()
         self.mailbox_storage = Mock()
@@ -198,6 +206,7 @@ class IndexSentEmailForMailboxTests(TestCase):
 
 
 class StoreWrittenClientEmailsTests(TestCase):
+
     def setUp(self):
         self.client_storage = Mock()
         self.email_storage = Mock()
@@ -255,6 +264,7 @@ class StoreWrittenClientEmailsTests(TestCase):
 
 
 class ReceiveInboundEmailTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.raw_email_storage = Mock()
@@ -319,6 +329,7 @@ class ReceiveInboundEmailTests(TestCase):
 
 
 class ProcessServiceEmailTests(TestCase):
+
     def setUp(self):
         self.raw_email_storage = Mock()
         self.email_storage = Mock()
@@ -360,6 +371,7 @@ class ProcessServiceEmailTests(TestCase):
 
 
 class DownloadClientEmailsTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.client_storage = Mock()
@@ -453,6 +465,7 @@ class DownloadClientEmailsTests(TestCase):
 
 
 class UploadClientEmailsTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.next_task = MagicMock()
@@ -493,6 +506,7 @@ class UploadClientEmailsTests(TestCase):
 
 
 class RegisterClientTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.client_storage = Mock()
@@ -537,6 +551,7 @@ class RegisterClientTests(TestCase):
 
 
 class CreateClientTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.task = MagicMock()
@@ -582,6 +597,7 @@ class CreateClientTests(TestCase):
 
 
 class ListClientsTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
 
@@ -602,6 +618,7 @@ class ListClientsTests(TestCase):
 
 
 class GetClientTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.client_storage = Mock()
@@ -673,6 +690,7 @@ class GetClientTests(TestCase):
 
 
 class DeleteClientTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.delete_mailbox = MagicMock()
@@ -759,6 +777,7 @@ class DeleteClientTests(TestCase):
 
 
 class CalculateNumberOfUsersMetricTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.user_storage = Mock()
@@ -801,6 +820,7 @@ class CalculateNumberOfUsersMetricTests(TestCase):
 
 
 class CalculatePendingEmailsMetricTests(TestCase):
+
     def setUp(self):
         self.auth = Mock()
         self.pending_storage = Mock()

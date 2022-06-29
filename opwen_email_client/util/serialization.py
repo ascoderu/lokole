@@ -11,6 +11,7 @@ T = TypeVar('T')
 
 
 class Serializer(metaclass=ABCMeta):
+
     @abstractmethod
     def serialize(self, obj: T, type_: str = '') -> bytes:
         raise NotImplementedError  # pragma: no cover
