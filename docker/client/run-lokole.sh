@@ -4,6 +4,8 @@ set -e
 
 scriptdir="$(dirname "$0")"
 
+export FLASK_APP="opwen_email_client.webapp:app"
+
 if [[ -n "${LOKOLE_ADMIN_NAME}" ]] && [[ -n "${LOKOLE_ADMIN_PASSWORD}" ]]; then
   (
     flask manage createadmin --name="${LOKOLE_ADMIN_NAME}" --password="${LOKOLE_ADMIN_PASSWORD}"
