@@ -1,0 +1,1 @@
+FLASK_APP=opwen_email_client.webapp

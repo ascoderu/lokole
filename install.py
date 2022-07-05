@@ -563,7 +563,6 @@ class WebappSetup(Setup):
             return
 
         self.sh('OPWEN_SETTINGS="{settings}" '
-                'export FLASK_APP="opwen_email_client.webapp:app" '
                 '"{manage}" createadmin --name="{name}" --password="{password}"'.format(
                  settings=self.settings_path,
                  manage='{}/bin/flask manage'.format(self.venv_path),
@@ -700,7 +699,7 @@ class WebappSetup(Setup):
 
     def _setup_restarter(self):
         restarter_command = (
-            'export FLASK_APP="opwen_email_client.webapp:app" && "{venv}/bin/flask" '
+            '"{venv}/bin/flask" '
             'manage restarter '
             '--directory="{directory}"'.format(
                 venv=self.venv_path,
