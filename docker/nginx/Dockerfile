@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.7
+ARG PYTHON_VERSION=3.10
 FROM python:${PYTHON_VERSION} AS builder
 
 RUN curl -sSL https://git.io/get-mo -o /usr/bin/mo \
