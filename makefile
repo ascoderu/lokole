@@ -3,11 +3,11 @@ SHELL := bash -o pipefail
 default: build
 
 .github.env: .github.env.gpg
-	@gpg --decrypt --batch --passphrase "$GPG_PASSPHRASE" .github.env.gpg >.github.env
+	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .github.env.gpg >.github.env
 
 github-env: .github.env
-	@docker run --rm python:3.9 python -c 'import uuid; print("SUFFIX=%s" % uuid.uuid4())' >>"$GITHUB_ENV"
-	@sed 's/^export //' <.github.env >>"$GITHUB_ENV"
+	@docker run --rm python:3.7 python -c 'import uuid; print("SUFFIX=%s" % uuid.uuid4())' >>"$(GITHUB_ENV)"
+	@sed 's/^export //' <.github.env >>"$(GITHUB_ENV)"
 
 integration-tests:
 	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
