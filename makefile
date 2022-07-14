@@ -3,6 +3,7 @@ SHELL := bash -o pipefail
 default: build
 
 .github.env: .github.env.gpg
+	gpg --version
 	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .github.env.gpg >.github.env
 
 github-env: .github.env
