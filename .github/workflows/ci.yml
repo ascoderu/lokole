@@ -2,10 +2,9 @@ name: CI
 
 on:
   pull_request_target:
-    types:
-      - opened
-      - reopened
-      - synchronize
+    - opened
+    - reopened
+    - synchronize
 
 jobs:
   test-live:
