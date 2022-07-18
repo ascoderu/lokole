@@ -1,6 +1,11 @@
 name: CI
 
-on: [pull_request_target]
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 jobs:
   test-live:
