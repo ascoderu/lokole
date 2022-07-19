@@ -1,0 +1,9 @@
+# Docs:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches#require-pull-request-reviews-before-merging
+
+/makefile           @ascoderu/lokole-dev
+/.github.env.gpg    @ascoderu/lokole-dev
+/docker-compose.yml @ascoderu/lokole-dev
+/docker/            @ascoderu/lokole-dev
+/.github            @ascoderu/lokole-dev
