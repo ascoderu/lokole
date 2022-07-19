@@ -6,10 +6,12 @@ on:
       - opened
       - reopened
       - synchronize
+      - labeled
 
 jobs:
   test-live:
     runs-on: ubuntu-18.04
+    if: contains(github.event.pull_request.labels.*.name, 'safe to run')
 
     steps:
       - uses: actions/checkout@v2
