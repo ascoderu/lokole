@@ -10,6 +10,7 @@ on:
 jobs:
   test-local:
     runs-on: ubuntu-18.04
+    if: github.event_name == 'pull_request'
 
     steps:
       - uses: actions/checkout@v3
@@ -26,6 +27,7 @@ jobs:
 
   test-unit:
     runs-on: ubuntu-18.04
+    if: github.event_name == 'pull_request'
 
     steps:
       - uses: actions/checkout@v3
