@@ -2,7 +2,7 @@ from urllib.parse import unquote
 from urllib.parse import urlparse
 
 import click
-from azure.servicebus import ServiceBusClient
+from azure.servicebus.management import ServiceBusAdministrationClient
 from libcloud.storage.providers import get_driver
 
 from opwen_email_server import config
@@ -59,16 +59,16 @@ def delete_queues(suffix):
         click.echo(f'Skipping queue cleanup for {queue_broker.scheme}')
         return
 
-    client = ServiceBusClient(
-        service_namespace=queue_broker.hostname,
-        shared_access_key_name=unquote(queue_broker.username),
-        shared_access_key_value=unquote(queue_broker.password),
-    )
+    # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/servicebus/azure-servicebus/migration_guide.md#working-with-administration-client
+    connection_string = f"Endpoint=sb://{queue_broker.hostname}.servicebus.windows.net/;" \
+                        f"SharedAccessKeyName={unquote(queue_broker.username)};" \
+                        f"SharedAccessKey={unquote(queue_broker.password)}"
 
-    for queue in client.list_queues():
-        if queue.name.endswith(suffix):
-            click.echo(f'Deleting queue {queue.name}')
-            client.delete_queue(queue.name)
+    with ServiceBusAdministrationClient.from_connection_string(connection_string) as servicebus_mgmt_client:
+        for queue in servicebus_mgmt_client.list_queues():
+            if queue.name.endswith(suffix):
+                click.echo(f'Deleting queue {queue.name}')
+                servicebus_mgmt_client.delete_queue(queue.name)
 
 
 @cli.command()
