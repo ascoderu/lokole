@@ -52,17 +52,15 @@ def print_queues(separator):
 @cli.command()
 @click.option('-s', '--suffix', default='')
 def delete_queues(suffix):
-    suffix = suffix.replace('-', '_')
 
-    queue_broker = urlparse(config.QUEUE_BROKER)
-    if queue_broker.scheme != 'azureservicebus':
-        click.echo(f'Skipping queue cleanup for {queue_broker.scheme}')
+    if config.QUEUE_BROKER_SCHEME != 'azureservicebus':
+        click.echo(f'Skipping queue cleanup for {config.QUEUE_BROKER_SCHEME}')
         return
 
     # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/servicebus/azure-servicebus/migration_guide.md#working-with-administration-client
-    connection_string = f"Endpoint=sb://{queue_broker.hostname}.servicebus.windows.net/;" \
-                        f"SharedAccessKeyName={unquote(queue_broker.username)};" \
-                        f"SharedAccessKey={unquote(queue_broker.password)}"
+    connection_string = f"Endpoint=sb://{config.QUEUE_BROKER_HOST}.servicebus.windows.net/;" \
+                        f"SharedAccessKeyName={config.QUEUE_BROKER_USERNAME};" \
+                        f"SharedAccessKey={config.QUEUE_BROKER_PASSWORD}"
 
     with ServiceBusAdministrationClient.from_connection_string(connection_string) as servicebus_mgmt_client:
         for queue in servicebus_mgmt_client.list_queues():
