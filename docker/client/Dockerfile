@@ -45,11 +45,6 @@ RUN sed -i "s|^__version__ = '[^']*'|__version__ = '${VERSION}'|g" opwen_email_c
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
-# Install git for pip requirements using git
-RUN apt-get update \
- && apt-get install -y --no-install-recommends git=1:2.30.2-1 \
- && rm -rf /var/lib/apt/lists/*
-
 # hadolint ignore=DL3010
 COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz
 
