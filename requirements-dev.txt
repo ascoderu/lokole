@@ -1,10 +1,10 @@
-flake8==4.0.1
+flake8==5.0.4
 flex==6.14.1
 isort==5.10.1
 PyAMQP==0.1.0.7
 lockfile==0.12.2
-mypy==0.961
-nose2[coverage_plugin]==0.11.0
+mypy==0.971
+nose2[coverage_plugin]==0.12.0
 responses==0.21.0
 bandit==1.7.4
 yapf==0.32.0
