@@ -10,45 +10,45 @@ github-env: .github.env
 	@sed 's/^export //' <.github.env >>"$(GITHUB_ENV)"
 
 integration-tests:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest
+	docker compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest
 
 test-emails:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest \
+	docker compose -f docker-compose.yml -f docker/docker-compose.test.yml build integtest && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.test.yml run --rm integtest \
   ./3-receive-email-for-client.sh bdd640fb-0667-1ad1-1c80-317fa3b1799d
 
 clean-storage:
-	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
-	docker-compose exec -T api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
+	docker compose exec -T api python -m opwen_email_server.integration.cli delete-containers --suffix "$(SUFFIX)"
+	docker compose exec -T api python -m opwen_email_server.integration.cli delete-queues --suffix "$(SUFFIX)"
 
 ci:
-	BUILD_TARGET=builder docker-compose build && \
-  docker-compose run --rm --no-deps api ./docker/app/run-ci.sh ----coverage-xml---- | tee coverage.xml && \
+	BUILD_TARGET=builder docker compose build && \
+  docker compose run --rm --no-deps api ./docker/app/run-ci.sh ----coverage-xml---- | tee coverage.xml && \
   sed -i '1,/----coverage-xml----/d' coverage.xml && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.test.yml build ci
+  docker compose -f docker-compose.yml -f docker/docker-compose.test.yml build ci
 
 build:
-	docker-compose build
+	docker compose build
 
 start:
-	docker-compose up -d --remove-orphans
+	docker compose up -d --remove-orphans
 
 start-devtools:
-	docker-compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
+	docker compose -f docker-compose.yml -f docker/docker-compose.tools.yml up -d --remove-orphans
 
 status:
-	docker-compose ps; \
-  docker-compose ps --services | while read service; do \
+	docker compose ps; \
+  docker compose ps --services | while read service; do \
     echo "==================== $$service ===================="; \
-    docker-compose logs "$$service"; \
+    docker compose logs "$$service"; \
   done
 
 logs:
-	docker-compose logs --follow --tail=100
+	docker compose logs --follow --tail=100
 
 stop:
-	docker-compose \
+	docker compose \
     -f docker-compose.yml \
     -f docker/docker-compose.test.yml \
     -f docker/docker-compose.tools.yml \
@@ -56,7 +56,7 @@ stop:
 
 verify-build:
 	docker pull wagoodman/dive
-	docker-compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \
+	docker compose config | grep -o "image: ascoderu/.*" | sed 's/^image: //' | sort -u | while read image; do \
     echo "==================== $$image ===================="; \
     docker run --rm \
       -v /var/run/docker.sock:/var/run/docker.sock \
@@ -77,7 +77,7 @@ release-docker:
     export BUILD_TARGET="runtime"; \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
-    docker-compose build; \
+    docker compose build; \
   ) done
 
 gh-pages-remote:
@@ -101,16 +101,16 @@ kubeconfig:
   fi
 
 renew-cert-k8s: kubeconfig
-	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+	docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/kube-config:/secrets/kube-config" \
     setup \
     /app/renew-cert.sh && \
   rm -f "$(PWD)/kube-config"
 
 deploy-k8s: kubeconfig
-	docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+	docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e IMAGE_REGISTRY="$(DOCKER_USERNAME)" \
     -e DOCKER_TAG="$(DOCKER_TAG)" \
     -e HELM_NAME="$(HELM_NAME)" \
@@ -124,16 +124,16 @@ renew-cert:
 	echo "Skipping: handled by cron on the VM"
 
 deploy-gh-pages:
-	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+	@docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/build:/app/build" \
     -v "$(PWD)/.git:/app/.git" \
     setup \
     ghp-import --push --force --remote ghp --branch gh-pages --message "Update" /app/build
 
 deploy-pypi:
-	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+	@docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/dist:/dist" \
     setup \
     twine upload --skip-existing -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
@@ -143,12 +143,12 @@ deploy-docker:
   for tag in "latest" "$(DOCKER_TAG)"; do ( \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
-    docker-compose push; \
+    docker compose push; \
   ) done
 
 deploy: deploy-pypi deploy-gh-pages deploy-docker
-	@docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
-  docker-compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
+	@docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
+  docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -e LOKOLE_VM_USERNAME="$(LOKOLE_VM_USERNAME)" \
     -e LOKOLE_VM_PASSWORD="$(LOKOLE_VM_PASSWORD)" \
     -e LOKOLE_DNS_NAME="$(LOKOLE_DNS_NAME)" \
