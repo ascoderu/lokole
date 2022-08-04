@@ -26,16 +26,6 @@ class ConfigTests(TestCase):
         with setenvs(envs):
             self.assertEqual(config.QUEUE_BROKER, 'azureservicebus://user:pass@host')
 
-    def test_queue_broker_servicebus_urlsafe(self):
-        envs = {
-            'LOKOLE_QUEUE_BROKER_SCHEME': 'azureservicebus',
-            'LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME': 'us/er',
-            'LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY': 'pass',
-            'LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE': 'host',
-        }
-        with setenvs(envs):
-            self.assertEqual(config.QUEUE_BROKER, 'azureservicebus://us%2Fer:pass@host')
-
     def test_container_names_are_valid(self):
         acceptable_container_name = '^[a-z0-9][a-z0-9-]{2,62}$'
 
