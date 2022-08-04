@@ -1,6 +1,3 @@
-from urllib.parse import unquote
-from urllib.parse import urlparse
-
 import click
 from azure.servicebus.management import ServiceBusAdministrationClient
 from libcloud.storage.providers import get_driver
