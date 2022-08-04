@@ -18,4 +18,4 @@ jobs:
           make \
             -e BUILD_TARGET=runtime \
             -e DOCKER_TAG="${GITHUB_REF##*/}" \
-            release deploy
+            release-pypi deploy-pypi
