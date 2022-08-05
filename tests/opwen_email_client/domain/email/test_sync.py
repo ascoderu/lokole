@@ -87,8 +87,7 @@ class AzureSyncTests(TestCase):
         self.sync.upload(items=[{'foo': 0, 'read': True, 'attachments': [{'_uid': '1', 'filename': 'foo.txt'}]}],
                          users=[])
 
-        self.assertUploadIs({self.sync._emails_file: b'{"attachments":[{"filename":"foo.txt"}]'
-                             b',"foo":0}\n'})
+        self.assertUploadIs({self.sync._emails_file: b'{"attachments":[{"filename":"foo.txt"}]' b',"foo":0}\n'})
 
     def test_upload_with_no_content_does_not_hit_network(self):
         self.sync.upload(items=[], users=[])

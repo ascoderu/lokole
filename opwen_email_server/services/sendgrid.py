@@ -25,7 +25,6 @@ from opwen_email_server.utils.serialization import to_base64
 
 
 class SendSendgridEmail(LogMixin):
-
     def __init__(self, key: str, sandbox: bool = False) -> None:
         self._key = key
         self._sandbox = sandbox
@@ -143,7 +142,6 @@ class SendSendgridEmail(LogMixin):
 
 
 class _SendgridManagement(LogMixin):
-
     def __init__(self, key: str) -> None:
         self._key = key
 
@@ -159,7 +157,6 @@ class _SendgridManagement(LogMixin):
 
 
 class DeleteSendgridMailbox(_SendgridManagement):
-
     def _run(self, client_id: str, domain: str) -> None:
         response = http_delete(
             url=MAILBOX_DETAIL_URL.format(domain),
@@ -175,7 +172,6 @@ class DeleteSendgridMailbox(_SendgridManagement):
 
 
 class SetupSendgridMailbox(_SendgridManagement):
-
     def __init__(self, key: str, max_retries: int, retry_interval_seconds: float):
         super().__init__(key)
         self._max_retries = max_retries

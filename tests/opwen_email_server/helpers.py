@@ -1,5 +1,4 @@
 class MockResponses:
-
     def __init__(self, responses):
         self._i = 0
         self._responses = responses

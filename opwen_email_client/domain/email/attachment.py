@@ -5,7 +5,6 @@ from base64 import b64encode
 
 
 class AttachmentEncoder(metaclass=ABCMeta):
-
     @abstractmethod
     def encode(self, content: bytes) -> str:
         raise NotImplementedError  # pragma: no cover

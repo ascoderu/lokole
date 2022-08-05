@@ -9,7 +9,6 @@ from tests.opwen_email_client.webapp.base import Base
 
 @skipUnless(isfile(DEFAULT_XML_PATH), reason='mkwvconf database is missing')
 class MkwvconfTests(Base.AppTests):
-
     def get_json(self, url):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

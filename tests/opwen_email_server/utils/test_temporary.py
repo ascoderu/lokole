@@ -7,7 +7,6 @@ from opwen_email_server.utils import temporary
 
 
 class CreateTempFilenameTests(TestCase):
-
     def test_creates_new_file(self):
         filename = temporary.create_tempfilename()
 
@@ -47,7 +46,6 @@ class CreateTempFilenameTests(TestCase):
 
 
 class RemovingTests(TestCase):
-
     def test_removes_file_when_done(self):
         with NamedTemporaryFile(delete=False) as fobj:
             with temporary.removing(fobj.name) as path:

@@ -8,7 +8,6 @@ from opwen_email_server.utils.serialization import to_msgpack_bytes
 
 
 class NewGuid:
-
     def __init__(self, seed: Optional[int] = None) -> None:
         self._random = None  # type: Optional[Random]
 

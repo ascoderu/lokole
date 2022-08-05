@@ -31,7 +31,6 @@ from tests.opwen_email_server.helpers import throw
 
 
 class AzureTextStorageTests(TestCase):
-
     def test_stores_fetches_and_deletes_text(self):
         resource_id, expected_content = 'id1', 'some content'
 
@@ -103,7 +102,6 @@ class AzureTextStorageTests(TestCase):
 
 
 class AzureTextStorageCaseInsensitiveTests(TestCase):
-
     def test_stores_fetches_and_deletes_text(self):
         self._storage.store_text('iD1', 'some content')
         actual_content = self._storage.fetch_text('Id1')
@@ -140,7 +138,6 @@ class AzureTextStorageCaseInsensitiveTests(TestCase):
 
 
 class AzureFileStorageTests(TestCase):
-
     def test_stores_fetches_and_deletes_file(self):
         resource_id, expected_content = 'id1', 'some content'
         self._given_file(resource_id, expected_content)
@@ -184,7 +181,6 @@ class AzureFileStorageTests(TestCase):
 
 
 class AzureObjectsStorageTests(TestCase):
-
     def test_fetches_jsonl_objects(self):
         resource_id = '3d2bfa80-18f7-11e7-93ae-92361f002671.tar.gz'
         name = 'file'
@@ -304,7 +300,6 @@ class AzureObjectsStorageTests(TestCase):
 
 
 class AzureObjectStorageTests(TestCase):
-
     def test_roundtrip(self):
         given = {'a': 1}
         resource_id = '123'

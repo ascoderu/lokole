@@ -5,7 +5,6 @@ from opwen_email_server.utils import collections
 
 
 class ToIterableTests(TestCase):
-
     def test_makes_item_iterable(self):
         obj = {'a': 1, 'b': 2}
 
@@ -22,7 +21,6 @@ class ToIterableTests(TestCase):
 
 
 class ChunksTests(TestCase):
-
     def test_creates_fullsize_chunks(self):
         chunks = collections.chunks([1, 2, 3, 4], 2)
 
@@ -35,7 +33,6 @@ class ChunksTests(TestCase):
 
 
 class SingletonTests(TestCase):
-
     def test_creates_object_only_once(self):
         value1 = self.function1()
         value2 = self.function1()
@@ -63,7 +60,6 @@ class SingletonTests(TestCase):
 
 
 class AppendTests(TestCase):
-
     def test_yields_item_after_items(self):
         collection = collections.append([1, 2, 3], 4)
 

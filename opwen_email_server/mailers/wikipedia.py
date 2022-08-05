@@ -16,7 +16,6 @@ WIKIPEDIA_ADDRESS = 'wikipedia@bot.lokole.ca'
 
 
 class WikipediaEmailFormatter(LogMixin):
-
     def __init__(self,
                  languages_getter: Callable[[], dict] = languages,
                  language_setter: Callable[[str], None] = set_lang,

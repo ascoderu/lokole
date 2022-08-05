@@ -35,7 +35,6 @@ Response = Union[dict, Tuple[str, int]]
 
 
 class _Action(ABC, LogMixin):
-
     def __call__(self, *args, **kwargs) -> Response:
         try:
             return self._action(*args, **kwargs)
@@ -54,7 +53,6 @@ class Ping(_Action):
 
 
 class SendOutboundEmails(_Action):
-
     def __init__(self, email_storage: AzureObjectStorage, send_email: SendSendgridEmail):
 
         self._email_storage = email_storage
@@ -72,7 +70,6 @@ class SendOutboundEmails(_Action):
 
 
 class StoreInboundEmails(_Action):
-
     def __init__(self,
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
@@ -117,7 +114,6 @@ class StoreInboundEmails(_Action):
 
 
 class _IndexEmailForMailbox(_Action):
-
     def __init__(self, email_storage: AzureObjectStorage, mailbox_storage: AzureTextStorage):
         self._email_storage = email_storage
         self._mailbox_storage = mailbox_storage
@@ -161,7 +157,6 @@ class IndexSentEmailForMailbox(_IndexEmailForMailbox):
 
 
 class StoreWrittenClientEmails(_Action):
-
     def __init__(self, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  user_storage: AzureObjectStorage, next_task: Callable[[str], None]):
 
@@ -220,7 +215,6 @@ class StoreWrittenClientEmails(_Action):
 
 
 class ReceiveInboundEmail(_Action):
-
     def __init__(self, auth: Auth, raw_email_storage: AzureTextStorage, next_task: Callable[[str], None]):
         self._auth = auth
         self._raw_email_storage = raw_email_storage
@@ -250,7 +244,6 @@ class ReceiveInboundEmail(_Action):
 
 
 class ProcessServiceEmail(_Action):
-
     def __init__(self,
                  raw_email_storage: AzureTextStorage,
                  email_storage: AzureObjectStorage,
@@ -295,7 +288,6 @@ class ProcessServiceEmail(_Action):
 
 
 class DownloadClientEmails(_Action):
-
     def __init__(self, auth: Auth, client_storage: AzureObjectsStorage, email_storage: AzureObjectStorage,
                  pending_storage: AzureTextStorage):
 
@@ -354,7 +346,6 @@ class DownloadClientEmails(_Action):
 
 
 class UploadClientEmails(_Action):
-
     def __init__(self, auth: Auth, next_task: Callable[[str], None]):
         self._auth = auth
         self._next_task = next_task
@@ -374,7 +365,6 @@ class UploadClientEmails(_Action):
 
 
 class RegisterClient(_Action):
-
     def __init__(self, auth: Auth, client_storage: AzureObjectsStorage, setup_mailbox: Callable[[str, str], None],
                  setup_mx_records: Callable[[str], None], client_id_source: Callable[[], str]):
         self._auth = auth
@@ -396,7 +386,6 @@ class RegisterClient(_Action):
 
 
 class CreateClient(_Action):
-
     def __init__(self, auth: Auth, task: Callable[[str, str], None]):
         self._auth = auth
         self._task = task
@@ -415,7 +404,6 @@ class CreateClient(_Action):
 
 
 class ListClients(_Action):
-
     def __init__(self, auth: Auth):
         self._auth = auth
 
@@ -429,7 +417,6 @@ class ListClients(_Action):
 
 
 class GetClient(_Action):
-
     def __init__(self, auth: Auth, client_storage: AzureObjectsStorage):
         self._auth = auth
         self._client_storage = client_storage
@@ -457,7 +444,6 @@ class GetClient(_Action):
 
 
 class DeleteClient(_Action):
-
     def __init__(self, auth: Auth, delete_mailbox: Callable[[str, str], None], delete_mx_records: Callable[[str], None],
                  mailbox_storage: AzureTextStorage, pending_storage: AzureTextStorage,
                  user_storage: AzureObjectStorage):
@@ -496,7 +482,6 @@ class DeleteClient(_Action):
 
 
 class CalculateNumberOfUsersMetric(_Action):
-
     def __init__(self, auth: Auth, user_storage: AzureObjectStorage):
         self._auth = auth
         self._user_storage = user_storage
@@ -513,7 +498,6 @@ class CalculateNumberOfUsersMetric(_Action):
 
 
 class CalculatePendingEmailsMetric(_Action):
-
     def __init__(self, auth: Auth, pending_storage: AzureTextStorage):
         self._auth = auth
         self._pending_storage = pending_storage

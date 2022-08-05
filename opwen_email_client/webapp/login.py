@@ -55,7 +55,6 @@ _migrate = Migrate()
 
 
 class FlaskLoginUserStore(UserStore):
-
     def __init__(self):
         store = SQLAlchemyUserDatastore(_db, _User, _Role)
         super().__init__(read=store, write=store)

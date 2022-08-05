@@ -9,7 +9,6 @@ from uuid import uuid4
 
 
 class EmailStore(metaclass=ABCMeta):
-
     def __init__(self, restricted: Optional[Dict[str, Set[str]]] = None):
         self._restricted = restricted or {}
 

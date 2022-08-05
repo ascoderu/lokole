@@ -4,7 +4,6 @@ from opwen_email_server.utils import serialization
 
 
 class JsonTests(TestCase):
-
     def test_creates_slim_json(self):
         serialized = serialization.to_json({'a': 1, 'b': 2})
 
@@ -18,7 +17,6 @@ class JsonTests(TestCase):
 
 
 class Base64Tests(TestCase):
-
     def test_roundtrip(self):
         original = b'some bytes'
         serialized = serialization.to_base64(original)
@@ -28,7 +26,6 @@ class Base64Tests(TestCase):
 
 
 class MsgpackTests(TestCase):
-
     def test_roundtrip(self):
         original = {'a': 1, 'b': '你好'}
         serialized = serialization.to_msgpack_bytes(original)
@@ -38,7 +35,6 @@ class MsgpackTests(TestCase):
 
 
 class JsonlTests(TestCase):
-
     def test_roundtrip(self):
         original = {'a': 1, 'b': '你好'}
         serialized = serialization.to_jsonl_bytes(original)

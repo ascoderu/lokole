@@ -48,7 +48,6 @@ def render_body(email: dict) -> str:
 
 @app.context_processor
 def _inject_format_last_login():
-
     def format_last_login(user, current_user) -> str:
         if not user.last_login_at:
             return ''

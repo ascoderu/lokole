@@ -9,7 +9,6 @@ from requests import post as http_post
 
 
 class EmailServerClient(metaclass=ABCMeta):
-
     @abstractmethod
     def upload(self, resource_id: str, container: str):
         raise NotImplementedError  # pragma: no cover
@@ -20,7 +19,6 @@ class EmailServerClient(metaclass=ABCMeta):
 
 
 class HttpEmailServerClient(EmailServerClient):
-
     def __init__(self, compression: str, endpoint: str, client_id: str):
         self._compression = compression
         self._endpoint = endpoint
@@ -64,7 +62,6 @@ class HttpEmailServerClient(EmailServerClient):
 
 
 class LocalEmailServerClient(EmailServerClient):
-
     def download(self) -> str:
         root = getenv('OPWEN_REMOTE_ACCOUNT_NAME')
         container = getenv('OPWEN_REMOTE_RESOURCE_CONTAINER')
