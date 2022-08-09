@@ -10,6 +10,7 @@ from flask_security.datastore import UserDatastore as UserReadStore
 
 
 class User(UserMixin):
+
     @property
     @abstractmethod
     def id(self) -> Union[str, int]:
@@ -37,6 +38,7 @@ class User(UserMixin):
 
 
 class UserStore(metaclass=ABCMeta):
+
     def __init__(self, read: UserReadStore, write: UserWriteStore) -> None:
         self.r = read
         self.w = write

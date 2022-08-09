@@ -13,6 +13,7 @@ from tests.opwen_email_server.helpers import throw
 
 
 class DeleteMxRecordsTests(TestCase):
+
     def test_does_not_make_request_when_key_is_missing(self):
         action = DeleteMxRecords(account='', secret='', provider='CLOUDFLARE')
 
@@ -67,6 +68,7 @@ class DeleteMxRecordsTests(TestCase):
 
 
 class SetupMxRecordsTests(TestCase):
+
     def test_does_not_make_request_when_key_is_missing(self):
         action = SetupMxRecords(account='', secret='', provider='CLOUDFLARE')
 

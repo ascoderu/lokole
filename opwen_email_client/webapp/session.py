@@ -32,6 +32,7 @@ class Session(object):
 
 
 def track_history(func):
+
     @wraps(func)
     def history_tracker(*args, **kwargs):
         Session.store_last_visited_url()

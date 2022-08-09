@@ -7,6 +7,7 @@ ECHO_ADDRESS = 'echo@bot.lokole.ca'
 
 
 class EchoEmailFormatter(LogMixin):
+
     def __init__(self, now: Callable[[], datetime] = datetime.utcnow):
         self._now = now
 

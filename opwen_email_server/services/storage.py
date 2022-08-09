@@ -36,6 +36,7 @@ Download = Tuple[str, Callable[[bytes], dict]]
 
 
 class _Container:
+
     def __init__(self, wrapped: Container):
         self._wrapped = wrapped
 
@@ -53,6 +54,7 @@ class _Container:
 
 
 class _CaseInsensitiveContainer(_Container):
+
     def get_object(self, object_name: str) -> Object:
         object_name = object_name.lower()
         return super().get_object(object_name)
@@ -71,6 +73,7 @@ class _CaseInsensitiveContainer(_Container):
 
 
 class _BaseAzureStorage(LogMixin):
+
     def __init__(self,
                  account: str,
                  key: str,
@@ -144,6 +147,7 @@ class _BaseAzureStorage(LogMixin):
 
 
 class AzureFileStorage(_BaseAzureStorage):
+
     def store_file(self, resource_id: str, path: str):
         self.log_debug('storing file %s at %s', path, resource_id)
         self._client.upload_object(path, resource_id)

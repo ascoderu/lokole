@@ -56,7 +56,8 @@ class i8n(object):
     USER_PROMOTED = _('The user now is an administrator.')
     ALREADY_PROMOTED = _('The user already is an administrator.')
     ADMIN_CANNOT_BE_SUSPENDED = _("Administrators can't be suspended.")
-    ADMIN_PASSWORD_CANNOT_BE_RESET = _("Administrator password can't be " "reset.")
+    ADMIN_PASSWORD_CANNOT_BE_RESET = _("Administrator password can't be "
+                                       "reset.")
     PASSWORD_CHANGED_BY_ADMIN = _('Password was reset by administrator to: ')
     SAME_PASSWORD = _(' Your new password must be different than your previous password.')
 

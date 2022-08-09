@@ -16,7 +16,9 @@ from opwen_email_client.util.wtforms import SuffixedStringField
 
 
 class Base(object):
+
     class FieldTests(TestCase, metaclass=ABCMeta):
+
         @abstractmethod
         def create_field(self) -> Field:
             raise NotImplementedError
@@ -31,6 +33,7 @@ class Base(object):
 
 
 class SuffixedStringFieldTests(Base.FieldTests):
+
     def create_field(self):
         return SuffixedStringField('bar')
 
@@ -45,6 +48,7 @@ class SuffixedStringFieldTests(Base.FieldTests):
 
 
 class HtmlTextAreaFieldTests(Base.FieldTests):
+
     def create_field(self):
         return HtmlTextAreaField()
 
@@ -76,6 +80,7 @@ class HtmlTextAreaFieldTests(Base.FieldTests):
 
 
 class EscapedHtmlTextAreaFieldTests(HtmlTextAreaFieldTests):
+
     @property
     def safe_markup(self):
         for markup, expected in super().safe_markup:
@@ -88,6 +93,7 @@ class EscapedHtmlTextAreaFieldTests(HtmlTextAreaFieldTests):
 
 
 class EmailsTests(TestCase):
+
     def test_verifies_single_email(self):
         self.verify(',', 'foo@bar.com')
 
@@ -108,6 +114,7 @@ class EmailsTests(TestCase):
 
 
 class CronScheduleTests(TestCase):
+
     def test_valid_schedule(self):
         self.verify('* * * * *')
 
@@ -129,6 +136,7 @@ class CronScheduleTests(TestCase):
 
 
 class DummyField(object):
+
     def __init__(self, data):
         self.data = data
 
@@ -142,6 +150,7 @@ class DummyPostData(dict):
     Taken from https://github.com/wtforms/wtforms/blob/f5ef784caf/tests/common.py
 
     """
+
     def getlist(self, key):
         v = self[key]
         if not isinstance(v, (list, tuple)):

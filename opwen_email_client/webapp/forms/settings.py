@@ -77,6 +77,7 @@ class SettingsForm(FlaskForm):
 
     @classmethod
     def _update_config(cls, env_key: str, value: str):
+
         def is_env(line):
             return line.startswith('{}='.format(env_key))
 

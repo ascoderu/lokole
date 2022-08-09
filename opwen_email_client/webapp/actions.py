@@ -33,6 +33,7 @@ from opwen_email_client.webapp.config import root_domain
 
 
 class SyncEmails(object):
+
     def __init__(self, email_store: EmailStore, email_sync: Sync, user_store: UserStore, log: Logger):
         self._email_store = email_store
         self._email_sync = email_sync
@@ -97,6 +98,7 @@ class UpdateCode(object):
 
 
 class RestartApp(object):
+
     def __init__(self, restart_paths: Mapping[str, str]):
         self._restart_paths = restart_paths
 
@@ -108,6 +110,7 @@ class RestartApp(object):
 
 
 class RestartAppComponent(object):
+
     def __init__(self, restart_path: str):
         self._restart_path = restart_path
 
@@ -129,6 +132,7 @@ class RestartAppComponent(object):
 
 
 class SendWelcomeEmail(object):
+
     def __init__(self, to: str, time, email_store: EmailStore):
         self._to = to
         self._time = time
@@ -231,6 +235,7 @@ class StartInternetConnection(object):
 
 
 class ClientRegister(object):
+
     def __init__(self, client_name: str, access_token: str, path: str, logger: Logger):
         self._client_name = client_name
         self._github_access_token = access_token

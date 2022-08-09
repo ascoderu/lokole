@@ -98,6 +98,7 @@ class SendgridEmailSenderTests(TestCase):
 
 @skipUnless(SENDGRID_KEY, 'no sendgrid key configured')
 class LiveSendgridEmailSenderTests(SendgridEmailSenderTests):
+
     def assertSendsEmail(self, email: dict, success: bool = True, **kwargs):
         send_email = SendSendgridEmail(key=SENDGRID_KEY, sandbox=True)
 
@@ -107,6 +108,7 @@ class LiveSendgridEmailSenderTests(SendgridEmailSenderTests):
 
 
 class DeleteSendgridMailboxTests(TestCase):
+
     def test_does_not_make_request_when_key_is_missing(self):
         action = SetupSendgridMailbox(key='', max_retries=1, retry_interval_seconds=1)
 
@@ -152,6 +154,7 @@ class DeleteSendgridMailboxTests(TestCase):
 
 
 class SetupSendgridMailboxTests(TestCase):
+
     def test_does_not_make_request_when_key_is_missing(self):
         action = SetupSendgridMailbox(key='', max_retries=1, retry_interval_seconds=1)
 
