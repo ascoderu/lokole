@@ -1,5 +1,5 @@
 ARG NODE_VERSION=12
-ARG PYTHON_VERSION=3.7
+ARG PYTHON_VERSION=3.9
 FROM node:${NODE_VERSION} AS yarn
 
 WORKDIR /app
@@ -54,7 +54,6 @@ RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
 
 COPY --from=compiler /app/docker/client/run-*.sh /app/docker/client/
 COPY --from=compiler /app/docker/client/*.env /app/docker/client/
-COPY --from=compiler /app/manage.py /app/
 
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env

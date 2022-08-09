@@ -231,6 +231,7 @@ def descending_timestamp(email_sent_at: str) -> str:
 
 
 class MimeEmailParser(LogMixin):
+
     def __call__(self, mime_email: str) -> dict:
         email = parse_mime_email(mime_email)
         email = format_attachments(email)

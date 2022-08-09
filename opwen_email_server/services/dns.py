@@ -11,6 +11,7 @@ from opwen_email_server.utils.log import LogMixin
 
 
 class _MxRecords(LogMixin):
+
     def __init__(self, account: str, secret: str, provider: str) -> None:
         self._account = account
         self._secret = secret
@@ -39,6 +40,7 @@ class _MxRecords(LogMixin):
 
 
 class DeleteMxRecords(_MxRecords):
+
     def _run(self, client_name: str, zone: Zone) -> None:
         try:
             record = next(record for record in self._driver.iterate_records(zone) if record.name == client_name)
@@ -50,6 +52,7 @@ class DeleteMxRecords(_MxRecords):
 
 
 class SetupMxRecords(_MxRecords):
+
     def _run(self, client_name: str, zone: Zone) -> None:
         try:
             self._driver.create_record(

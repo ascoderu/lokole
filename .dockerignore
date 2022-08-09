@@ -18,7 +18,6 @@ opwen_statuspage/node_modules/
 !requirements*.txt
 !setup.cfg
 !install.py
-!manage.py
 !MANIFEST.in
 !setup.py
 !README.rst

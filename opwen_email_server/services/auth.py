@@ -13,6 +13,7 @@ from opwen_email_server.utils.log import LogMixin
 
 
 class BasicAuth(LogMixin):
+
     def __init__(self, users: dict):
         self._users = dict(users)
 
@@ -36,6 +37,7 @@ class BasicAuth(LogMixin):
 
 
 class GithubAuth(LogMixin):
+
     def __init__(self, organization: str, page_size: int = 50):
         self._organization = organization
         self._page_size = page_size
@@ -107,6 +109,7 @@ class GithubAuth(LogMixin):
 
 
 class Auth:
+
     def insert(self, client_id: str, domain: str, owner: dict) -> None:
         raise NotImplementedError  # pragma: no cover
 
@@ -127,6 +130,7 @@ class Auth:
 
 
 class AzureAuth(Auth, LogMixin):
+
     def __init__(self, storage: AzureObjectStorage, sudo_scope: str) -> None:
         self._storage = storage
         self._sudo_scope = sudo_scope
@@ -190,6 +194,7 @@ class AzureAuth(Auth, LogMixin):
 
 
 class NoAuth(Auth):
+
     def __init__(self, client_id: str = 'service', domain: str = 'service'):
         self._client_id = client_id
         self._domain = domain

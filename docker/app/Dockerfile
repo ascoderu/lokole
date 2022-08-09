@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.7
+ARG PYTHON_VERSION=3.9
 FROM python:${PYTHON_VERSION} AS builder
 
 RUN apt-get update \

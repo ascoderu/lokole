@@ -12,6 +12,7 @@ from tests.opwen_email_server.helpers import throw
 
 
 class WikipediaServiceTests(TestCase):
+
     def setUp(self):
         self.now = datetime.utcnow
         self.languages = MagicMock()

@@ -28,6 +28,7 @@ def _given_test_image(size: ImageSize) -> bytes:
 
 
 class ParseMimeEmailTests(TestCase):
+
     def test_parses_email_metadata(self):
         mime_email = self._given_mime_email('email-html.mime')
 
@@ -90,6 +91,7 @@ class MimeEmailParserTests(ParseMimeEmailTests):
 
 
 class GetDomainsTests(TestCase):
+
     def test_gets_domains(self):
         email = {'to': ['foo@bar.com', 'baz@bar.com', 'foo@com']}
 
@@ -106,6 +108,7 @@ class GetDomainsTests(TestCase):
 
 
 class GetReceipientsTests(TestCase):
+
     def test_get_recipients(self):
         email = {'to': ['foo@bar.com'], 'cc': ['baz@bar.com', 'foo@com']}
 
@@ -130,6 +133,7 @@ class ResizeImageTests(TestCase):
 
 
 class ConvertImgUrlToBase64Tests(TestCase):
+
     @mock_responses.activate
     def test_format_inline_images_with_img_tag(self):
         self.givenTestImage()
@@ -240,6 +244,7 @@ class ConvertImgUrlToBase64Tests(TestCase):
 
 
 class EnsureHasSentAtTests(TestCase):
+
     def test_sets_sent_at_if_missing(self):
         input_email = {}
 
@@ -266,6 +271,7 @@ class EnsureHasSentAtTests(TestCase):
 
 
 class FormatAttachedFilesTests(TestCase):
+
     def test_format_attachments_without_attachment(self):
         input_email = {'attachments': []}
 
@@ -292,6 +298,7 @@ class FormatAttachedFilesTests(TestCase):
 
 
 class DescendingTimestampTests(TestCase):
+
     def test_descending_timestamp_correct(self):
         sent_at = '2020-02-01 21:09'
 

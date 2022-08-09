@@ -190,6 +190,7 @@ class _Email(_Base):
 
 
 class _SqlalchemyEmailStore(EmailStore):
+
     def __init__(self, page_size: int, database_uri: str, restricted=None):
         super().__init__(restricted)
         self._page_size = page_size
@@ -329,6 +330,7 @@ class _SqlalchemyEmailStore(EmailStore):
 
 
 class SqliteEmailStore(_SqlalchemyEmailStore):
+
     def __init__(self, page_size: int, database_path: str, restricted=None):
         super().__init__(
             page_size=page_size,

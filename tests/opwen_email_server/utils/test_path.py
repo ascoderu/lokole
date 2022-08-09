@@ -4,6 +4,7 @@ from opwen_email_server.utils import path
 
 
 class GetExtensionTests(TestCase):
+
     def test_with_simple_extension(self):
         self.assertEqual(path.get_extension('foo.txt'), '.txt')
 

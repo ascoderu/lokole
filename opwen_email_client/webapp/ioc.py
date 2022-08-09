@@ -1,24 +1,19 @@
 from importlib import import_module
 
 from cached_property import cached_property
-from flask import Flask
-from flask_babelex import Babel
 
 from opwen_email_client.domain.email.client import HttpEmailServerClient
 from opwen_email_client.domain.email.client import LocalEmailServerClient
 from opwen_email_client.domain.email.sql_store import SqliteEmailStore
 from opwen_email_client.domain.email.sync import AzureSync
 from opwen_email_client.util.serialization import JsonSerializer
-from opwen_email_client.webapp.cache import cache
 from opwen_email_client.webapp.config import AppConfig
 from opwen_email_client.webapp.forms.login import LoginForm
-from opwen_email_client.webapp.forms.login import RegisterForm
 from opwen_email_client.webapp.login import FlaskLoginUserStore
-from opwen_email_client.webapp.mkwvconf import blueprint as mkwvconf
-from opwen_email_client.webapp.security import security
 
 
 class Ioc:
+
     @cached_property
     def email_store(self):
         return SqliteEmailStore(
@@ -77,20 +72,3 @@ def _new_ioc(fqn: str) -> Ioc:
     cls = getattr(module, class_name)
 
     return cls()
-
-
-def create_app(config=AppConfig) -> Flask:
-    app = Flask(__name__, static_url_path=config.APP_ROOT + '/static')
-    app.config.from_object(config)
-
-    app.babel = Babel(app)
-
-    app.ioc = _new_ioc(config.IOC)
-
-    cache.init_app(app)
-    app.ioc.user_store.init_app(app)
-    security.init_app(app, app.ioc.user_store.r, register_form=RegisterForm, login_form=app.ioc.login_form)
-
-    app.register_blueprint(mkwvconf, url_prefix=config.APP_ROOT + '/api/mkwvconf')
-
-    return app

@@ -21,8 +21,6 @@ with (here / client_package / '__init__.py').open(encoding='utf-8') as fobj:
     version = re.search(r"^__version__ = '([^']*)'",
                         fobj.read(), re.MULTILINE).group(1)
 
-scripts = ['manage.py']
-
 setup(
     name=client_package,
     version=version,
@@ -34,7 +32,6 @@ setup(
     description='Email client for the Lokole project: https://ascoderu.ca',
     long_description=long_description,
     include_package_data=True,
-    scripts=scripts,
     install_requires=requirements_for('requirements-webapp.txt'),
     extras_require={
         server_package: requirements_for('requirements.txt'),

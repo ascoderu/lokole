@@ -8,6 +8,7 @@ from opwen_email_client.domain.email.store import EmailStore
 
 
 class Base(object):
+
     class EmailStoreTests(TestCase, metaclass=ABCMeta):
         page_size = 10
 
@@ -23,6 +24,7 @@ class Base(object):
             return list(emails)
 
         def assertContainsEmail(self, expected: dict, collection: Iterable[dict]):
+
             def cleanup(email):
                 email = {key: value for (key, value) in email.items() if value}
                 email['from'] = email.get('from', '').lower() or None

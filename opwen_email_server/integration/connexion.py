@@ -52,7 +52,7 @@ client_read = DownloadClientEmails(
 
 client_create = CreateClient(
     auth=get_auth(),
-    task=register_client.delay,
+    task=register_client,
 )
 
 client_list = ListClients(auth=get_auth())
