@@ -12,7 +12,7 @@ Flask==2.2.1
 SQLAlchemy==1.4.39
 WTForms==3.0.1
 email-validator==1.2.1
-Werkzeug==2.2.1
+Werkzeug==2.2.3
 fasteners==0.17.3
 apache-libcloud==3.6.0
 bcrypt==3.2.2
