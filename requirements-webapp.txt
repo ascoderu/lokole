@@ -19,7 +19,7 @@ bcrypt==3.2.2
 beautifulsoup4==4.11.1
 cached-property==1.5.2
 celery[sqlalchemy]==5.2.7
-environs==9.5.0
+environs==11.0.0
 gunicorn==20.1.0
 mkwvconf @ git+https://github.com/ascoderu/mkwvconf.git@dev
 passlib==1.7.4
