@@ -1,4 +1,4 @@
-Babel==2.10.3
+Babel==2.13.1
 Flask-BabelEx==0.9.4
 Flask-Caching==2.0.1
 Flask-Cors==3.0.10
