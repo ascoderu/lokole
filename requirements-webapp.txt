@@ -9,7 +9,7 @@ Flask-Security==3.0.0   # TODO: Upgrade to Flask-Security-Too
 Flask-Testing==0.8.1
 Flask-WTF==1.0.1
 Flask==2.2.1
-SQLAlchemy==1.4.39
+SQLAlchemy==1.4.53
 WTForms==3.0.1
 email-validator==1.2.1
 Werkzeug==2.2.1
