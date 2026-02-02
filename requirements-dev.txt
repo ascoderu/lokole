@@ -7,5 +7,6 @@ mypy==0.971
 nose2[coverage_plugin]==0.12.0
 responses==0.21.0
 bandit==1.7.4
+pbr>=3.0.0
 yapf==0.32.0
 watchdog[watchmedo]==2.1.9
