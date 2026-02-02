@@ -1,5 +1,5 @@
 ARG NODE_VERSION=12
-ARG PYTHON_VERSION=3.9
+ARG PYTHON_VERSION=3.12
 FROM node:${NODE_VERSION} AS yarn
 
 WORKDIR /app
@@ -13,6 +13,10 @@ RUN yarn run lint \
  && yarn run build
 
 FROM python:${PYTHON_VERSION} AS builder
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends mobile-broadband-provider-info=20230416-1 \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

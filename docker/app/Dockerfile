@@ -1,10 +1,6 @@
 ARG PYTHON_VERSION=3.9
 FROM python:${PYTHON_VERSION} AS builder
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends mobile-broadband-provider-info=20201225-1 \
- && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 COPY requirements-dev.txt ./
