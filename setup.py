@@ -32,6 +32,7 @@ setup(
     description='Email client for the Lokole project: https://ascoderu.ca',
     long_description=long_description,
     include_package_data=True,
+    python_requires='>=3.12',
     install_requires=requirements_for('requirements-webapp.txt'),
     extras_require={
         server_package: requirements_for('requirements.txt'),
