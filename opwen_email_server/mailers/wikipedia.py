@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 from typing import Callable
 from urllib.parse import urlparse
 
@@ -21,7 +22,7 @@ class WikipediaEmailFormatter(LogMixin):
                  languages_getter: Callable[[], dict] = languages,
                  language_setter: Callable[[str], None] = set_lang,
                  page_fetch: Callable[[str], WikipediaPage] = page,
-                 now: Callable[[], datetime] = datetime.utcnow):
+                 now: Callable[[], datetime] = lambda: datetime.now(timezone.utc).replace(tzinfo=None)):
         self._now = now
         self._languages = languages_getter
         self._language_setter = language_setter

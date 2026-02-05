@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 from io import BytesIO
 from os import path
 from typing import Iterable
@@ -186,7 +187,7 @@ def register_complete() -> Response:
     user_store = app.ioc.user_store
 
     send_welcome_email = SendWelcomeEmail(
-        time=datetime.utcnow(),
+        time=datetime.now(timezone.utc).replace(tzinfo=None),
         to=current_user.email,
         email_store=app.ioc.email_store,
     )

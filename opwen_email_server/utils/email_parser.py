@@ -140,7 +140,7 @@ def get_domain(address: str) -> str:
 
 def ensure_has_sent_at(email: dict):
     if not email.get('sent_at'):
-        email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+        email['sent_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')
 
 
 def _get_image_type(response: Response, url: str) -> Optional[str]:

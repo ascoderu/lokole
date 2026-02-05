@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 
 from sqlalchemy import BLOB
 from sqlalchemy import Boolean
@@ -232,7 +233,7 @@ class _SqlalchemyEmailStore(EmailStore):
             db.add(_Attachment.from_dict(db, attachment))
 
     def _mark_sent(self, uids):
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
         set_sent_at = {_Email.sent_at: now}
 
         with self._dbwrite() as db:
