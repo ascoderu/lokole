@@ -1,10 +1,19 @@
-FROM mcr.microsoft.com/azure-cli:2.0.32
+FROM mcr.microsoft.com/azure-cli:2.66.0
 
-RUN apk add -q --no-cache \
-    curl=7.59.0-r0 \
-    docker=1.11.2-r1 \
-    jq=1.5-r2 \
-    util-linux=2.28-r3
+# Install only missing packages to avoid breaking Azure CLI's curl/libssh2 linkage
+# The azure-cli image already has curl, jq, ca-certificates, wget
+RUN tdnf install -y \
+        tar \
+        util-linux \
+        python3-pip
+
+# Install Docker CLI from Docker's official repository for API 1.44+ support
+# Use curl instead of wget since azure-cli already has curl
+RUN curl -fsSL -o /tmp/docker.tgz "https://download.docker.com/linux/static/stable/x86_64/docker-27.4.1.tgz" && \
+    tar -xzf /tmp/docker.tgz -C /tmp && \
+    mv /tmp/docker/docker /usr/local/bin/ && \
+    rm -rf /tmp/docker /tmp/docker.tgz && \
+    chmod +x /usr/local/bin/docker
 
 WORKDIR /app
 
