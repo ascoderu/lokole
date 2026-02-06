@@ -88,13 +88,11 @@ class Setup:
 
     def _grant_permissions(self):
         for group in self.groups:
-            self.sh('usermod -a -G "{group}" "{user}"'
-                    .format(group=group, user=self.user))
+            self.sh('usermod -a -G "{group}" "{user}"'.format(group=group, user=self.user))
 
     def _install_dependencies(self):
         if self.packages:
-            self.sh('apt-get install -y {}'.format(' '.join(self.packages)),
-                    retry_attempts=10, retry_interval=60)
+            self.sh('apt-get install -y {}'.format(' '.join(self.packages)), retry_attempts=10, retry_interval=60)
 
     def _run(self):
         raise NotImplementedError
@@ -177,9 +175,7 @@ class Setup:
 
     def sh(self, command, user=None, accept_failure=False, retry_attempts=0, retry_interval=0):
         if user:
-            command = "su '{user}' -c '{command}'".format(
-                user=user,
-                command=command)
+            command = "su '{user}' -c '{command}'".format(user=user, command=command)
 
         process = run(command, shell=True, stderr=PIPE, stdout=PIPE)  # nosec
         stdout = process.stdout.decode('utf-8').strip()
@@ -213,6 +209,7 @@ class Setup:
 
 
 class SystemSetup(Setup):
+
     def _run(self):
         self._ensure_root()
         self._ensure_apt()
@@ -228,19 +225,16 @@ class SystemSetup(Setup):
         self.sh('apt-get update', retry_attempts=10, retry_interval=30)
 
     def _set_locale(self):
-        locale_command = (
-            'export LANGUAGE="{0}"; '
-            'export LC_ALL="{0}"; '
-            'export LANG="{0}"; '
-            'export LC_TYPE="{0}";'
-        ).format(self.args.locale)
+        locale_command = ('export LANGUAGE="{0}"; '
+                          'export LC_ALL="{0}"; '
+                          'export LANG="{0}"; '
+                          'export LC_TYPE="{0}";').format(self.args.locale)
 
         self.sh('locale-gen "{}"'.format(self.args.locale))
         self.sh('update-locale')
         self.sh('eval "{}"'.format(locale_command))
 
-        self.write_file('/etc/profile.d/set-locale.sh', locale_command,
-                        executable=True)
+        self.write_file('/etc/profile.d/set-locale.sh', locale_command, executable=True)
 
     def _set_timezone(self):
         self.sh('timedatectl set-timezone "{}"'.format(self.args.timezone))
@@ -249,9 +243,7 @@ class SystemSetup(Setup):
         if not self.args.password:
             return
 
-        self.sh('echo "{user}:{password}" | chpasswd'.format(
-                user=self.user,
-                password=self.args.password))
+        self.sh('echo "{user}:{password}" | chpasswd'.format(user=self.user, password=self.args.password))
 
     @property
     def is_enabled(self):
@@ -327,11 +319,9 @@ class WifiSetup(Setup):
         self.write_file('/etc/network/interfaces', (
             'auto lo',
             'iface lo inet loopback',
-
             'auto eth0',
             'allow-hotplug eth0',
             'iface eth0 inet dhcp',
-
             'auto wlan0',
             'allow-hotplug wlan0',
             'iface wlan0 inet static',
@@ -340,7 +330,6 @@ class WifiSetup(Setup):
             'address {}'.format(self.ip),
             'netmask 255.255.255.0',
             'wireless-power off',
-
             'auto ppp0',
             'iface ppp0 inet wvdial',
         ))
@@ -419,6 +408,7 @@ class ModemSetup(Setup):
 
 
 class ClientSetup(Setup):
+
     def _run(self):
         create_request_payload = dumps({'domain': self.client_domain}).encode('utf-8')
         create_request = Request(self.client_url_create)
@@ -431,9 +421,7 @@ class ClientSetup(Setup):
                 pass
         except HTTPError as ex:
             self.abort('Unable to register client {client_name}: [{status_code}] {message}'.format(
-                client_name=self.args.client_name,
-                status_code=ex.code,
-                message=ex.read().decode('utf-8').strip()))
+                client_name=self.args.client_name, status_code=ex.code, message=ex.read().decode('utf-8').strip()))
 
         while True:
             get_request = Request(self.client_url_details)
@@ -513,9 +501,7 @@ class WebappSetup(Setup):
         self._reboot()
 
     def _create_virtualenv(self):
-        self.sh('{python} -m venv "{venv_path}"'.format(
-                 python=current_python_binary,
-                 venv_path=self.venv_path),
+        self.sh('{python} -m venv "{venv_path}"'.format(python=current_python_binary, venv_path=self.venv_path),
                 user=self.user)
 
         self._pip_install('pip', 'setuptools', 'wheel')
@@ -531,32 +517,40 @@ class WebappSetup(Setup):
         self._pip_install(package)
 
     def _compile_translations(self):
-        self.sh('"{pybabel}" compile -d "{translations}"'.format(
-               pybabel='{}/bin/pybabel'.format(self.venv_path),
-               translations=self.abspath(self.webapp_files_root / 'translations')),
-              user=self.user)
+        self.sh('"{pybabel}" compile -d "{translations}"'.format(pybabel='{}/bin/pybabel'.format(self.venv_path),
+                                                                 translations=self.abspath(self.webapp_files_root /
+                                                                                           'translations')),
+                user=self.user)
 
     def _setup_secrets(self):
         extra_settings = {
-            'OPWEN_APP_ROOT': self.args.app_root,
-            'OPWEN_STATE_DIRECTORY': self.abspath(self.args.state_directory),
-            'OPWEN_SESSION_KEY': generate_secret(32),
-            'OPWEN_MAX_UPLOAD_SIZE_MB': self.args.max_upload_size,
-            'OPWEN_SIM_TYPE': self.args.sim_type,
-            'OPWEN_EMAIL_SERVER_HOSTNAME': self.args.server_host,
-            'OPWEN_CLIENT_NAME': self.args.client_name,
-            'OPWEN_ROOT_DOMAIN': self.args.client_domain,
-            'OPWEN_RESTART_PATH': ','.join((
+            'OPWEN_APP_ROOT':
+            self.args.app_root,
+            'OPWEN_STATE_DIRECTORY':
+            self.abspath(self.args.state_directory),
+            'OPWEN_SESSION_KEY':
+            generate_secret(32),
+            'OPWEN_MAX_UPLOAD_SIZE_MB':
+            self.args.max_upload_size,
+            'OPWEN_SIM_TYPE':
+            self.args.sim_type,
+            'OPWEN_EMAIL_SERVER_HOSTNAME':
+            self.args.server_host,
+            'OPWEN_CLIENT_NAME':
+            self.args.client_name,
+            'OPWEN_ROOT_DOMAIN':
+            self.args.client_domain,
+            'OPWEN_RESTART_PATH':
+            ','.join((
                 '{}=HUP'.format(self.abspath(self.restarter_directory / self.args.server_name)),
                 '{}='.format(self.abspath(self.restarter_directory / self.args.worker_name)),
                 '{}='.format(self.abspath(self.restarter_directory / self.args.cron_name)),
             )),
         }
 
-        self.write_file(self.settings_path, (
-            '{}={}'.format(key, value)
-            for settings in (extra_settings, self.app_config)
-            for (key, value) in settings.items()))
+        self.write_file(self.settings_path, ('{}={}'.format(key, value)
+                                             for settings in (extra_settings, self.app_config)
+                                             for (key, value) in settings.items()))
 
     def _create_admin_user(self):
         if self.args.admin == 'no':
@@ -565,14 +559,15 @@ class WebappSetup(Setup):
         self.sh('OPWEN_SETTINGS="{settings}" '
                 'export FLASK_APP="opwen_email_client.webapp:app" '
                 '"{manage}" createadmin --name="{name}" --password="{password}"'.format(
-                 settings=self.settings_path,
-                 manage='{}/bin/flask manage'.format(self.venv_path),
-                 name=self.args.admin_name,
-                 password=self.args.admin_password),
+                    settings=self.settings_path,
+                    manage='{}/bin/flask manage'.format(self.venv_path),
+                    name=self.args.admin_name,
+                    password=self.args.admin_password),
                 user=self.user)
 
     def _install_nginx(self):
-        self.write_file('/etc/nginx/sites-available/default', '''
+        self.write_file(
+            '/etc/nginx/sites-available/default', '''
             server {{
               listen {port};
               server_name localhost;
@@ -589,11 +584,10 @@ class WebappSetup(Setup):
                 include proxy_params;
                 proxy_pass http://unix:{socket};
               }}
-            }}'''.format(
-            port=self.args.port,
-            app_root=self.args.app_root,
-            files_root=self.abspath(self.webapp_files_root),
-            socket=self.socket_path))
+            }}'''.format(port=self.args.port,
+                         app_root=self.args.app_root,
+                         files_root=self.abspath(self.webapp_files_root),
+                         socket=self.socket_path))
 
         if self.args.log_directory == '-':
             access_log = 'stdout'
@@ -602,7 +596,8 @@ class WebappSetup(Setup):
             access_log = self.abspath(Path(self.args.log_directory) / 'nginx_access.log')
             error_log = self.abspath(Path(self.args.log_directory) / 'nginx_error.log')
 
-        self.write_file('/etc/nginx/nginx.conf', '''
+        self.write_file(
+            '/etc/nginx/nginx.conf', '''
             user www-data;
             worker_processes 4;
             pid /run/nginx.pid;
@@ -632,84 +627,66 @@ class WebappSetup(Setup):
               fastcgi_connect_timeout {timeout_seconds};
               fastcgi_send_timeout {timeout_seconds};
               fastcgi_read_timeout {timeout_seconds};
-            }}'''.format(
-            access_log=access_log,
-            error_log=error_log,
-            max_upload_size=self.args.max_upload_size,
-            timeout_seconds=self.args.timeout))
+            }}'''.format(access_log=access_log,
+                         error_log=error_log,
+                         max_upload_size=self.args.max_upload_size,
+                         timeout_seconds=self.args.timeout))
 
         self.sh('systemctl stop nginx', accept_failure=True)
         self.sh('systemctl disable nginx', accept_failure=True)
 
-        self.create_daemon(
-            program_name=self.args.nginx_name,
-            command='/usr/sbin/nginx -g "daemon off;"',
-            user='root')
+        self.create_daemon(program_name=self.args.nginx_name, command='/usr/sbin/nginx -g "daemon off;"', user='root')
 
     def _setup_gunicorn(self):
-        gunicorn_script = (
-            '"{venv}/bin/gunicorn" '
-            '--bind="unix:{socket}" '
-            '--timeout={timeout} '
-            '--workers={workers} '
-            '--log-level={loglevel} '
-            'opwen_email_client.webapp:app'.format(
-                venv=self.venv_path,
-                socket=self.socket_path,
-                timeout=self.args.timeout,
-                workers=self.args.num_gunicorn_workers,
-                loglevel=self.args.log_level))
+        gunicorn_script = ('"{venv}/bin/gunicorn" '
+                           '--bind="unix:{socket}" '
+                           '--timeout={timeout} '
+                           '--workers={workers} '
+                           '--log-level={loglevel} '
+                           'opwen_email_client.webapp:app'.format(venv=self.venv_path,
+                                                                  socket=self.socket_path,
+                                                                  timeout=self.args.timeout,
+                                                                  workers=self.args.num_gunicorn_workers,
+                                                                  loglevel=self.args.log_level))
 
-        self.create_daemon(
-            program_name=self.args.server_name,
-            command=gunicorn_script,
-            env={'OPWEN_SETTINGS': self.settings_path})
+        self.create_daemon(program_name=self.args.server_name,
+                           command=gunicorn_script,
+                           env={'OPWEN_SETTINGS': self.settings_path})
 
     def _setup_celery(self):
-        celery_command = (
-            '"{venv}/bin/celery" '
-            '--app=opwen_email_client.webapp.tasks '
-            'worker '
-            '--loglevel={loglevel} '
-            '--concurrency={workers}'.format(
-                venv=self.venv_path,
-                loglevel=self.args.log_level,
-                workers=self.args.num_celery_workers))
+        celery_command = ('"{venv}/bin/celery" '
+                          '--app=opwen_email_client.webapp.tasks '
+                          'worker '
+                          '--loglevel={loglevel} '
+                          '--concurrency={workers}'.format(venv=self.venv_path,
+                                                           loglevel=self.args.log_level,
+                                                           workers=self.args.num_celery_workers))
 
-        self.create_daemon(
-            program_name=self.args.worker_name,
-            command=celery_command,
-            env={'OPWEN_SETTINGS': self.settings_path})
+        self.create_daemon(program_name=self.args.worker_name,
+                           command=celery_command,
+                           env={'OPWEN_SETTINGS': self.settings_path})
 
     def _setup_cron(self):
-        celery_command = (
-            '"{venv}/bin/celery" '
-            '--app=opwen_email_client.webapp.tasks '
-            'beat '
-            '--pidfile="{cronstate_pid}" '
-            '--loglevel={loglevel} '.format(
-                settings=self.settings_path,
-                cronstate_pid=self.cronstate_pid,
-                venv=self.venv_path,
-                loglevel=self.args.log_level))
+        celery_command = ('"{venv}/bin/celery" '
+                          '--app=opwen_email_client.webapp.tasks '
+                          'beat '
+                          '--pidfile="{cronstate_pid}" '
+                          '--loglevel={loglevel} '.format(settings=self.settings_path,
+                                                          cronstate_pid=self.cronstate_pid,
+                                                          venv=self.venv_path,
+                                                          loglevel=self.args.log_level))
 
-        self.create_daemon(
-            program_name=self.args.cron_name,
-            command=celery_command,
-            env={'OPWEN_SETTINGS': self.settings_path})
+        self.create_daemon(program_name=self.args.cron_name,
+                           command=celery_command,
+                           env={'OPWEN_SETTINGS': self.settings_path})
 
     def _setup_restarter(self):
-        restarter_command = (
-            'export FLASK_APP="opwen_email_client.webapp:app" && "{venv}/bin/flask" '
-            'manage restarter '
-            '--directory="{directory}"'.format(
-                venv=self.venv_path,
-                directory=self.abspath(self.restarter_directory)))
+        restarter_command = ('export FLASK_APP="opwen_email_client.webapp:app" && "{venv}/bin/flask" '
+                             'manage restarter '
+                             '--directory="{directory}"'.format(venv=self.venv_path,
+                                                                directory=self.abspath(self.restarter_directory)))
 
-        self.create_daemon(
-            program_name=self.args.restarter_name,
-            command=restarter_command,
-            user='root')
+        self.create_daemon(program_name=self.args.restarter_name, command=restarter_command, user='root')
 
     def _reboot(self):
         LOG.info('All done. Lokole client %s is ready to be used.', self.args.client_name)
@@ -719,36 +696,28 @@ class WebappSetup(Setup):
             self.sh('shutdown --reboot now', user='root')
 
     def _pip_install(self, *packages):
-        self.sh('"{pip}" install --no-cache-dir --upgrade {packages}'.format(
-                 pip='{}/bin/pip'.format(self.venv_path),
-                 packages=' '.join(packages)),
+        self.sh('"{pip}" install --no-cache-dir --upgrade {packages}'.format(pip='{}/bin/pip'.format(self.venv_path),
+                                                                             packages=' '.join(packages)),
                 retry_attempts=60,
                 retry_interval=5,
                 user=self.user)
 
     @property
     def webapp_files_root(self):
-        return (Path(self.venv_path) /
-                'lib' /
-                'python{}.{}'.format(version_info.major, version_info.minor) /
-                'site-packages' /
-                'opwen_email_client' /
-                'webapp')
+        return (Path(self.venv_path) / 'lib' / 'python{}.{}'.format(version_info.major, version_info.minor) /
+                'site-packages' / 'opwen_email_client' / 'webapp')
 
     @property
     def socket_path(self):
-        return self.abspath(Path(self.args.state_directory)
-                            / '{}.sock'.format(self.args.server_name))
+        return self.abspath(Path(self.args.state_directory) / '{}.sock'.format(self.args.server_name))
 
     @property
     def settings_path(self):
-        return self.abspath(Path(self.args.state_directory)
-                            / 'settings.env')
+        return self.abspath(Path(self.args.state_directory) / 'settings.env')
 
     @property
     def cronstate_pid(self):
-        return self.abspath(Path(self.args.state_directory)
-                            / '{}.pid'.format(self.args.cron_name))
+        return self.abspath(Path(self.args.state_directory) / '{}.pid'.format(self.args.cron_name))
 
     @property
     def restarter_directory(self):
@@ -810,122 +779,122 @@ def main(args, abort):
 def cli():
     parser = ArgumentParser(description=__doc__)
 
-    parser.add_argument('client_name', type=str.lower, help=(
-        'The name that should be assigned to the Lokole device '
-        'that is being configured by this script. Usually this '
-        'will be a name that is descriptive for the location '
-        'where the device will be deployed. The client name '
-        'should be globally unique as it is used as the key for '
-        'a bunch of things.'
-    ))
-    parser.add_argument('sim_type', choices=SIM_TYPES, help=(
-        'The mobile network to which to connect to upload data.'
-    ))
-    parser.add_argument('sync_schedule', nargs='?', help=(
-        'How often the Lokole should sync with the server. '
-        'In cron syntax. '
-        'Example: "34 * * * *" for once per hour at the 34th minute.'
-    ))
-    parser.add_argument('registration_credentials', nargs='?', help=(
-        'Github access token for registering with the Lokole server.'
-    ))
-    parser.add_argument('--app_root', default=getenv('OPWEN_APP_ROOT', ''), help=(
-        'The URL prefix at which the app will be accessible.'
-    ))
-    parser.add_argument('--admin', default=getenv('LOKOLE_ADMIN', 'yes'), help=(
-        'If set to "no", skip creation of application admin user.'
-    ))
-    parser.add_argument('--admin_name', default=getenv('LOKOLE_ADMIN_NAME', 'admin'), help=(
-        'If set, create an admin user with this account name.'
-    ))
-    parser.add_argument('--admin_password', default=getenv('LOKOLE_ADMIN_PASSWORD', 'lokole1Admin'), help=(
-        'If set, create an admin user with this password.'
-    ))
-    parser.add_argument('--password', default=getenv('LOKOLE_PASSWORD', ''), help=(
-        'If set to a non-empty string, updates the password of '
-        'the current user to this value as part of the setup. '
-        'Useful for fully automated setups of new devices that '
-        'come with a default insecure password.'
-    ))
-    parser.add_argument('--system_setup', default=getenv('LOKOLE_SYSTEM_SETUP', 'yes'), help=(
-        'If set to "no", skip system setup.'
-    ))
-    parser.add_argument('--reboot', default=getenv('LOKOLE_REBOOT', 'yes'), help=(
-        'If set to "no", skip system reboot after setup.'
-    ))
-    parser.add_argument('--wifi', default=getenv('LOKOLE_WIFI', 'yes'), help=(
-        'If set to "no", skip setup of WiFi access point and '
-        'local DNS server configuration.'
-    ))
-    parser.add_argument('--wifi_name', default=getenv('LOKOLE_NETWORK_NAME', 'Lokole'), help=(
-        'The name of the WiFi network to create for the Lokole email app.'
-    ))
-    parser.add_argument('--wifi_password', default=getenv('LOKOLE_NETWORK_PASSWORD', 'Ascoderu'), help=(
-        'The password of the WiFi network to create for the Lokole email app.'
-    ))
-    parser.add_argument('--script_log_level', default=getenv('LOKOLE_SCRIPT_LOG_LEVEL', 'INFO'), help=(
-        'The logging verbosity of this script.'
-    ))
-    parser.add_argument('--server_host', default=getenv('LOKOLE_SERVER_HOST', 'mailserver.lokole.ca'), help=(
-        'The host of the email sync server to use.'
-    ))
-    parser.add_argument('--client_domain', default=getenv('LOKOLE_CLIENT_DOMAIN', 'lokole.ca'), help=(
-        'The root domain for which to set up the Lokole email app.'
-    ))
-    parser.add_argument('--client_version', default=getenv('LOKOLE_CLIENT_VERSION', ''), help=(
-        'The version of the Lokole email app to install.'
-    ))
-    parser.add_argument('--client_dist', default=getenv('LOKOLE_CLIENT_DIST', ''), help=(
-        'The dist package of the Lokole email app to install.'
-    ))
-    parser.add_argument('--port', default=getenv('LOKOLE_PORT', '80'), help=(
-        'The port on which to run the Lokole email app.'
-    ))
-    parser.add_argument('--state_directory', default=getenv('LOKOLE_STATE_DIRECTORY', 'lokole/state'), help=(
-        'The location where to store the Lokole email app state.'
-    ))
-    parser.add_argument('--log_directory', default=getenv('LOKOLE_LOG_DIRECTORY', 'lokole/logs'), help=(
-        'The location where to store the Lokole email app logs.'
-    ))
-    parser.add_argument('--venv_directory', default=getenv('LOKOLE_VENV_DIRECTORY', 'lokole/venv'), help=(
-        'The location where to store the Lokole email app Python environment.'
-    ))
-    parser.add_argument('--server_name', default=getenv('LOKOLE_SERVER_NAME', 'lokole_gunicorn'), help=(
-        'Name of the Lokole webapp server.'
-    ))
-    parser.add_argument('--nginx_name', default=getenv('LOKOLE_NGINX_NAME', 'lokole_nginx'), help=(
-        'Name of the Nginx service.'
-    ))
-    parser.add_argument('--worker_name', default=getenv('LOKOLE_WORKER_NAME', 'lokole_celery_worker'), help=(
-        'Name of the Lokole webapp worker.'
-    ))
-    parser.add_argument('--cron_name', default=getenv('LOKOLE_CRON_NAME', 'lokole_celery_beat'), help=(
-        'Name of the Lokole cron worker.'
-    ))
-    parser.add_argument('--restarter_name', default=getenv('LOKOLE_RESTARTER_NAME', 'lokole_restarter'), help=(
-        'Name of the Lokole restarter.'
-    ))
-    parser.add_argument('--log_level', default=getenv('LOKOLE_LOG_LEVEL', 'error'), help=(
-        'The log level for the Lokole email app.'
-    ))
-    parser.add_argument('--timeout', type=int, default=300, help=(
-        'Timeout for the Lokole email app. In seconds.'
-    ))
-    parser.add_argument('--max_upload_size', type=int, default=10, help=(
-        'Maximum allowed size of uploads to the Lokole email app. In MB.'
-    ))
-    parser.add_argument('--num_celery_workers', type=int, default=2, help=(
-        'Number of celery workers for the Lokole email app.'
-    ))
-    parser.add_argument('--num_gunicorn_workers', type=int, default=max(2, cpu_count() - 1), help=(
-        'Number of gunicorn workers for the Lokole email app.'
-    ))
-    parser.add_argument('--locale', default=getenv('LOKOLE_LOCALE', 'en_GB.UTF-8'), help=(
-        'Locale to set up on the system.'
-    ))
-    parser.add_argument('--timezone', default=getenv('LOKOLE_TIMEZONE', 'Etc/UTC'), help=(
-        'Timezone to set up on the system.'
-    ))
+    parser.add_argument('client_name',
+                        type=str.lower,
+                        help=('The name that should be assigned to the Lokole device '
+                              'that is being configured by this script. Usually this '
+                              'will be a name that is descriptive for the location '
+                              'where the device will be deployed. The client name '
+                              'should be globally unique as it is used as the key for '
+                              'a bunch of things.'))
+    parser.add_argument('sim_type', choices=SIM_TYPES, help=('The mobile network to which to connect to upload data.'))
+    parser.add_argument('sync_schedule',
+                        nargs='?',
+                        help=('How often the Lokole should sync with the server. '
+                              'In cron syntax. '
+                              'Example: "34 * * * *" for once per hour at the 34th minute.'))
+    parser.add_argument('registration_credentials',
+                        nargs='?',
+                        help=('Github access token for registering with the Lokole server.'))
+    parser.add_argument('--app_root',
+                        default=getenv('OPWEN_APP_ROOT', ''),
+                        help=('The URL prefix at which the app will be accessible.'))
+    parser.add_argument('--admin',
+                        default=getenv('LOKOLE_ADMIN', 'yes'),
+                        help=('If set to "no", skip creation of application admin user.'))
+    parser.add_argument('--admin_name',
+                        default=getenv('LOKOLE_ADMIN_NAME', 'admin'),
+                        help=('If set, create an admin user with this account name.'))
+    parser.add_argument('--admin_password',
+                        default=getenv('LOKOLE_ADMIN_PASSWORD', 'lokole1Admin'),
+                        help=('If set, create an admin user with this password.'))
+    parser.add_argument('--password',
+                        default=getenv('LOKOLE_PASSWORD', ''),
+                        help=('If set to a non-empty string, updates the password of '
+                              'the current user to this value as part of the setup. '
+                              'Useful for fully automated setups of new devices that '
+                              'come with a default insecure password.'))
+    parser.add_argument('--system_setup',
+                        default=getenv('LOKOLE_SYSTEM_SETUP', 'yes'),
+                        help=('If set to "no", skip system setup.'))
+    parser.add_argument('--reboot',
+                        default=getenv('LOKOLE_REBOOT', 'yes'),
+                        help=('If set to "no", skip system reboot after setup.'))
+    parser.add_argument('--wifi',
+                        default=getenv('LOKOLE_WIFI', 'yes'),
+                        help=('If set to "no", skip setup of WiFi access point and '
+                              'local DNS server configuration.'))
+    parser.add_argument('--wifi_name',
+                        default=getenv('LOKOLE_NETWORK_NAME', 'Lokole'),
+                        help=('The name of the WiFi network to create for the Lokole email app.'))
+    parser.add_argument('--wifi_password',
+                        default=getenv('LOKOLE_NETWORK_PASSWORD', 'Ascoderu'),
+                        help=('The password of the WiFi network to create for the Lokole email app.'))
+    parser.add_argument('--script_log_level',
+                        default=getenv('LOKOLE_SCRIPT_LOG_LEVEL', 'INFO'),
+                        help=('The logging verbosity of this script.'))
+    parser.add_argument('--server_host',
+                        default=getenv('LOKOLE_SERVER_HOST', 'mailserver.lokole.ca'),
+                        help=('The host of the email sync server to use.'))
+    parser.add_argument('--client_domain',
+                        default=getenv('LOKOLE_CLIENT_DOMAIN', 'lokole.ca'),
+                        help=('The root domain for which to set up the Lokole email app.'))
+    parser.add_argument('--client_version',
+                        default=getenv('LOKOLE_CLIENT_VERSION', ''),
+                        help=('The version of the Lokole email app to install.'))
+    parser.add_argument('--client_dist',
+                        default=getenv('LOKOLE_CLIENT_DIST', ''),
+                        help=('The dist package of the Lokole email app to install.'))
+    parser.add_argument('--port',
+                        default=getenv('LOKOLE_PORT', '80'),
+                        help=('The port on which to run the Lokole email app.'))
+    parser.add_argument('--state_directory',
+                        default=getenv('LOKOLE_STATE_DIRECTORY', 'lokole/state'),
+                        help=('The location where to store the Lokole email app state.'))
+    parser.add_argument('--log_directory',
+                        default=getenv('LOKOLE_LOG_DIRECTORY', 'lokole/logs'),
+                        help=('The location where to store the Lokole email app logs.'))
+    parser.add_argument('--venv_directory',
+                        default=getenv('LOKOLE_VENV_DIRECTORY', 'lokole/venv'),
+                        help=('The location where to store the Lokole email app Python environment.'))
+    parser.add_argument('--server_name',
+                        default=getenv('LOKOLE_SERVER_NAME', 'lokole_gunicorn'),
+                        help=('Name of the Lokole webapp server.'))
+    parser.add_argument('--nginx_name',
+                        default=getenv('LOKOLE_NGINX_NAME', 'lokole_nginx'),
+                        help=('Name of the Nginx service.'))
+    parser.add_argument('--worker_name',
+                        default=getenv('LOKOLE_WORKER_NAME', 'lokole_celery_worker'),
+                        help=('Name of the Lokole webapp worker.'))
+    parser.add_argument('--cron_name',
+                        default=getenv('LOKOLE_CRON_NAME', 'lokole_celery_beat'),
+                        help=('Name of the Lokole cron worker.'))
+    parser.add_argument('--restarter_name',
+                        default=getenv('LOKOLE_RESTARTER_NAME', 'lokole_restarter'),
+                        help=('Name of the Lokole restarter.'))
+    parser.add_argument('--log_level',
+                        default=getenv('LOKOLE_LOG_LEVEL', 'error'),
+                        help=('The log level for the Lokole email app.'))
+    parser.add_argument('--timeout', type=int, default=300, help=('Timeout for the Lokole email app. In seconds.'))
+    parser.add_argument('--max_upload_size',
+                        type=int,
+                        default=10,
+                        help=('Maximum allowed size of uploads to the Lokole email app. In MB.'))
+    parser.add_argument('--num_celery_workers',
+                        type=int,
+                        default=2,
+                        help=('Number of celery workers for the Lokole email app.'))
+    parser.add_argument('--num_gunicorn_workers',
+                        type=int,
+                        default=max(2,
+                                    cpu_count() - 1),
+                        help=('Number of gunicorn workers for the Lokole email app.'))
+    parser.add_argument('--locale',
+                        default=getenv('LOKOLE_LOCALE', 'en_GB.UTF-8'),
+                        help=('Locale to set up on the system.'))
+    parser.add_argument('--timezone',
+                        default=getenv('LOKOLE_TIMEZONE', 'Etc/UTC'),
+                        help=('Timezone to set up on the system.'))
 
     main(parser.parse_args(), parser.error)
 
