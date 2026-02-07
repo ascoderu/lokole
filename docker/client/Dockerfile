@@ -1,5 +1,5 @@
 ARG NODE_VERSION=12
-ARG PYTHON_VERSION=3.9
+ARG PYTHON_VERSION=3.12
 FROM node:${NODE_VERSION} AS yarn
 
 WORKDIR /app
@@ -19,11 +19,11 @@ WORKDIR /app
 COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
-COPY requirements-webapp.txt ./
-RUN pip install --no-cache-dir -r requirements-webapp.txt
-
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY requirements-webapp.txt ./
+RUN pip install --no-cache-dir -r requirements-webapp.txt
 
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
@@ -44,6 +44,12 @@ RUN sed -i "s|^__version__ = '[^']*'|__version__ = '${VERSION}'|g" opwen_email_c
  && cp "dist/opwen_email_client-${VERSION}.tar.gz" dist/pkg.tar.gz
 
 FROM python:${PYTHON_VERSION}-slim AS runtime
+
+# Install git for mkwvconf dependency installation
+# hadolint ignore=DL3008
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git \
+ && rm -rf /var/lib/apt/lists/*
 
 # hadolint ignore=DL3010
 COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz

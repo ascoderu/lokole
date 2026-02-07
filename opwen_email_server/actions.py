@@ -4,6 +4,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Iterable
+from typing import Optional
 from typing import Tuple
 from typing import Union
 
@@ -78,13 +79,13 @@ class StoreInboundEmails(_Action):
                  email_storage: AzureObjectStorage,
                  pending_storage: AzureTextStorage,
                  next_task: Callable[[str], None],
-                 email_parser: Callable[[str], dict] = None):
+                 email_parser: Optional[Callable[[str], dict]] = None):
 
         self._raw_email_storage = raw_email_storage
         self._email_storage = email_storage
         self._pending_storage = pending_storage
         self._next_task = next_task
-        self._email_parser = email_parser or MimeEmailParser()
+        self._email_parser = email_parser if email_parser else MimeEmailParser()
 
     def _action(self, resource_id):  # type: ignore
         try:
@@ -256,13 +257,13 @@ class ProcessServiceEmail(_Action):
                  email_storage: AzureObjectStorage,
                  next_task: Callable[[str], None],
                  registry: Dict[str, Any],
-                 email_parser: Callable[[dict], dict] = None):
+                 email_parser: Optional[Callable[[dict], dict]] = None):
 
         self._raw_email_storage = raw_email_storage
         self._email_storage = email_storage
         self._next_task = next_task
         self._registry = registry
-        self._email_parser = email_parser or MimeEmailParser()
+        self._email_parser = email_parser if email_parser else MimeEmailParser()
 
     def _action(self, resource_id):  # type: ignore
         try:

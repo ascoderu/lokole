@@ -3,9 +3,10 @@ flex==6.14.1
 isort==5.10.1
 PyAMQP==0.1.0.7
 lockfile==0.12.2
-mypy==0.971
+mypy==1.5.0
 nose2[coverage_plugin]==0.12.0
 responses==0.21.0
 bandit==1.7.4
+pbr==5.11.1  # Explicit dependency for bandit
 yapf==0.32.0
 watchdog[watchmedo]==2.1.9

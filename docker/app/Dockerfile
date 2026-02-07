@@ -1,8 +1,9 @@
 ARG PYTHON_VERSION=3.9
 FROM python:${PYTHON_VERSION} AS builder
 
+# hadolint ignore=DL3008
 RUN apt-get update \
- && apt-get install -y --no-install-recommends mobile-broadband-provider-info=20201225-1 \
+ && apt-get install -y --no-install-recommends mobile-broadband-provider-info \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

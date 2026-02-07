@@ -140,7 +140,7 @@ def get_domain(address: str) -> str:
 
 def ensure_has_sent_at(email: dict):
     if not email.get('sent_at'):
-        email['sent_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+        email['sent_at'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')
 
 
 def _get_image_type(response: Response, url: str) -> Optional[str]:
@@ -164,7 +164,7 @@ def _change_image_size(image_content_bytes: bytes) -> bytes:
         return image_content_bytes
 
     new_size = (MAX_WIDTH_IMAGES, MAX_HEIGHT_IMAGES)
-    image.thumbnail(new_size, Image.ANTIALIAS)
+    image.thumbnail(new_size, Image.Resampling.LANCZOS)
     new_image = BytesIO()
     image.save(new_image, image.format)
     new_image.seek(0)

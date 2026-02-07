@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 from io import BytesIO
 from itertools import chain
 from mimetypes import guess_type
@@ -73,7 +74,7 @@ class NewEmailForm(FlaskForm):
 
         sent_at = None
         if all(_is_local_message(address) for address in chain(to, cc, bcc)):
-            sent_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+            sent_at = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')
 
         form['sent_at'] = sent_at
         form['read'] = True
