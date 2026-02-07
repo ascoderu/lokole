@@ -16,7 +16,7 @@ jobs:
   trigger-on-label:
     if: github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'test-iiab-integration')
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Trigger integration tests
         uses: peter-evans/repository-dispatch@v2
@@ -31,11 +31,11 @@ jobs:
               "sha": "${{ github.event.pull_request.head.sha }}",
               "repo": "${{ github.repository }}"
             }
-  
+
   trigger-on-merge:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Trigger post-merge tests
         uses: peter-evans/repository-dispatch@v2
