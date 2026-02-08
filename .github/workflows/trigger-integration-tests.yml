@@ -1,0 +1,51 @@
+name: Trigger Integration Tests
+
+on:
+  # Use pull_request_target for fork PRs to access secrets when labeled by maintainers
+  # This is safe because:
+  # 1. We don't checkout or execute any code from the PR
+  # 2. We only read PR metadata and dispatch to another repo
+  # 3. The label must be manually added by someone with write access
+  pull_request_target:
+    types: [labeled]
+  push:
+    branches:
+      - master
+
+jobs:
+  trigger-on-label:
+    if: github.event_name == 'pull_request_target' && contains(github.event.pull_request.labels.*.name, 'test-iiab-integration')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger integration tests
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.INTEGRATION_TEST_PAT }}
+          repository: ascoderu/iiab-lokole-tests
+          event-type: test-integration-lokole
+          client-payload: |
+            {
+              "pr_number": ${{ github.event.pull_request.number }},
+              "ref": "${{ github.event.pull_request.head.ref }}",
+              "sha": "${{ github.event.pull_request.head.sha }}",
+              "repo": "${{ github.repository }}"
+            }
+
+  trigger-on-merge:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger post-merge tests
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.INTEGRATION_TEST_PAT }}
+          repository: ascoderu/iiab-lokole-tests
+          event-type: lokole-merged
+          client-payload: |
+            {
+              "branch": "${{ github.ref_name }}",
+              "sha": "${{ github.sha }}",
+              "repo": "${{ github.repository }}"
+            }
