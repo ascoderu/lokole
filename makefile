@@ -136,7 +136,7 @@ deploy-pypi:
   docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml run --rm \
     -v "$(PWD)/dist:/dist" \
     setup \
-    twine upload --skip-existing -u "$(PYPI_USERNAME)" -p "$(PYPI_PASSWORD)" /dist/*
+    twine upload --skip-existing --username __token__ --password "$(PYPI_TOKEN)" /dist/*
 
 deploy-docker:
 	@echo "$(DOCKER_PASSWORD)" | docker login --username "$(DOCKER_USERNAME)" --password-stdin && \
