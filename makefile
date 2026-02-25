@@ -77,7 +77,7 @@ release-docker:
     export BUILD_TARGET="runtime"; \
     export BUILD_TAG="$$tag"; \
     export DOCKER_REPO="$(DOCKER_USERNAME)"; \
-    docker compose build; \
+    docker compose build $(DOCKER_BUILD_ARGS); \
   ) done
 
 gh-pages-remote:

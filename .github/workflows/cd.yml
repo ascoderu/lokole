@@ -18,4 +18,5 @@ jobs:
           make \
             -e BUILD_TARGET=runtime \
             -e DOCKER_TAG="${GITHUB_REF##*/}" \
+            -e DOCKER_BUILD_ARGS="--no-cache" \
             release-docker deploy-docker release-pypi deploy-pypi
