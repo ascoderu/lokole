@@ -6,7 +6,7 @@ default: build
 	@gpg --decrypt --batch --passphrase "$(GPG_PASSPHRASE)" .github.env.gpg >.github.env
 
 github-env: .github.env
-	@docker run --rm python:3.7 python -c 'import uuid; print("SUFFIX=%s" % uuid.uuid4())' >>"$(GITHUB_ENV)"
+	@docker run --rm python:3.12 python -c 'import uuid; print("SUFFIX=%s" % uuid.uuid4())' >>"$(GITHUB_ENV)"
 	@sed 's/^export //' <.github.env >>"$(GITHUB_ENV)"
 
 integration-tests:
