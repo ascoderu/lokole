@@ -16,6 +16,8 @@ FROM python:${PYTHON_VERSION} AS builder
 
 WORKDIR /app
 
+RUN pip install --upgrade pip
+
 COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt
 

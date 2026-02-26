@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.9
+ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION} AS builder
 
 # hadolint ignore=DL3008
@@ -7,6 +7,8 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+RUN pip install --upgrade pip
 
 COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt \
