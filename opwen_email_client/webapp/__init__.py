@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from flask import Flask
-from flask_babelex import Babel
+from flask_babel import Babel
 
 from opwen_email_client.webapp.cache import cache
 from opwen_email_client.webapp.commands import managesbp
@@ -14,7 +14,18 @@ from opwen_email_client.webapp.security import security
 app = Flask(__name__, static_url_path=AppConfig.APP_ROOT + '/static')
 app.config.from_object(AppConfig)
 
-app.babel = Babel(app)
+def get_locale():
+    """Locale selector for Flask-Babel 4.0+"""
+    from opwen_email_client.webapp.session import Session
+    from flask_login import current_user
+    current_language = Session.get_current_language()
+    if not current_language and current_user.is_authenticated:
+        current_language = current_user.language
+    if not current_language:
+        current_language = AppConfig.DEFAULT_LOCALE.language
+    return current_language
+
+app.babel = Babel(app, locale_selector=get_locale)
 
 app.ioc = _new_ioc(AppConfig.IOC)
 

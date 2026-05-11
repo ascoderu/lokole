@@ -430,25 +430,16 @@ def _on_500(status_code: int) -> Response:
 
 @app.context_processor
 def _inject_config() -> dict:
+    from flask import get_locale
     return {
         'locales': AppConfig.LOCALES,
-        'current_locale': Locale.parse(_localeselector()),
+        'current_locale': Locale.parse(get_locale()),
         'local_only': AppConfig.SIM_TYPE == 'LocalOnly',
         'app_root': AppConfig.APP_ROOT,
         'can_change_password': AppConfig.SECURITY_CHANGEABLE,
         'can_register_user': AppConfig.SECURITY_REGISTERABLE,
         'can_search_email': AppConfig.EMAIL_SEARCHABLE,
     }
-
-
-@app.babel.localeselector
-def _localeselector() -> str:
-    current_language = Session.get_current_language()
-    if not current_language and current_user.is_authenticated:
-        current_language = current_user.language
-    if not current_language:
-        current_language = AppConfig.DEFAULT_LOCALE.language
-    return current_language
 
 
 def _emails_view(emails: Iterable[dict], page: int, template: str = 'email.html', **kwargs) -> Response:
