@@ -293,7 +293,7 @@ class ClientRegister(object):
                 self._log.exception('Unable to fetch client {client_name}: [{status_code}] {message}'.format(
                     client_name=self._client_name,
                     status_code=get_response.status_code,
-                    message=ex.read().decode('utf-8').strip()))
+                    message=ex.response.text.strip()))
             else:
                 client_info = loads(get_response.text)
                 break

@@ -286,6 +286,7 @@ def settings() -> Response:
 
 
 @app.route(AppConfig.APP_ROOT + '/admin/register', methods=['GET', 'POST'])
+@login_required
 @track_history
 def register() -> Response:
     if not current_user.is_admin:
