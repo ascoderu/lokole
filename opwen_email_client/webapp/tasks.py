@@ -31,26 +31,27 @@ def setup_periodic_tasks(sender, **kwargs):
 def sync(*args, **kwargs):
     from opwen_email_client.webapp import app as webapp
 
-    sync_emails = SyncEmails(
-        log=log,
-        email_sync=webapp.ioc.email_sync,
-        email_store=webapp.ioc.email_store,
-        user_store=webapp.ioc.user_store,
-    )
-
-    if check_connection(AppConfig.EMAIL_SERVER_HOSTNAME, 80):
-        sync_emails()
-    else:
-        start_internet_connection = StartInternetConnection(
-            state_dir=AppConfig.STATE_BASEDIR,
-            modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
-            sim_config_dir=AppConfig.SIM_CONFIG_DIR,
-            sim_type=AppConfig.SIM_TYPE,
+    with webapp.app_context():
+        sync_emails = SyncEmails(
+            log=log,
+            email_sync=webapp.ioc.email_sync,
+            email_store=webapp.ioc.email_store,
+            user_store=webapp.ioc.user_store,
         )
 
-        if AppConfig.SIM_TYPE != 'LocalOnly':
-            with start_internet_connection():
-                sync_emails()
+        if check_connection(AppConfig.EMAIL_SERVER_HOSTNAME, 80):
+            sync_emails()
+        else:
+            start_internet_connection = StartInternetConnection(
+                state_dir=AppConfig.STATE_BASEDIR,
+                modem_config_dir=AppConfig.MODEM_CONFIG_DIR,
+                sim_config_dir=AppConfig.SIM_CONFIG_DIR,
+                sim_type=AppConfig.SIM_TYPE,
+            )
+
+            if AppConfig.SIM_TYPE != 'LocalOnly':
+                with start_internet_connection():
+                    sync_emails()
 
 
 # noinspection PyUnusedLocal
