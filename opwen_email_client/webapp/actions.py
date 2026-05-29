@@ -123,10 +123,15 @@ class RestartAppComponent(object):
         component_name = path.name
         signal = path.read_text(encoding='ascii').strip()
 
-        if signal:
-            check_call(['supervisorctl', 'signal', signal, component_name])
+        # Convert component name from supervisor format (lokole_gunicorn) to systemd format (lokole-gunicorn)
+        service_name = component_name.replace('_', '-')
+
+        # Map signals to systemctl commands:
+        # HUP = graceful reload, empty = restart
+        if signal == 'HUP':
+            check_call(['systemctl', 'reload', service_name])
         else:
-            check_call(['supervisorctl', 'restart', component_name])
+            check_call(['systemctl', 'restart', service_name])
 
         path.unlink()
 
