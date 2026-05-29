@@ -146,7 +146,10 @@ def ensure_has_sent_at(email: dict):
 def _get_image_type(response: Response, url: str) -> Optional[str]:
     content_type = response.headers.get('Content-Type')
     if not content_type:
-        content_type = guess_type(url.split('?')[0])[0]
+        # Extract the filename from the URL by removing query string and domain
+        # e.g., 'http://example.com/path/image.png?size=large' -> 'image.png'
+        filename = url.split('?')[0].split('/')[-1]
+        content_type = guess_type(filename)[0]
     return content_type
 
 

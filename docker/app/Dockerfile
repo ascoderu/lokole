@@ -8,6 +8,7 @@ RUN apt-get update \
 
 WORKDIR /app
 
+# hadolint ignore=DL3013
 RUN pip install --upgrade pip
 
 COPY requirements-dev.txt ./
