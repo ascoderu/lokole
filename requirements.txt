@@ -2,7 +2,7 @@ Flask==2.2.1
 Flask-Cors==3.0.10
 Pillow==10.4.0  # 10.1.0+ required for Python 3.13 support
 setuptools>=65.5.0,<73.0.0  # Required for pkg_resources (gunicorn dependency). setuptools 73+ removed pkg_resources
-apache-libcloud==3.6.0
+apache-libcloud==3.2.0
 applicationinsights==0.11.10
 beautifulsoup4==4.11.1
 cached-property==1.5.2
