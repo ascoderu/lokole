@@ -25,7 +25,7 @@ class TransportTests(TestCase):
 
     @cached_property
     def queue(self) -> Queue:
-        return Queue(self.queue_name, exchange=self.exchange, routing_key=self.routing_key, durable=True)
+        return Queue(self.queue_name, exchange=self.exchange, routing_key=self.routing_key)
 
     @skipUnless(QUEUE_BROKER, 'no celery broker configured')
     def test_send_message(self):
