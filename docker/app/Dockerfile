@@ -15,10 +15,6 @@ COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
-COPY requirements-webapp.txt ./
-RUN pip install --no-cache-dir -r requirements-webapp.txt \
- && rm -rf /tmp/pip-ephem-wheel-cache*
-
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
  && pip wheel --no-cache-dir -r requirements.txt -w /deps \
