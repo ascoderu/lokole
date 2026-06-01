@@ -55,9 +55,9 @@ def delete_queues(suffix):
         return
 
     # https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/servicebus/azure-servicebus/migration_guide.md#working-with-administration-client
-    connection_string = f"Endpoint=sb://{config.QUEUE_BROKER_HOST}.servicebus.windows.net/;" \
-                        f"SharedAccessKeyName={config.QUEUE_BROKER_USERNAME};" \
-                        f"SharedAccessKey={config.QUEUE_BROKER_PASSWORD}"
+    connection_string = (f"Endpoint=sb://{config.QUEUE_BROKER_HOST}.servicebus.windows.net/;"
+                         f"SharedAccessKeyName={config.QUEUE_BROKER_USERNAME};"
+                         f"SharedAccessKey={config.QUEUE_BROKER_PASSWORD}")
 
     with ServiceBusAdministrationClient.from_connection_string(connection_string) as servicebus_mgmt_client:
         for queue in servicebus_mgmt_client.list_queues():
