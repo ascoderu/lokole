@@ -16,7 +16,7 @@ WTForms==3.0.1
 email-validator==1.2.1
 Werkzeug==2.2.1
 fasteners==0.17.3
-apache-libcloud==3.6.0
+apache-libcloud==3.2.0
 bcrypt==4.0.1
 beautifulsoup4==4.11.1
 cached-property==1.5.2
