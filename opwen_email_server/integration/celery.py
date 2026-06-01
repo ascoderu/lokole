@@ -1,4 +1,6 @@
 from celery import Celery
+from kombu import Exchange
+from kombu import Queue
 
 from opwen_email_server import config
 from opwen_email_server.actions import IndexReceivedEmailForMailbox
@@ -121,6 +123,29 @@ def _fqn(task):
     return f'{__name__}.{task.__name__}'
 
 
+# RabbitMQ 4.0+ deprecated transient non-exclusive queues
+# Explicitly define all queues as durable
+default_exchange = Exchange('celery', type='direct', durable=True)
+
+task_queues = (
+    Queue(config.REGISTER_CLIENT_QUEUE,
+          exchange=default_exchange,
+          routing_key=config.REGISTER_CLIENT_QUEUE,
+          durable=True),
+    Queue(config.MAILBOX_RECEIVED_QUEUE,
+          exchange=default_exchange,
+          routing_key=config.MAILBOX_RECEIVED_QUEUE,
+          durable=True),
+    Queue(config.MAILBOX_SENT_QUEUE, exchange=default_exchange, routing_key=config.MAILBOX_SENT_QUEUE, durable=True),
+    Queue(config.PROCESS_SERVICE_QUEUE,
+          exchange=default_exchange,
+          routing_key=config.PROCESS_SERVICE_QUEUE,
+          durable=True),
+    Queue(config.INBOUND_STORE_QUEUE, exchange=default_exchange, routing_key=config.INBOUND_STORE_QUEUE, durable=True),
+    Queue(config.WRITTEN_STORE_QUEUE, exchange=default_exchange, routing_key=config.WRITTEN_STORE_QUEUE, durable=True),
+    Queue(config.SEND_QUEUE, exchange=default_exchange, routing_key=config.SEND_QUEUE, durable=True),
+)
+
 task_routes = {
     _fqn(register_client): {'queue': config.REGISTER_CLIENT_QUEUE},
     _fqn(index_received_email_for_mailbox): {'queue': config.MAILBOX_RECEIVED_QUEUE},
@@ -131,7 +156,16 @@ task_routes = {
     _fqn(send): {'queue': config.SEND_QUEUE}
 }
 
-celery.conf.update(task_routes=task_routes)
+celery.conf.update(
+    task_queues=task_queues,
+    task_routes=task_routes,
+    # RabbitMQ 4.0+ deprecated transient non-exclusive queues
+    # Disable remote control to avoid creating non-durable pidbox queues
+    worker_enable_remote_control=False,
+    # RabbitMQ 4.0+ deprecated global_qos feature
+    # Use per-consumer prefetch instead of global QoS
+    worker_prefetch_multiplier=1,
+)
 
 if __name__ == '__main__':
     celery.start()

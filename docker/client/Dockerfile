@@ -28,6 +28,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-webapp.txt ./
 RUN pip install --no-cache-dir -r requirements-webapp.txt
 
+# Integration test dependencies (only needed when using AzureIoc)
+COPY requirements-integration.txt ./
+RUN pip install --no-cache-dir -r requirements-integration.txt
+
 ENV OPWEN_SESSION_KEY=changeme
 ENV OPWEN_SETTINGS=/app/docker/client/webapp.env
 
@@ -56,9 +60,13 @@ RUN apt-get update \
 
 # hadolint ignore=DL3010
 COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz
+COPY --from=compiler /app/requirements-integration.txt /app/requirements-integration.txt
 
+# Install without [opwen_email_server] extra to avoid server dependencies (libcloud 3.2.0)
+# Client only needs base package with requirements-webapp.txt (libcloud 3.8.0)
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
+RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz" \
+ && pip install --no-cache-dir -r /app/requirements-integration.txt \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
 COPY --from=compiler /app/docker/client/run-*.sh /app/docker/client/

@@ -1,4 +1,4 @@
-setuptools>=65.5.0,<73.0.0  # Required for pkg_resources in Python 3.12+ (no longer included by default). Upper bound because setuptools 73+ removed pkg_resources
+setuptools>=65.5.0,<73.0.0  # Required for pkg_resources in Python 3.12+ (setuptools 73+ removed it)
 Babel==2.14.0  # 2.14.0+ required for Python 3.13 (removed cgi module dependency)
 Flask-BabelEx==0.9.4
 pytz  # Required by Flask-BabelEx (no longer a transitive dep of Babel 2.14+)
@@ -16,7 +16,7 @@ WTForms==3.0.1
 email-validator==1.2.1
 Werkzeug==2.2.1
 fasteners==0.17.3
-apache-libcloud==3.8.0
+apache-libcloud==3.8.0  # Client: Python 3.12 support. Overrides base 3.2.0. Azure Storage only.
 bcrypt==4.0.1
 beautifulsoup4==4.11.1
 cached-property==1.5.2

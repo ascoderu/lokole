@@ -1,0 +1,15 @@
+# Additional dependencies required for integration testing with AzureIoc
+# These are server-side dependencies imported by opwen_email_server.integration.webapp.AzureIoc
+# Only needed when LOKOLE_IOC=opwen_email_server.integration.webapp.AzureIoc (integration tests)
+# Production client uses opwen_email_client.webapp.ioc.Ioc which doesn't need these
+
+applicationinsights==0.11.10  # Required by opwen_email_server.utils.log
+msgpack==1.0.4  # Required by opwen_email_server.utils.serialization
+python-http-client==3.3.7  # Required by sendgrid
+sendgrid==6.9.7  # Required by opwen_email_server.integration.celery.send_and_index_email
+pyzmail36==1.0.5  # Required by opwen_email_server email parsing
+azure-servicebus==7.8.0  # Required by opwen_email_server.services.queue
+connexion[swagger-ui]==2.14.0  # Required by opwen_email_server API
+jsonschema==4.23.0  # Required by connexion
+referencing==0.35.1  # Required by jsonschema
+wikipedia==1.4.0  # Required by opwen_email_server.services.index
