@@ -162,6 +162,9 @@ celery.conf.update(
     # RabbitMQ 4.0+ deprecated transient non-exclusive queues
     # Disable remote control to avoid creating non-durable pidbox queues
     worker_enable_remote_control=False,
+    # RabbitMQ 4.0+ deprecated global_qos feature
+    # Use per-consumer prefetch instead of global QoS
+    worker_prefetch_multiplier=1,
 )
 
 if __name__ == '__main__':
