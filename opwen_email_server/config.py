@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from environs import Env
 
 env = Env()
@@ -65,6 +67,9 @@ QUEUE_BROKER_USERNAME = env('LOKOLE_EMAIL_SERVER_QUEUES_SAS_NAME')
 QUEUE_BROKER_PASSWORD = env('LOKOLE_EMAIL_SERVER_QUEUES_SAS_KEY')
 QUEUE_BROKER_HOST = env('LOKOLE_EMAIL_SERVER_QUEUES_NAMESPACE')
 if env('LOKOLE_QUEUE_BROKER_SCHEME', ''):
-    QUEUE_BROKER = f"{QUEUE_BROKER_SCHEME}://{QUEUE_BROKER_USERNAME}:{QUEUE_BROKER_PASSWORD}@{QUEUE_BROKER_HOST}"
+    # URL-encode credentials to handle special characters
+    username = quote(QUEUE_BROKER_USERNAME, safe='')
+    password = quote(QUEUE_BROKER_PASSWORD, safe='')
+    QUEUE_BROKER = f"{QUEUE_BROKER_SCHEME}://{username}:{password}@{QUEUE_BROKER_HOST}"
 else:
     QUEUE_BROKER = env('LOKOLE_QUEUE_BROKER_URL', '')
