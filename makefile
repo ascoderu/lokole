@@ -73,12 +73,14 @@ release-pypi:
   docker container rm webapp
 
 release-docker:
-	for tag in "latest" "$(DOCKER_TAG)"; do ( \
-    export BUILD_TARGET="runtime"; \
-    export BUILD_TAG="$$tag"; \
-    export DOCKER_REPO="$(DOCKER_USERNAME)"; \
-    docker compose build $(DOCKER_BUILD_ARGS); \
-  ) done
+	export BUILD_TARGET="runtime"; \
+	export BUILD_TAG="$(DOCKER_TAG)"; \
+	export VERSION="$(DOCKER_TAG)"; \
+	export DOCKER_REPO="$(DOCKER_USERNAME)"; \
+	docker compose build $(DOCKER_BUILD_ARGS) && \
+	docker compose config --images | grep -v "^$$" | while read image; do \
+		docker tag "$$image" "$${image%:*}:latest"; \
+	done
 
 gh-pages-remote:
 	@git remote add ghp "https://$(GITHUB_AUTH_TOKEN)@github.com/ascoderu/lokole.git" && \
@@ -140,11 +142,11 @@ deploy-pypi:
 
 deploy-docker:
 	@echo "$(DOCKER_PASSWORD)" | docker login --username "$(DOCKER_USERNAME)" --password-stdin && \
-  for tag in "latest" "$(DOCKER_TAG)"; do ( \
-    export BUILD_TAG="$$tag"; \
-    export DOCKER_REPO="$(DOCKER_USERNAME)"; \
-    docker compose push; \
-  ) done
+	export BUILD_TAG="$(DOCKER_TAG)"; \
+	export DOCKER_REPO="$(DOCKER_USERNAME)"; \
+	docker compose push && \
+	export BUILD_TAG="latest"; \
+	docker compose push
 
 deploy: deploy-pypi deploy-gh-pages deploy-docker
 	@docker compose -f docker-compose.yml -f docker/docker-compose.setup.yml build setup && \
