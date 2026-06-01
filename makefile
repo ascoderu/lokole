@@ -78,7 +78,7 @@ release-docker:
 	export VERSION="$(DOCKER_TAG)"; \
 	export DOCKER_REPO="$(DOCKER_USERNAME)"; \
 	docker compose build $(DOCKER_BUILD_ARGS) && \
-	docker compose config --images | grep -v "^$$" | while read image; do \
+	docker compose config --images | grep "$(DOCKER_USERNAME)" | while read image; do \
 		docker tag "$$image" "$${image%:*}:latest"; \
 	done
 
