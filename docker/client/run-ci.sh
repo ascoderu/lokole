@@ -12,10 +12,10 @@ yapf --recursive --parallel --diff opwen_email_client tests/opwen_email_client
 bandit --recursive opwen_email_client
 mypy opwen_email_client
 
-# Run only client tests
-coverage run -m nose2 -v tests.opwen_email_client
+# Run only client tests with client-only coverage
+coverage run --source=opwen_email_client -m nose2 -v tests.opwen_email_client
 coverage xml
-coverage report
+coverage report --fail-under=50
 
 if [[ -n "$1" ]]; then
   echo "$1"
