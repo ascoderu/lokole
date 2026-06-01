@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.9
 FROM python:${PYTHON_VERSION} AS builder
 
 # hadolint ignore=DL3008
@@ -13,10 +13,6 @@ RUN pip install --upgrade pip
 
 COPY requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt \
- && rm -rf /tmp/pip-ephem-wheel-cache*
-
-COPY requirements-webapp.txt ./
-RUN pip install --no-cache-dir -r requirements-webapp.txt \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
 COPY requirements.txt ./
