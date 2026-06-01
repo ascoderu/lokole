@@ -58,7 +58,9 @@ RUN apt-get update \
 COPY --from=compiler /app/dist/pkg.tar.gz /app/dist/pkg.tar.gz
 
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz[opwen_email_server]" \
+# Install without [opwen_email_server] extra to avoid server dependencies (libcloud 3.2.0)
+# Client only needs base package with requirements-webapp.txt (libcloud 3.8.0)
+RUN pip install --no-cache-dir "/app/dist/pkg.tar.gz" \
  && rm -rf /tmp/pip-ephem-wheel-cache*
 
 COPY --from=compiler /app/docker/client/run-*.sh /app/docker/client/
