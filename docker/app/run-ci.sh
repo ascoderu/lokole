@@ -15,7 +15,7 @@ mypy opwen_email_server
 # Run only server tests with server-only coverage
 coverage run --source=opwen_email_server -m nose2 -v tests.opwen_email_server
 coverage xml
-coverage report --fail-under=35
+# Note: No coverage threshold check - test-local job enforces 75% combined coverage
 
 if [[ -n "$1" ]]; then
   echo "$1"
