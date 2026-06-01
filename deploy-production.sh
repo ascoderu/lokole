@@ -37,6 +37,12 @@ echo "✓ Code updated"
 echo ""
 
 echo "🐳 Pulling latest Docker images..."
+set -a  # automatically export all variables
+source secrets/azure.env
+source secrets/cloudflare.env 2>/dev/null || true
+source secrets/users.env 2>/dev/null || true
+source secrets/sendgrid.env 2>/dev/null || true
+set +a  # stop auto-export
 docker-compose -f docker/docker-compose.prod.yml pull
 echo "✓ Images pulled"
 echo ""
