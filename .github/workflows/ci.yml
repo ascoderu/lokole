@@ -24,16 +24,27 @@ jobs:
       - run: make stop
         if: ${{ always() }}
 
-  test-unit:
+  test-server:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
       - run: |
           make \
-            -e BUILD_TARGET=runtime \
+            -e BUILD_TARGET=builder \
             -e LOKOLE_SENDGRID_KEY= \
             -e LOKOLE_QUEUE_BROKER_SCHEME= \
-            ci build verify-build
+            ci
+      - run: bash <(curl -s https://codecov.io/bash)
+        if: ${{ success() }}
+
+  test-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          BUILD_TARGET=builder docker compose build webapp && \
+          docker compose run --rm --no-deps webapp ./docker/client/run-ci.sh
       - run: bash <(curl -s https://codecov.io/bash)
         if: ${{ success() }}

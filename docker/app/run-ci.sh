@@ -5,13 +5,15 @@ set -e
 scriptdir="$(dirname "$0")"
 cd "${scriptdir}/../.."
 
-flake8 opwen_email_server opwen_email_client
-isort --check-only opwen_email_server opwen_email_client
-yapf --recursive --parallel --diff opwen_email_server opwen_email_client tests
-bandit --recursive opwen_email_server opwen_email_client
-mypy opwen_email_server opwen_email_client
+# Server CI only tests server code (Python 3.9)
+flake8 opwen_email_server
+isort --check-only opwen_email_server
+yapf --recursive --parallel --diff opwen_email_server tests/opwen_email_server
+bandit --recursive opwen_email_server
+mypy opwen_email_server
 
-coverage run -m nose2 -v
+# Run only server tests
+coverage run -m nose2 -v tests.opwen_email_server
 coverage xml
 coverage report
 
