@@ -7,6 +7,7 @@ from cached_property import cached_property
 from python_http_client import BadRequestsError
 from requests import delete as http_delete
 from requests import get as http_get
+from requests import patch as http_patch
 from requests import post as http_post
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Attachment
@@ -191,7 +192,29 @@ class SetupSendgridMailbox(_SendgridManagement):
             )
 
             if get_response.ok:
-                self.log_debug('Mailbox %s already exists', domain)
+                existing_config = get_response.json()
+                expected_url = INBOX_URL.format(client_id)
+                current_url = existing_config.get('url', '')
+
+                if current_url != expected_url:
+                    self.log_info('Updating stale webhook for %s: %s -> %s', domain, current_url, expected_url)
+                    patch_response = http_patch(
+                        url=MAILBOX_DETAIL_URL.format(domain),
+                        json={
+                            'hostname': domain,
+                            'url': expected_url,
+                            'spam_check': existing_config.get('spam_check', True),
+                            'send_raw': existing_config.get('send_raw', True),
+                        },
+                        headers={
+                            'Authorization': f'Bearer {self._key}',
+                        },
+                    )
+                    if not patch_response.ok:
+                        patch_response.raise_for_status()
+                    self.log_info('Updated mailbox for %s', domain)
+                else:
+                    self.log_debug('Mailbox %s already exists with correct URL', domain)
                 break
 
             create_response = http_post(

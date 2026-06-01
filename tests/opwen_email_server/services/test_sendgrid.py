@@ -181,6 +181,10 @@ class SetupSendgridMailboxTests(TestCase):
     def test_skips_request_when_domain_already_exists(self):
         mock_responses.add(mock_responses.GET,
                            'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           json={
+                               'url': 'https://mailserver.lokole.ca/api/email/sendgrid/my-client-id', 'spam_check':
+                               True, 'send_raw': True
+                           },
                            status=200)
 
         action = SetupSendgridMailbox('my-key', max_retries=1, retry_interval_seconds=1)
@@ -188,6 +192,29 @@ class SetupSendgridMailboxTests(TestCase):
         action('my-client-id', 'my-domain')
 
         self.assertEqual(len(mock_responses.calls), 1)
+
+    @mock_responses.activate
+    def test_updates_webhook_when_url_mismatches(self):
+        mock_responses.add(mock_responses.GET,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           json={
+                               'url': 'https://mailserver.lokole.ca/api/email/sendgrid/old-client-id', 'spam_check':
+                               True, 'send_raw': True
+                           },
+                           status=200)
+        mock_responses.add(mock_responses.PATCH,
+                           'https://api.sendgrid.com/v3/user/webhooks/parse/settings/my-domain',
+                           status=200)
+
+        action = SetupSendgridMailbox('my-key', max_retries=1, retry_interval_seconds=1)
+
+        action('new-client-id', 'my-domain')
+
+        self.assertEqual(len(mock_responses.calls), 2)
+        self.assertEqual(mock_responses.calls[0].request.method, 'GET')
+        self.assertEqual(mock_responses.calls[1].request.method, 'PATCH')
+        self.assertIn(b'"url": "https://mailserver.lokole.ca/api/email/sendgrid/new-client-id"',
+                      mock_responses.calls[1].request.body)
 
     @mock_responses.activate
     def test_retries_request_when_creation_failed(self):
