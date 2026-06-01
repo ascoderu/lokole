@@ -16,7 +16,7 @@ WTForms==3.0.1
 email-validator==1.2.1
 Werkzeug==2.2.1
 fasteners==0.17.3
-apache-libcloud==3.8.0
+apache-libcloud==3.8.0  # Client overrides base requirements.txt (3.2.0) for Python 3.12 support. Only uses Azure Storage driver, not Cloudflare DNS.
 bcrypt==4.0.1
 beautifulsoup4==4.11.1
 cached-property==1.5.2
