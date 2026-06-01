@@ -101,11 +101,14 @@ class SetupMxRecordsTests(TestCase):
                 Zone(id='1', domain='foo.com', type='master', ttl=1, driver=mock_driver),
                 zone,
             ]
-            
-            existing_record = Record(
-                id='1', name='my-domain', type=RecordType.MX, 
-                data='mx.sendgrid.net', zone=zone, ttl=1, driver=mock_driver
-            )
+
+            existing_record = Record(id='1',
+                                     name='my-domain',
+                                     type=RecordType.MX,
+                                     data='mx.sendgrid.net',
+                                     zone=zone,
+                                     ttl=1,
+                                     driver=mock_driver)
             mock_driver.iterate_records.return_value = [existing_record]
             mock_driver.create_record.side_effect = throw(
                 RecordAlreadyExistsError('record already exists', mock_driver, 'record_id'))
@@ -126,11 +129,14 @@ class SetupMxRecordsTests(TestCase):
                 Zone(id='1', domain='foo.com', type='master', ttl=1, driver=mock_driver),
                 zone,
             ]
-            
-            existing_record = Record(
-                id='1', name='my-domain', type=RecordType.MX, 
-                data='wrong-server.com', zone=zone, ttl=1, driver=mock_driver
-            )
+
+            existing_record = Record(id='1',
+                                     name='my-domain',
+                                     type=RecordType.MX,
+                                     data='wrong-server.com',
+                                     zone=zone,
+                                     ttl=1,
+                                     driver=mock_driver)
             mock_driver.iterate_records.return_value = [existing_record]
             mock_driver.create_record.side_effect = throw(
                 RecordAlreadyExistsError('record already exists', mock_driver, 'record_id'))

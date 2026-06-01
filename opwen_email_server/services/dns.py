@@ -1,5 +1,4 @@
 from cached_property import cached_property
-from libcloud.common.types import LibcloudError
 from libcloud.dns.base import DNSDriver
 from libcloud.dns.base import Zone
 from libcloud.dns.providers import get_driver
@@ -66,10 +65,8 @@ class SetupMxRecords(_MxRecords):
         except RecordAlreadyExistsError:
             # Record exists - verify it points to the correct mail server
             try:
-                existing_record = next(
-                    record for record in self._driver.iterate_records(zone)
-                    if record.name == client_name and record.type == RecordType.MX
-                )
+                existing_record = next(record for record in self._driver.iterate_records(zone)
+                                       if record.name == client_name and record.type == RecordType.MX)
             except StopIteration:
                 # Shouldn't happen, but handle gracefully
                 self.log_warning('MX record exists but could not be found for %s.%s', client_name, zone.domain)
@@ -84,8 +81,8 @@ class SetupMxRecords(_MxRecords):
                     data=MX_RECORD,
                     extra={'priority': 0},
                 )
-                self.log_info('Updated MX records for client %s.%s from %s to %s',
-                             client_name, zone.domain, existing_record.data, MX_RECORD)
+                self.log_info('Updated MX records for client %s.%s from %s to %s', client_name, zone.domain,
+                              existing_record.data, MX_RECORD)
             else:
                 self.log_info('MX records for client %s.%s already exist with correct value', client_name, zone.domain)
         else:
