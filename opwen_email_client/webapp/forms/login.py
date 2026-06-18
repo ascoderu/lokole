@@ -1,7 +1,7 @@
 from flask_security import LoginForm as _LoginForm
 from flask_security import RegisterForm as _RegisterForm
 from flask_security.forms import email_required
-from flask_security.forms import email_validator
+from flask_security.forms import valid_user_email
 from flask_security.forms import unique_user_email
 from wtforms import IntegerField
 from wtforms.validators import NoneOf
@@ -29,7 +29,7 @@ class RegisterForm(_RegisterForm):
                                     email_character_validator,
                                     forbidden_account_validator,
                                     email_required,
-                                    email_validator,
+                                    valid_user_email,
                                     unique_user_email,
                                 ])
 

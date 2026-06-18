@@ -71,6 +71,10 @@ class AzureUser(User):
         return True
 
     @property
+    def fs_uniquifier(self) -> str:
+        return self.email
+
+    @property
     def is_admin(self) -> bool:
         return False
 

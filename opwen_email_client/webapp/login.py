@@ -30,6 +30,7 @@ class _User(_db.Model, User):
     email = _db.Column(_db.String(255), unique=True, index=True)
     password = _db.Column(_db.String(255), nullable=False)
     active = _db.Column(_db.Boolean(), default=True)
+    fs_uniquifier = _db.Column(_db.String(255), unique=True, nullable=False)
     last_login_at = _db.Column(_db.DateTime())
     current_login_at = _db.Column(_db.DateTime())
     last_login_ip = _db.Column(_db.String(128))

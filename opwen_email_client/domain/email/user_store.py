@@ -36,6 +36,11 @@ class User(UserMixin):
     def active(self) -> bool:
         raise NotImplementedError  # pragma: no cover
 
+    @property
+    @abstractmethod
+    def fs_uniquifier(self) -> str:
+        raise NotImplementedError  # pragma: no cover
+
 
 class UserStore(metaclass=ABCMeta):
 
